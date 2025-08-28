@@ -1,0 +1,33 @@
+/* Import Inter from Google Fonts — must be first */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Your styles */
+html, body {
+  font-family: 'Inter', sans-serif;
+  background-color: #0b0f1a;
+  color: #e6f1ff;
+  min-height: 100%;
+}
+
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Optional CRT overlay */
+.crt::after {
+  content:'';
+  position:fixed; inset:0; pointer-events:none;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(255,255,255,0.03),
+    rgba(255,255,255,0.03) 1px,
+    transparent 2px,
+    transparent 3px
+  );
+  mix-blend-mode: soft-light;
+}
