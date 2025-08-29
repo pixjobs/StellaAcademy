@@ -1,0 +1,169 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Root / Monorepo
+# ─────────────────────────────────────────────────────────────────────────────
+# Environment files: keep ONLY examples/schemas in Git
+.env*
+!.env.example
+!.env.schema
+
+# Local secrets / creds / temp
+.secrets/
+secrets/
+*.secret
+*.key
+*.pem
+*.p12
+*.crt
+*.csr
+
+# If you mount ADC or similar into the repo during dev, ignore it
+gcloud/
+.gcloud/
+.gsa/
+*.service-account.json
+**/service-account*.json
+**/*-sa.json
+
+# Node package managers cache
+.npm/
+.pnpm-store/
+.yarn/cache/
+.yarn/unplugged/
+.yarn/build-state.yml
+.pnp.*
+.pnp.js
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.swp
+*.swo
+*~
+
+# IDEs / Editors
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/launch.json
+!.vscode/tasks.json
+*.code-workspace
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Frontend (Next.js / TypeScript / Vite tooling)
+# ─────────────────────────────────────────────────────────────────────────────
+node_modules/
+.next/
+.next-static/
+.next-turbo/
+.turbo/
+.turbopack/        # Next.js 15 (Turbopack)
+out/               # next export
+dist/
+build/
+*.tsbuildinfo
+.vercel/
+.vercel_build_output/
+coverage/
+playwright-report/
+test-results/
+cypress/videos/
+cypress/screenshots/
+cypress/downloads/
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Backend (Python / Flask)
+# ─────────────────────────────────────────────────────────────────────────────
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyc
+*.pyd
+
+# Virtual envs
+.venv/
+venv/
+env/
+ENV/
+.python-version    # pyenv local version file (usually safe to ignore)
+
+# Tooling caches
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.tox/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+.pyre/
+.hypothesis/
+
+# Flask specifics
+instance/          # Flask's instance folder (runtime config/DB)
+*.pid
+
+# Requirements lock tools (keep lock files committed; just ignoring build artifacts)
+pip-wheel-metadata/
+pip-log.txt
+
+# Local databases
+*.db
+*.sqlite
+*.sqlite3
+*.sqlite-shm
+*.sqlite-wal
+
+# ML / model artifacts (keep large weights out of Git)
+*.pt
+*.bin
+*.safetensors
+*.onnx
+*.h5
+*.ckpt
+*.tflite
+*.pb
+models/
+checkpoints/
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Docker / Compose
+# ─────────────────────────────────────────────────────────────────────────────
+# Keep Dockerfiles in Git; ignore local-only compose overrides & envs
+docker-compose.override.yml
+docker-data/
+.docker/
+*.tar
+*.img
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Images/Artifacts generated at build time
+# ─────────────────────────────────────────────────────────────────────────────
+*.map
+*.tmp
+tmp/
+temp/
+.cache/
+.cache-loader/
+.parcel-cache/
+.eslintcache
+stylelintcache
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Misc project-specific
+# ─────────────────────────────────────────────────────────────────────────────
+# If you export assets for the app at runtime
+exports/
+generated/
