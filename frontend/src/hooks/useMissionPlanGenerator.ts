@@ -4,7 +4,8 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import type { EnrichedMissionPlan } from '@/types/mission';
 import { useGame } from '@/lib/store';
 
-// Keep all related types and type guards with the hook that uses them
+export type MissionType = 'rocket-lab' | 'rover-cam' | 'space-poster';
+
 type LlmJobState = 'waiting' | 'active' | 'completed' | 'failed' | 'delayed' | 'paused';
 type PollCompleted = {
   state: 'completed';
@@ -18,8 +19,7 @@ function isRecord(x: unknown): x is Record<string, unknown> {
   return typeof x === 'object' && x !== null;
 }
 function isMissionPlan(x: unknown): x is EnrichedMissionPlan {
-  if (!isRecord(x)) return false;
-  return typeof x.missionTitle === 'string' && Array.isArray(x.topics);
+  return isRecord(x) && typeof x.missionTitle === 'string' && Array.isArray(x.topics);
 }
 function extractPlan(result: PollCompleted['result']): EnrichedMissionPlan | null {
   if (isMissionPlan(result)) return result;
@@ -30,11 +30,12 @@ function extractPlan(result: PollCompleted['result']): EnrichedMissionPlan | nul
 }
 
 /**
- * A custom hook to manage the lifecycle of generating a mission plan.
- * It handles enqueueing a job, polling for its status, and returning the final plan.
+ * Generate a mission plan via the worker/queue.
+ * Pass one of: 'rocket-lab' | 'rover-cam' | 'space-poster'
  */
-export function useMissionPlanGenerator() {
+export function useMissionPlanGenerator(missionType: MissionType = 'rocket-lab') {
   const role = useGame((s) => s.role);
+
   const [jobId, setJobId] = useState<string | null>(null);
   const [missionPlan, setMissionPlan] = useState<EnrichedMissionPlan | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -51,28 +52,30 @@ export function useMissionPlanGenerator() {
     setGenerationCount((c) => c + 1);
   }, []);
 
-  // Effect for enqueueing the job
+  // Enqueue a new mission job whenever role/missionType changes or user triggers regenerate
   useEffect(() => {
     let cancelled = false;
-    
+
     const enqueue = async () => {
       try {
         const res = await fetch('/api/generate-mission', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ missionType: 'rocket-lab', role }),
+          body: JSON.stringify({ missionType, role }),
         });
 
         if (res.status === 202) {
-          const data = await res.json() as { jobId?: string };
+          const data = (await res.json()) as { jobId?: string };
           if (!data.jobId) throw new Error('No jobId returned from enqueue');
           if (!cancelled) setJobId(data.jobId);
         } else if (res.ok) {
-           const data = await res.json() as unknown;
-           if (isMissionPlan(data) && !cancelled) {
-             setMissionPlan(data);
-             setIsLoading(false);
-           }
+          const data = (await res.json()) as unknown;
+          if (isMissionPlan(data) && !cancelled) {
+            setMissionPlan(data);
+            setIsLoading(false);
+          } else {
+            throw new Error('Unexpected response format from enqueue endpoint.');
+          }
         } else {
           const txt = await res.text();
           throw new Error(`Enqueue failed (${res.status}): ${txt}`);
@@ -85,14 +88,14 @@ export function useMissionPlanGenerator() {
       }
     };
 
-    void enqueue();
+    enqueue();
     return () => {
       cancelled = true;
       abortRef.current?.abort();
     };
-  }, [role, generationCount]);
+  }, [role, missionType, generationCount]);
 
-  // Effect for polling the job status
+  // Poll for job completion if we got a jobId
   useEffect(() => {
     if (!jobId || missionPlan) return;
 
@@ -102,22 +105,24 @@ export function useMissionPlanGenerator() {
       abortRef.current = new AbortController();
 
       try {
-        const res = await fetch(`/api/llm/enqueue?id=${jobId}`, { signal: abortRef.current.signal });
+        const res = await fetch(`/api/llm/enqueue?id=${jobId}`, {
+          signal: abortRef.current.signal,
+          cache: 'no-store',
+        });
         if (!res.ok) throw new Error(`Polling error (${res.status})`);
 
-        const json = await res.json() as PollResponse;
+        const json = (await res.json()) as PollResponse;
 
         if (json.state === 'completed') {
           const plan = extractPlan(json.result);
           if (!plan) throw new Error('Mission plan format is invalid.');
           setMissionPlan(plan);
           setIsLoading(false);
-          setJobId(null); // Stop polling
+          setJobId(null);
         } else if (json.state === 'failed') {
           throw new Error(json.error || 'Mission generation failed.');
         } else {
-          // If still ongoing, poll again after a delay
-          setTimeout(() => void poll(), 2000);
+          setTimeout(poll, 1500);
         }
       } catch (e) {
         if (!stopped) {
@@ -127,8 +132,11 @@ export function useMissionPlanGenerator() {
       }
     };
 
-    void poll();
-    return () => { stopped = true; abortRef.current?.abort(); };
+    poll();
+    return () => {
+      stopped = true;
+      abortRef.current?.abort();
+    };
   }, [jobId, missionPlan]);
 
   return { missionPlan, isLoading, error, generateNewPlan };

@@ -2,15 +2,14 @@
 
 import { useState } from 'react';
 import { useMissionPlanGenerator } from '@/hooks/useMissionPlanGenerator';
-import type { EnrichedMissionPlan } from '@/types/mission';
+import type { EnrichedMissionPlan, Img } from '@/types/mission';
 
 import MissionControl from '@/components/MissionControl';
 import MissionStandby from '@/components/MissionStandby';
 import TopicSelector from '@/components/TopicSelector';
-import { Button } from '@/components/ui/button'; // Assuming you have a button component
+import { Button } from '@/components/ui/button';
 
 type Topic = EnrichedMissionPlan['topics'][number];
-type Img = { title?: string; href?: string };
 
 // This mission briefing text replaces the old static sidebar
 const MISSION_BRIEFING = `Mission briefing received. Your objectives are as follows:
@@ -73,12 +72,12 @@ export default function RocketLabPage() {
         <div>
           <h1 className="font-pixel text-xl text-gold mb-1">🚀 Rocket Lab</h1>
           {selectedTopic && (
-            <h2 className="text-lg text-sky">Objective: {selectedTopic.title}</h2>
+            <h2 className="text-lg text-sky-400">Objective: {selectedTopic.title}</h2>
           )}
         </div>
         <div className="flex gap-2">
           {selectedTopic && (
-             <Button onClick={handleReturnToTopics} variant="outline">Change Topic</Button>
+            <Button onClick={handleReturnToTopics} variant="outline">Change Topic</Button>
           )}
           <Button onClick={generateNewPlan}>Generate New Mission</Button>
         </div>
@@ -88,9 +87,9 @@ export default function RocketLabPage() {
       {selectedTopic && missionPlan ? (
         // STATE: Topic has been selected -> Show Mission Control
         <MissionControl
-          key={`${selectedTopic.title}-${selectedImageIdx}`} // Force re-mount on selection change
+          key={`${selectedTopic.title}-${selectedImageIdx}`}
           mission={selectedTopic.title}
-          images={reorderImages(selectedTopic.images, selectedImageIdx)}
+          images={reorderImages(selectedTopic.images as Img[] | undefined, selectedImageIdx)}
           context={buildContext(selectedTopic, selectedImageIdx)}
           initialMessage={{
             id: 'stella-briefing',

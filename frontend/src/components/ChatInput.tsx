@@ -1,12 +1,17 @@
-// src/components/ChatInput.tsx
 'use client';
 
-import { useState } from 'react';
+import { type Dispatch, type SetStateAction } from 'react';
+import TextareaAutosize from 'react-textarea-autosize';
+import { Send, Square } from 'lucide-react';
 
+// The props are now updated to accept `value` and `setValue` from the parent component.
+// This makes it a "controlled component" and fixes the TypeScript error.
 type ChatInputProps = {
   onSend: (prompt: string) => void;
   onStop: () => void;
   isLoading: boolean;
+  value: string;
+  setValue: Dispatch<SetStateAction<string>>;
   placeholder?: string;
 };
 
@@ -14,54 +19,66 @@ export default function ChatInput({
   onSend,
   onStop,
   isLoading,
+  value,
+  setValue,
   placeholder = 'Ask a follow-up question…',
 }: ChatInputProps) {
-  const [q, setQ] = useState('');
+  // The internal state `useState` has been removed. The component is now controlled by its parent.
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    const msg = q.trim();
-    if (!msg || isLoading) return;
-    onSend(msg);
-    setQ('');
-  }
+  const handleSend = () => {
+    const trimmed = value.trim();
+    if (!trimmed || isLoading) return;
+    onSend(trimmed);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
 
   return (
-    <form onSubmit={handleSubmit} className="flex gap-1.5 mt-2">
-      <input
-        className="flex-1 rounded-md bg-slate-800/70 border border-slate-700
-                   px-2.5 py-1.5 text-[13px] font-pixel tracking-wide
-                   outline-none focus:border-mint placeholder:text-slate-500
-                   disabled:opacity-50"
+    <div className="relative flex items-center">
+      <TextareaAutosize
+        id="chat-input" // Important for focus logic in the parent component
+        className="flex-1 resize-none rounded-lg bg-background border border-input
+                   px-3 py-2 text-sm font-sans
+                   ring-offset-background placeholder:text-muted-foreground
+                   focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2
+                   disabled:opacity-60 pr-12" // Added padding-right to make space for the button
         placeholder={placeholder}
-        value={q}
-        onChange={(e) => setQ(e.target.value)}
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        onKeyDown={handleKeyDown}
         disabled={isLoading}
         aria-label="Type your message"
+        maxRows={5}
+        rows={1}
       />
 
-      <button
-        type="submit"
-        disabled={isLoading || !q.trim()}
-        className="px-2.5 py-1.5 rounded-md font-pixel text-[11px]
-                   bg-sky-900/70 border border-sky-400/35 text-cyan-100
-                   hover:bg-sky-800/70 disabled:opacity-50 disabled:cursor-not-allowed"
-        aria-label="Send message"
-      >
-        {isLoading ? 'Wait…' : 'Send'}
-      </button>
-
-      {isLoading && (
-        <button
-          type="button"
-          onClick={onStop}
-          className="px-2.5 py-1.5 rounded-md font-pixel text-[11px]
-                     bg-red-700/70 border border-red-400/60 text-red-100"
-          aria-label="Stop generation"
-        >
-          Stop
-        </button>
-      )}
-    </form>
+      <div className="absolute right-2 flex items-center">
+        {isLoading ? (
+          <button
+            type="button"
+            onClick={onStop}
+            className="p-2 rounded-md text-slate-300 hover:bg-red-900/50 hover:text-red-300 transition-colors"
+            aria-label="Stop generation"
+          >
+            <Square className="w-4 h-4" />
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={handleSend}
+            disabled={!value.trim()}
+            className="p-2 rounded-md text-gold hover:bg-gold/20 disabled:text-slate-600 disabled:bg-transparent transition-colors"
+            aria-label="Send message"
+          >
+            <Send className="w-4 h-4" />
+          </button>
+        )}
+      </div>
+    </div>
   );
 }

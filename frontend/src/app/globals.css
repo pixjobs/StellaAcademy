@@ -1,105 +1,142 @@
-/* 1. FONT IMPORTS — Must be at the very top */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+/* 1) FONT IMPORTS — Must be at the very top */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..7वीन&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
-/* 2. TAILWIND DIRECTIVES */
+/* 2) TAILWIND DIRECTIVES */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* 3. BASE STYLES & THEME TWEAKS using @layer */
+/* 3) UNIFIED BASE STYLES & THEME */
 @layer base {
-  /* Define CSS variables for your color palette for easy reuse */
+  /* --- CUSTOM & SHADCN THEME VARIABLES --- */
   :root {
-    --color-bg: #0b0f1a;
-    --color-text: #e6f1ff;
-    --color-mint: #5eead4;
-    --color-sky: #38bdf8;
-    --color-gold: #fde047;
+    --radius: 0.5rem;
+
+    /* --- THIS IS THE FIX --- */
+    /* Your custom colors, defined as CSS variables */
+    --custom-mint: 168 76% 66%;
+    --custom-sky: 207 90% 60%;
+    --custom-gold: 54 98% 63%;
+    /* --- END OF FIX --- */
+  }
+ 
+  /* Default light mode theme variables */
+  :root {
+    --background: 224 40% 95%;
+    --foreground: 224 40% 8%;
+    --card: 224 40% 95%;
+    --card-foreground: 224 40% 8%;
+    --popover: 224 40% 95%;
+    --popover-foreground: 224 40% 8%;
+    --primary: 216 98% 52%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 224 20% 90%;
+    --secondary-foreground: 224 20% 10%;
+    --muted: 224 20% 90%;
+    --muted-foreground: 224 20% 40%;
+    --accent: 224 20% 90%;
+    --accent-foreground: 224 20% 10%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 224 20% 85%;
+    --input: 224 20% 85%;
+    --ring: 216 98% 52%;
   }
 
-  html, body {
-    font-family: 'Inter', sans-serif;
-    background-color: var(--color-bg);
-    color: var(--color-text);
-    min-height: 100%;
+  /* Active dark mode theme */
+  .dark {
+    --background: 224 40% 8%;
+    --foreground: 216 67% 95%;
+    --card: 225 33% 11%;
+    --card-foreground: 216 67% 95%;
+    --popover: 224 40% 8%;
+    --popover-foreground: 216 67% 95%;
+    --primary: 216 67% 95%;
+    --primary-foreground: 224 40% 8%;
+    --secondary: 222 47% 11%;
+    --secondary-foreground: 216 67% 95%;
+    --muted: 222 47% 11%;
+    --muted-foreground: 224 15% 55%;
+    --accent: 222 47% 11%;
+    --accent-foreground: 216 67% 95%;
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 216 67% 95%;
+    --border: 222 47% 11%;
+    --input: 222 47% 11%;
+    --ring: 207 90% 54%; /* Mapped to --custom-sky */
   }
 
+  /* --- CONSOLIDATED BODY & BASE STYLES --- */
   * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground min-h-screen;
+    font-family: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
-    -moz-osx-smoothing: grayscale;
+    -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Custom themed text selection color */
+  h1, h2, h3 {
+    @apply text-foreground tracking-tight font-semibold;
+  }
+
   ::selection {
-    background-color: var(--color-sky);
-    color: var(--color-bg);
-  }
-
-  /* Custom themed scrollbars for WebKit browsers (Chrome, Safari) */
-  ::-webkit-scrollbar {
-    width: 8px;
-  }
-  ::-webkit-scrollbar-track {
-    background: #1e293b; /* slate-800 */
-  }
-  ::-webkit-scrollbar-thumb {
-    background: #475569; /* slate-600 */
-    border-radius: 4px;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background: #64748b; /* slate-500 */
+    @apply bg-sky text-background;
   }
 }
 
-/* 4. CUSTOM COMPONENTS using @layer */
+
+/* 4) COMPONENT STYLES */
 @layer components {
-  /* A reusable, styled pixel button component */
+  /* Custom button with a pixelated feel */
   .btn-pixel {
     @apply rounded-md border-2 border-slate-600 bg-slate-700/50 px-4 py-1.5
            text-slate-200 transition-all duration-200
            hover:border-mint hover:bg-mint hover:text-slate-900
-           focus:outline-none focus:ring-2 focus:ring-mint focus:ring-offset-2 focus:ring-offset-slate-900
-           disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-slate-700/50 disabled:hover:border-slate-600 disabled:hover:text-slate-200;
+           focus:outline-none focus:ring-2 focus:ring-mint focus:ring-offset-2 focus:ring-offset-background
+           disabled:cursor-not-allowed disabled:opacity-50;
   }
 
-  /* Blinking cursor animation for Stella's loading state */
+  /* Blinking cursor for typing animations */
   .blinking-cursor {
-    font-weight: 500;
-    color: var(--color-mint);
+    @apply font-semibold text-mint;
     animation: 1.2s blink step-end infinite;
   }
-
   @keyframes blink {
-    from, to { color: transparent }
-    50% { color: var(--color-mint); }
+    from, to { color: transparent; }
+    50% { @apply text-mint; }
   }
 }
 
-/* 5. CUSTOM UTILITIES using @layer */
+
+/* 5) UTILITY STYLES */
 @layer utilities {
-  .smooth-scroll {
-    scroll-behavior: smooth;
-  }
   .font-pixel {
     font-family: 'Press Start 2P', cursive;
   }
+
+  .crt::after {
+    content: '';
+    @apply fixed inset-0 pointer-events-none z-[100];
+    background: repeating-linear-gradient(0deg, #fff0 0, #fff0 2px, #fff3 0, #fff3 3px);
+    mix-blend-mode: soft-light;
+  }
 }
 
-/* 6. FULL-SCREEN EFFECTS */
-/* Optional CRT overlay */
-.crt::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  background: repeating-linear-gradient(
-    0deg,
-    rgba(255,255,255,0.03),
-    rgba(255,255,255,0.03) 1px,
-    transparent 2px,
-    transparent 3px
-  );
-  mix-blend-mode: soft-light;
-  z-index: 100; /* Ensure it's on top */
+
+/* 6) MATHJAX STYLES */
+.prose mjx-container {
+  color: inherit !important;
+  text-align: left !important;
+  margin-top: 1em !important;
+  margin-bottom: 1em !important;
+}
+.prose p mjx-container[display="false"] {
+  display: inline-block !important;
+  margin: 0 !important;
+  font-size: 0.95em;
+  vertical-align: -1px;
 }

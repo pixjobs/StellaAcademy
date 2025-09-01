@@ -1,10 +1,10 @@
+
 import './globals.css';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import AppBackground from '@/components/AppBackground';
 import { getApod } from '@/lib/apod';
-import GSAPProvider from '@/components/GSAPProvider'; // <-- 1. Import the new provider
-
+import GSAPProvider from '@/components/GSAPProvider'; 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const useApod = process.env.USE_APOD_BG === 'true';
   const apod = useApod ? await getApod() : null;
