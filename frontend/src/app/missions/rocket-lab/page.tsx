@@ -1,179 +1,107 @@
-// /app/missions/rocket-lab/page.tsx
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import { useGame } from '@/lib/store';
+import { useState } from 'react';
+import { useMissionPlanGenerator } from '@/hooks/useMissionPlanGenerator';
 import type { EnrichedMissionPlan } from '@/types/mission';
 
 import MissionControl from '@/components/MissionControl';
 import MissionStandby from '@/components/MissionStandby';
 import TopicSelector from '@/components/TopicSelector';
+import { Button } from '@/components/ui/button'; // Assuming you have a button component
 
 type Topic = EnrichedMissionPlan['topics'][number];
+type Img = { title?: string; href?: string };
 
+// This mission briefing text replaces the old static sidebar
+const MISSION_BRIEFING = `Mission briefing received. Your objectives are as follows:
+1.  Provide a simple summary of the chosen image.
+2.  Identify its key concept (e.g., thrust, staging, aerodynamics).
+3.  Ask a "what if" question to test understanding.
+4.  Connect it to a real-world mission.
+Remember to use the 'Quiz Me' command for self-assessment. Good luck, Commander.`;
+
+/* ---------- helpers ---------- */
+function reorderImages(images: Img[] = [], focusIndex: number): Img[] {
+  if (images.length === 0) return [];
+  const i = Math.max(0, Math.min(focusIndex, images.length - 1));
+  return [images[i], ...images.slice(0, i), ...images.slice(i + 1)];
+}
+function buildContext(topic: Topic, pickedIndex = 0): string {
+  const chosen = topic.images?.[pickedIndex];
+  const chosenLine = chosen ? `Selected image for analysis: #${pickedIndex + 1} ${chosen.title ?? 'Untitled'}` : '';
+  return `Objective: ${topic.title}. ${topic.summary}\n${chosenLine}`;
+}
+
+/* ---------- component ---------- */
 export default function RocketLabPage() {
-  const role = useGame((s) => s.role);
-
-  const [jobId, setJobId] = useState<string | null>(null);
-  const [missionPlan, setMissionPlan] = useState<EnrichedMissionPlan | null>(null);
+  const { missionPlan, isLoading, error, generateNewPlan } = useMissionPlanGenerator();
   const [selectedTopic, setSelectedTopic] = useState<Topic | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [selectedImageIdx, setSelectedImageIdx] = useState<number>(0);
 
-  const abortRef = useRef<AbortController | null>(null);
+  const handleSelectTopic = (topic: Topic, imageIndex: number): void => {
+    setSelectedTopic(topic);
+    setSelectedImageIdx(imageIndex);
+  };
 
-  // Enqueue on role change
-  useEffect(() => {
-    let cancelled = false;
-    setMissionPlan(null);
+  const handleReturnToTopics = (): void => {
     setSelectedTopic(null);
-    setError(null);
-    setJobId(null);
+  };
 
-    async function enqueue() {
-      try {
-        const res = await fetch('/api/generate-mission', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ missionType: 'rocket-lab', role }),
-        });
-
-        // If your API ever serves a cached mission directly (200),
-        // handle that too (not strictly needed if it always returns 202).
-        if (res.status === 200) {
-          const data = await res.json();
-          setMissionPlan(data as EnrichedMissionPlan);
-          return;
-        }
-
-        if (res.status !== 202) {
-          const txt = await res.text();
-          throw new Error(`Enqueue failed (${res.status}): ${txt}`);
-        }
-
-        const data = (await res.json()) as { jobId: string };
-        if (!data?.jobId) throw new Error('No jobId returned from enqueue');
-        if (!cancelled) setJobId(data.jobId);
-      } catch (e) {
-        if (!cancelled) setError((e as Error).message);
-      }
-    }
-
-    enqueue();
-    return () => {
-      cancelled = true;
-      // cancel any pending poll
-      abortRef.current?.abort();
-    };
-  }, [role]);
-
-  // Poll for result when jobId is set
-  useEffect(() => {
-    if (!jobId || missionPlan) return;
-
-    let stopped = false;
-    let attempt = 0;
-
-    const poll = async () => {
-      if (stopped) return;
-      attempt += 1;
-
-      // New controller per poll to allow cancel on unmount
-      abortRef.current?.abort();
-      const ac = new AbortController();
-      abortRef.current = ac;
-
-      try {
-        const res = await fetch(`/api/llm/enqueue?id=${encodeURIComponent(jobId)}`, {
-          signal: ac.signal,
-          headers: { 'Accept': 'application/json' },
-        });
-
-        if (!res.ok) {
-          // If 404 (job not found) or 500 (failed), surface it
-          const payload = await res.json().catch(() => ({}));
-          throw new Error(payload?.error || `Polling error (${res.status})`);
-        }
-
-        const json: {
-          state: 'waiting' | 'active' | 'completed' | 'failed' | 'delayed' | 'paused';
-          progress?: number;
-          result?: { type?: string; result?: EnrichedMissionPlan } | EnrichedMissionPlan;
-        } = await res.json();
-
-        if (json.state === 'completed') {
-          // The unified endpoint returns { result: { type, result } }.
-          // Our mission-specific GET unwraps to { result: EnrichedMissionPlan }.
-          const maybePlan =
-            (json.result && 'topics' in (json.result as any))
-              ? (json.result as EnrichedMissionPlan)
-              : (json.result && typeof json.result === 'object' && 'result' in json.result
-                  ? (json.result as any).result as EnrichedMissionPlan
-                  : null);
-
-          if (!maybePlan) throw new Error('Completed without mission result');
-          setMissionPlan(maybePlan);
-          return;
-        }
-
-        // Backoff between polls: 500ms → 1s → 2s (cap at 2s)
-        const delay = Math.min(2000, 500 * Math.pow(2, Math.max(0, attempt - 1)));
-        setTimeout(poll, delay);
-      } catch (e) {
-        if (stopped) return;
-        setError((e as Error).message);
-        // retry after a short pause unless aborted
-        setTimeout(() => {
-          if (!stopped) poll();
-        }, 1500);
-      }
-    };
-
-    poll();
-
-    return () => {
-      stopped = true;
-      abortRef.current?.abort();
-    };
-  }, [jobId, missionPlan]);
-
-  const handleSelectTopic = (topic: Topic) => setSelectedTopic(topic);
-
-  // Loading / error UI
-  if (!missionPlan) {
+  // RENDER: Loading or Error State
+  if (isLoading || error) {
     return (
-      <section className="container mx-auto px-4 py-8 max-w-5xl">
+      <section className="container mx-auto flex flex-col items-center justify-center p-4 text-center min-h-[60vh]">
         <h1 className="font-pixel text-xl text-gold mb-4">🚀 Rocket Lab</h1>
         {error ? (
-          <div className="rounded-xl border border-red-600/50 bg-red-900/30 p-4 text-red-200">
-            <p className="font-semibold mb-1">Mission queue error</p>
-            <p className="text-sm opacity-90">{error}</p>
+          <div className="rounded-xl border border-red-600/50 bg-red-900/30 p-4 text-red-200 max-w-md">
+            <p className="font-semibold mb-1">Mission Generation Failed</p>
+            <p className="text-sm opacity-90 mb-4">{error}</p>
+            <Button onClick={generateNewPlan} variant="destructive">Try Again</Button>
           </div>
         ) : (
-          <MissionStandby missionName="Generating Mission" />
+          <MissionStandby missionName="Generating Mission Plan..." />
         )}
       </section>
     );
   }
 
-  if (selectedTopic) {
-    return (
-      <section className="container mx-auto px-4 py-8 max-w-5xl">
-        <h1 className="font-pixel text-xl text-gold mb-1">🚀 Rocket Lab</h1>
-        <h2 className="text-lg text-sky mb-4">Objective: {selectedTopic.title}</h2>
-        <MissionControl
-          key={selectedTopic.title}
-          mission={selectedTopic.title}
-          images={selectedTopic.images}
-          context={`Student is learning about: ${selectedTopic.title}. ${selectedTopic.summary}`}
-        />
-      </section>
-    );
-  }
-
+  // RENDER: Main Content after loading
   return (
-    <section className="container mx-auto px-4 py-8 max-w-5xl">
-      <h1 className="font-pixel text-xl text-gold mb-4">🚀 Rocket Lab</h1>
-      <TopicSelector plan={missionPlan} onSelectTopic={handleSelectTopic} />
+    <section className="container mx-auto px-4 py-8 max-w-6xl">
+      {/* --- Header Area with Actions --- */}
+      <div className="flex justify-between items-start mb-6">
+        <div>
+          <h1 className="font-pixel text-xl text-gold mb-1">🚀 Rocket Lab</h1>
+          {selectedTopic && (
+            <h2 className="text-lg text-sky">Objective: {selectedTopic.title}</h2>
+          )}
+        </div>
+        <div className="flex gap-2">
+          {selectedTopic && (
+             <Button onClick={handleReturnToTopics} variant="outline">Change Topic</Button>
+          )}
+          <Button onClick={generateNewPlan}>Generate New Mission</Button>
+        </div>
+      </div>
+
+      {/* --- Conditional Content Area --- */}
+      {selectedTopic && missionPlan ? (
+        // STATE: Topic has been selected -> Show Mission Control
+        <MissionControl
+          key={`${selectedTopic.title}-${selectedImageIdx}`} // Force re-mount on selection change
+          mission={selectedTopic.title}
+          images={reorderImages(selectedTopic.images, selectedImageIdx)}
+          context={buildContext(selectedTopic, selectedImageIdx)}
+          initialMessage={{
+            id: 'stella-briefing',
+            role: 'stella',
+            text: MISSION_BRIEFING,
+          }}
+        />
+      ) : (
+        // STATE: No topic selected yet -> Show Topic Selector
+        missionPlan && <TopicSelector plan={missionPlan} onSelect={handleSelectTopic} />
+      )}
     </section>
   );
 }

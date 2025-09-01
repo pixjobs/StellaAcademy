@@ -1,5 +1,5 @@
 export type EnrichedTopic = {
-  title: string;
+  title?: string;
   summary: string;
   images: { title: string; href: string }[];
   keywords?: string[];
