@@ -1,5 +1,8 @@
 // src/lib/nasa.ts
 import { getNasaApiKey } from '@/lib/secrets';
+// --- THIS IS THE FIX (PART 1) ---
+// 1. Import the canonical, detailed MarsPhoto type.
+import type { MarsPhoto } from '@/types/llm';
 
 /* ─────────────────────────────────────────────────────────
    Types
@@ -24,13 +27,7 @@ export type NivlItem = {
   href: string | null; // image URL (thumb/medium/orig)
 };
 
-export type MarsPhoto = {
-  id: number;
-  imgSrc: string;
-  earthDate: string;
-  camera: string;
-  rover: string;
-};
+// 2. The local, incorrect MarsPhoto type has been removed.
 
 /* ─────────────────────────────────────────────────────────
    Config
@@ -266,6 +263,8 @@ async function pickBestNivlAsset(nasaId: string, prefer: 'orig' | 'large' | 'any
 /* ─────────────────────────────────────────────────────────
    Mars Rover Photos with camera fallback
 ────────────────────────────────────────────────────────── */
+// --- THIS IS THE FIX (PART 2) ---
+// 3. The function signature now promises to return the canonical MarsPhoto[] type.
 export async function fetchMarsPhotos(opts?: {
   rover?: 'curiosity' | 'perseverance' | 'opportunity' | 'spirit';
   sol?: number;
@@ -300,12 +299,14 @@ export async function fetchMarsPhotos(opts?: {
     const j = await r.json();
     const photos = (j.photos || []) as any[];
     if (photos.length) {
+      // 4. The returned object now perfectly matches the imported MarsPhoto type.
       return photos.map((p) => ({
         id: p.id,
-        imgSrc: upgradeHttps(p.img_src) || p.img_src,
-        earthDate: p.earth_date,
-        camera: p.camera?.full_name || p.camera?.name,
-        rover: p.rover?.name,
+        sol: p.sol,
+        camera: p.camera, // Pass the whole camera object
+        img_src: upgradeHttps(p.img_src) || p.img_src,
+        earth_date: p.earth_date,
+        rover: p.rover, // Pass the whole rover object
       }));
     }
   }
@@ -324,10 +325,12 @@ export function buildContextFromNIVL(items: NivlItem[], limit = 8): string {
     .join('\n');
 }
 
+// --- THIS IS THE FIX (PART 3) ---
+// 5. This function is updated to work with the nested structure of the correct MarsPhoto type.
 export function buildContextFromMars(items: MarsPhoto[], limit = 8): string {
   return items
     .slice(0, limit)
-    .map((p, i) => `#${i + 1} ${p.rover} • ${p.camera} (${p.earthDate}) – ${p.imgSrc}`)
+    .map((p, i) => `#${i + 1} ${p.rover.name} • ${p.camera.name} (${p.earth_date}) – ${p.img_src}`)
     .join('\n');
 }
 

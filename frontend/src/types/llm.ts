@@ -1,6 +1,37 @@
 // src/types/llm.ts
+
 export type Role = 'explorer' | 'cadet' | 'scholar';
 
+// ---------- Mars Rover Photo API Types ----------
+
+export type MarsCamera = {
+  id: number;
+  name: string;
+  rover_id: number;
+  full_name: string;
+};
+
+export type MarsRover = {
+  id: number;
+  name: string;
+  landing_date: string;
+  launch_date: string;
+  status: string;
+};
+
+export type MarsPhoto = {
+  id: number;
+  sol: number;
+  camera: MarsCamera;
+  img_src: string;
+  earth_date: string;
+  rover: MarsRover;
+};
+
+
+// ---------- Mission & Topic Data Structures ----------
+// Note: These are simplified versions. The canonical, richer types
+// should live in `types/mission.ts`.
 export type EnrichedTopic = {
   title: string;
   summary: string;
@@ -14,10 +45,13 @@ export type EnrichedMissionPlan = {
   topics: EnrichedTopic[];
 };
 
+
+// ---------- BullMQ Job & Result Types ----------
+
 export type MissionJobData = {
   type: 'mission';
   payload: {
-    missionType: 'rocket-lab' | 'rover-cam';
+    missionType: 'rocket-lab' | 'rover-cam' | 'space-poster'; // Added 'space-poster'
     role: Role;
   };
   cacheKey?: string;

@@ -5,13 +5,29 @@ export type Difficulty = 'starter' | 'core' | 'challenge';
 
 export type Img = {
   href: string;            // required so <img src> is always valid
-  title?: string;          // optional caption/title
+  // --- THIS IS THE FIX ---
+  // The `title` is now a required string. This enforces data integrity
+  // and prevents runtime errors like `[object Object]` when a title is missing.
+  // The data normalization we did in the page component now correctly satisfies this type.
+  title: string;
   alt?: string;            // accessibility text
   credit?: string;         // photographer/source
   license?: string;        // e.g., "CC-BY-4.0", "All Rights Reserved"
   width?: number;
   height?: number;
   dominantColor?: `#${string}`; // hex (optional)
+};
+
+export type NoteType = 'concept' | 'formula' | 'reference' | 'image';
+
+export type Note = {
+  id: string;
+  type: NoteType;
+  title: string;
+  body?: string;
+  url?: string;
+  imgHref?: string;
+  createdAt: number;
 };
 
 export type LinkRef = {
@@ -46,9 +62,9 @@ export type AssessmentItem =
 // ---------- topics & plan ----------
 export type EnrichedTopic = {
   // original
-  title?: string;
+  title: string; // Made title required for consistency
   summary: string;
-  images: Img[];
+  images: Img[]; // Now uses the strict Img type
   keywords?: string[];
 
   // additions (all optional, safe for existing code)

@@ -5,22 +5,32 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
+  // Base classes applied to all buttons for consistency
+  'inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50',
   {
     variants: {
       variant: {
-        // Default variant uses your custom 'gold' theme color
-        default: 'bg-gold text-background font-semibold hover:bg-gold/90',
-        
-        destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
+        // --- THIS IS THE NEW "LIQUID GLASS" STYLE ---
+        // It's translucent, has a subtle border, and a backdrop blur for a frosted effect.
+        default:
+          'bg-white/10 border border-white/10 backdrop-blur-md shadow-lg text-slate-50 hover:bg-white/20',
 
-        // --- THIS IS THE FIX ---
-        // The outline variant is now visible and theme-consistent.
-        outline: 'border border-slate-700 bg-transparent hover:bg-slate-800 hover:text-slate-100',
+        // A solid, theme-appropriate red for destructive actions. No glass effect for clarity.
+        destructive:
+          'bg-destructive text-destructive-foreground hover:bg-destructive/90 border-transparent',
+
+        // --- THE "LIQUID GLASS" OUTLINE STYLE ---
+        // Starts transparent and gains a subtle glass background on hover.
+        outline:
+          'border border-white/10 backdrop-blur-md text-slate-300 hover:bg-white/10 hover:text-slate-100',
         
-        secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+        // A solid, subtle button for secondary actions that don't need the glass effect.
+        secondary:
+          'bg-secondary text-secondary-foreground hover:bg-secondary/80 border-transparent',
         
-        ghost: 'hover:bg-accent hover:text-accent-foreground',
+        // No background or border until hovered. The hover state uses the theme's accent color.
+        ghost:
+          'hover:bg-accent hover:text-accent-foreground',
       },
       size: {
         default: 'h-10 px-4 py-2',

@@ -3,9 +3,8 @@
 import { type Dispatch, type SetStateAction } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
 import { Send, Square } from 'lucide-react';
+import { cn } from '@/lib/utils'; // Assuming you have cn for class merging
 
-// The props are now updated to accept `value` and `setValue` from the parent component.
-// This makes it a "controlled component" and fixes the TypeScript error.
 type ChatInputProps = {
   onSend: (prompt: string) => void;
   onStop: () => void;
@@ -21,10 +20,8 @@ export default function ChatInput({
   isLoading,
   value,
   setValue,
-  placeholder = 'Ask a follow-up question…',
+  placeholder = 'Ask Stella a follow-up question…',
 }: ChatInputProps) {
-  // The internal state `useState` has been removed. The component is now controlled by its parent.
-
   const handleSend = () => {
     const trimmed = value.trim();
     if (!trimmed || isLoading) return;
@@ -41,12 +38,14 @@ export default function ChatInput({
   return (
     <div className="relative flex items-center">
       <TextareaAutosize
-        id="chat-input" // Important for focus logic in the parent component
-        className="flex-1 resize-none rounded-lg bg-background border border-input
-                   px-3 py-2 text-sm font-sans
-                   ring-offset-background placeholder:text-muted-foreground
-                   focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2
-                   disabled:opacity-60 pr-12" // Added padding-right to make space for the button
+        id="chat-input"
+        className={cn(
+          // --- THIS IS THE NEW "LIQUID GLASS" STYLE ---
+          "flex-1 resize-none rounded-lg border bg-white/5 border-white/10 backdrop-blur-lg",
+          "px-3 py-2 text-sm font-sans text-slate-100",
+          "placeholder:text-slate-400 disabled:opacity-60 pr-12",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+        )}
         placeholder={placeholder}
         value={value}
         onChange={(e) => setValue(e.target.value)}
@@ -72,7 +71,12 @@ export default function ChatInput({
             type="button"
             onClick={handleSend}
             disabled={!value.trim()}
-            className="p-2 rounded-md text-gold hover:bg-gold/20 disabled:text-slate-600 disabled:bg-transparent transition-colors"
+            className={cn(
+              // --- LIQUID GLASS BUTTON STYLE ---
+              "p-2 rounded-md transition-colors",
+              "text-slate-300 hover:bg-white/10 hover:text-white",
+              "disabled:text-slate-600 disabled:bg-transparent disabled:cursor-not-allowed"
+            )}
             aria-label="Send message"
           >
             <Send className="w-4 h-4" />

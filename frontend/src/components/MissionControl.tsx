@@ -6,16 +6,8 @@ import { useMissionChatQueued as useMissionChat } from '@/hooks/useMissionChatQu
 import { gsap } from 'gsap';
 import { useGSAP } from '@gsap/react';
 import {
-  ChevronLeft,
-  ChevronRight,
-  BookOpen,
-  FlaskConical,
-  Link as LinkIcon,
-  Image as ImageIcon,
-  Plus,
-  Trash2,
-  Bookmark,
-  Sparkles,
+  ChevronLeft, ChevronRight, BookOpen, FlaskConical, Link as LinkIcon,
+  Image as ImageIcon, Plus, Trash2, Bookmark, Sparkles, SlidersHorizontal,
 } from 'lucide-react';
 
 import ChatDisplay, { type Message } from './ChatDisplay';
@@ -23,39 +15,26 @@ import ChatInput from './ChatInput';
 import { Button } from './ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 
-/* ─────────────────────────────────────────────────────────
-   Strict Types - The Single Source of Truth
-   NOTE: For a larger project, these should live in a shared `types.ts`.
-────────────────────────────────────────────────────────── */
-
+// NOTE: For a larger project, these should be moved to a shared `types.ts` file.
 type NoteType = 'concept' | 'formula' | 'reference' | 'image';
 
 type Note = {
-  id: string;
-  type: NoteType;
-  title: string;
-  body?: string;
-  url?: string;
-  imgHref?: string;
-  createdAt: number;
+  id: string; type: NoteType; title: string; body?: string;
+  url?: string; imgHref?: string; createdAt: number;
 };
 
-// Use the shared Img type everywhere to avoid structural mismatches.
-import type { Img } from '@/types/mission';
+type Img = {
+  title: string;
+  href: string;
+};
 
 export type MissionControlProps = {
-  mission?: string;
-  images?: Img[]; // Uses the strict, shared type
-  context?: string;
-  initialImage?: number;
-  initialMessage?: Message;
+  mission?: string; images?: Img[]; context?: string;
+  initialImage?: number; initialMessage?: Message;
 };
 
-/* ─────────────────────────────────────────────────────────
-   Helpers
-────────────────────────────────────────────────────────── */
 const uid = () => Math.random().toString(36).slice(2, 9);
-const urlRegex = /(https?:\/\/[\w.-]+(?:\/[\w\-._~:\/?#[\]@!$&'()*+,;=.]+)?)/g;
+const urlRegex = /(https?:\/\/[\w.-]+(?:\/[\w\-._~:/?#[\]@!$&'()*+,;=.]+)?)/g;
 
 function usePersistentNotes(missionKey: string) {
   const storageKey = `stella:notes:${missionKey}`;
@@ -63,61 +42,43 @@ function usePersistentNotes(missionKey: string) {
     try {
       const raw = typeof window !== 'undefined' ? localStorage.getItem(storageKey) : null;
       return raw ? (JSON.parse(raw) as Note[]) : [];
-    } catch {
-      return [];
-    }
+    } catch { return []; }
   });
   useEffect(() => {
-    try {
-      localStorage.setItem(storageKey, JSON.stringify(notes));
-    } catch {}
+    localStorage.setItem(storageKey, JSON.stringify(notes));
   }, [notes, storageKey]);
   return { notes, setNotes };
 }
 
-/* ─────────────────────────────────────────────────────────
-   Main Component
-────────────────────────────────────────────────────────── */
 export default function MissionControl({
-  mission = 'general',
-  images = [],
-  context,
-  initialImage,
-  initialMessage,
+  mission = 'general', images = [], context, initialImage, initialMessage,
 }: MissionControlProps) {
   const { role } = useGame();
-  // With strict types, we can trust the `images` prop directly. No complex `useMemo` needed.
-  const pics = images;
   const { notes, setNotes } = usePersistentNotes(mission);
-
   const { messages, loading, sendMessage, stop, reset } = useMissionChat({ role, mission });
 
-  const [selImageIndex, setSelImageIndex] = useState(() => Math.max(0, (initialImage ?? 1) - 1));
+  const [selImageIndex, setSelImageIndex] = useState(() => Math.max(0, initialImage ?? 0));
   const [chatInputValue, setChatInputValue] = useState('');
+  const [isNotebookOpen, setIsNotebookOpen] = useState(false);
 
   const rootRef = useRef<HTMLDivElement>(null);
-  useGSAP(() => {
-    gsap.from(rootRef.current, { autoAlpha: 0, duration: 0.45, ease: 'power2.out' });
-  }, { scope: rootRef });
+  useGSAP(() => { gsap.from(rootRef.current, { autoAlpha: 0, duration: 0.45, ease: 'power2.out' }); }, { scope: rootRef });
 
   const buildContext = useCallback(() => {
-    const currentPic = pics[selImageIndex];
-    const title = currentPic?.title?.trim() ?? '';
-    const href = currentPic?.href?.trim() ?? '';
+    const currentPic = images[selImageIndex];
     const lines = [
-      `Student is learning about: ${mission}.`,
-      context?.trim() || '',
-      `Current Image: #${selImageIndex + 1} ${title} – ${href}`,
+      `Student is learning about: ${mission}.`, context?.trim() || '',
+      `Current Image: #${selImageIndex + 1} ${currentPic?.title.trim() ?? ''} – ${currentPic?.href.trim() ?? ''}`,
     ];
     return lines.filter(Boolean).join('\n');
-  }, [pics, mission, context, selImageIndex]);
+  }, [images, mission, context, selImageIndex]);
 
   useEffect(() => {
-    if (pics.length > 0 && messages.length === 0 && !initialMessage) {
+    if (images.length > 0 && messages.length === 0 && !initialMessage) {
       sendMessage(`Give a ${role}-friendly 2-line summary of the current image.`, buildContext());
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pics.length]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [images.length]);
 
   const onSend = (text: string) => {
     sendMessage(text, buildContext());
@@ -125,18 +86,10 @@ export default function MissionControl({
   };
 
   const addNote = useCallback((partialNote: Partial<Note>) => {
-    setNotes(prev => [
-      {
-        id: uid(),
-        type: partialNote.type ?? 'concept',
-        title: partialNote.title ?? 'Untitled Note',
-        body: partialNote.body,
-        url: partialNote.url,
-        imgHref: partialNote.imgHref,
-        createdAt: Date.now(),
-      },
-      ...prev,
-    ]);
+    setNotes(prev => [{
+      id: uid(), type: partialNote.type ?? 'concept', title: partialNote.title ?? 'Untitled Note',
+      body: partialNote.body, url: partialNote.url, imgHref: partialNote.imgHref, createdAt: Date.now(),
+    }, ...prev]);
   }, [setNotes]);
 
   const removeNote = (id: string) => setNotes(prev => prev.filter(n => n.id !== id));
@@ -149,25 +102,35 @@ export default function MissionControl({
   };
 
   const handleCaptureMessage = useCallback((message: Message) => {
-    const text = message.text;
-    if (!text) return;
-    const links = Array.from(text.matchAll(urlRegex), m => m[0]);
+    if (!message.text) return;
+    const links = Array.from(message.text.matchAll(urlRegex), m => m[0]);
     if (links.length > 0) {
-      addNote({ type: 'reference', title: 'Captured Link', url: links[0], body: text.replace(links[0], '').trim() });
+      addNote({ type: 'reference', title: 'Captured Link', url: links[0], body: message.text.replace(links[0], '').trim() });
     } else {
-      addNote({ type: 'concept', title: 'Captured Note', body: text });
+      addNote({ type: 'concept', title: 'Captured Note', body: message.text });
     }
   }, [addNote]);
-
+  
+  // --- THIS IS THE FIX ---
+  // The new handler function required by the upgraded ChatDisplay component.
+  const handleCaptureFormula = useCallback((formulaText: string) => {
+    addNote({
+      type: 'formula',
+      title: 'Captured Formula',
+      body: formulaText,
+    });
+  }, [addNote]);
+  
   const handleNoteClick = useCallback((note: Note) => {
     let prompt = '';
     switch (note.type) {
       case 'concept': prompt = `Explain this concept in a simpler way: "${note.title}"`; break;
-      case 'formula': prompt = `Give me a practice problem for this formula: ${note.body}`; break;
+      case 'formula': prompt = `Give me a practice problem using this: ${note.body}`; break;
       case 'reference': prompt = `Summarize the key idea from this reference: ${note.url}`; break;
       case 'image': prompt = `Tell me one surprising fact about this image: "${note.title}"`; break;
     }
     setChatInputValue(prompt);
+    setIsNotebookOpen(false);
     document.querySelector<HTMLInputElement>('#chat-input')?.focus();
   }, []);
 
@@ -176,9 +139,9 @@ export default function MissionControl({
     return (initialMessage ? [initialMessage, ...dynamicMessages] : dynamicMessages);
   }, [messages, initialMessage]);
 
-  if (pics.length === 0) {
+  if (images.length === 0) {
     return (
-      <div className="rounded-2xl bg-slate-900/60 p-4 text-center">
+      <div className="rounded-2xl bg-white/5 border border-white/10 backdrop-blur-lg p-4 text-center">
         <h3 className="font-pixel text-lg text-gold mb-2 font-semibold">Mission Standby</h3>
         <p className="text-sm">No visuals were retrieved for this objective.</p>
       </div>
@@ -187,48 +150,50 @@ export default function MissionControl({
 
   return (
     <TooltipProvider>
-      <div ref={rootRef} className="grid gap-5 xl:grid-cols-[minmax(260px,1fr)_minmax(420px,1.2fr)_minmax(280px,0.9fr)] lg:grid-cols-[minmax(320px,1.2fr)_minmax(420px,1.4fr)] grid-cols-1 items-start">
+      <div ref={rootRef} className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-[1fr_1.5fr] gap-5 items-start">
         <VisualPanel
-          currentImage={pics[selImageIndex]}
+          currentImage={images[selImageIndex]}
           imageIndex={selImageIndex}
-          imageCount={pics.length}
-          onPrev={() => handleImageChange((selImageIndex - 1 + pics.length) % pics.length)}
-          onNext={() => handleImageChange((selImageIndex + 1) % pics.length)}
+          imageCount={images.length}
+          onPrev={() => handleImageChange((selImageIndex - 1 + images.length) % images.length)}
+          onNext={() => handleImageChange((selImageIndex + 1) % images.length)}
           onQuickAction={(prompt) => sendMessage(prompt, buildContext())}
-          onSaveImage={() => addNote({ type: 'image', title: pics[selImageIndex].title ?? 'Untitled', imgHref: pics[selImageIndex].href })}
+          onSaveImage={() => addNote({ type: 'image', title: images[selImageIndex].title, imgHref: images[selImageIndex].href })}
         />
-        <ChatPanel
-          messages={chatMessages}
-          isLoading={loading}
-          onSend={onSend}
-          onStop={stop}
-          onCaptureMessage={handleCaptureMessage}
-          inputValue={chatInputValue}
-          setInputValue={setChatInputValue}
-        />
-        <NotebookPanel
-          notes={notes}
-          onAddNote={addNote}
-          onRemoveNote={removeNote}
-          onNoteClick={handleNoteClick}
-        />
+        <div className="flex flex-col gap-5">
+          <ChatPanel
+            messages={chatMessages}
+            isLoading={loading}
+            onSend={onSend}
+            onStop={stop}
+            onCaptureMessage={handleCaptureMessage}
+            onCaptureFormula={handleCaptureFormula} // <-- The new prop is now passed down
+            inputValue={chatInputValue}
+            setInputValue={setChatInputValue}
+            onToggleNotebook={() => setIsNotebookOpen(!isNotebookOpen)}
+          />
+          <div className={isNotebookOpen ? 'block' : 'hidden lg:block'}>
+            <NotebookPanel
+              notes={notes}
+              onAddNote={addNote}
+              onRemoveNote={removeNote}
+              onNoteClick={handleNoteClick}
+            />
+          </div>
+        </div>
       </div>
     </TooltipProvider>
   );
 }
 
 /* ─────────────────────────────────────────────────────────
-   Child Components (Strictly Typed & Color-Streamlined)
+   Child Components
 ────────────────────────────────────────────────────────── */
 
 type VisualPanelProps = {
-  currentImage: Img;
-  imageIndex: number;
-  imageCount: number;
-  onPrev: () => void;
-  onNext: () => void;
-  onQuickAction: (prompt: string) => void;
-  onSaveImage: () => void;
+  currentImage: Img; imageIndex: number; imageCount: number;
+  onPrev: () => void; onNext: () => void;
+  onQuickAction: (prompt: string) => void; onSaveImage: () => void;
 };
 function VisualPanel({ currentImage, imageIndex, imageCount, onPrev, onNext, onQuickAction, onSaveImage }: VisualPanelProps) {
   const imageRef = useRef<HTMLDivElement>(null);
@@ -238,10 +203,10 @@ function VisualPanel({ currentImage, imageIndex, imageCount, onPrev, onNext, onQ
 
   return (
     <div className="w-full h-full flex flex-col gap-3 sticky top-4">
-      <div ref={imageRef} className="relative w-full aspect-video rounded-xl overflow-hidden border border-input bg-black/50 group">
-        <img key={currentImage.href} src={currentImage.href} alt={currentImage.title ?? 'Untitled image'} className="w-full h-full object-contain" />
+      <div ref={imageRef} className="relative w-full aspect-video rounded-xl overflow-hidden border border-white/10 bg-black/50 group">
+        <img key={currentImage.href} src={currentImage.href} alt={currentImage.title} className="w-full h-full object-contain" />
         <div className="absolute bottom-0 left-0 right-0 px-3 py-2 text-xs bg-gradient-to-t from-black/80 to-transparent text-slate-200">
-          {(currentImage.title ?? 'Untitled')} • #{imageIndex + 1}/{imageCount}
+          {currentImage.title} • #{imageIndex + 1}/{imageCount}
         </div>
         {imageCount > 1 && (
           <>
@@ -251,7 +216,7 @@ function VisualPanel({ currentImage, imageIndex, imageCount, onPrev, onNext, onQ
         )}
       </div>
       <div className="flex flex-wrap gap-2">
-        <Button onClick={() => onQuickAction('Explain this image at my level.')} variant="outline" size="sm">Explain</Button>
+        <Button onClick={() => onQuickAction('Explain this image.')} variant="outline" size="sm">Explain</Button>
         <Button onClick={() => onQuickAction('Quiz me on this image.')} variant="outline" size="sm">Quiz Me</Button>
         <Button onClick={() => onQuickAction('Give me a one-sentence summary.')} variant="outline" size="sm">Summary</Button>
         <Button onClick={onSaveImage} size="sm" variant="default"><Bookmark className="w-4 h-4 mr-1.5"/>Save Image</Button>
@@ -261,21 +226,23 @@ function VisualPanel({ currentImage, imageIndex, imageCount, onPrev, onNext, onQ
 }
 
 type ChatPanelProps = {
-  messages: Message[];
-  isLoading: boolean;
-  onSend: (text: string) => void;
-  onStop: () => void;
-  onCaptureMessage: (message: Message) => void;
-  inputValue: string;
-  setInputValue: Dispatch<SetStateAction<string>>;
+  messages: Message[]; isLoading: boolean; onSend: (text: string) => void; onStop: () => void;
+  onCaptureMessage: (message: Message) => void; onCaptureFormula: (formula: string) => void; // <-- New prop added here
+  inputValue: string; setInputValue: Dispatch<SetStateAction<string>>; onToggleNotebook: () => void;
 };
-function ChatPanel({ messages, isLoading, onSend, onStop, onCaptureMessage, inputValue, setInputValue }: ChatPanelProps) {
+function ChatPanel({ messages, isLoading, onSend, onStop, onCaptureMessage, onCaptureFormula, inputValue, setInputValue, onToggleNotebook }: ChatPanelProps) {
   return (
-    <div className="chat-interface flex-1 flex flex-col rounded-xl bg-card border p-2 md:p-3 min-h-[70vh] lg:min-h-0">
-      <div className="flex-1 overflow-y-auto">
-        <ChatDisplay messages={messages} onCapture={onCaptureMessage} />
+    <div className="chat-interface flex flex-col rounded-xl bg-white/5 border border-white/10 backdrop-blur-lg shadow-lg p-2 md:p-3 min-h-[70vh] lg:min-h-0">
+      <div className="flex items-center justify-end lg:hidden mb-2 px-1">
+          <Button onClick={onToggleNotebook} variant="ghost" size="sm">
+              <SlidersHorizontal className="w-4 h-4 mr-2"/>
+              Notebook
+          </Button>
       </div>
-      <div className="mt-2 pt-2 border-t">
+      <div className="flex-1 overflow-y-auto">
+        <ChatDisplay messages={messages} onCapture={onCaptureMessage} onCaptureFormula={onCaptureFormula} />
+      </div>
+      <div className="mt-2 pt-2 border-t border-white/10">
         {isLoading && <div className="text-xs text-gold animate-pulse mb-2 px-2">Stella is thinking…</div>}
         <ChatInput onSend={onSend} onStop={onStop} isLoading={isLoading} value={inputValue} setValue={setInputValue} />
       </div>
@@ -284,18 +251,16 @@ function ChatPanel({ messages, isLoading, onSend, onStop, onCaptureMessage, inpu
 }
 
 type NotebookPanelProps = {
-  notes: Note[];
-  onAddNote: (partialNote: Partial<Note>) => void;
-  onRemoveNote: (id: string) => void;
-  onNoteClick: (note: Note) => void;
+  notes: Note[]; onAddNote: (partialNote: Partial<Note>) => void;
+  onRemoveNote: (id: string) => void; onNoteClick: (note: Note) => void;
 };
 function NotebookPanel({ notes, onAddNote, onRemoveNote, onNoteClick }: NotebookPanelProps) {
   const [tab, setTab] = useState<NoteType>('concept');
   const filteredNotes = useMemo(() => notes.filter((n) => n.type === tab), [notes, tab]);
 
   return (
-    <aside className="rounded-xl bg-card border p-3 md:p-4 sticky top-4">
-      <div className="flex items-center gap-2 mb-3 border-b pb-3">
+    <aside className="rounded-xl bg-white/5 border border-white/10 backdrop-blur-lg shadow-lg p-3 md:p-4">
+      <div className="flex items-center gap-2 mb-3 border-b border-white/10 pb-3">
         <Sparkles className="w-5 h-5 text-gold"/>
         <h3 className="font-pixel text-lg text-gold">Mission Notebook</h3>
       </div>
@@ -305,28 +270,26 @@ function NotebookPanel({ notes, onAddNote, onRemoveNote, onNoteClick }: Notebook
         <TabButton active={tab === 'reference'} onClick={() => setTab('reference')} icon={<LinkIcon className="w-4 h-4" />}>Links</TabButton>
         <TabButton active={tab === 'image'} onClick={() => setTab('image')} icon={<ImageIcon className="w-4 h-4" />}>Images</TabButton>
       </div>
-
       <Tooltip>
         <TooltipTrigger asChild>
           <Button variant="outline" size="sm" className="w-full mb-3" onClick={() => onAddNote({ type: tab, title: 'New Note', body: '...' })}><Plus className="w-4 h-4 mr-1"/>Add New {tab}</Button>
         </TooltipTrigger>
         <TooltipContent>Manually add a new item to this tab.</TooltipContent>
       </Tooltip>
-
       {filteredNotes.length === 0 ? (
-        <div className="text-xs text-muted-foreground border border-dashed rounded-lg p-3 text-center">
+        <div className="text-xs text-muted-foreground border border-dashed border-white/20 rounded-lg p-3 text-center">
           <p>No {tab}s saved yet.</p>
-          <p className="mt-1">Click the <Bookmark className="w-3 h-3 inline-block -mt-1 mx-1"/> icon on a message from Stella to save it here.</p>
+          <p className="mt-1">Click the <Bookmark className="w-3 h-3 inline-block -mt-1 mx-1"/> icon on a message to save it here.</p>
         </div>
       ) : (
         <ul className="space-y-2 max-h-[60vh] overflow-y-auto pr-1">
           {filteredNotes.map((note) => (
-            <li key={note.id} className="rounded-lg border bg-secondary/50 p-2 group">
+            <li key={note.id} className="rounded-lg border border-white/10 bg-white/5 p-2 group">
               <div className="flex items-start justify-between gap-2">
                 <button onClick={() => onNoteClick(note)} className="text-left flex-1 space-y-1">
                   <div className="text-xs font-semibold text-foreground truncate group-hover:text-gold transition-colors">{note.title}</div>
                   {note.url && <a className="text-[11px] underline text-sky-400 break-all block" href={note.url} target="_blank" rel="noreferrer" onClick={e => e.stopPropagation()}>{note.url}</a>}
-                  {note.imgHref && <img src={note.imgHref} alt={note.title} className="rounded-md border mt-1" />}
+                  {note.imgHref && <img src={note.imgHref} alt={note.title} className="rounded-md border border-white/10 mt-1" />}
                   {note.body && <p className="text-[11px] text-muted-foreground whitespace-pre-wrap">{note.body}</p>}
                 </button>
                 <Tooltip>
@@ -346,15 +309,8 @@ function NotebookPanel({ notes, onAddNote, onRemoveNote, onNoteClick }: Notebook
 
 type TabButtonProps = { active: boolean; onClick: () => void; children: React.ReactNode; icon: React.ReactNode };
 function TabButton({ active, onClick, children, icon }: TabButtonProps) {
-  // Use shadcn <Button> variants for consistent theming instead of hand-styled <button>.
   return (
-    <Button
-      type="button"
-      onClick={onClick}
-      variant={active ? 'secondary' : 'ghost'}
-      size="sm"
-      className="flex items-center gap-1.5"
-    >
+    <Button type="button" onClick={onClick} variant={active ? 'secondary' : 'ghost'} size="sm" className="flex items-center gap-1.5">
       {icon} {children}
     </Button>
   );

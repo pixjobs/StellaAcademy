@@ -1,27 +1,25 @@
-/* 1) FONT IMPORTS — Must be at the very top */
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..7वीन&display=swap');
+/* 1) GLOBAL IMPORTS — Must be at the very top */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+@import 'katex/dist/katex.min.css';
+
 
 /* 2) TAILWIND DIRECTIVES */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* 3) UNIFIED BASE STYLES & THEME */
-@layer base {
-  /* --- CUSTOM & SHADCN THEME VARIABLES --- */
-  :root {
-    --radius: 0.5rem;
 
-    /* --- THIS IS THE FIX --- */
-    /* Your custom colors, defined as CSS variables */
+/* 3) THEME & BASE STYLES */
+@layer base {
+  /* --- Color Palette Variables (HSL values for reusability) --- */
+  :root {
     --custom-mint: 168 76% 66%;
     --custom-sky: 207 90% 60%;
     --custom-gold: 54 98% 63%;
-    /* --- END OF FIX --- */
   }
- 
-  /* Default light mode theme variables */
+
+  /* --- ShadCN Light Mode Theme --- */
   :root {
     --background: 224 40% 95%;
     --foreground: 224 40% 8%;
@@ -29,8 +27,8 @@
     --card-foreground: 224 40% 8%;
     --popover: 224 40% 95%;
     --popover-foreground: 224 40% 8%;
-    --primary: 216 98% 52%;
-    --primary-foreground: 0 0% 100%;
+    --primary: hsl(var(--custom-gold));
+    --primary-foreground: 224 40% 8%;
     --secondary: 224 20% 90%;
     --secondary-foreground: 224 20% 10%;
     --muted: 224 20% 90%;
@@ -41,10 +39,11 @@
     --destructive-foreground: 0 0% 100%;
     --border: 224 20% 85%;
     --input: 224 20% 85%;
-    --ring: 216 98% 52%;
+    --ring: hsl(var(--custom-sky));
+    --radius: 0.5rem;
   }
 
-  /* Active dark mode theme */
+  /* --- ShadCN Dark Mode Theme --- */
   .dark {
     --background: 224 40% 8%;
     --foreground: 216 67% 95%;
@@ -52,7 +51,7 @@
     --card-foreground: 216 67% 95%;
     --popover: 224 40% 8%;
     --popover-foreground: 216 67% 95%;
-    --primary: 216 67% 95%;
+    --primary: hsl(var(--custom-gold));
     --primary-foreground: 224 40% 8%;
     --secondary: 222 47% 11%;
     --secondary-foreground: 216 67% 95%;
@@ -64,32 +63,33 @@
     --destructive-foreground: 216 67% 95%;
     --border: 222 47% 11%;
     --input: 222 47% 11%;
-    --ring: 207 90% 54%; /* Mapped to --custom-sky */
+    --ring: hsl(var(--custom-sky));
   }
 
-  /* --- CONSOLIDATED BODY & BASE STYLES --- */
+  /* --- Global Element Styles --- */
   * {
     @apply border-border;
   }
 
   body {
-    @apply bg-background text-foreground min-h-screen;
+    @apply min-h-screen bg-background text-foreground;
     font-family: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
   h1, h2, h3 {
-    @apply text-foreground tracking-tight font-semibold;
+    @apply font-semibold tracking-tight text-foreground;
   }
 
   ::selection {
-    @apply bg-sky text-background;
+    background-color: hsl(var(--custom-sky));
+    color: hsl(var(--background));
   }
 }
 
 
-/* 4) COMPONENT STYLES */
+/* 4) CUSTOM COMPONENT STYLES */
 @layer components {
   /* Custom button with a pixelated feel */
   .btn-pixel {
@@ -102,17 +102,18 @@
 
   /* Blinking cursor for typing animations */
   .blinking-cursor {
-    @apply font-semibold text-mint;
+    @apply font-semibold;
+    color: hsl(var(--custom-mint));
     animation: 1.2s blink step-end infinite;
   }
   @keyframes blink {
     from, to { color: transparent; }
-    50% { @apply text-mint; }
+    50% { color: hsl(var(--custom-mint)); }
   }
 }
 
 
-/* 5) UTILITY STYLES */
+/* 5) CUSTOM UTILITY STYLES */
 @layer utilities {
   .font-pixel {
     font-family: 'Press Start 2P', cursive;
@@ -120,23 +121,32 @@
 
   .crt::after {
     content: '';
-    @apply fixed inset-0 pointer-events-none z-[100];
-    background: repeating-linear-gradient(0deg, #fff0 0, #fff0 2px, #fff3 0, #fff3 3px);
+    @apply pointer-events-none fixed inset-0 z-[100];
+    background: repeating-linear-gradient(0deg, rgba(255,255,255,0) 0, rgba(255,255,255,0) 2px, rgba(255,255,255,0.1) 0, rgba(255,255,255,0.1) 3px);
     mix-blend-mode: soft-light;
   }
 }
 
 
-/* 6) MATHJAX STYLES */
-.prose mjx-container {
-  color: inherit !important;
-  text-align: left !important;
-  margin-top: 1em !important;
-  margin-bottom: 1em !important;
-}
-.prose p mjx-container[display="false"] {
-  display: inline-block !important;
-  margin: 0 !important;
-  font-size: 0.95em;
-  vertical-align: -1px;
+/* 6) KATEX STYLES FOR TAILWIND PROSE (THE FIX) */
+/*
+ * This tells Tailwind's .prose styles to completely ignore KaTeX elements,
+ * allowing the original katex.min.css stylesheet to take full control.
+*/
+@layer utilities {
+  /*
+   * Revert all prose styling on the KaTeX container and all of its children (*).
+   * The `all: revert` property is a powerful CSS reset.
+   */
+  .prose .katex,
+  .prose .katex * {
+    all: revert;
+  }
+
+  /*
+   * Style the block-level display container for proper spacing within the document flow.
+   */
+  .prose .katex-display {
+    @apply my-6 block overflow-x-auto overflow-y-hidden text-center;
+  }
 }
