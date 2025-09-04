@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useGame, Role } from '@/lib/store'; // Assuming Role is exported from your store
+import { useGame, Role } from '@/lib/store';
 
 const roles: { id: Role; label: string; blurb: string; persona: string }[] = [
   {
@@ -30,11 +30,13 @@ const roles: { id: Role; label: string; blurb: string; persona: string }[] = [
   }
 ];
 
+// --- MISSION ROSTER UPGRADE ---
+// "Rover Cam" has been replaced with the new "Earth Observer" mission.
 const missions = [
   {
     id: 'rocket-lab',
     title: 'Rocket Lab',
-    href: '/missions/rocket-lab',
+    href: '/missions/rocket-lab', // Assuming root-level mission pages
     tasks: {
       explorer: 'Help Stella name 3 rocket parts for a pre-launch check!',
       cadet: 'Analyze launch conditions and decide if it’s a "Go" or "No Go".',
@@ -42,13 +44,13 @@ const missions = [
     }
   },
   {
-    id: 'rover-cam',
-    title: 'Rover Cam',
-    href: '/missions/rover-cam',
+    id: 'earth-observer', // REPLACED
+    title: 'Earth Observer', // REPLACED
+    href: '/missions/earth-observer', // REPLACED
     tasks: {
-      explorer: 'Discover a cool rock on Mars and create a story about it.',
-      cadet: 'Form a hypothesis about a Martian landscape for Stella to evaluate.',
-      scholar: 'Propose and justify the next scientific target for the rover.'
+      explorer: 'Find your home continent and ask Stella what the weather is like!',
+      cadet: 'Identify a major storm system and ask Stella to explain its scientific name.',
+      scholar: 'Analyze cloud patterns to deduce the season in a hemisphere and justify it.'
     }
   },
   {
@@ -64,10 +66,13 @@ const missions = [
 ];
 
 export default function Home() {
-  // NOTE: This component uses local state. Consider moving `started` to your global `useGame`
-  // store to prevent the "hidden on refresh" hydration issue.
-  const { role, setRole } = useGame();
-  const [started, setStarted] = useState(false);
+  // --- STATE MANAGEMENT UPGRADE ---
+  // To prevent the intro from showing on "back" navigation, this state should
+  // come from your global store. Ensure your `useGame` store exports `started` and `setStarted`.
+  // Example `useGame` store modification:
+  // `started: boolean; setStarted: (started: boolean) => void;`
+  // `set({ started })`
+  const { role, setRole, started, setStarted } = useGame();
 
   useEffect(() => {
     if (!started) return;
@@ -84,7 +89,7 @@ export default function Home() {
         <IntroOverlay
           onStart={() => {
             window.dispatchEvent(new Event('stella:warp'));
-            setStarted(true);
+            setStarted(true); // This now calls the global store action
             window.scrollTo({ top: 0, behavior: 'instant' as any });
           }}
         />
@@ -93,7 +98,6 @@ export default function Home() {
       {started && (
         <section className="container mx-auto px-4 py-10 max-w-5xl">
           <div className="rounded-2xl bg-slate-900/60 p-6 shadow-pixel mb-8 border border-white/10 backdrop-blur-md">
-            {/* RE-ADDED: `text-gold` for brand consistency with the intro screen. */}
             <h1 className="font-pixel text-2xl text-gold mb-2">Stella Academy 🌟</h1>
             <p className="text-slate-300">
               Welcome to <strong className="text-gold">Stella Academy</strong> — your interactive space tutor. Choose a role and a mission, and Stella will teach, quiz, and explore the cosmos with you — powered by <span className="text-mint">gpt-oss-20b</span>.
@@ -101,7 +105,6 @@ export default function Home() {
           </div>
 
           <div className="rounded-2xl bg-slate-900/60 p-6 shadow-pixel mb-8 border border-white/10 backdrop-blur-md">
-            {/* Using a different color for subheadings creates good visual hierarchy. `text-sky` is a good choice. */}
             <h2 className="font-pixel text-xl text-sky mb-4">Choose your learning path</h2>
             <div className="grid sm:grid-cols-3 gap-3">
               {roles.map((r) => (
@@ -121,13 +124,11 @@ export default function Home() {
           </div>
 
           <div className="rounded-2xl bg-slate-900/60 p-6 shadow-pixel mb-8 border border-white/10 backdrop-blur-md">
-            {/* Using `text-sky` to match the other subheading. */}
             <h2 className="font-pixel text-xl text-sky mb-4">Select a Mission</h2>
             <div className="grid md:grid-cols-3 gap-4">
               {missions.map((m) => (
                 <div key={m.id} className="mission-card rounded-xl border border-slate-700 bg-slate-800/40 p-4 flex flex-col">
                   <div className="flex-grow">
-                    {/* RE-ADDED: `text-gold` for the titles on the mission cards. */}
                     <div className="font-pixel text-base text-gold mb-2">{m.title}</div>
                     <p className="text-xs text-slate-300 mb-3">
                       <span className="font-bold text-sky">Your Task: </span>
@@ -168,8 +169,8 @@ function IntroOverlay({ onStart }: { onStart: () => void }) {
 
   useEffect(() => {
     const tl = gsap.timeline();
-    tl.set(rootRef.current, { opacity: 0 })
-      .to(rootRef.current, { opacity: 1, duration: 0.4, ease: 'power2.out' })
+    // The `.set` call is removed. The initial state is now handled by CSS.
+    tl.to(rootRef.current, { opacity: 1, duration: 0.4, ease: 'power2.out' })
       .fromTo(
         panelRef.current,
         { y: 20, opacity: 0, scale: 0.98 },
@@ -203,7 +204,10 @@ function IntroOverlay({ onStart }: { onStart: () => void }) {
   return (
     <div
       ref={rootRef}
-      className="fixed inset-0 z-30 flex items-center justify-center px-4 py-6 pointer-events-auto"
+      // --- FONT BUG FIX ---
+      // This `opacity-0` class ensures the component is invisible on first render,
+      // preventing the flash of unstyled/greyed-out text before the animation runs.
+      className="fixed inset-0 z-30 flex items-center justify-center px-4 py-6 pointer-events-auto opacity-0"
       aria-modal
       role="dialog"
     >
@@ -233,7 +237,7 @@ function IntroOverlay({ onStart }: { onStart: () => void }) {
           <div>
             <h1 ref={titleRef} className="font-pixel text-2xl text-gold">Welcome to Stella Academy 🌟</h1>
             <p ref={textRef} className="mt-2 text-slate-200 text-sm leading-relaxed">
-              I’m <span className="text-sky">Stella</span> — your interactive space tutor. We’ll explore rockets, rovers, and today’s space picture together. Pick the path that suits you and I’ll guide you with quick, friendly challenges.
+              I’m <span className="text-sky">Stella</span> — your interactive space tutor. We’ll explore rockets, planets, and today’s space picture together. Pick the path that suits you and I’ll guide you with quick, friendly challenges.
             </p>
             <div className="mt-4 flex flex-wrap items-center gap-2 text-[11px] text-slate-300">
               <span className="px-2 py-1 rounded bg-slate-800/70 border border-white/10">Interactive Analysis</span>

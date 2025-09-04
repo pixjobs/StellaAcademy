@@ -1,68 +1,45 @@
-// ChatDisplay.tsx
+// frontend/src/components/ChatDisplay.tsx
+// Full-width for Stella, mobile-optimised, colors fixed, no horizontal scroll
 'use client';
 
-import { useRef, useEffect, useState, memo, useMemo, type ReactNode } from 'react';
+import { useRef, useEffect, useState, memo } from 'react';
 import clsx from 'clsx';
-import type { Root, Paragraph, Text, PhrasingContent } from 'mdast';
-import type { Math as MdastMath, InlineMath as MdastInlineMath } from 'mdast-util-math';
-import { visit, SKIP } from 'unist-util-visit';
 import { Bookmark } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import MarkdownRenderer from '@/components/MarkdownRenderer';
+import { normalizeMathForMarkdown } from '@/utils/normalizeMath';
 
-export type Message = {
-  id: string;
-  role: 'user' | 'stella' | 'error';
-  text: string;
-};
+export type Message = { id: string; role: 'user' | 'stella' | 'error'; text: string };
 
 type ChatDisplayProps = {
   messages: Message[];
   maxLength?: number;
   onCapture: (message: Message) => void;
-  onCaptureFormula: (formula: string) => void;
+  onCaptureFormula: (formula: string) => void; // kept for API compatibility
 };
 
-/* ----------------------- Liquid Glass Styles ----------------------- */
 const ROLE_STYLES = {
-  row: { user: 'justify-end', stella: 'justify-start', error: 'justify-center' },
   bubble: {
-    user: 'bg-sky-900/10 border-sky-400/20 text-slate-100',
-    stella: 'bg-white/5 border-white/10 text-slate-100',
+    user:
+      'bg-gradient-to-br from-sky-900/30 via-sky-800/20 to-emerald-700/20 ' +
+      'border-sky-400/30 text-foreground shadow-sky-900/20',
+    stella: 'bg-white/5 border-white/10 text-foreground shadow-black/20',
     error:
       'bg-destructive/80 border-destructive/90 text-destructive-foreground font-mono text-xs w-full text-center',
   },
+  ring: {
+    user: 'focus-visible:ring-sky-400/40',
+    stella: 'focus-visible:ring-gold/40',
+    error: 'focus-visible:ring-destructive/60',
+  },
 } as const;
 
-/* ----------------------- remark plugin: bracket/paren → mdast math ----------------------- */
-function remarkBracketedMath() {
-  const looksLikeMath = (s: string) =>
-    /\\[a-zA-Z]|[\^_=]|\\frac|\\mathbf|\\vec|\\cdot|\\times|\\sum|\\int|\\lim|\\boxed/.test(s.trim());
-
-  const normaliseMath = (src: string): string =>
-    src
-      .replace(/^\s*,\s*/, '').replace(/\s*,\s*$/, '')
-      .replace(/([A-Za-z0-9}])\s*,\s*(?=[A-Za-z\\(])/g, '$1 \\cdot ');
-
-  return (tree: Root) => {
-    // ... (All the visit() logic from your original file remains unchanged here) ...
-    visit(tree, 'paragraph', (node: Paragraph, index, parent) => { if (!parent || typeof index !== 'number' || node.children.length !== 1 || node.children[0].type !== 'text') return; const raw = (node.children[0] as Text).value.trim(); const m = raw.match(/^\[\s*([^\[\]\n]{1,2000})\s*\]$/); if (!m) return; const inner = (m[1] || '').trim(); if (!inner || !looksLikeMath(inner)) return; parent.children.splice(index, 1, { type: 'math', value: normaliseMath(inner) }); return SKIP; });
-    visit(tree, 'paragraph', (node: Paragraph, index, parent) => { if (!parent || typeof index !== 'number' || !node.children.every(c => c.type === 'text')) return; const raw = (node.children as Text[]).map(t => t.value).join(''); const lines = raw.split(/\r?\n/); const newSiblings: (Paragraph | MdastMath)[] = []; let buf: string[] = []; const flushBuf = () => { if (!buf.length) return; const text = buf.join('\n'); if (text.trim().length) newSiblings.push({ type: 'paragraph', children: [{ type: 'text', value: text }] }); buf = []; }; const startRE = /^\s*(?:[-*]\s+|\d+\.\s+)?\[\s*([^\[\]\n]{1,2000})\s*\]\s*(.*)$/; for (const line of lines) { const m = line.match(startRE); if (m) { const inner = (m[1] || '').trim(); const trailing = m[2] || ''; if (inner && looksLikeMath(inner)) { flushBuf(); newSiblings.push({ type: 'math', value: normaliseMath(inner) }); if (trailing.trim().length) newSiblings.push({ type: 'paragraph', children: [{ type: 'text', value: trailing }] }); continue; } } buf.push(line); } flushBuf(); if (newSiblings.length > 1 || (newSiblings.length === 1 && newSiblings[0].type !== 'paragraph')) { parent.children.splice(index, 1, ...newSiblings); return SKIP; } });
-    visit(tree, 'paragraph', (node: Paragraph) => { for (let i = 0; i < node.children.length; i++) { const ch = node.children[i]; if (ch.type !== 'text' || !ch.value) continue; const parts: PhrasingContent[] = []; let last = 0; const parenRE = /\(\s*([^()\n]{1,400})\s*\)/g; let m: RegExpExecArray | null; while ((m = parenRE.exec(ch.value))) { const start = m.index; const end = parenRE.lastIndex; const inner = (m[1] || '').trim(); if (start > last) parts.push({ type: 'text', value: ch.value.slice(last, start) }); if (inner && looksLikeMath(inner)) { parts.push({ type: 'inlineMath', value: normaliseMath(inner) }); } else { parts.push({ type: 'text', value: ch.value.slice(start, end) }); } last = end; } if (last < ch.value.length) parts.push({ type: 'text', value: ch.value.slice(last) }); if (parts.some(p => p.type === 'inlineMath')) { node.children.splice(i, 1, ...parts); i += parts.length - 1; } } });
-  };
-}
-
-// FIX: The old normalizeLatexInText function has been completely removed.
-
-/* ================================================================ */
-/*                            Main Component                        */
-/* ================================================================ */
 export default function ChatDisplay({
   messages,
-  maxLength = 500,
+  maxLength = 600,
   onCapture,
-  onCaptureFormula,
 }: ChatDisplayProps) {
+  const scrollRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -70,21 +47,25 @@ export default function ChatDisplay({
   }, [messages]);
 
   return (
-    <div className="space-y-4">
+    <div
+      ref={scrollRef}
+      className={clsx(
+        // vertical scroll only
+        'w-full max-h-[calc(100dvh-10rem)] overflow-y-auto overflow-x-hidden',
+        'overscroll-contain scroll-smooth',
+        // padding & spacing tuned for mobile
+        'px-2 sm:px-3 space-y-3 sm:space-y-4',
+      )}
+    >
       {messages.length === 0 ? (
-        <div className="text-muted-foreground font-sans text-sm p-4 text-center">
+        <div className="text-muted-foreground font-sans text-sm p-6 text-center rounded-xl border border-white/10 bg-white/5">
           Ask Stella a question to get started...
         </div>
       ) : (
         messages.map((msg) => (
-          <div key={msg.id} className={clsx('chat-message flex w-full group', ROLE_STYLES.row[msg.role])}>
-            <MessageBubble
-              message={msg}
-              onCapture={onCapture}
-              maxLength={maxLength}
-              onCaptureFormula={onCaptureFormula}
-            />
-          </div>
+          <MessageRow key={msg.id} message={msg}>
+            <MessageBubble message={msg} onCapture={onCapture} maxLength={maxLength} />
+          </MessageRow>
         ))
       )}
       <div ref={bottomRef} />
@@ -92,44 +73,60 @@ export default function ChatDisplay({
   );
 }
 
-/* ----------------------- Message Bubble Sub-Component ----------------------- */
-
-type MessageBubbleProps = {
-  message: Message;
-  onCapture: (message: Message) => void;
-  maxLength: number;
-  onCaptureFormula: (formula: string) => void;
-};
-
-const MessageBubble = memo(function MessageBubble({
+/* Row wrapper: stella = full width; user = right-aligned */
+function MessageRow({
   message,
-  onCapture,
-  maxLength,
-  onCaptureFormula,
-}: MessageBubbleProps) {
+  children,
+}: {
+  message: Message;
+  children: React.ReactNode;
+}) {
+  if (message.role === 'stella') return <div className="w-full">{children}</div>;
+  if (message.role === 'error') return <div className="w-full flex justify-center">{children}</div>;
+  return <div className="w-full flex justify-end">{children}</div>;
+}
+
+type MessageBubbleProps = { message: Message; onCapture: (message: Message) => void; maxLength: number };
+
+const MessageBubble = memo(function MessageBubble({ message, onCapture, maxLength }: MessageBubbleProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-
-  // FIX: We no longer normalize the text here. We use the raw text.
   const isLong = message.text.length > maxLength;
-  const display = isLong && !isExpanded ? `${message.text.slice(0, maxLength)}…` : message.text;
+  const raw = isLong && !isExpanded ? `${message.text.slice(0, maxLength)}…` : message.text;
+  const display = normalizeMathForMarkdown(raw);
 
-  const customPlugins = useMemo(() => [remarkBracketedMath], []);
+  const isStella = message.role === 'stella';
 
   return (
     <div
       className={clsx(
-        'relative rounded-xl px-3.5 py-2 max-w-[90%] border backdrop-blur-lg shadow-lg font-sans text-[15px] leading-relaxed',
-        ROLE_STYLES.bubble[message.role]
+        // width
+        isStella
+          ? 'w-[calc(100%+1rem)] -mx-2 sm:mx-0 sm:w-full sm:rounded-2xl sm:border sm:shadow-lg'
+          : 'max-w-[92%] sm:max-w-[80%] md:max-w-[70%] rounded-2xl border shadow-lg',
+        // visuals
+        'backdrop-blur-xl',
+        'px-3.5 py-2 sm:px-4 sm:py-3',
+        'transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl',
+        'focus-within:outline-none focus-within:ring-2',
+        ROLE_STYLES.bubble[message.role],
+        ROLE_STYLES.ring[message.role],
+        // scrolling
+        'overflow-x-hidden', // hide horizontal scroll
       )}
+      tabIndex={0}
     >
-      {message.role === 'stella' && (
+      {isStella && (
         <TooltipProvider delayDuration={300}>
           <Tooltip>
             <TooltipTrigger asChild>
               <button
                 type="button"
                 onClick={() => onCapture(message)}
-                className="absolute top-1 -right-3 p-1.5 rounded-full bg-slate-900/40 border border-transparent text-slate-400 opacity-0 group-hover:opacity-100 transition-all hover:bg-white/10 hover:text-white hover:border-white/20"
+                className={clsx(
+                  'absolute top-2 right-2 p-1.5 rounded-full border text-slate-300',
+                  'bg-slate-900/30 border-white/10',
+                  'opacity-0 group-hover:opacity-100 transition-all hover:bg-white/15 hover:text-white',
+                )}
                 aria-label="Save to notebook"
               >
                 <Bookmark className="w-4 h-4" />
@@ -145,13 +142,28 @@ const MessageBubble = memo(function MessageBubble({
       ) : message.role === 'error' ? (
         <span>{display}</span>
       ) : (
-        // FIX: Pass the raw display text to the renderer.
-        <MarkdownRenderer
-          onCaptureFormula={onCaptureFormula}
-          remarkPlugins={customPlugins}
+        <div
+          className={clsx(
+            // Typography + colors bound to CSS vars
+            'prose prose-invert prose-theme max-w-none',
+            // smoother reading on mobile
+            'text-[14.5px] leading-relaxed sm:text-[15px]',
+            // element rhythm
+            'prose-p:my-2 prose-ul:my-2 prose-ol:my-2 prose-li:my-0.5',
+            'prose-h1:mt-2 prose-h1:mb-3 prose-h2:mt-2 prose-h2:mb-2 prose-h3:mt-2 prose-h3:mb-1.5',
+            'prose-a:no-underline hover:prose-a:underline',
+            'prose-code:px-1 prose-code:py-0.5 prose-code:rounded-md prose-code:bg-white/10',
+            // prevent horizontal scroll; wrap long content
+            'break-words',
+            // tables & code safety
+            '[&_table]:w-full [&_table]:table-fixed [&_th]:font-semibold [&_td]:align-top',
+            '[&_pre]:whitespace-pre-wrap [&_pre]:break-words',
+            // MathJax SVG scale/wrap
+            '[&_.MathJax]:max-w-full [&_.mjx-svg]:max-w-full [&_.mjx-svg]:h-auto',
+          )}
         >
-          {display}
-        </MarkdownRenderer>
+          <MarkdownRenderer>{display}</MarkdownRenderer>
+        </div>
       )}
 
       {isLong && !isExpanded && (

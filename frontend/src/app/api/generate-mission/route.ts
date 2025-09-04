@@ -5,9 +5,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'node:crypto';
 import { Job } from 'bullmq';
 import { llmQueue, connection as redis } from '@/lib/queue';
-import type { Role, LlmJobResult } from '@/types/llm';
+// Import types from the single source of truth
+import type { Role, MissionType, LlmJobResult } from '@/types/llm';
 
-type RequestPayload = { missionType: 'rocket-lab' | 'rover-cam'; role: Role };
+// Use the imported types for the request payload
+type RequestPayload = { missionType: MissionType; role: Role };
 
 function hashId(o: unknown): string {
   return crypto.createHash('sha256').update(JSON.stringify(o)).digest('hex');

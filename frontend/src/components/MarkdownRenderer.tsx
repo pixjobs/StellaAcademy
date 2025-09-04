@@ -1,119 +1,112 @@
 // components/MarkdownRenderer.tsx
 'use client';
 
-import { FC, memo, useMemo, type ReactNode } from 'react';
-import ReactMarkdown, { type Components } from 'react-markdown';
+import React from 'react';
+import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
-import katex from 'katex';
-import 'katex/dist/katex.min.css';
-import type { Pluggable } from 'unified';
-import type { Math as MdastMath, InlineMath as MdastInlineMath } from 'mdast-util-math';
-import { ClipboardCopy } from 'lucide-react';
+import rehypeRaw from 'rehype-raw';
+import rehypeMathjax from 'rehype-mathjax/svg';
+import { visit } from 'unist-util-visit';
+// 1. Import from the correct library for HAST (HTML Abstract Syntax Tree)
+import { toString } from 'hast-util-to-string';
+import type { Plugin } from 'unified';
+import type { Root } from 'mdast';
+// 2. Import the correct type for HAST nodes that react-markdown provides
+import type { Element } from 'hast';
+import { Bookmark } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
-/* ----------------------- Memoized Sub-Components (Unchanged) ----------------------- */
-const ThemedAnchor = memo(function ThemedAnchor({ href, children, ...props }: React.ComponentPropsWithoutRef<'a'>) {
-  return (<a href={href} target="_blank" rel="noreferrer" className="underline text-gold hover:text-gold/80" {...props}>{children}</a>);
-});
+/**
+ * A higher-order component that wraps a Markdown element and adds a "Save" button.
+ * It is now type-safe and handles optional nodes.
+ */
+const Capturable = ({
+  node,
+  children,
+  onCapture,
+}: {
+  // 3. The `node` is an optional HAST Element, which is the correct type.
+  node?: Element;
+  children: React.ReactNode;
+  onCapture?: (text: string) => void;
+}) => {
+  // 4. Gracefully do nothing if the capture function or the node isn't available.
+  if (!onCapture || !node) {
+    return <>{children}</>;
+  }
 
-const InteractiveInlineMath = memo(function InteractiveInlineMath({ formula, onCapture }: { formula: string; onCapture: (f: string) => void }) {
-  const html = useMemo(() => katex.renderToString(formula, { throwOnError: false, displayMode: false }), [formula]);
-  return (
-    <TooltipProvider delayDuration={200}>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <span className="relative group p-1 cursor-pointer align-middle">
-            <span dangerouslySetInnerHTML={{ __html: html }} />
-            <button
-              type="button"
-              onClick={() => onCapture(formula)}
-              className="absolute -top-2 -right-2 p-1 rounded-full bg-slate-900/40 border border-transparent text-slate-400 opacity-0 group-hover:opacity-100 transition-all hover:bg-white/10 hover:text-white hover:border-white/20"
-              aria-label="Save formula"
-            >
-              <ClipboardCopy className="w-3.5 h-3.5" />
-            </button>
-          </span>
-        </TooltipTrigger>
-        <TooltipContent>Save Formula to Notebook</TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
-  );
-});
+  const handleCapture = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    // We've already checked that `node` exists, so this is safe.
+    const text = toString(node);
+    onCapture(text);
+  };
 
-const InteractiveBlockMath = memo(function InteractiveBlockMath({ formula, onCapture }: { formula: string; onCapture: (f: string) => void }) {
-  const html = useMemo(() => katex.renderToString(formula, { throwOnError: false, displayMode: true }), [formula]);
   return (
-    <div className="relative group my-4">
-      <div dangerouslySetInnerHTML={{ __html: html }} />
+    <div className="group relative">
+      {children}
       <TooltipProvider delayDuration={200}>
         <Tooltip>
           <TooltipTrigger asChild>
             <button
               type="button"
-              onClick={() => onCapture(formula)}
-              className="absolute top-1 right-1 p-1.5 rounded-full bg-slate-900/40 border border-transparent text-slate-400 opacity-0 group-hover:opacity-100 transition-all hover:bg-white/10 hover:text-white hover:border-white/20"
-              aria-label="Save formula"
+              onClick={handleCapture}
+              className="absolute top-1 -right-8 p-1.5 rounded-full border text-slate-400 bg-slate-900/50 border-white/10 opacity-0 group-hover:opacity-100 transition-all hover:bg-white/20 hover:text-white focus:opacity-100"
+              aria-label="Save snippet to notebook"
             >
-              <ClipboardCopy className="w-4 h-4" />
+              <Bookmark className="w-3.5 h-3.5" />
             </button>
           </TooltipTrigger>
-          <TooltipContent>Save Formula to Notebook</TooltipContent>
+          <TooltipContent side="right">Save Snippet</TooltipContent>
         </Tooltip>
       </TooltipProvider>
     </div>
   );
-});
+};
 
-/* ----------------------- Types and Helpers (Unchanged) ----------------------- */
-type MathProps = { node?: MdastMath; children?: ReactNode };
-type InlineMathProps = { node?: MdastInlineMath; children?: ReactNode };
-interface CustomComponents extends Components {
-  math?: (props: MathProps) => ReactNode;
-  inlineMath?: (props: InlineMathProps) => ReactNode;
-}
-const getFormula = (node?: { value?: string }, children?: ReactNode) => (node?.value as string | undefined) ?? String(children ?? '');
+// Custom remark plugin for fenced math blocks (unchanged)
+const remarkMathFromFencedCode: Plugin<[], Root> = () => (tree) => {
+  visit(tree, 'code', (node: any) => {
+    const lang = (node.lang || '').toLowerCase();
+    if (lang === 'math' || lang === 'tex' || lang === 'latex') {
+      node.type = 'math';
+      node.value = node.value || '';
+    }
+  });
+};
 
-/* ================================================================ */
-/*                        Main Renderer Component                     */
-/* ================================================================ */
-interface MarkdownRendererProps {
-  children: string; // This `children` prop is now expected to be a clean, valid Markdown string.
-  onCaptureFormula: (formula: string) => void;
-  remarkPlugins?: Pluggable[];
-}
+type Props = {
+  children: string;
+  onCaptureFragment?: (text: string) => void;
+};
 
-const MarkdownRenderer: FC<MarkdownRendererProps> = ({
-  children,
-  onCaptureFormula,
-  remarkPlugins = [],
-}) => {
-  const mdComponents: CustomComponents = useMemo(
-    () => ({
-      a: ThemedAnchor,
-      math: ({ node, children }) => (
-        <InteractiveBlockMath formula={getFormula(node, children)} onCapture={onCaptureFormula} />
-      ),
-      inlineMath: ({ node, children }) => (
-        <InteractiveInlineMath formula={getFormula(node, children)} onCapture={onCaptureFormula} />
-      ),
-    }),
-    [onCaptureFormula]
-  );
-
-  // The `preprocessAndNormalize` function and the `useMemo` hook that called it
-  // have been completely removed. We now pass the children prop directly.
-
+export default function MarkdownRenderer({ children, onCaptureFragment }: Props) {
   return (
-    <div className="prose prose-sm prose-invert max-w-none prose-p:my-2 prose-code:before:content-[''] prose-code:after:content-['']">
+    <div className="prose prose-sm prose-invert max-w-none">
       <ReactMarkdown
-        remarkPlugins={[...remarkPlugins, remarkMath, remarkGfm]}
-        components={mdComponents as Components}
+        remarkPlugins={[remarkMathFromFencedCode, remarkMath, remarkGfm]}
+        rehypePlugins={[rehypeRaw, rehypeMathjax]}
+        components={{
+          // 5. The `node` prop passed from here is now correctly typed and handled by `Capturable`.
+          p: ({ node, ...props }) => (
+            <Capturable node={node} onCapture={onCaptureFragment}><p {...props} /></Capturable>
+          ),
+          pre: ({ node, ...props }) => (
+            <Capturable node={node} onCapture={onCaptureFragment}><pre {...props} /></Capturable>
+          ),
+          li: ({ node, ...props }) => (
+            <Capturable node={node} onCapture={onCaptureFragment}><li {...props} /></Capturable>
+          ),
+          table: ({ node, ...props }) => (
+            <Capturable node={node} onCapture={onCaptureFragment}>
+              <div className="overflow-x-auto my-4"><table {...props} /></div>
+            </Capturable>
+          ),
+        }}
       >
         {children}
       </ReactMarkdown>
     </div>
   );
-};
-
-export default memo(MarkdownRenderer);
+}

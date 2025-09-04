@@ -1,3 +1,4 @@
+// components/Header.tsx
 'use client';
 
 import Link from 'next/link';
@@ -20,7 +21,9 @@ export default function Header() {
   return (
     <header
       ref={ref}
-      className="w-full bg-ink text-gold shadow-pixel font-pixel px-4 py-3 flex items-center justify-between"
+      // --- MODIFICATION ---
+      // Added `relative` and `z-50` to ensure the header is on top.
+      className="relative z-50 w-full bg-ink text-gold shadow-pixel font-pixel px-4 py-3 flex items-center justify-between"
     >
       {/* Logo / Title */}
       <Link href="/" className="text-lg tracking-wider hover:text-mint transition-colors">

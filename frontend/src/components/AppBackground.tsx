@@ -1,46 +1,64 @@
+// components/AppBackground.tsx
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { usePathname } from 'next/navigation'; // <-- Hook
 import gsap from 'gsap';
 import WarpDrive from '@/components/WarpDrive';
 
 type Props = { url?: string; warpOnLoad?: boolean };
 
 export default function AppBackground({ url, warpOnLoad = true }: Props) {
+  // --- THIS IS THE FIX ---
+  // 1. All hooks are called UNCONDITIONALLY at the top of the component.
+  //    This ensures they are called in the same order on every render.
+  const pathname = usePathname();
   const apodRef = useRef<HTMLDivElement>(null);
   const warpRef = useRef<HTMLDivElement>(null);
 
   // Preload APOD so we never fade to blank
   useEffect(() => {
-    if (!url) return;
+    // We can have conditional logic *inside* a hook, but the hook itself must always be called.
+    if (!url || pathname === '/about') return;
     const img = new Image();
     img.src = url;
-  }, [url]);
+  }, [url, pathname]); // Add pathname to the dependency array
 
   // Initial states + auto-kick the warp on mount
   useEffect(() => {
-    const apod = apodRef.current!, warp = warpRef.current!;
+    // This hook also runs on every render, but we exit early if we're on the about page.
+    if (pathname === '/about') return;
+
+    const apod = apodRef.current!;
+    const warp = warpRef.current!;
     gsap.set(apod, { opacity: 0 });
     gsap.set(warp, { opacity: warpOnLoad ? 1 : 0 });
 
     if (warpOnLoad) {
-      // kick on next paint to avoid race conditions
       const id = requestAnimationFrame(() =>
         window.dispatchEvent(new Event('stella:warp'))
       );
       return () => cancelAnimationFrame(id);
     }
-  }, [warpOnLoad]);
+  }, [warpOnLoad, pathname]); // Add pathname to the dependency array
 
   const revealApod = () => {
-    const apod = apodRef.current!, warp = warpRef.current!;
+    const apod = apodRef.current!;
+    const warp = warpRef.current!;
     gsap.timeline()
       .to(warp, { opacity: 0, duration: 1.0, ease: 'power2.out' })
       .to(apod, { opacity: 1, duration: 1.1, ease: 'power2.out' }, '<0.1');
   };
 
+  // 2. The conditional return happens AFTER all hooks have been called.
+  //    This satisfies the Rules of Hooks.
+  if (pathname === '/about') {
+    return null;
+  }
+
+  // 3. The JSX is returned for all other pages.
   return (
-    <div className="fixed inset-0 z-0 pointer-events-none select-none" aria-hidden>
+    <div className="fixed inset-0 z-[-1] pointer-events-none select-none" aria-hidden>
       {/* APOD base (z-0) */}
       <div
         ref={apodRef}
@@ -65,7 +83,7 @@ export default function AppBackground({ url, warpOnLoad = true }: Props) {
         <WarpDrive
           autoStart
           density={1100}
-          respectReducedMotion={false}   // ⬅️ force warp even if OS has reduced motion
+          respectReducedMotion={false}
           onCruise={revealApod}
         />
       </div>

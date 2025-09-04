@@ -1,72 +1,46 @@
 /* 1) GLOBAL IMPORTS — Must be at the very top */
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-@import 'katex/dist/katex.min.css';
-
 
 /* 2) TAILWIND DIRECTIVES */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-
 /* 3) THEME & BASE STYLES */
 @layer base {
-  /* --- Color Palette Variables (HSL values for reusability) --- */
+  /* Define custom color palettes */
   :root {
     --custom-mint: 168 76% 66%;
     --custom-sky: 207 90% 60%;
     --custom-gold: 54 98% 63%;
   }
 
-  /* --- ShadCN Light Mode Theme --- */
-  :root {
-    --background: 224 40% 95%;
-    --foreground: 224 40% 8%;
-    --card: 224 40% 95%;
-    --card-foreground: 224 40% 8%;
-    --popover: 224 40% 95%;
-    --popover-foreground: 224 40% 8%;
+  /* Define theme variables for dark mode (default) */
+  :root, .dark {
+    --background: 224 40% 8%;
+    --foreground: 0 0% 100%; /* White */
+    --card: 225 33% 11%;
+    --card-foreground: 0 0% 100%; /* White */
+    --popover: 224 40% 8%;
+    --popover-foreground: 0 0% 100%; /* White */
     --primary: hsl(var(--custom-gold));
     --primary-foreground: 224 40% 8%;
-    --secondary: 224 20% 90%;
-    --secondary-foreground: 224 20% 10%;
-    --muted: 224 20% 90%;
-    --muted-foreground: 224 20% 40%;
-    --accent: 224 20% 90%;
-    --accent-foreground: 224 20% 10%;
+    --secondary: 222 47% 11%;
+    --secondary-foreground: 0 0% 100%; /* White */
+    --muted: 222 47% 11%;
+    --muted-foreground: 224 15% 55%;
+    --accent: 222 47% 11%;
+    --accent-foreground: 0 0% 100%; /* White */
     --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 224 20% 85%;
-    --input: 224 20% 85%;
+    --destructive-foreground: 0 0% 100%; /* White */
+    --border: 222 47% 11%;
+    --input: 222 47% 11%;
     --ring: hsl(var(--custom-sky));
     --radius: 0.5rem;
   }
 
-  /* --- ShadCN Dark Mode Theme --- */
-  .dark {
-    --background: 224 40% 8%;
-    --foreground: 216 67% 95%;
-    --card: 225 33% 11%;
-    --card-foreground: 216 67% 95%;
-    --popover: 224 40% 8%;
-    --popover-foreground: 216 67% 95%;
-    --primary: hsl(var(--custom-gold));
-    --primary-foreground: 224 40% 8%;
-    --secondary: 222 47% 11%;
-    --secondary-foreground: 216 67% 95%;
-    --muted: 222 47% 11%;
-    --muted-foreground: 224 15% 55%;
-    --accent: 222 47% 11%;
-    --accent-foreground: 216 67% 95%;
-    --destructive: 0 63% 31%;
-    --destructive-foreground: 216 67% 95%;
-    --border: 222 47% 11%;
-    --input: 222 47% 11%;
-    --ring: hsl(var(--custom-sky));
-  }
-
-  /* --- Global Element Styles --- */
+  /* Base element styles */
   * {
     @apply border-border;
   }
@@ -79,7 +53,7 @@
   }
 
   h1, h2, h3 {
-    @apply font-semibold tracking-tight text-foreground;
+    @apply font-semibold tracking-tight; /* text-foreground is inherited from body */
   }
 
   ::selection {
@@ -88,10 +62,8 @@
   }
 }
 
-
 /* 4) CUSTOM COMPONENT STYLES */
 @layer components {
-  /* Custom button with a pixelated feel */
   .btn-pixel {
     @apply rounded-md border-2 border-slate-600 bg-slate-700/50 px-4 py-1.5
            text-slate-200 transition-all duration-200
@@ -100,7 +72,6 @@
            disabled:cursor-not-allowed disabled:opacity-50;
   }
 
-  /* Blinking cursor for typing animations */
   .blinking-cursor {
     @apply font-semibold;
     color: hsl(var(--custom-mint));
@@ -110,10 +81,33 @@
     from, to { color: transparent; }
     50% { color: hsl(var(--custom-mint)); }
   }
+
+  /* Tailwind Typography (.prose) theme binding */
+  .prose {
+    --tw-prose-body: hsl(var(--foreground));
+    --tw-prose-headings: hsl(var(--foreground));
+    --tw-prose-lead: hsl(var(--foreground));
+    --tw-prose-links: hsl(var(--custom-gold));
+    --tw-prose-bold: hsl(var(--foreground));
+    --tw-prose-counters: hsl(var(--foreground)); /* Changed from muted */
+    --tw-prose-bullets: hsl(var(--foreground)); /* Changed from muted */
+    --tw-prose-hr: hsl(var(--border));
+    --tw-prose-quotes: hsl(var(--foreground));
+    --tw-prose-quote-borders: hsl(var(--border));
+    --tw-prose-captions: hsl(var(--muted-foreground));
+    --tw-prose-code: hsl(var(--foreground));
+    --tw-prose-pre-code: hsl(var(--foreground));
+    --tw-prose-pre-bg: hsl(var(--card));
+    --tw-prose-th-borders: hsl(var(--border));
+    --tw-prose-td-borders: hsl(var(--border));
+  }
+
+  .prose a {
+    @apply font-semibold text-primary underline underline-offset-4 transition-colors duration-200 hover:text-primary/80;
+  }
 }
 
-
-/* 5) CUSTOM UTILITY STYLES */
+/* 5) CUSTOM UTILITY & OVERRIDE STYLES */
 @layer utilities {
   .font-pixel {
     font-family: 'Press Start 2P', cursive;
@@ -125,28 +119,25 @@
     background: repeating-linear-gradient(0deg, rgba(255,255,255,0) 0, rgba(255,255,255,0) 2px, rgba(255,255,255,0.1) 0, rgba(255,255,255,0.1) 3px);
     mix-blend-mode: soft-light;
   }
-}
 
-
-/* 6) KATEX STYLES FOR TAILWIND PROSE (THE FIX) */
-/*
- * This tells Tailwind's .prose styles to completely ignore KaTeX elements,
- * allowing the original katex.min.css stylesheet to take full control.
-*/
-@layer utilities {
-  /*
-   * Revert all prose styling on the KaTeX container and all of its children (*).
-   * The `all: revert` property is a powerful CSS reset.
-   */
-  .prose .katex,
-  .prose .katex * {
-    all: revert;
-  }
-
-  /*
-   * Style the block-level display container for proper spacing within the document flow.
-   */
+  /* Katex & MathJax Fixes */
+  .katex, .katex-display { color: hsl(var(--foreground)); }
+  .katex-display { overflow-x: auto; overflow-y: hidden; text-align: center; }
+  .prose .katex, .prose .katex * { all: revert; }
   .prose .katex-display {
     @apply my-6 block overflow-x-auto overflow-y-hidden text-center;
   }
+  .prose .MathJax,
+  .prose .mjx-svg,
+  .prose .MathJax svg {
+    color: hsl(var(--foreground));
+    fill: currentColor;
+    stroke: currentColor;
+    max-width: 100%;
+  }
+
+  /* Typography color safety net */
+  .prose :where(h1,h2,h3,h4,h5,h6){ color: hsl(var(--foreground)) !important; }
+  .prose :where(p,li,strong,em,code,th,td,blockquote){ color: hsl(var(--foreground)); }
+  .prose a{ color: hsl(var(--custom-gold)); }
 }

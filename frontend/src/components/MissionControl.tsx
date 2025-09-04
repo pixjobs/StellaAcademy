@@ -1,3 +1,4 @@
+// MissionControl.tsx
 'use client';
 
 import { useEffect, useMemo, useRef, useState, useCallback, Dispatch, SetStateAction } from 'react';
@@ -6,55 +7,32 @@ import { useMissionChatQueued as useMissionChat } from '@/hooks/useMissionChatQu
 import { gsap } from 'gsap';
 import { useGSAP } from '@gsap/react';
 import {
-  ChevronLeft, ChevronRight, BookOpen, FlaskConical, Link as LinkIcon,
-  Image as ImageIcon, Plus, Trash2, Bookmark, Sparkles, SlidersHorizontal,
+  ChevronLeft, ChevronRight, Bookmark, SlidersHorizontal,
 } from 'lucide-react';
 
+// UI and Child Components
 import ChatDisplay, { type Message } from './ChatDisplay';
 import ChatInput from './ChatInput';
 import { Button } from './ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
+import NotebookPanel from './NotebookPanel';
 
-// NOTE: For a larger project, these should be moved to a shared `types.ts` file.
-type NoteType = 'concept' | 'formula' | 'reference' | 'image';
-
-type Note = {
-  id: string; type: NoteType; title: string; body?: string;
-  url?: string; imgHref?: string; createdAt: number;
-};
-
-type Img = {
-  title: string;
-  href: string;
-};
+// Types and Context
+import { Img, Note } from '@/types/mission';
+import { NotesProvider, useNotes } from '@/lib/notes/NotesContext';
 
 export type MissionControlProps = {
   mission?: string; images?: Img[]; context?: string;
   initialImage?: number; initialMessage?: Message;
 };
 
-const uid = () => Math.random().toString(36).slice(2, 9);
 const urlRegex = /(https?:\/\/[\w.-]+(?:\/[\w\-._~:/?#[\]@!$&'()*+,;=.]+)?)/g;
 
-function usePersistentNotes(missionKey: string) {
-  const storageKey = `stella:notes:${missionKey}`;
-  const [notes, setNotes] = useState<Note[]>(() => {
-    try {
-      const raw = typeof window !== 'undefined' ? localStorage.getItem(storageKey) : null;
-      return raw ? (JSON.parse(raw) as Note[]) : [];
-    } catch { return []; }
-  });
-  useEffect(() => {
-    localStorage.setItem(storageKey, JSON.stringify(notes));
-  }, [notes, storageKey]);
-  return { notes, setNotes };
-}
-
-export default function MissionControl({
+function MissionControlInternal({
   mission = 'general', images = [], context, initialImage, initialMessage,
 }: MissionControlProps) {
   const { role } = useGame();
-  const { notes, setNotes } = usePersistentNotes(mission);
+  const { notes, addNote, removeNote } = useNotes();
   const { messages, loading, sendMessage, stop, reset } = useMissionChat({ role, mission });
 
   const [selImageIndex, setSelImageIndex] = useState(() => Math.max(0, initialImage ?? 0));
@@ -85,15 +63,6 @@ export default function MissionControl({
     setChatInputValue('');
   };
 
-  const addNote = useCallback((partialNote: Partial<Note>) => {
-    setNotes(prev => [{
-      id: uid(), type: partialNote.type ?? 'concept', title: partialNote.title ?? 'Untitled Note',
-      body: partialNote.body, url: partialNote.url, imgHref: partialNote.imgHref, createdAt: Date.now(),
-    }, ...prev]);
-  }, [setNotes]);
-
-  const removeNote = (id: string) => setNotes(prev => prev.filter(n => n.id !== id));
-
   const handleImageChange = (newIndex: number) => {
     if (newIndex === selImageIndex || loading) return;
     setSelImageIndex(newIndex);
@@ -101,7 +70,7 @@ export default function MissionControl({
     sendMessage(`Give a ${role}-friendly 2-line summary of the new image.`, buildContext());
   };
 
-  const handleCaptureMessage = useCallback((message: Message) => {
+  const handleCaptureMessage = (message: Message) => {
     if (!message.text) return;
     const links = Array.from(message.text.matchAll(urlRegex), m => m[0]);
     if (links.length > 0) {
@@ -109,28 +78,37 @@ export default function MissionControl({
     } else {
       addNote({ type: 'concept', title: 'Captured Note', body: message.text });
     }
-  }, [addNote]);
+  };
   
-  // --- THIS IS THE FIX ---
-  // The new handler function required by the upgraded ChatDisplay component.
-  const handleCaptureFormula = useCallback((formulaText: string) => {
-    addNote({
-      type: 'formula',
-      title: 'Captured Formula',
-      body: formulaText,
-    });
-  }, [addNote]);
+  const handleCaptureFormula = (formulaText: string) => {
+    addNote({ type: 'formula', title: 'Captured Formula', body: formulaText });
+  };
   
   const handleNoteClick = useCallback((note: Note) => {
     let prompt = '';
-    switch (note.type) {
-      case 'concept': prompt = `Explain this concept in a simpler way: "${note.title}"`; break;
-      case 'formula': prompt = `Give me a practice problem using this: ${note.body}`; break;
-      case 'reference': prompt = `Summarize the key idea from this reference: ${note.url}`; break;
-      case 'image': prompt = `Tell me one surprising fact about this image: "${note.title}"`; break;
+
+    // If the note has a body, that's the most valuable content. Use it directly.
+    if (note.body) {
+      prompt = note.body;
+    } 
+    // For other types without a body, generate a sensible prompt as a fallback.
+    else {
+      switch (note.type) {
+        case 'reference':
+          prompt = `Tell me more about this link: ${note.url}`;
+          break;
+        case 'image':
+          prompt = `What are the key features of the image titled "${note.title}"?`;
+          break;
+        default:
+          prompt = `Can you elaborate on "${note.title}"?`;
+          break;
+      }
     }
+    
     setChatInputValue(prompt);
-    setIsNotebookOpen(false);
+    setIsNotebookOpen(false); // Close notebook on mobile
+    // Ensure the input is focused so the user can immediately start typing or send.
     document.querySelector<HTMLInputElement>('#chat-input')?.focus();
   }, []);
 
@@ -167,7 +145,7 @@ export default function MissionControl({
             onSend={onSend}
             onStop={stop}
             onCaptureMessage={handleCaptureMessage}
-            onCaptureFormula={handleCaptureFormula} // <-- The new prop is now passed down
+            onCaptureFormula={handleCaptureFormula}
             inputValue={chatInputValue}
             setInputValue={setChatInputValue}
             onToggleNotebook={() => setIsNotebookOpen(!isNotebookOpen)}
@@ -186,9 +164,18 @@ export default function MissionControl({
   );
 }
 
+export default function MissionControl(props: MissionControlProps) {
+  return (
+    <NotesProvider missionKey={props.mission || 'general'}>
+      <MissionControlInternal {...props} />
+    </NotesProvider>
+  );
+}
+
+
 /* ─────────────────────────────────────────────────────────
-   Child Components
-────────────────────────────────────────────────────────── */
+   Child Components (VisualPanel and ChatPanel)
+   ────────────────────────────────────────────────────────── */
 
 type VisualPanelProps = {
   currentImage: Img; imageIndex: number; imageCount: number;
@@ -227,7 +214,7 @@ function VisualPanel({ currentImage, imageIndex, imageCount, onPrev, onNext, onQ
 
 type ChatPanelProps = {
   messages: Message[]; isLoading: boolean; onSend: (text: string) => void; onStop: () => void;
-  onCaptureMessage: (message: Message) => void; onCaptureFormula: (formula: string) => void; // <-- New prop added here
+  onCaptureMessage: (message: Message) => void; onCaptureFormula: (formula: string) => void;
   inputValue: string; setInputValue: Dispatch<SetStateAction<string>>; onToggleNotebook: () => void;
 };
 function ChatPanel({ messages, isLoading, onSend, onStop, onCaptureMessage, onCaptureFormula, inputValue, setInputValue, onToggleNotebook }: ChatPanelProps) {
@@ -247,71 +234,5 @@ function ChatPanel({ messages, isLoading, onSend, onStop, onCaptureMessage, onCa
         <ChatInput onSend={onSend} onStop={onStop} isLoading={isLoading} value={inputValue} setValue={setInputValue} />
       </div>
     </div>
-  );
-}
-
-type NotebookPanelProps = {
-  notes: Note[]; onAddNote: (partialNote: Partial<Note>) => void;
-  onRemoveNote: (id: string) => void; onNoteClick: (note: Note) => void;
-};
-function NotebookPanel({ notes, onAddNote, onRemoveNote, onNoteClick }: NotebookPanelProps) {
-  const [tab, setTab] = useState<NoteType>('concept');
-  const filteredNotes = useMemo(() => notes.filter((n) => n.type === tab), [notes, tab]);
-
-  return (
-    <aside className="rounded-xl bg-white/5 border border-white/10 backdrop-blur-lg shadow-lg p-3 md:p-4">
-      <div className="flex items-center gap-2 mb-3 border-b border-white/10 pb-3">
-        <Sparkles className="w-5 h-5 text-gold"/>
-        <h3 className="font-pixel text-lg text-gold">Mission Notebook</h3>
-      </div>
-      <div className="flex items-center gap-2 mb-3 flex-wrap">
-        <TabButton active={tab === 'concept'} onClick={() => setTab('concept')} icon={<BookOpen className="w-4 h-4" />}>Notes</TabButton>
-        <TabButton active={tab === 'formula'} onClick={() => setTab('formula')} icon={<FlaskConical className="w-4 h-4" />}>Formulas</TabButton>
-        <TabButton active={tab === 'reference'} onClick={() => setTab('reference')} icon={<LinkIcon className="w-4 h-4" />}>Links</TabButton>
-        <TabButton active={tab === 'image'} onClick={() => setTab('image')} icon={<ImageIcon className="w-4 h-4" />}>Images</TabButton>
-      </div>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button variant="outline" size="sm" className="w-full mb-3" onClick={() => onAddNote({ type: tab, title: 'New Note', body: '...' })}><Plus className="w-4 h-4 mr-1"/>Add New {tab}</Button>
-        </TooltipTrigger>
-        <TooltipContent>Manually add a new item to this tab.</TooltipContent>
-      </Tooltip>
-      {filteredNotes.length === 0 ? (
-        <div className="text-xs text-muted-foreground border border-dashed border-white/20 rounded-lg p-3 text-center">
-          <p>No {tab}s saved yet.</p>
-          <p className="mt-1">Click the <Bookmark className="w-3 h-3 inline-block -mt-1 mx-1"/> icon on a message to save it here.</p>
-        </div>
-      ) : (
-        <ul className="space-y-2 max-h-[60vh] overflow-y-auto pr-1">
-          {filteredNotes.map((note) => (
-            <li key={note.id} className="rounded-lg border border-white/10 bg-white/5 p-2 group">
-              <div className="flex items-start justify-between gap-2">
-                <button onClick={() => onNoteClick(note)} className="text-left flex-1 space-y-1">
-                  <div className="text-xs font-semibold text-foreground truncate group-hover:text-gold transition-colors">{note.title}</div>
-                  {note.url && <a className="text-[11px] underline text-sky-400 break-all block" href={note.url} target="_blank" rel="noreferrer" onClick={e => e.stopPropagation()}>{note.url}</a>}
-                  {note.imgHref && <img src={note.imgHref} alt={note.title} className="rounded-md border border-white/10 mt-1" />}
-                  {note.body && <p className="text-[11px] text-muted-foreground whitespace-pre-wrap">{note.body}</p>}
-                </button>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <button onClick={() => onRemoveNote(note.id)} className="p-1 rounded text-muted-foreground hover:bg-destructive/20 hover:text-destructive" aria-label="Remove"><Trash2 className="w-3.5 h-3.5" /></button>
-                  </TooltipTrigger>
-                  <TooltipContent>Delete Note</TooltipContent>
-                </Tooltip>
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
-    </aside>
-  );
-}
-
-type TabButtonProps = { active: boolean; onClick: () => void; children: React.ReactNode; icon: React.ReactNode };
-function TabButton({ active, onClick, children, icon }: TabButtonProps) {
-  return (
-    <Button type="button" onClick={onClick} variant={active ? 'secondary' : 'ghost'} size="sm" className="flex items-center gap-1.5">
-      {icon} {children}
-    </Button>
   );
 }
