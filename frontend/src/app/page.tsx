@@ -1,77 +1,24 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import gsap from 'gsap';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useGame, Role } from '@/lib/store';
+import IntroOverlay from '@/components/IntroOverlay';
 
 const roles: { id: Role; label: string; blurb: string; persona: string }[] = [
-  {
-    id: 'explorer',
-    label: 'Explorer (Kid)',
-    blurb: 'Explore amazing space pictures with a friendly guide.',
-    persona:
-      'You are Stella, a cheerful and imaginative space guide for kids. Use simple words, fun facts, and storytelling.'
-  },
-  {
-    id: 'cadet',
-    label: 'Cadet (Teen)',
-    blurb: 'Analyze mission data and form hypotheses with a co-pilot.',
-    persona:
-      'You are Stella, a sharp and encouraging mission co-pilot for teens. Provide scientific context and challenge the user to think critically.'
-  },
-  {
-    id: 'scholar',
-    label: 'Scholar (Uni)',
-    blurb: 'Conduct deep analysis and collaborate with an AI research partner.',
-    persona:
-      'You are Stella, a sophisticated AI research assistant for university-level students. Engage in Socratic dialogue, analyze complex data, and discuss research methodologies.'
-  }
+  { id: 'explorer', label: 'Explorer (Kid)', blurb: 'Explore amazing space pictures with a friendly guide.', persona: 'You are Stella, a cheerful...' },
+  { id: 'cadet', label: 'Cadet (Teen)', blurb: 'Analyze mission data and form hypotheses with a co-pilot.', persona: 'You are Stella, a sharp...' },
+  { id: 'scholar', label: 'Scholar (Uni)', blurb: 'Conduct deep analysis and collaborate with an AI research partner.', persona: 'You are Stella, a sophisticated...' },
 ];
 
-// --- MISSION ROSTER UPGRADE ---
-// "Rover Cam" has been replaced with the new "Earth Observer" mission.
 const missions = [
-  {
-    id: 'rocket-lab',
-    title: 'Rocket Lab',
-    href: '/missions/rocket-lab', // Assuming root-level mission pages
-    tasks: {
-      explorer: 'Help Stella name 3 rocket parts for a pre-launch check!',
-      cadet: 'Analyze launch conditions and decide if it’s a "Go" or "No Go".',
-      scholar: 'Interpret simulated telemetry data to identify a launch anomaly.'
-    }
-  },
-  {
-    id: 'earth-observer', // REPLACED
-    title: 'Earth Observer', // REPLACED
-    href: '/missions/earth-observer', // REPLACED
-    tasks: {
-      explorer: 'Find your home continent and ask Stella what the weather is like!',
-      cadet: 'Identify a major storm system and ask Stella to explain its scientific name.',
-      scholar: 'Analyze cloud patterns to deduce the season in a hemisphere and justify it.'
-    }
-  },
-  {
-    id: 'space-poster',
-    title: 'Space Poster',
-    href: '/missions/space-poster',
-    tasks: {
-      explorer: 'Pick a space photo and ask Stella to write a cool poem about it.',
-      cadet: 'Write a scientific caption for a NASA photo and have Stella edit it.',
-      scholar: 'Co-write a research abstract about a cosmic event with Stella.'
-    }
-  }
+  { id: 'rocket-lab', title: 'Rocket Lab', href: '/missions/rocket-lab', tasks: { explorer: 'Help Stella name 3 rocket parts for a pre-launch check!', cadet: 'Analyze launch conditions and decide if it’s a "Go" or "No Go".', scholar: 'Interpret simulated telemetry data to identify a launch anomaly.' } },
+  { id: 'earth-observer', title: 'Earth Observer', href: '/missions/earth-observer', tasks: { explorer: 'Find your home continent and ask Stella what the weather is like!', cadet: 'Identify a major storm system and ask Stella to explain its scientific name.', scholar: 'Analyze cloud patterns to deduce the season in a hemisphere and justify it.' } },
+  { id: 'space-poster', title: 'Space Poster', href: '/missions/space-poster', tasks: { explorer: 'Pick a space photo and ask Stella to write a cool poem about it.', cadet: 'Write a scientific caption for a NASA photo and have Stella edit it.', scholar: 'Co-write a research abstract about a cosmic event with Stella.' } },
 ];
 
 export default function Home() {
-  // --- STATE MANAGEMENT UPGRADE ---
-  // To prevent the intro from showing on "back" navigation, this state should
-  // come from your global store. Ensure your `useGame` store exports `started` and `setStarted`.
-  // Example `useGame` store modification:
-  // `started: boolean; setStarted: (started: boolean) => void;`
-  // `set({ started })`
   const { role, setRole, started, setStarted } = useGame();
 
   useEffect(() => {
@@ -89,10 +36,32 @@ export default function Home() {
         <IntroOverlay
           onStart={() => {
             window.dispatchEvent(new Event('stella:warp'));
-            setStarted(true); // This now calls the global store action
+            setStarted(true);
             window.scrollTo({ top: 0, behavior: 'instant' as any });
           }}
-        />
+          // Optional: customise headline/copy/badges/CTA/image
+          title="Welcome to Stella Academy 🌟"
+          copy="You’re signed in — great! I’m Stella, your interactive space tutor. Choose a learning path and I’ll guide you with quick, friendly challenges."
+          badges={['Interactive Analysis', 'Creative Co-writing', 'Personalised Learning']}
+          ctaLabel="▶ Press Start"
+          imageSrc="/stella.png"
+        >
+          {/* Optional slot — put the role selector here if you want it in the intro */}
+          <div className="grid grid-cols-3 gap-2">
+            {roles.map((r) => (
+              <button
+                key={r.id}
+                onClick={() => setRole(r.id)}
+                className={`rounded border border-white/15 bg-white/5 px-3 py-2 text-left hover:bg-white/10 transition ${
+                  role === r.id ? 'outline outline-1 outline-mint' : ''
+                }`}
+              >
+                <div className="font-pixel text-xs text-white">{r.label}</div>
+                <div className="text-[11px] text-slate-300">{r.blurb}</div>
+              </button>
+            ))}
+          </div>
+        </IntroOverlay>
       )}
 
       {started && (
@@ -154,117 +123,5 @@ export default function Home() {
         </section>
       )}
     </>
-  );
-}
-
-function IntroOverlay({ onStart }: { onStart: () => void }) {
-  const rootRef = useRef<HTMLDivElement>(null);
-  const panelRef = useRef<HTMLDivElement>(null);
-  const titleRef = useRef<HTMLHeadingElement>(null);
-  const textRef = useRef<HTMLParagraphElement>(null);
-  const btnRef = useRef<HTMLButtonElement>(null);
-  const blobA = useRef<HTMLDivElement>(null);
-  const blobB = useRef<HTMLDivElement>(null);
-  const stellaRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const tl = gsap.timeline();
-    // The `.set` call is removed. The initial state is now handled by CSS.
-    tl.to(rootRef.current, { opacity: 1, duration: 0.4, ease: 'power2.out' })
-      .fromTo(
-        panelRef.current,
-        { y: 20, opacity: 0, scale: 0.98 },
-        { y: 0, opacity: 1, scale: 1, duration: 0.6, ease: 'power3.out' },
-        '<0.1'
-      )
-      .from(
-        [titleRef.current, textRef.current, btnRef.current],
-        { opacity: 0, y: 10, stagger: 0.08, duration: 0.45, ease: 'power2.out' },
-        '-=0.2'
-      );
-
-    gsap.to(stellaRef.current, { y: -6, duration: 2.2, ease: 'sine.inOut', yoyo: true, repeat: -1 });
-    gsap.to(blobA.current, { x: 40, y: -20, scale: 1.1, rotate: 8, duration: 8, ease: 'sine.inOut', yoyo: true, repeat: -1 });
-    gsap.to(blobB.current, { x: -50, y: 30, scale: 0.95, rotate: -10, duration: 9, ease: 'sine.inOut', yoyo: true, repeat: -1 });
-
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Enter' || e.key === ' ') handleStart();
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, []);
-
-  const handleStart = () => {
-    const tl = gsap.timeline({ onComplete: onStart });
-    tl.to(btnRef.current, { scale: 0.96, duration: 0.08, ease: 'power1.out' })
-      .to(panelRef.current, { y: -20, opacity: 0, scale: 0.98, duration: 0.35, ease: 'power2.in' }, '<')
-      .to(rootRef.current, { opacity: 0, duration: 0.35, ease: 'power2.in' }, '<0.05');
-  };
-
-  return (
-    <div
-      ref={rootRef}
-      // --- FONT BUG FIX ---
-      // This `opacity-0` class ensures the component is invisible on first render,
-      // preventing the flash of unstyled/greyed-out text before the animation runs.
-      className="fixed inset-0 z-30 flex items-center justify-center px-4 py-6 pointer-events-auto opacity-0"
-      aria-modal
-      role="dialog"
-    >
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(0,0,0,0.2),_rgba(0,0,0,0.75)_70%)]" />
-      <div className="absolute inset-0 -z-10 overflow-hidden">
-        <div
-          ref={blobA}
-          className="absolute -top-12 -left-8 w-80 h-80 rounded-full opacity-40 blur-3xl"
-          style={{ background: 'radial-gradient(circle at 30% 30%, rgba(99,179,237,0.6), rgba(99,179,237,0) 60%)' }}
-        />
-        <div
-          ref={blobB}
-          className="absolute -bottom-10 -right-6 w-96 h-96 rounded-full opacity-35 blur-3xl"
-          style={{ background: 'radial-gradient(circle at 60% 40%, rgba(16,185,129,0.55), rgba(16,185,129,0) 60%)' }}
-        />
-      </div>
-      <div
-        ref={panelRef}
-        className="relative w-full max-w-3xl rounded-3xl border border-white/20 bg-white/10 backdrop-blur-2xl shadow-[0_0_0_1px_rgba(255,255,255,0.12)_inset,0_20px_60px_rgba(0,0,0,0.45)] overflow-hidden"
-      >
-        <div className="grid md:grid-cols-[180px_1fr] gap-4 p-5 md:p-7">
-          <div ref={stellaRef} className="relative flex items-center justify-center">
-            <div className="relative w-[150px] h-[150px] rounded-2xl border border-white/25 bg-slate-700/20 overflow-hidden shadow-lg">
-              <Image src="/stella.png" alt="Stella" fill className="object-cover" sizes="150px" priority />
-            </div>
-          </div>
-          <div>
-            <h1 ref={titleRef} className="font-pixel text-2xl text-gold">Welcome to Stella Academy 🌟</h1>
-            <p ref={textRef} className="mt-2 text-slate-200 text-sm leading-relaxed">
-              I’m <span className="text-sky">Stella</span> — your interactive space tutor. We’ll explore rockets, planets, and today’s space picture together. Pick the path that suits you and I’ll guide you with quick, friendly challenges.
-            </p>
-            <div className="mt-4 flex flex-wrap items-center gap-2 text-[11px] text-slate-300">
-              <span className="px-2 py-1 rounded bg-slate-800/70 border border-white/10">Interactive Analysis</span>
-              <span className="px-2 py-1 rounded bg-slate-800/70 border border-white/10">Creative Co-writing</span>
-              <span className="px-2 py-1 rounded bg-slate-800/70 border border-white/10">Personalized Learning</span>
-            </div>
-            <div className="mt-5">
-              <button
-                ref={btnRef}
-                onClick={handleStart}
-                className="btn-pixel font-pixel text-sm px-4 py-2"
-                aria-label="Press Start"
-                title="Press Start"
-              >
-                ▶ Press Start
-              </button>
-              <div className="mt-2 text-[11px] text-slate-400">
-                Tip: Press <kbd className="px-1 bg-slate-800/70 rounded border border-white/10">Enter</kbd> to start
-              </div>
-            </div>
-          </div>
-        </div>
-        <div
-          className="pointer-events-none absolute inset-0 opacity-40"
-          style={{ background: 'linear-gradient(120deg, rgba(255,255,255,0.14), rgba(255,255,255,0.04) 30%, rgba(255,255,255,0) 60%)' }}
-        />
-      </div>
-    </div>
   );
 }

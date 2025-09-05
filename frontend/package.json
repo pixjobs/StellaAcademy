@@ -8,6 +8,7 @@
     "worker": "tsx src/workers/ollama/worker.ts"
   },
   "dependencies": {
+    "@clerk/nextjs": "^6.31.9",
     "@google-cloud/secret-manager": "^6.1.0",
     "@gsap/react": "^2.1.2",
     "@radix-ui/react-tooltip": "^1.2.8",

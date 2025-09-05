@@ -9,11 +9,21 @@ import type { Server } from 'http';
 import { Worker, QueueEvents } from 'bullmq';
 import { connection, LLM_QUEUE_NAME } from '@/lib/queue';
 import { startHealthServer } from './health';
-import { clampInt, isRole, isMissionType, maskRedisUrl } from './utils';
+import {
+  clampInt,
+  isRole,
+  isMissionType,
+  maskRedisUrl,
+  // prompt/parse helpers centralized in utils.ts
+  buildTutorSystem,
+  buildTutorUser,
+  hardenAskPrompt,
+  extractJson,
+} from './utils';
 import { getOllamaInfo, callOllama, pingOllama } from './ollama-client';
 import { computeMission } from './mission-computer';
 import { postProcessLlmResponse } from './llm-post-processing';
-import type { LlmJobData, LlmJobResult } from '@/types/llm';
+import type { LlmJobData, LlmJobResult, TutorPreflightOutput } from '@/types/llm';
 
 /**
  * The main application function. This is ONLY called after the bootstrap
@@ -34,7 +44,7 @@ function startApp() {
   (async () => {
     healthServer = startHealthServer();
     const ollamaOk = await pingOllama();
-    
+
     console.log('[worker] boot', {
       queue: LLM_QUEUE_NAME,
       redisUrl: maskRedisUrl(process.env.REDIS_URL),
@@ -59,9 +69,10 @@ function startApp() {
       console.log(`${logPrefix} picked up job.`, { name, type: data.type });
 
       try {
+        /* ----------------------------- mission ----------------------------- */
         if (data.type === 'mission') {
           console.log(`${logPrefix} 🚀 Starting 'mission' job.`, { payload: data.payload });
-          
+
           // --- ROBUST VALIDATION ---
           // No more silent fallbacks. If the type is invalid, the job will fail.
           const receivedMissionType = data.payload?.missionType;
@@ -71,35 +82,75 @@ function startApp() {
           }
           // From here on, 'missionType' is guaranteed to be a valid MissionType.
           const missionType = receivedMissionType;
-          
+
           // Validate the role with a safe fallback, as it's less critical.
           const role = isRole(data.payload?.role) ? data.payload.role : 'explorer';
-          
+
           console.log(`${logPrefix} Parameters validated successfully.`, { missionType, role });
           await job.updateProgress(5);
-          
+
           console.log(`${logPrefix} Calling mission computer for '${missionType}'...`);
           const mission = await computeMission(role, missionType);
           console.log(`${logPrefix} ✅ Mission computer finished successfully.`);
-          
+
           await job.updateProgress(100);
           return { type: 'mission', result: mission };
         }
 
+        /* -------------------------------- ask ------------------------------ */
         if (data.type === 'ask') {
           console.log(`${logPrefix} 🗣️ Starting 'ask' job.`);
           const { prompt, context } = data.payload;
           if (typeof prompt !== 'string' || !prompt) {
             throw new Error('Job payload is missing a valid prompt.');
           }
-          const hardenedPrompt = context ? `Use the following context...\n${context}\n...to answer:\n${prompt}` : prompt;
-          
+
+          const hardenedPrompt = hardenAskPrompt(prompt, context);
+
           await job.updateProgress(5);
           const rawAnswer = await callOllama(hardenedPrompt, { temperature: 0.6 });
           const fixedAnswer = postProcessLlmResponse(rawAnswer, {});
-          
+
           await job.updateProgress(100);
           return { type: 'ask', result: { answer: fixedAnswer } };
+        }
+
+        /* ----------------------- tutor-preflight (NEW) ---------------------- */
+        if (data.type === 'tutor-preflight') {
+          console.log(`${logPrefix} 🎓 Starting 'tutor-preflight' job.`, { payload: data.payload });
+
+          const { mission, topicTitle, topicSummary, imageTitle, role } = (data as any).payload ?? {};
+          if (!mission || !topicTitle || !topicSummary || !role) {
+            throw new Error('Invalid tutor-preflight payload: mission, topicTitle, topicSummary, and role are required.');
+          }
+
+          await job.updateProgress(5);
+
+          // Build prompts and call Ollama
+          const system = buildTutorSystem(role, mission, topicTitle, imageTitle);
+          const user = buildTutorUser(topicSummary);
+
+          const raw = await callOllama(
+            `${system}\n\nUSER:\n${user}\n\nReturn JSON only.`,
+            { temperature: 0.6 }
+          );
+
+          // Parse strict JSON (with resilient fallback)
+          const parsed = extractJson<TutorPreflightOutput>(raw);
+
+          // Minimal schema guard
+          if (
+            typeof parsed?.systemPrompt !== 'string' ||
+            !Array.isArray(parsed?.starterMessages) ||
+            typeof parsed?.warmupQuestion !== 'string' ||
+            !parsed?.difficultyHints
+          ) {
+            console.error(`${logPrefix} tutor-preflight parsed (invalid)`, parsed);
+            throw new Error('Tutor-preflight: JSON missing required fields.');
+          }
+
+          await job.updateProgress(100);
+          return { type: 'tutor-preflight', result: parsed };
         }
 
         // This will catch any job types that are not explicitly handled.
@@ -135,7 +186,7 @@ function startApp() {
   const shutdown = async () => {
     console.log('[worker] shutting down...');
     if (healthServer) {
-      await new Promise(resolve => healthServer.close(resolve));
+      await new Promise((resolve) => healthServer.close(resolve));
     }
     await worker.close();
     await events.close();

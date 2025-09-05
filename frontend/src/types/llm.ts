@@ -7,17 +7,21 @@
  * =========================================================================
  */
 
+/* --------------------------------- Roles --------------------------------- */
+
 export type Role = 'explorer' | 'cadet' | 'scholar';
 
-/**
- * A runtime constant containing all valid Role types.
- * This is used by type guards to validate data at runtime, ensuring this
- * file remains the single source of truth.
- */
+/** All valid roles (runtime validation). */
 export const ALL_ROLES: Role[] = ['explorer', 'cadet', 'scholar'];
 
-// ---------- CANONICAL MISSION TYPE ----------
-// This is the single source of truth for all valid mission types in the application.
+/** Runtime type guard for Role. */
+export function isRole(v: unknown): v is Role {
+  return typeof v === 'string' && (ALL_ROLES as string[]).includes(v);
+}
+
+/* ----------------------------- Mission Types ----------------------------- */
+
+/** Canonical mission types. Keep this union authoritative. */
 export type MissionType =
   | 'rocket-lab'
   | 'rover-cam'
@@ -25,10 +29,7 @@ export type MissionType =
   | 'earth-observer'
   | 'celestial-investigator';
 
-// --- NEW: RUNTIME VALIDATION ARRAY ---
-// This constant is derived from the type above and is used for runtime checks.
-// If you add a new MissionType to the union type, you MUST also add it here.
-// TypeScript will help enforce this.
+/** Runtime list for validation. */
 export const ALL_MISSION_TYPES: MissionType[] = [
   'rocket-lab',
   'rover-cam',
@@ -37,10 +38,13 @@ export const ALL_MISSION_TYPES: MissionType[] = [
   'celestial-investigator',
 ];
 
+/** Runtime type guard for MissionType. */
+export function isMissionType(v: unknown): v is MissionType {
+  return typeof v === 'string' && (ALL_MISSION_TYPES as string[]).includes(v);
+}
 
-
-// ---------- Mars Rover Photo API Types ----------
-// These types accurately reflect the data from the NASA Mars Rover API.
+/* --------------------------- External API Types -------------------------- */
+/** Mars Rover Photo API (NASA) */
 
 export type MarsCamera = {
   id: number;
@@ -66,9 +70,7 @@ export type MarsPhoto = {
   rover: MarsRover;
 };
 
-
-// ---------- Mission & Topic Data Structures ----------
-// These types define the final, structured data that the worker produces.
+/* ---------------------- Mission & Topic Data Structures ------------------- */
 
 export type Img = {
   title: string;
@@ -88,13 +90,20 @@ export type EnrichedMissionPlan = {
   topics: EnrichedTopic[];
 };
 
+/* ----------------------------- Chat Primitives --------------------------- */
 
-// ---------- BullMQ Job & Payload Types ----------
-// These define the structure of the data sent to the worker queue.
+/** Common message shape used by tutor-preflight starter messages, etc. */
+export type ChatMessage = {
+  id: string;
+  role: 'stella' | 'user';
+  text: string;
+};
+
+/* ---------------------- BullMQ Job & Payload Types ----------------------- */
 
 export interface LlmMissionPayload {
   missionType: MissionType;
-  role: Role; // This was missing and is now correctly included.
+  role: Role;
 }
 
 export interface LlmAskPayload {
@@ -103,6 +112,32 @@ export interface LlmAskPayload {
   role?: Role;
   mission?: string;
 }
+
+/**
+ * New: Tutor Preflight
+ * Generates role-aware system prompt, starter messages, warmup, goals, and difficulty hints.
+ */
+export type TutorPreflightInput = {
+  mission: string;       // e.g., 'rocket-lab'
+  topicTitle: string;    // e.g., 'Thrust'
+  topicSummary: string;  // short summary text
+  imageTitle?: string;   // selected image title (optional)
+  role: Role;            // 'explorer' | 'cadet' | 'scholar'
+};
+
+export type TutorPreflightOutput = {
+  systemPrompt: string;
+  starterMessages: ChatMessage[]; // typically 1–2 Stella messages to open
+  warmupQuestion: string;
+  goalSuggestions: string[];      // 2–3 short goals
+  difficultyHints: {
+    easy: string;
+    standard: string;
+    challenge: string;
+  };
+};
+
+/* ----------------------------- Job Data (Union) -------------------------- */
 
 export interface MissionJobData {
   type: 'mission';
@@ -116,12 +151,19 @@ export interface AskJobData {
   cacheKey?: string;
 }
 
-// LlmJobData is a union of all possible job types.
-export type LlmJobData = MissionJobData | AskJobData;
+export interface TutorPreflightJobData {
+  type: 'tutor-preflight';
+  payload: TutorPreflightInput;
+  cacheKey?: string;
+}
 
+/** Union of all job inputs sent to the worker. */
+export type LlmJobData =
+  | MissionJobData
+  | AskJobData
+  | TutorPreflightJobData;
 
-// ---------- BullMQ Job Result Types ----------
-// These define the structure of the data the worker returns upon completion.
+/* -------------------------- BullMQ Job Result Types ---------------------- */
 
 export interface AskResult {
   answer: string;
@@ -130,4 +172,5 @@ export interface AskResult {
 
 export type LlmJobResult =
   | { type: 'mission'; result: EnrichedMissionPlan }
-  | { type: 'ask'; result: AskResult };
+  | { type: 'ask'; result: AskResult }
+  | { type: 'tutor-preflight'; result: TutorPreflightOutput };

@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useMissionPlanGenerator } from '@/hooks/useMissionPlanGenerator';
-// Import the canonical types from their central locations.
+import { useGame } from '@/lib/store'; // ← get the role the user picked on Home
 import type { EnrichedMissionPlan, Img } from '@/types/mission';
 
 import MissionControl from '@/components/MissionControl';
@@ -19,22 +19,17 @@ type TopicFromHook = EnrichedMissionPlan['topics'][number];
 // A stricter "clean" type that guarantees the images array is present and valid.
 type CleanTopic = Omit<TopicFromHook, 'images'> & { images: Img[] };
 
-/* -------------------------------------------------------------------------- */
-/*                                Configuration                               */
-/* -------------------------------------------------------------------------- */
-
-const MISSION_BRIEFING = `Mission briefing received. Your objectives are as follows:
-1.  Provide a simple summary of the chosen image.
-2.  Identify its key concept (e.g., thrust, staging, aerodynamics).
-3.  Ask a "what if" question to test understanding.
-4.  Connect it to a real-world mission.
-Remember to use the 'Quiz Me' command for self-assessment. Good luck, Commander.`;
+// Preflight result (matches worker’s `tutor-preflight` result)
+type TutorPreflightResult = {
+  systemPrompt: string;
+  starterMessages: Array<{ role: 'user' | 'assistant' | 'system'; text: string }>;
+  difficulty?: 'explorer' | 'cadet' | 'scholar' | string;
+};
 
 /* -------------------------------------------------------------------------- */
 /*                                   Helpers                                  */
 /* -------------------------------------------------------------------------- */
 
-// These helpers can now safely assume they receive clean, validated data.
 function reorderImages(images: Img[], focusIndex: number): Img[] {
   if (images.length === 0) return [];
   const i = Math.max(0, Math.min(focusIndex, images.length - 1));
@@ -47,39 +42,82 @@ function buildContext(topic: CleanTopic, pickedIndex = 0): string {
   return `Objective: ${topic.title}. ${topic.summary}\n${chosenLine}`.trim();
 }
 
+// POST → /api/preFlight and return jobId
+async function startPreflight(payload: {
+  mission: string;
+  topicTitle: string;
+  topicSummary: string;
+  imageTitle?: string;
+  role: 'explorer' | 'cadet' | 'scholar';
+}) {
+  const res = await fetch('/api/preFlight', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data?.error || 'Failed to enqueue preflight.');
+  return data.jobId as string;
+}
+
+// Poll GET → /api/preFlight?id=... until completed/failed
+async function waitForPreflight(jobId: string, { timeoutMs = 25_000, intervalMs = 700 } = {}) {
+  const started = Date.now();
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    const res = await fetch(`/api/preFlight?id=${encodeURIComponent(jobId)}`);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data?.error || 'Preflight status error.');
+
+    if (data.state === 'completed') {
+      return data.result as TutorPreflightResult;
+    }
+    if (data.state === 'failed') {
+      throw new Error(data?.error || 'Preflight job failed.');
+    }
+    if (Date.now() - started > timeoutMs) {
+      throw new Error('Preflight timed out.');
+    }
+    await new Promise((r) => setTimeout(r, intervalMs));
+  }
+}
+
 /* -------------------------------------------------------------------------- */
 /*                                 Component                                  */
 /* -------------------------------------------------------------------------- */
 
 export default function RocketLabPage() {
-  // --- THIS IS THE CRITICAL FIX ---
-  // We now explicitly tell the hook which mission to generate.
-  // This eliminates the silent fallback bug.
+  // Role from global store (Explorer/Cadet/Scholar)
+  const { role = 'explorer' } = useGame();
+
+  // Generate the topic/mission plan as before
   const { missionPlan, isLoading, error, generateNewPlan } = useMissionPlanGenerator('rocket-lab');
 
-  // --- DATA NORMALIZATION ---
-  // Create a memoized, "clean" version of the mission plan as soon as it arrives.
-  // This step guarantees that all topics and images have the required properties.
   const cleanMissionPlan = useMemo(() => {
     if (!missionPlan) return null;
     return {
       ...missionPlan,
       topics: missionPlan.topics.map((topic): CleanTopic => ({
         ...topic,
-        // Normalize the images array: provide defaults and filter out invalid entries.
         images: (topic.images || [])
-          .map(img => ({
+          .map((img) => ({
             title: img.title ?? 'Untitled Image',
             href: img.href ?? '',
           }))
-          .filter(img => img.href), // Ensure every image has a valid URL.
+          .filter((img) => img.href),
       })),
     };
   }, [missionPlan]);
 
-  // All component state will now use our clean, strict `CleanTopic` type.
+  // UI state
   const [selectedTopic, setSelectedTopic] = useState<CleanTopic | null>(null);
   const [selectedImageIdx, setSelectedImageIdx] = useState<number>(0);
+
+  // Preflight state
+  const [preflightLoading, setPreflightLoading] = useState(false);
+  const [preflightError, setPreflightError] = useState<string | null>(null);
+  const [preflightBriefing, setPreflightBriefing] = useState<string | null>(null);
+  const lastRequestedRef = useRef<string | null>(null); // prevent race conditions
 
   const handleSelectTopic = useCallback((topic: CleanTopic, imageIndex: number) => {
     setSelectedTopic(topic);
@@ -88,9 +126,64 @@ export default function RocketLabPage() {
 
   const handleReturnToTopics = useCallback(() => {
     setSelectedTopic(null);
+    // reset preflight state
+    setPreflightLoading(false);
+    setPreflightError(null);
+    setPreflightBriefing(null);
+    lastRequestedRef.current = null;
   }, []);
 
-  // RENDER: Loading or Error State
+  // Kick off preflight whenever a topic is selected
+  useEffect(() => {
+    if (!selectedTopic) return;
+
+    const imageTitle = selectedTopic.images[selectedImageIdx]?.title || undefined;
+    const reqKey = `${selectedTopic.title}::${imageTitle}::${role}`;
+    lastRequestedRef.current = reqKey;
+
+    setPreflightLoading(true);
+    setPreflightError(null);
+    setPreflightBriefing(null);
+
+    (async () => {
+      try {
+        const jobId = await startPreflight({
+          mission: 'rocket-lab',
+          topicTitle: selectedTopic.title,
+          topicSummary: selectedTopic.summary,
+          imageTitle,
+          role,
+        });
+
+        const result = await waitForPreflight(jobId);
+
+        // Build a single Markdown “briefing” out of starter messages
+        // Prefer the first assistant/system message if present
+        const assistantFirst =
+          result.starterMessages.find((m) => m.role === 'assistant') ||
+          result.starterMessages.find((m) => m.role === 'system') ||
+          result.starterMessages[0];
+
+        const briefingText =
+          assistantFirst?.text?.trim() ||
+          'Mission briefing ready. Choose a task to begin.';
+
+        // prevent setting state if a newer request superseded this one
+        if (lastRequestedRef.current === reqKey) {
+          setPreflightBriefing(briefingText);
+          setPreflightLoading(false);
+        }
+      } catch (e: unknown) {
+        if (lastRequestedRef.current === reqKey) {
+          setPreflightError(String((e as Error)?.message || e));
+          setPreflightLoading(false);
+        }
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedTopic, selectedImageIdx, role]);
+
+  // RENDER: Loading or Error State for plan generation
   if (isLoading || error) {
     return (
       <section className="container mx-auto flex flex-col items-center justify-center p-4 text-center min-h-[60vh]">
@@ -127,22 +220,39 @@ export default function RocketLabPage() {
       </div>
 
       {selectedTopic ? (
-        // STATE: Topic selected -> Show Mission Control
-        <MissionControl
-          key={`${selectedTopic.title}-${selectedImageIdx}`}
-          mission={selectedTopic.title}
-          // The data passed here is now guaranteed to be clean. No more casting `as Img[]` is needed.
-          images={reorderImages(selectedTopic.images, selectedImageIdx)}
-          context={buildContext(selectedTopic, selectedImageIdx)}
-          initialMessage={{
-            id: 'stella-briefing',
-            role: 'stella',
-            text: MISSION_BRIEFING,
-          }}
-        />
+        preflightLoading ? (
+          <MissionStandby missionName="Preparing Mission Briefing..." />
+        ) : preflightError ? (
+          <div className="rounded-xl border border-red-600/50 bg-red-900/30 p-4 text-red-200 max-w-xl">
+            <p className="font-semibold mb-1">Preflight Failed</p>
+            <p className="text-sm opacity-90 mb-3">{preflightError}</p>
+            <div className="flex gap-2">
+              <Button
+                onClick={() => {
+                  // retrigger by re-setting the same selection
+                  setSelectedTopic((t) => (t ? { ...t } : t));
+                }}
+                variant="secondary"
+              >
+                Retry
+              </Button>
+              <Button onClick={handleReturnToTopics} variant="outline">Back to Topics</Button>
+            </div>
+          </div>
+        ) : (
+          <MissionControl
+            key={`${selectedTopic.title}-${selectedImageIdx}`}
+            mission={selectedTopic.title}
+            images={reorderImages(selectedTopic.images, selectedImageIdx)}
+            context={buildContext(selectedTopic, selectedImageIdx)}
+            initialMessage={{
+              id: 'stella-briefing',
+              role: 'stella',
+              text: preflightBriefing ?? 'Mission briefing ready.',
+            }}
+          />
+        )
       ) : (
-        // STATE: No topic selected -> Show Topic Selector
-        // We pass the cleanMissionPlan to ensure TopicSelector receives reliable data.
         cleanMissionPlan && <TopicSelector plan={cleanMissionPlan} onSelect={handleSelectTopic} />
       )}
     </section>

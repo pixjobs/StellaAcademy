@@ -1,9 +1,9 @@
-// components/Header.tsx
 'use client';
 
 import Link from 'next/link';
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
+import { SignOutButton } from '@clerk/nextjs';
 
 export default function Header() {
   const ref = useRef<HTMLElement>(null);
@@ -21,8 +21,6 @@ export default function Header() {
   return (
     <header
       ref={ref}
-      // --- MODIFICATION ---
-      // Added `relative` and `z-50` to ensure the header is on top.
       className="relative z-50 w-full bg-ink text-gold shadow-pixel font-pixel px-4 py-3 flex items-center justify-between"
     >
       {/* Logo / Title */}
@@ -31,16 +29,19 @@ export default function Header() {
       </Link>
 
       {/* Nav Links */}
-      <nav className="flex gap-4 text-xs">
-        <Link href="/missions" className="hover:text-sky transition-colors">
-          Missions
+      <nav className="flex gap-4 text-xs items-center">
+        <Link href="/" className="hover:text-sky transition-colors">
+          Home
         </Link>
         <Link href="/about" className="hover:text-sky transition-colors">
           About
         </Link>
-        <Link href="/settings" className="hover:text-sky transition-colors">
-          ⚙ Settings
-        </Link>
+        {/* Log out button */}
+        <SignOutButton>
+          <button className="hover:text-red-400 transition-colors">
+            ⎋ Log out
+          </button>
+        </SignOutButton>
       </nav>
     </header>
   );
