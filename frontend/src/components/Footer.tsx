@@ -214,7 +214,7 @@ export default function Footer() {
 
       {/* Right: version & NASA credit */}
       <div className="text-slate-400 text-right">
-        <div>© {year} Stella Academy · v{APP_VERSION}</div>
+        <div>© {year} Stella Academy</div>
         <div>
           Images/Data courtesy of{' '}
           <a

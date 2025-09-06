@@ -1,22 +1,40 @@
+// app/layout.tsx
 import type { Metadata } from 'next';
+import type { ReactNode } from 'react';
 
 import './globals.css';
 import 'katex/dist/katex.min.css';
 
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { getApod } from '@/lib/apod';
 import GSAPProvider from '@/components/GSAPProvider';
 import ConditionalBackgrounds from '@/components/ConditionalBackgrounds';
-import Providers from './providers'; // ✅ add this
+import Providers from './providers';
 
 export const metadata: Metadata = {
   title: 'Stella Academy',
 };
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
+type RootLayoutProps = {
+  children: ReactNode;
+};
+
+export default async function RootLayout({ children }: RootLayoutProps) {
   const useApod = process.env.USE_APOD_BG === 'true';
-  const apod = useApod ? await getApod() : null;
+
+  // Resolve getApod via dynamic import to avoid interop/alias hiccups.
+  // If anything fails, we just skip APOD and continue.
+  let bgUrl: string | undefined;
+  if (useApod) {
+    try {
+      const mod = await import('@/lib/apod'); // server module
+      const apod = await mod.getApod();
+      bgUrl = apod?.bgUrl ?? undefined;
+    } catch (err) {
+      console.warn('[layout] Failed to load APOD background:', err);
+      bgUrl = undefined;
+    }
+  }
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -27,11 +45,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           'selection:bg-accent selection:text-accent-foreground',
         ].join(' ')}
       >
-        {/* Wrap the whole app with ClerkProvider */}
         <Providers>
           <GSAPProvider>
             {/* Background logic */}
-            <ConditionalBackgrounds url={apod?.bgUrl || undefined} />
+            <ConditionalBackgrounds url={bgUrl} />
 
             {/* Foreground content (above background) */}
             <div className="relative z-20 flex min-h-screen flex-col">

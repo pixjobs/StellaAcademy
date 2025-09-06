@@ -1,10 +1,9 @@
 // --- STEP 1: BOOTSTRAP THE ENVIRONMENT ---
-// We import and call the bootstrapper first to load environment variables.
 import { bootstrap } from './boot';
 
-// --- STEP 2: IMPORT APPLICATION MODULES ---
-// All other imports happen AFTER the bootstrap is defined.
 /* eslint-disable no-console */
+
+// --- STEP 2: IMPORT APPLICATION MODULES ---
 import type { Server } from 'http';
 import { Worker, QueueEvents } from 'bullmq';
 import { connection, LLM_QUEUE_NAME } from '@/lib/queue';
@@ -14,7 +13,6 @@ import {
   isRole,
   isMissionType,
   maskRedisUrl,
-  // prompt/parse helpers centralized in utils.ts
   buildTutorSystem,
   buildTutorUser,
   hardenAskPrompt,
@@ -23,22 +21,87 @@ import {
 import { getOllamaInfo, callOllama, pingOllama } from './ollama-client';
 import { computeMission } from './mission-computer';
 import { postProcessLlmResponse } from './llm-post-processing';
-import type { LlmJobData, LlmJobResult, TutorPreflightOutput } from '@/types/llm';
 
-/**
- * The main application function. This is ONLY called after the bootstrap
- * process has successfully completed.
- */
+// Link helpers (pure, local; safe on both server & worker)
+import { markdownifyBareUrls, extractLinksFromText } from '@/lib/llm/links';
+
+import type {
+  LlmJobData,
+  LlmJobResult,
+  TutorPreflightOutput,
+  LinkPreview,
+} from '@/types/llm';
+
+/* -------------------------------------------------------------------------- */
+/*                  Dynamic, fail-soft Google search resolver                 */
+/* -------------------------------------------------------------------------- */
+
+type GoogleSearchFn = (q: string, n?: number) => Promise<LinkPreview[]>;
+
+// cache between jobs so we don’t keep re-importing
+let cachedSearchFn: GoogleSearchFn | null = null;
+let triedResolve = false;
+
+async function resolveGoogleSearch(): Promise<GoogleSearchFn | undefined> {
+  if (cachedSearchFn) return cachedSearchFn;
+  if (triedResolve) return undefined; // don’t spam logs every job
+
+  triedResolve = true;
+
+  // Allow disabling from env easily
+  const disabled =
+    process.env.ENABLE_WEB_ENRICH === '0' ||
+    process.env.DISABLE_WEB_ENRICH === '1';
+  if (disabled) {
+    console.warn('[worker] web enrichment disabled by env');
+    return undefined;
+  }
+
+  try {
+    // NOTE: Path alias “@/lib/search” requires tsconfig-paths/register.
+    // boot.ts should import 'tsconfig-paths/register' – verify that’s in place.
+    const mod: any = await import('@/lib/search');
+
+    // Support both named and default export shapes
+    const fn: unknown =
+      mod?.googleCustomSearch ??
+      mod?.default?.googleCustomSearch ??
+      mod?.default; // if the file did: export default function googleCustomSearch(){}
+
+    if (typeof fn === 'function') {
+      cachedSearchFn = fn as GoogleSearchFn;
+      const keys = Object.keys(mod || {});
+      console.log('[worker] search module resolved', {
+        exportKeys: keys,
+        used: fn === mod.googleCustomSearch
+          ? 'named googleCustomSearch'
+          : fn === mod?.default?.googleCustomSearch
+            ? 'default.googleCustomSearch'
+            : 'default function',
+      });
+      return cachedSearchFn;
+    }
+
+    console.warn('[worker] search module loaded but no callable export found', {
+      exportKeys: Object.keys(mod || {}),
+    });
+    return undefined;
+  } catch (e) {
+    console.warn('[worker] search module import failed; skipping web enrichment', {
+      message: (e as Error)?.message || String(e),
+    });
+    return undefined;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/*                               Main start fn                                */
+/* -------------------------------------------------------------------------- */
+
 function startApp() {
-  /* ─────────────────────────────────────────────────────────
-     Config & Environment (Now safe to read from process.env)
-  ────────────────────────────────────────────────────────── */
   const CONCURRENCY = clampInt(process.env.OLLAMA_WORKER_CONCURRENCY, 1, 8, 1);
   const DEBUG = process.env.DEBUG_WORKER === '1';
 
-  /* ─────────────────────────────────────────────────────────
-     Worker Boot & Logging
-  ────────────────────────────────────────────────────────── */
   let healthServer: Server;
 
   (async () => {
@@ -51,15 +114,13 @@ function startApp() {
       ollama: { ...getOllamaInfo(), reachable: ollamaOk },
       concurrency: CONCURRENCY,
       pid: process.pid,
+      webEnrich: process.env.ENABLE_WEB_ENRICH ?? '(unset)',
     });
   })().catch((err) => {
     console.error('[worker] FATAL BOOT ERROR:', err);
     process.exit(1);
   });
 
-  /* ─────────────────────────────────────────────────────────
-     Main Worker Process
-  ────────────────────────────────────────────────────────── */
   const worker = new Worker<LlmJobData, LlmJobResult>(
     LLM_QUEUE_NAME,
     async (job) => {
@@ -73,17 +134,12 @@ function startApp() {
         if (data.type === 'mission') {
           console.log(`${logPrefix} 🚀 Starting 'mission' job.`, { payload: data.payload });
 
-          // --- ROBUST VALIDATION ---
-          // No more silent fallbacks. If the type is invalid, the job will fail.
           const receivedMissionType = data.payload?.missionType;
           if (!isMissionType(receivedMissionType)) {
             console.error(`${logPrefix} ❌ Invalid missionType received.`, { received: receivedMissionType });
             throw new Error(`Invalid or missing missionType: "${receivedMissionType}". Job cannot proceed.`);
           }
-          // From here on, 'missionType' is guaranteed to be a valid MissionType.
           const missionType = receivedMissionType;
-
-          // Validate the role with a safe fallback, as it's less critical.
           const role = isRole(data.payload?.role) ? data.payload.role : 'explorer';
 
           console.log(`${logPrefix} Parameters validated successfully.`, { missionType, role });
@@ -100,7 +156,7 @@ function startApp() {
         /* -------------------------------- ask ------------------------------ */
         if (data.type === 'ask') {
           console.log(`${logPrefix} 🗣️ Starting 'ask' job.`);
-          const { prompt, context } = data.payload;
+          const { prompt, context, role, mission } = data.payload;
           if (typeof prompt !== 'string' || !prompt) {
             throw new Error('Job payload is missing a valid prompt.');
           }
@@ -109,10 +165,53 @@ function startApp() {
 
           await job.updateProgress(5);
           const rawAnswer = await callOllama(hardenedPrompt, { temperature: 0.6 });
-          const fixedAnswer = postProcessLlmResponse(rawAnswer, {});
+
+          // Post-process model output (existing cleanup)
+          const cleanedAnswer = postProcessLlmResponse(rawAnswer, {});
+          // Convert bare URLs to Markdown links for clickable rendering
+          const answerWithLinks = markdownifyBareUrls(cleanedAnswer);
+
+          // Build structured links: extract + optional GCS enrichment
+          let links: LinkPreview[] = [];
+          try {
+            const inline = extractLinksFromText(answerWithLinks, 8);
+
+            const baseQuery = [
+              mission ? `[${mission}]` : '',
+              role ? `[${role}]` : '',
+              (context || '').slice(0, 240),
+              (prompt || '').slice(0, 280),
+            ]
+              .filter(Boolean)
+              .join(' ')
+              .replace(/\s+/g, ' ')
+              .trim()
+              .slice(0, 360);
+
+            const googleSearchFn = await resolveGoogleSearch();
+            if (!googleSearchFn) {
+              if (process.env.ENABLE_WEB_ENRICH !== '0' && process.env.DISABLE_WEB_ENRICH !== '1') {
+                console.warn(`${logPrefix} search module not available; skipping web enrichment`);
+              }
+            }
+
+            const web = baseQuery && googleSearchFn ? await googleSearchFn(baseQuery, 5) : [];
+
+            const seen = new Set(inline.map((l) => l.url));
+            const merged = [...inline, ...web.filter((w) => !seen.has(w.url))];
+            links = merged.slice(0, 8);
+          } catch (e) {
+            console.warn(`${logPrefix} link enrichment failed (continuing):`, (e as Error)?.message || e);
+          }
 
           await job.updateProgress(100);
-          return { type: 'ask', result: { answer: fixedAnswer } };
+          return {
+            type: 'ask',
+            result: {
+              answer: answerWithLinks,
+              links,
+            },
+          };
         }
 
         /* ----------------------- tutor-preflight (NEW) ---------------------- */
@@ -126,7 +225,6 @@ function startApp() {
 
           await job.updateProgress(5);
 
-          // Build prompts and call Ollama
           const system = buildTutorSystem(role, mission, topicTitle, imageTitle);
           const user = buildTutorUser(topicSummary);
 
@@ -135,10 +233,8 @@ function startApp() {
             { temperature: 0.6 }
           );
 
-          // Parse strict JSON (with resilient fallback)
           const parsed = extractJson<TutorPreflightOutput>(raw);
 
-          // Minimal schema guard
           if (
             typeof parsed?.systemPrompt !== 'string' ||
             !Array.isArray(parsed?.starterMessages) ||
@@ -153,12 +249,10 @@ function startApp() {
           return { type: 'tutor-preflight', result: parsed };
         }
 
-        // This will catch any job types that are not explicitly handled.
         throw new Error(`Unknown job type: ${String((data as any).type)}`);
       } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : String(err);
         console.error(`${logPrefix} ❌ job error`, { name, msg, stack: (err as Error)?.stack });
-        // Re-throw the error to ensure BullMQ marks the job as failed.
         throw err;
       }
     },
@@ -174,7 +268,9 @@ function startApp() {
   ────────────────────────────────────────────────────────── */
   const events = new QueueEvents(LLM_QUEUE_NAME, { connection });
 
-  events.on('failed', ({ jobId, failedReason }) => console.error(`[worker] job failed`, { jobId, failedReason }));
+  events.on('failed', ({ jobId, failedReason }) =>
+    console.error(`[worker] job failed`, { jobId, failedReason })
+  );
   if (DEBUG) {
     events.on('active', ({ jobId }) => console.log(`[worker] active`, { jobId }));
     events.on('completed', ({ jobId }) => console.log(`[worker] completed`, { jobId }));
@@ -199,5 +295,4 @@ function startApp() {
 }
 
 // --- STEP 3: EXECUTE ---
-// First, bootstrap the environment. If it succeeds, then start the app.
 bootstrap().then(startApp);

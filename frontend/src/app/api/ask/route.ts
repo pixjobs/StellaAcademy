@@ -14,24 +14,152 @@ import {
 import { llmQueue } from '@/lib/queue';
 import type { Role } from '@/types/llm';
 
-/** Simple, model-friendly formatting guardrails */
+/* -------------------------------------------------------------------------- */
+/*                             Link helpers (local)                           */
+/* -------------------------------------------------------------------------- */
+
+type LinkPreview = {
+  url: string;
+  title?: string;
+  faviconUrl?: string;
+  meta?: string;
+};
+
+// Not-too-greedy bare URL regex (exclude trailing punctuation)
+const URL_RE = /(https?:\/\/[^\s<>()\][}{"']+?[^\s<>()\][}{"'.,!?;:])/gi;
+
+/** Convert bare URLs in normal text to `[host](url)`; skip fenced & inline code and existing md/html links. */
+function markdownifyBareUrls(text: string): string {
+  const parts = splitByCodeRegions(text);
+  return parts.map(p => (p.code ? p.raw : autolinkInTextBlock(p.raw))).join('');
+}
+
+/** Split by fenced blocks ```...``` and inline code `...` while preserving raw chunks. */
+function splitByCodeRegions(raw: string): Array<{ code: boolean; raw: string }> {
+  const out: Array<{ code: boolean; raw: string }> = [];
+  const fenced = /```[\s\S]*?```/g;
+  let last = 0;
+  let m: RegExpExecArray | null;
+
+  while ((m = fenced.exec(raw))) {
+    if (m.index > last) splitInline(raw.slice(last, m.index), out);
+    out.push({ code: true, raw: m[0] });
+    last = fenced.lastIndex;
+  }
+  if (last < raw.length) splitInline(raw.slice(last), out);
+  return out;
+}
+
+function splitInline(segment: string, out: Array<{ code: boolean; raw: string }>) {
+  const inline = /`[^`\n]*`/g;
+  let iLast = 0;
+  let im: RegExpExecArray | null;
+  while ((im = inline.exec(segment))) {
+    if (im.index > iLast) out.push({ code: false, raw: segment.slice(iLast, im.index) });
+    out.push({ code: true, raw: im[0] });
+    iLast = inline.lastIndex;
+  }
+  if (iLast < segment.length) out.push({ code: false, raw: segment.slice(iLast) });
+}
+
+function autolinkInTextBlock(block: string): string {
+  // IMPORTANT: do not rely on typed parameters for offset/string because capture groups change positions.
+  return block.replace(URL_RE, (match: string, ...args: any[]) => {
+    const offset = args[args.length - 2] as number;    // safe: second from last
+    const whole  = args[args.length - 1] as string;    // safe: last
+
+    // 1) Already a Markdown link target? ( ... ](URL) )
+    const before2 = whole.slice(Math.max(0, offset - 2), offset);
+    if (before2 === '](') return match;
+
+    // 2) Already inside HTML attribute like href="URL"
+    const before6 = whole.slice(Math.max(0, offset - 6), offset).toLowerCase();
+    if (before6.includes('href="') || before6.includes("href='")) return match;
+
+    const host = safeHost(match);
+    return `[${host}](${stripTracking(match)})`;
+  });
+}
+
+function extractLinksFromText(text: string, cap = 8): LinkPreview[] {
+  const links: string[] = [];
+  const seen = new Set<string>();
+
+  // 1) URLs already in markdown: [label](url)
+  const MD_RE = /\[[^\]]*?\]\((https?:\/\/[^\s)]+)\)/gi;
+  let mdMatch: RegExpExecArray | null;
+  while ((mdMatch = MD_RE.exec(text)) !== null) {
+    const u = stripTracking(mdMatch[1]);
+    if (!seen.has(u)) {
+      seen.add(u);
+      links.push(u);
+      if (links.length >= cap) break;
+    }
+  }
+
+  // 2) Bare URLs
+  if (links.length < cap) {
+    const BARE_RE = new RegExp(URL_RE.source, 'gi'); // fresh regex, own lastIndex
+    let bareMatch: RegExpExecArray | null;
+    while ((bareMatch = BARE_RE.exec(text)) !== null) {
+      const u = stripTracking(bareMatch[0]);
+      if (!seen.has(u)) {
+        seen.add(u);
+        links.push(u);
+        if (links.length >= cap) break;
+      }
+    }
+  }
+
+  return links.map((url) => ({
+    url,
+    title: safeHost(url),
+    faviconUrl: `https://icons.duckduckgo.com/ip3/${safeHostname(url)}.ico`,
+  }));
+}
+
+function stripTracking(rawUrl: string): string {
+  try {
+    const u = new URL(rawUrl);
+    const toDelete = ['utm_source','utm_medium','utm_campaign','utm_term','utm_content','gclid','fbclid'];
+    toDelete.forEach(p => u.searchParams.delete(p));
+    return u.toString();
+  } catch {
+    return rawUrl;
+  }
+}
+function safeHost(url: string): string {
+  try { return new URL(url).hostname.replace(/^www\./, ''); } catch { return url; }
+}
+function safeHostname(url: string): string {
+  try { return new URL(url).hostname; } catch { return ''; }
+}
+
+/* -------------------------------------------------------------------------- */
+/*                         Model output formatting guardrails                 */
+/* -------------------------------------------------------------------------- */
+
 const FORMATTING_INSTRUCTIONS = `
 You are Stella, a helpful AI assistant.
-Your entire response MUST be a single, valid Markdown document.
-Do NOT use LaTeX document structure like \\documentclass.
 
-**Formatting Rules:**
-- Use Markdown for headings (#), lists (*), and tables (|).
-- Use double dollar signs \`$$ ... $$\` for standalone math equations.
-- Use single dollar signs \`$ ... $\` for inline math variables.
+Your entire response MUST be a single, valid **Markdown** document.
+Do NOT use LaTeX doc scaffolding like \\documentclass.
 
-Example:
-The formula is:
+**Formatting Rules**
+- Use Markdown headings (#), lists (*), and tables (|).
+- Use $$ ... $$ for block math; $ ... $ for inline math.
+- When you include a web reference, write it as a Markdown link: [short title or host](https://example.com).
+- Prefer short, descriptive link text (never paste long raw URLs into the prose).
+- Keep responses concise and scannable.
+
+Example (block math + link):
+The area of a circle is
 $$
 A = \\pi r^2
 $$
-Here, $A$ is the area and $r$ is the radius.
-`;
+
+More details: [wikipedia.org](https://en.wikipedia.org/wiki/Area_of_a_circle)
+`.trim();
 
 type AskPayload = {
   prompt: string;
@@ -49,11 +177,8 @@ export async function POST(req: NextRequest) {
     if (!raw) return NextResponse.json({ error: 'Empty request body; expected JSON.' }, { status: 400 });
 
     let body: AskPayload;
-    try {
-      body = JSON.parse(raw);
-    } catch {
-      return NextResponse.json({ error: 'Malformed JSON body.' }, { status: 400 });
-    }
+    try { body = JSON.parse(raw); }
+    catch { return NextResponse.json({ error: 'Malformed JSON body.' }, { status: 400 }); }
 
     const role: Role = (body.role as Role) ?? 'explorer';
     const prompt = typeof body.prompt === 'string' ? body.prompt.trim() : '';
@@ -67,7 +192,16 @@ export async function POST(req: NextRequest) {
     if (role !== 'explorer' && role !== 'cadet' && role !== 'scholar')
       return NextResponse.json({ error: "Invalid 'role'. Use explorer|cadet|scholar." }, { status: 400 });
 
-    const finalPrompt = `${FORMATTING_INSTRUCTIONS}\n\n--- USER PROMPT ---\n\n${prompt}`;
+    // Merge guardrails + (optional) context + user question
+    const finalPrompt = [
+      FORMATTING_INSTRUCTIONS,
+      body.context?.trim()
+        ? `\n--- CONTEXT START ---\n${body.context.trim()}\n--- CONTEXT END ---`
+        : '',
+      '\n--- USER PROMPT ---\n',
+      prompt,
+    ].join('');
+
     const payloadForQueue = { ...body, role, prompt: finalPrompt };
 
     // Stable job id for idempotency (same request → same job)
@@ -130,6 +264,36 @@ export async function GET(req: NextRequest) {
 
   if (!id) return NextResponse.json({ error: 'Missing ?id=' }, { status: 400 });
 
-  // Standard polling response (completed/failed/in-progress) with headers
-  return pollJobResponse(id, debug);
+  // Poll the worker result
+  const resp = await pollJobResponse(id, debug);
+
+  // Enrich ask results with clickable links + structured links (non-destructive for other job types)
+  try {
+    const payload = await resp.json();
+
+    if (payload?.type === 'ask' && payload?.result?.answer) {
+      const rawAnswer: string = payload.result.answer;
+
+      // Convert bare URLs to Markdown links for your MarkdownRenderer
+      const answerWithLinks = markdownifyBareUrls(rawAnswer);
+
+      // Build structured links (if worker didn’t already provide)
+      const existing: LinkPreview[] | undefined = payload.result.links;
+      const links: LinkPreview[] =
+        Array.isArray(existing) && existing.length > 0
+          ? existing
+          : extractLinksFromText(answerWithLinks);
+
+      return NextResponse.json(
+        { ...payload, result: { ...payload.result, answer: answerWithLinks, links } },
+        { status: 200 }
+      );
+    }
+
+    // Not an ask result; return unchanged
+    return NextResponse.json(payload, { status: 200 });
+  } catch {
+    // If pollJobResponse streamed or wasn’t JSON, just return it as-is
+    return resp;
+  }
 }

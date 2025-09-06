@@ -9,51 +9,57 @@
 
 /* 3) THEME & BASE STYLES */
 @layer base {
-  /* Define custom color palettes */
   :root {
     --custom-mint: 168 76% 66%;
     --custom-sky: 207 90% 60%;
     --custom-gold: 54 98% 63%;
   }
 
-  /* Define theme variables for dark mode (default) */
-  :root, .dark {
+  :root,
+  .dark {
     --background: 224 40% 8%;
-    --foreground: 0 0% 100%; /* White */
+    --foreground: 0 0% 100%;
     --card: 225 33% 11%;
-    --card-foreground: 0 0% 100%; /* White */
+    --card-foreground: 0 0% 100%;
     --popover: 224 40% 8%;
-    --popover-foreground: 0 0% 100%; /* White */
+    --popover-foreground: 0 0% 100%;
     --primary: hsl(var(--custom-gold));
     --primary-foreground: 224 40% 8%;
     --secondary: 222 47% 11%;
-    --secondary-foreground: 0 0% 100%; /* White */
+    --secondary-foreground: 0 0% 100%;
     --muted: 222 47% 11%;
     --muted-foreground: 224 15% 55%;
     --accent: 222 47% 11%;
-    --accent-foreground: 0 0% 100%; /* White */
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 100%; /* White */
+    --destructive-foreground: 0 0% 100%;
     --border: 222 47% 11%;
     --input: 222 47% 11%;
     --ring: hsl(var(--custom-sky));
     --radius: 0.5rem;
   }
 
-  /* Base element styles */
   * {
     @apply border-border;
   }
 
   body {
-    @apply min-h-screen bg-background text-foreground;
+    @apply min-h-screen bg-background text-foreground text-[19px] sm:text-[18px] leading-relaxed;
     font-family: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
-  h1, h2, h3 {
-    @apply font-semibold tracking-tight; /* text-foreground is inherited from body */
+  h1 {
+    @apply text-3xl sm:text-4xl font-bold tracking-tight leading-snug;
+  }
+
+  h2 {
+    @apply text-2xl sm:text-3xl font-semibold tracking-tight leading-snug;
+  }
+
+  h3 {
+    @apply text-xl sm:text-2xl font-semibold tracking-tight leading-snug;
   }
 
   ::selection {
@@ -65,8 +71,8 @@
 /* 4) CUSTOM COMPONENT STYLES */
 @layer components {
   .btn-pixel {
-    @apply rounded-md border-2 border-slate-600 bg-slate-700/50 px-4 py-1.5
-           text-slate-200 transition-all duration-200
+    @apply rounded-md border-2 border-slate-600 bg-slate-700/50 px-4 py-2
+           text-[15px] sm:text-[16px] text-slate-200 transition-all duration-200
            hover:border-mint hover:bg-mint hover:text-slate-900
            focus:outline-none focus:ring-2 focus:ring-mint focus:ring-offset-2 focus:ring-offset-background
            disabled:cursor-not-allowed disabled:opacity-50;
@@ -78,19 +84,24 @@
     animation: 1.2s blink step-end infinite;
   }
   @keyframes blink {
-    from, to { color: transparent; }
-    50% { color: hsl(var(--custom-mint)); }
+    from,
+    to {
+      color: transparent;
+    }
+    50% {
+      color: hsl(var(--custom-mint));
+    }
   }
 
-  /* Tailwind Typography (.prose) theme binding */
   .prose {
+    @apply text-[17px] sm:text-[18px] leading-relaxed;
     --tw-prose-body: hsl(var(--foreground));
     --tw-prose-headings: hsl(var(--foreground));
     --tw-prose-lead: hsl(var(--foreground));
     --tw-prose-links: hsl(var(--custom-gold));
     --tw-prose-bold: hsl(var(--foreground));
-    --tw-prose-counters: hsl(var(--foreground)); /* Changed from muted */
-    --tw-prose-bullets: hsl(var(--foreground)); /* Changed from muted */
+    --tw-prose-counters: hsl(var(--foreground));
+    --tw-prose-bullets: hsl(var(--foreground));
     --tw-prose-hr: hsl(var(--border));
     --tw-prose-quotes: hsl(var(--foreground));
     --tw-prose-quote-borders: hsl(var(--border));
@@ -111,19 +122,35 @@
 @layer utilities {
   .font-pixel {
     font-family: 'Press Start 2P', cursive;
+    @apply text-sm sm:text-base; /* slightly larger pixel font */
   }
 
   .crt::after {
     content: '';
     @apply pointer-events-none fixed inset-0 z-[100];
-    background: repeating-linear-gradient(0deg, rgba(255,255,255,0) 0, rgba(255,255,255,0) 2px, rgba(255,255,255,0.1) 0, rgba(255,255,255,0.1) 3px);
+    background: repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0) 0,
+      rgba(255, 255, 255, 0) 2px,
+      rgba(255, 255, 255, 0.1) 0,
+      rgba(255, 255, 255, 0.1) 3px
+    );
     mix-blend-mode: soft-light;
   }
 
-  /* Katex & MathJax Fixes */
-  .katex, .katex-display { color: hsl(var(--foreground)); }
-  .katex-display { overflow-x: auto; overflow-y: hidden; text-align: center; }
-  .prose .katex, .prose .katex * { all: revert; }
+  .katex,
+  .katex-display {
+    color: hsl(var(--foreground));
+  }
+  .katex-display {
+    overflow-x: auto;
+    overflow-y: hidden;
+    text-align: center;
+  }
+  .prose .katex,
+  .prose .katex * {
+    all: revert;
+  }
   .prose .katex-display {
     @apply my-6 block overflow-x-auto overflow-y-hidden text-center;
   }
@@ -136,8 +163,13 @@
     max-width: 100%;
   }
 
-  /* Typography color safety net */
-  .prose :where(h1,h2,h3,h4,h5,h6){ color: hsl(var(--foreground)) !important; }
-  .prose :where(p,li,strong,em,code,th,td,blockquote){ color: hsl(var(--foreground)); }
-  .prose a{ color: hsl(var(--custom-gold)); }
+  .prose :where(h1, h2, h3, h4, h5, h6) {
+    color: hsl(var(--foreground)) !important;
+  }
+  .prose :where(p, li, strong, em, code, th, td, blockquote) {
+    color: hsl(var(--foreground));
+  }
+  .prose a {
+    color: hsl(var(--custom-gold));
+  }
 }

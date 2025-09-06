@@ -2,8 +2,8 @@
  * =========================================================================
  * LLM & JOB TYPE DEFINITIONS
  *
- * This file is the single source of truth for the data structures related
- * to the BullMQ worker, including job payloads, results, and API types.
+ * Single source of truth for BullMQ worker payloads/results, API types,
+ * retrieval metadata, and optional link/citation structures.
  * =========================================================================
  */
 
@@ -92,11 +92,81 @@ export type EnrichedMissionPlan = {
 
 /* ----------------------------- Chat Primitives --------------------------- */
 
+/** Optional structured link metadata you can render as “Source” cards. */
+export type LinkPreview = {
+  url: string;
+  title?: string;
+  faviconUrl?: string; // e.g., icons.duckduckgo.com/ip3/<host>.ico
+  snippet?: string;    // short description from search result
+  meta?: string;       // any extra meta you want to surface
+};
+
+/** Optional inline citation marker (for superscripts/footnotes). */
+export type InlineCitation = {
+  index: number;       // 1-based marker used in text, e.g. [^1] or ¹
+  url: string;
+  title?: string;
+};
+
 /** Common message shape used by tutor-preflight starter messages, etc. */
 export type ChatMessage = {
   id: string;
   role: 'stella' | 'user';
   text: string;
+
+  /**
+   * Optional: structured links to show under the message (e.g., “Sources”).
+   * UI can fall back to auto-extracting raw URLs from `text` if empty.
+   */
+  links?: LinkPreview[];
+
+  /**
+   * Optional: inline citations you can map to superscripts in the rendered text.
+   * You can ignore this if you prefer simple `links` rendering.
+   */
+  citations?: InlineCitation[];
+};
+
+/* -------------------------- Retrieval & Telemetry ------------------------- */
+
+/** Controls for worker-side retrieval (e.g., Google CSE). */
+export type RetrievalOptions = {
+  /** Enable retrieval; if false/undefined, skip. */
+  enable?: boolean;
+
+  /** Optional explicit query; otherwise worker derives from prompt/context. */
+  qOverride?: string;
+
+  /** Number of results to fetch (worker may cap). */
+  num?: number;
+
+  /** Timeout budget for retrieval in ms (independent of LLM time). */
+  timeoutMs?: number;
+
+  /** Optional min score/quality if you introduce scoring/reranking. */
+  minScore?: number;
+
+  /** Optional source tag to log which retriever was used ("cse", "bing", etc). */
+  provider?: string;
+};
+
+/** Per-stage timing + flags for observability. */
+export type WorkerTiming = {
+  totalMs?: number;
+  retrievalMs?: number;
+  llmMs?: number;
+  queueWaitMs?: number;
+};
+
+/** Optional metadata for results (helps debugging/eval). */
+export type WorkerMeta = {
+  hadRetrieval?: boolean;       // whether retrieval actually ran
+  retrievedCount?: number;      // number of links kept
+  role?: Role;
+  mission?: string;
+  timing?: WorkerTiming;
+  model?: string;               // model id used by the worker
+  notes?: Record<string, unknown>; // arbitrary debug fields
 };
 
 /* ---------------------- BullMQ Job & Payload Types ----------------------- */
@@ -111,10 +181,16 @@ export interface LlmAskPayload {
   context?: string;
   role?: Role;
   mission?: string;
+
+  /**
+   * Optional worker-side retrieval controls.
+   * If omitted or `enable=false`, the worker should skip retrieval.
+   */
+  retrieval?: RetrievalOptions;
 }
 
 /**
- * New: Tutor Preflight
+ * Tutor Preflight
  * Generates role-aware system prompt, starter messages, warmup, goals, and difficulty hints.
  */
 export type TutorPreflightInput = {
@@ -135,6 +211,8 @@ export type TutorPreflightOutput = {
     standard: string;
     challenge: string;
   };
+  /** Optional observability for preflight generation. */
+  meta?: WorkerMeta;
 };
 
 /* ----------------------------- Job Data (Union) -------------------------- */
@@ -166,11 +244,23 @@ export type LlmJobData =
 /* -------------------------- BullMQ Job Result Types ---------------------- */
 
 export interface AskResult {
+  /** Final Markdown answer (your UI renders via MarkdownRenderer). */
   answer: string;
+
+  /** Token/timing counters if you collect them. */
   tokens?: { input?: number; output?: number; timeMs?: number };
+
+  /** Optional structured links for the answer bubble. */
+  links?: LinkPreview[];
+
+  /** Optional inline citations for superscripts/footnotes mapping. */
+  citations?: InlineCitation[];
+
+  /** Optional observability for the ask pipeline. */
+  meta?: WorkerMeta;
 }
 
 export type LlmJobResult =
-  | { type: 'mission'; result: EnrichedMissionPlan }
+  | { type: 'mission'; result: EnrichedMissionPlan; meta?: WorkerMeta }
   | { type: 'ask'; result: AskResult }
   | { type: 'tutor-preflight'; result: TutorPreflightOutput };

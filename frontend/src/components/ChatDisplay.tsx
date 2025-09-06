@@ -41,43 +41,31 @@ export default function ChatDisplay({
 }: ChatDisplayProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
-
-  // Track whether the user is currently at the bottom (or very near it).
   const [atBottom, setAtBottom] = useState(true);
 
-  // Observe the sentinel at the end of the list to know if we're "pinned" to bottom.
   useEffect(() => {
     const container = scrollRef.current;
     const sentinel = bottomRef.current;
     if (!container || !sentinel) return;
 
     const io = new IntersectionObserver(
-      (entries) => {
-        const entry = entries[0];
-        setAtBottom(entry.isIntersecting);
-      },
-      {
-        root: container,
-        threshold: 1.0, // fully in view = true (you can relax to 0.98 if needed)
-      }
+      (entries) => setAtBottom(entries[0]?.isIntersecting ?? true),
+      { root: container, threshold: 1.0 }
     );
 
     io.observe(sentinel);
     return () => io.disconnect();
   }, []);
 
-  // When new messages arrive (or update), if we're at the bottom, keep us pinned.
   useEffect(() => {
     if (!atBottom) return;
-    bottomRef.current?.scrollIntoView({ block: 'end' }); // instant; less jank during streaming
+    bottomRef.current?.scrollIntoView({ block: 'end' });
   }, [messages, atBottom]);
 
-  // Provide a manual "jump to bottom" action with smooth scroll.
   const jumpToBottom = useCallback(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
   }, []);
 
-  // If container resizes (mobile keyboard, window resize), keep pinned if atBottom.
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
@@ -89,19 +77,17 @@ export default function ChatDisplay({
   }, [atBottom]);
 
   return (
-    // Scrolling container (let the parent flex determine height)
     <div
       ref={scrollRef}
       className={clsx(
         'h-full w-full overflow-y-auto overscroll-contain',
-        // Remove `scroll-smooth` to avoid scroll jank; we do smooth only on button clicks.
-        'px-2 sm:px-3 space-y-3 sm:space-y-4 relative'
+        // ↓ tighter vertical spacing between messages
+        'px-2 sm:px-3 space-y-2 sm:space-y-3 relative'
       )}
-      // A small improvement to prevent unexpected anchor jumps when content grows
       style={{ overflowAnchor: 'auto' as any }}
     >
       {messages.length === 0 ? (
-        <div className="text-muted-foreground font-sans text-sm p-6 text-center rounded-xl border border-white/10 bg-white/5">
+        <div className="text-muted-foreground font-sans text-[13.5px] sm:text-sm p-4 sm:p-6 text-center rounded-xl border border-white/10 bg-white/5">
           Ask Stella a question to get started...
         </div>
       ) : (
@@ -112,23 +98,21 @@ export default function ChatDisplay({
         ))
       )}
 
-      {/* Bottom sentinel: always last */}
       <div ref={bottomRef} className="h-0 w-full" />
 
-      {/* “Scroll to latest” button appears when the user is not at bottom */}
       {!atBottom && (
         <button
           type="button"
           onClick={jumpToBottom}
           className={clsx(
             'sticky bottom-3 ml-auto mr-2 sm:mr-3',
-            'flex items-center gap-1 rounded-full border px-3 py-1.5 text-xs',
+            'flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px]', // ↓ smaller chip
             'bg-slate-900/70 border-white/10 text-slate-100 shadow-md backdrop-blur',
             'hover:bg-slate-900/80 transition-colors'
           )}
           aria-label="Scroll to latest"
         >
-          <ChevronDown className="h-4 w-4" />
+          <ChevronDown className="h-3.5 w-3.5" />
           New messages
         </button>
       )}
@@ -136,7 +120,6 @@ export default function ChatDisplay({
   );
 }
 
-// --- MessageRow and MessageBubble components can remain unchanged ---
 function MessageRow({ message, children }: { message: Message; children: React.ReactNode }) {
   if (message.role === 'stella') return <div className="w-full">{children}</div>;
   if (message.role === 'error') return <div className="w-full flex justify-center">{children}</div>;
@@ -153,7 +136,7 @@ const MessageBubble = memo(function MessageBubble({
   maxLength: number;
 }) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const rootRef = useRef<HTMLDivElement>(null); // ref to this bubble
+  const rootRef = useRef<HTMLDivElement>(null);
 
   const isLong = message.text.length > maxLength;
   const raw = isLong && !isExpanded ? `${message.text.slice(0, maxLength)}…` : message.text;
@@ -162,7 +145,6 @@ const MessageBubble = memo(function MessageBubble({
 
   const handleShowMore = () => {
     setIsExpanded(true);
-    // Wait for layout to update, then scroll the expanded bubble into view
     requestAnimationFrame(() => {
       rootRef.current?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     });
@@ -173,16 +155,18 @@ const MessageBubble = memo(function MessageBubble({
       ref={rootRef}
       className={clsx(
         isStella
-          ? 'w-[calc(100%+1rem)] -mx-2 sm:mx-0 sm:w-full sm:rounded-2xl sm:border sm:shadow-lg'
+          // Full-bleed only on very small screens; otherwise normal width
+          ? 'w-[calc(100%+0.75rem)] -mx-1.5 sm:mx-0 sm:w-full sm:rounded-2xl sm:border sm:shadow-lg'
           : 'max-w-[92%] sm:max-w-[80%] md:max-w-[70%] rounded-2xl border shadow-lg',
         'relative group backdrop-blur-xl',
-        'px-3.5 py-2 sm:px-4 sm:py-3',
+        // ↓ slightly smaller vertical padding
+        'px-3 py-2 sm:px-3.5 sm:py-2.5',
         'transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl',
         'focus-within:outline-none focus-within:ring-2',
         ROLE_STYLES.bubble[message.role],
         ROLE_STYLES.ring[message.role],
         'overflow-x-hidden',
-        'scroll-mt-16' // helpful if you have a sticky header
+        'scroll-mt-16'
       )}
       tabIndex={0}
     >
@@ -216,8 +200,9 @@ const MessageBubble = memo(function MessageBubble({
         <div
           className={clsx(
             'prose prose-invert prose-theme max-w-none',
-            'text-[14.5px] leading-relaxed sm:text-[15px]',
-            'prose-p:my-2 prose-ul:my-2 prose-ol:my-2 prose-li:my-0.5',
+            // ↓ slightly smaller text; tighter margins inside the bubble
+            'text-[14px] sm:text-[14.5px] leading-relaxed',
+            'prose-p:my-1.5 prose-ul:my-1.5 prose-ol:my-1.5 prose-li:my-0.5',
             'break-words'
           )}
         >
@@ -228,7 +213,7 @@ const MessageBubble = memo(function MessageBubble({
       {isLong && !isExpanded && (
         <button
           onClick={handleShowMore}
-          className="mt-2 text-xs text-gold hover:text-gold/80 underline underline-offset-2"
+          className="mt-1.5 text-[11px] text-gold hover:text-gold/80 underline underline-offset-2"
         >
           show more
         </button>
