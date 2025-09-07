@@ -1,33 +1,175 @@
-/* Import Inter from Google Fonts — must be first */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+/* 1) GLOBAL IMPORTS — Must be at the very top */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
+/* 2) TAILWIND DIRECTIVES */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Your styles */
-html, body {
-  font-family: 'Inter', sans-serif;
-  background-color: #0b0f1a;
-  color: #e6f1ff;
-  min-height: 100%;
+/* 3) THEME & BASE STYLES */
+@layer base {
+  :root {
+    --custom-mint: 168 76% 66%;
+    --custom-sky: 207 90% 60%;
+    --custom-gold: 54 98% 63%;
+  }
+
+  :root,
+  .dark {
+    --background: 224 40% 8%;
+    --foreground: 0 0% 100%;
+    --card: 225 33% 11%;
+    --card-foreground: 0 0% 100%;
+    --popover: 224 40% 8%;
+    --popover-foreground: 0 0% 100%;
+    --primary: hsl(var(--custom-gold));
+    --primary-foreground: 224 40% 8%;
+    --secondary: 222 47% 11%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 222 47% 11%;
+    --muted-foreground: 224 15% 55%;
+    --accent: 222 47% 11%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 222 47% 11%;
+    --input: 222 47% 11%;
+    --ring: hsl(var(--custom-sky));
+    --radius: 0.5rem;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply min-h-screen bg-background text-foreground text-[19px] sm:text-[18px] leading-relaxed;
+    font-family: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1 {
+    @apply text-3xl sm:text-4xl font-bold tracking-tight leading-snug;
+  }
+
+  h2 {
+    @apply text-2xl sm:text-3xl font-semibold tracking-tight leading-snug;
+  }
+
+  h3 {
+    @apply text-xl sm:text-2xl font-semibold tracking-tight leading-snug;
+  }
+
+  ::selection {
+    background-color: hsl(var(--custom-sky));
+    color: hsl(var(--background));
+  }
 }
 
-* {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* 4) CUSTOM COMPONENT STYLES */
+@layer components {
+  .btn-pixel {
+    @apply rounded-md border-2 border-slate-600 bg-slate-700/50 px-4 py-2
+           text-[15px] sm:text-[16px] text-slate-200 transition-all duration-200
+           hover:border-mint hover:bg-mint hover:text-slate-900
+           focus:outline-none focus:ring-2 focus:ring-mint focus:ring-offset-2 focus:ring-offset-background
+           disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .blinking-cursor {
+    @apply font-semibold;
+    color: hsl(var(--custom-mint));
+    animation: 1.2s blink step-end infinite;
+  }
+  @keyframes blink {
+    from,
+    to {
+      color: transparent;
+    }
+    50% {
+      color: hsl(var(--custom-mint));
+    }
+  }
+
+  .prose {
+    @apply text-[17px] sm:text-[18px] leading-relaxed;
+    --tw-prose-body: hsl(var(--foreground));
+    --tw-prose-headings: hsl(var(--foreground));
+    --tw-prose-lead: hsl(var(--foreground));
+    --tw-prose-links: hsl(var(--custom-gold));
+    --tw-prose-bold: hsl(var(--foreground));
+    --tw-prose-counters: hsl(var(--foreground));
+    --tw-prose-bullets: hsl(var(--foreground));
+    --tw-prose-hr: hsl(var(--border));
+    --tw-prose-quotes: hsl(var(--foreground));
+    --tw-prose-quote-borders: hsl(var(--border));
+    --tw-prose-captions: hsl(var(--muted-foreground));
+    --tw-prose-code: hsl(var(--foreground));
+    --tw-prose-pre-code: hsl(var(--foreground));
+    --tw-prose-pre-bg: hsl(var(--card));
+    --tw-prose-th-borders: hsl(var(--border));
+    --tw-prose-td-borders: hsl(var(--border));
+  }
+
+  .prose a {
+    @apply font-semibold text-primary underline underline-offset-4 transition-colors duration-200 hover:text-primary/80;
+  }
 }
 
-/* Optional CRT overlay */
-.crt::after {
-  content:'';
-  position:fixed; inset:0; pointer-events:none;
-  background: repeating-linear-gradient(
-    0deg,
-    rgba(255,255,255,0.03),
-    rgba(255,255,255,0.03) 1px,
-    transparent 2px,
-    transparent 3px
-  );
-  mix-blend-mode: soft-light;
+/* 5) CUSTOM UTILITY & OVERRIDE STYLES */
+@layer utilities {
+  .font-pixel {
+    font-family: 'Press Start 2P', cursive;
+    @apply text-sm sm:text-base; /* slightly larger pixel font */
+  }
+
+  .crt::after {
+    content: '';
+    @apply pointer-events-none fixed inset-0 z-[100];
+    background: repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0) 0,
+      rgba(255, 255, 255, 0) 2px,
+      rgba(255, 255, 255, 0.1) 0,
+      rgba(255, 255, 255, 0.1) 3px
+    );
+    mix-blend-mode: soft-light;
+  }
+
+  .katex,
+  .katex-display {
+    color: hsl(var(--foreground));
+  }
+  .katex-display {
+    overflow-x: auto;
+    overflow-y: hidden;
+    text-align: center;
+  }
+  .prose .katex,
+  .prose .katex * {
+    all: revert;
+  }
+  .prose .katex-display {
+    @apply my-6 block overflow-x-auto overflow-y-hidden text-center;
+  }
+  .prose .MathJax,
+  .prose .mjx-svg,
+  .prose .MathJax svg {
+    color: hsl(var(--foreground));
+    fill: currentColor;
+    stroke: currentColor;
+    max-width: 100%;
+  }
+
+  .prose :where(h1, h2, h3, h4, h5, h6) {
+    color: hsl(var(--foreground)) !important;
+  }
+  .prose :where(p, li, strong, em, code, th, td, blockquote) {
+    color: hsl(var(--foreground));
+  }
+  .prose a {
+    color: hsl(var(--custom-gold));
+  }
 }
