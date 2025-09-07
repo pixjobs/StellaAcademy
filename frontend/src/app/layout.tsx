@@ -11,24 +11,19 @@ import GSAPProvider from '@/components/GSAPProvider';
 import ConditionalBackgrounds from '@/components/ConditionalBackgrounds';
 import Providers from './providers';
 
-export const metadata: Metadata = {
-  title: 'Stella Academy',
-};
+export const metadata: Metadata = { title: 'Stella Academy' };
 
-type RootLayoutProps = {
-  children: ReactNode;
-};
+type RootLayoutProps = { children: ReactNode };
 
 export default async function RootLayout({ children }: RootLayoutProps) {
   const useApod = process.env.USE_APOD_BG === 'true';
 
-  // Resolve getApod via dynamic import to avoid interop/alias hiccups.
-  // If anything fails, we just skip APOD and continue.
   let bgUrl: string | undefined;
   if (useApod) {
     try {
-      const mod = await import('@/lib/apod'); // server module
-      const apod = await mod.getApod();
+      // Directly call the server lib: no network, no absolute URL required.
+      const { getApod } = await import('@/lib/apod'); // server-only module
+      const apod = await getApod();
       bgUrl = apod?.bgUrl ?? undefined;
     } catch (err) {
       console.warn('[layout] Failed to load APOD background:', err);
@@ -38,19 +33,14 @@ export default async function RootLayout({ children }: RootLayoutProps) {
 
   return (
     <html lang="en" suppressHydrationWarning>
-      <body
-        className={[
-          'min-h-screen bg-background text-foreground antialiased',
-          'overflow-x-hidden',
-          'selection:bg-accent selection:text-accent-foreground',
-        ].join(' ')}
-      >
+      <body className={[
+        'min-h-screen bg-background text-foreground antialiased',
+        'overflow-x-hidden',
+        'selection:bg-accent selection:text-accent-foreground',
+      ].join(' ')}>
         <Providers>
           <GSAPProvider>
-            {/* Background logic */}
             <ConditionalBackgrounds url={bgUrl} />
-
-            {/* Foreground content (above background) */}
             <div className="relative z-20 flex min-h-screen flex-col">
               <Header />
               <main className="flex-1">{children}</main>
