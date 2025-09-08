@@ -1,9 +1,8 @@
-// src/hooks/useMissionChat.ts
 'use client';
 
 import { useState, useRef, useCallback } from 'react';
 
-// Add 'error' to the possible roles for a message
+// The 'error' role allows displaying errors directly in the chat flow.
 export type Message = {
   id: string;
   role: 'user' | 'stella' | 'error';
@@ -41,7 +40,6 @@ export function useMissionChat({ role, mission }: UseMissionChatParams) {
     const stellaMessageId = `stella-${Date.now()}`;
     const stellaPlaceholder: Message = { id: stellaMessageId, role: 'stella', text: '' };
     
-    // Add both the user message and Stella's placeholder to the chat
     setMessages(prev => [...prev, newUserMessage, stellaPlaceholder]);
 
     const ac = new AbortController();
@@ -77,21 +75,37 @@ export function useMissionChat({ role, mission }: UseMissionChatParams) {
           )
         );
       }
-    } catch (err: any) {
-      if (err.name !== 'AbortError') {
-        // --- THIS IS THE KEY FIX ---
-        // Instead of a separate error state, we replace Stella's placeholder
-        // with a visible error message directly in the chat.
-        const errorMessage: Message = {
-          id: `error-${Date.now()}`,
-          role: 'error',
-          text: `Connection failed. Is the AI server running?\n\nDetails: ${err.message}`
-        };
-        setMessages(prev => prev.map(msg => msg.id === stellaMessageId ? errorMessage : msg));
-      } else {
-        // If the user stopped it, just remove the placeholder
-        setMessages(prev => prev.filter(msg => msg.id !== stellaMessageId));
+    } catch (err: unknown) { // FIX: Catch the error as 'unknown' for type safety.
+      
+      // We create a safe variable for the error message.
+      let errorMessageText = 'An unexpected error occurred.';
+
+      // Safely check if the caught value is an Error instance.
+      if (err instanceof Error) {
+        // If it's an AbortError, the user cancelled the request, so we handle it gracefully.
+        if (err.name === 'AbortError') {
+          // Remove Stella's placeholder message.
+          setMessages(prev => prev.filter(msg => msg.id !== stellaMessageId));
+          // Exit the catch block early.
+          return;
+        }
+        // For all other errors, we can safely use the message property.
+        errorMessageText = err.message;
+      } else if (typeof err === 'string') {
+        // Handle cases where a plain string might be thrown.
+        errorMessageText = err;
       }
+      
+      // Create a structured error message to display in the chat.
+      const errorMessage: Message = {
+        id: `error-${Date.now()}`,
+        role: 'error',
+        text: `Connection failed. Is the AI server running?\n\nDetails: ${errorMessageText}`
+      };
+      
+      // Replace Stella's placeholder with the error message.
+      setMessages(prev => prev.map(msg => msg.id === stellaMessageId ? errorMessage : msg));
+
     } finally {
       setLoading(false);
     }

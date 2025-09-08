@@ -104,16 +104,47 @@ export async function getSecret(name: string): Promise<string> {
     }
     cache[name] = value;
     return value;
-  } catch (err: any) {
-    if (err?.code === 5) {
-      console.warn(`[secrets] Secret '${name}' not found in GSM for project '${process.env.GOOGLE_CLOUD_PROJECT}'.`);
-    } else if (err?.code === 7) {
-      console.error(`🔴 [secrets] PERMISSION DENIED for '${name}'. Grant Secret Accessor to the service account.`);
-    } else {
-      console.error(`🔴 [secrets] Failed to fetch '${name}' from GSM:`, err);
+  } catch (err: unknown) { // Step 1: Catch the error as 'unknown' for type safety.
+
+      // Step 2: Check if the thrown value is a standard Error object. This is the most common case.
+      if (err instanceof Error) {
+        // Step 3: Safely assert a more specific shape for errors from the Google Cloud library.
+        // We expect an Error object that might have a `code` property.
+        const gcpError = err as { code?: number; message: string };
+
+        // Step 4: Use a clean and scalable `switch` statement to handle known error codes.
+        switch (gcpError.code) {
+          case 5: // NOT_FOUND
+            console.warn(
+              `[secrets] 🟡 Secret '${name}' not found in GSM for project '${process.env.GOOGLE_CLOUD_PROJECT}'. Please verify the secret name is correct.`
+            );
+            break;
+
+          case 7: // PERMISSION_DENIED
+            console.error(
+              `🔴 [secrets] PERMISSION DENIED for secret '${name}'. Ensure the service account has the 'Secret Manager Secret Accessor' role. If running locally, you may need to re-authenticate with 'gcloud auth application-default login'.`
+            );
+            break;
+
+          default:
+            // Step 5: Provide a robust default case for all other errors, including network issues.
+            // This logs the code if it exists and the full message for better debugging.
+            console.error(
+              `🔴 [secrets] Failed to fetch '${name}' from GSM. Code: ${gcpError.code ?? 'N/A'}. Message: ${gcpError.message}`
+            );
+            break;
+        }
+      } else {
+        // Step 6: Handle the rare edge case where something other than an Error object was thrown.
+        console.error(
+          `🔴 [secrets] An unexpected non-error value was thrown while fetching '${name}':`,
+          err
+        );
+      }
+      
+      // The function returns an empty string on any failure, as per the original logic.
+      return '';
     }
-    return '';
-  }
 }
 
 /** Convenience: fetch with default */

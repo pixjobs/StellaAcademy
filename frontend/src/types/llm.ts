@@ -101,6 +101,9 @@ export type LinkPreview = {
   meta?: string;       // any extra meta you want to surface
 };
 
+// Handy function type for Google CSE
+export type GoogleSearchFn = (q: string, n?: number) => Promise<LinkPreview[]>;
+
 /** Optional inline citation marker (for superscripts/footnotes). */
 export type InlineCitation = {
   index: number;       // 1-based marker used in text, e.g. [^1] or ¹

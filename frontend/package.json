@@ -20,7 +20,7 @@
     "start:worker": "node dist/workers/ollama/worker.js",
 
     "//3": "----- Misc -----",
-    "lint": "eslint"
+    "lint": "eslint . --ext .ts,.tsx --max-warnings=0"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.31.9",

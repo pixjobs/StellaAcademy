@@ -46,25 +46,46 @@ function splitInline(segment: string, out: Array<{ code: boolean; raw: string }>
 }
 
 function autolinkInTextBlock(block: string): string {
-  // Use rest args to safely read offset/string regardless of capture groups
-  return block.replace(URL_RE, (match: string, ...args: any[]) => {
-    const offset = args[args.length - 2] as number; // second from last
-    const whole  = args[args.length - 1] as string; // last
+  // Ensure global flag for matchAll without mutating the original
+  const flags = URL_RE.flags.includes('g') ? URL_RE.flags : `${URL_RE.flags}g`;
+  const re = new RegExp(URL_RE.source, flags);
+
+  let out = '';
+  let last = 0;
+
+  for (const m of block.matchAll(re)) {
+    const match = m[0];
+    const offset = m.index ?? 0;
 
     // 1) Already a Markdown link target? (...](URL))
-    const before2 = whole.slice(Math.max(0, offset - 2), offset);
-    if (before2 === '](') return match;
+    const before2 = block.slice(Math.max(0, offset - 2), offset);
+    if (before2 === '](') {
+      out += block.slice(last, offset) + match;
+      last = offset + match.length;
+      continue;
+    }
 
     // 2) Already in HTML href/src attribute
-    const before6 = whole.slice(Math.max(0, offset - 6), offset).toLowerCase();
-    if (before6.includes('href="') || before6.includes("href='") || before6.includes('src="') || before6.includes("src='")) {
-      return match;
+    const before6 = block.slice(Math.max(0, offset - 6), offset).toLowerCase();
+    if (
+      before6.includes('href="') || before6.includes("href='") ||
+      before6.includes('src="')  || before6.includes("src='")
+    ) {
+      out += block.slice(last, offset) + match;
+      last = offset + match.length;
+      continue;
     }
 
     const clean = stripTracking(match);
     const host = safeHost(clean);
-    return `[${host}](${clean})`;
-  });
+
+    out += block.slice(last, offset) + `[${host}](${clean})`;
+    last = offset + match.length;
+  }
+
+  // Append any trailing text after the last match
+  out += block.slice(last);
+  return out;
 }
 
 export function extractLinksFromText(text: string, cap = 8): LinkPreview[] {

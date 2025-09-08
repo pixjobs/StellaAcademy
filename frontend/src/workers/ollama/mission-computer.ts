@@ -8,7 +8,7 @@
  * =========================================================================
  */
 
-import { searchNIVL, fetchAPOD, fetchLatestMarsPhotos, fetchEPICImages, NivlItem } from '@/lib/nasa';
+import { searchNIVL, fetchAPOD, fetchLatestMarsPhotos, fetchEPICImages } from '@/lib/nasa';
 import { callOllama } from './ollama-client';
 import type { Role, MarsPhoto, MissionType } from '@/types/llm';
 import type { EnrichedMissionPlan, EnrichedTopic, Img } from '@/types/mission';
@@ -16,7 +16,6 @@ import type { EnrichedMissionPlan, EnrichedTopic, Img } from '@/types/mission';
 // --- Local Types ---
 type RawTopic = { title: string; summary: string; keywords: string[]; searchQueries: string[] };
 type RawMission = { missionTitle: string; introduction: string; topics: RawTopic[] };
-type APODLike = Partial<{ title: string; explanation: string; bgUrl: string }>;
 
 /* ─────────────────────────────────────────────────────────
    Main Export: computeMission

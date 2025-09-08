@@ -66,7 +66,7 @@ function splitInline(segment: string, out: Array<{ code: boolean; raw: string }>
 }
 
 function autolinkInTextBlock(block: string): string {
-  return block.replace(URL_RE, (match: string, ...args: any[]) => {
+  return block.replace(URL_RE, (match: string, ...args: (string | number)[]) => {
     const offset = args[args.length - 2] as number;
     const whole = args[args.length - 1] as string;
 

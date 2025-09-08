@@ -99,10 +99,6 @@ function MissionControlInternal({
     );
   };
 
-  const handleCaptureFormula = (formulaText: string) => {
-    addNote({ type: 'formula', title: 'Captured Formula', body: formulaText });
-  };
-
   const handleNoteClick = useCallback((note: Note) => {
     let prompt = note.body || `Can you elaborate on "${note.title}"?`;
     if (note.type === 'reference' && note.url) prompt = `Tell me more about this link: ${note.url}`;
@@ -177,7 +173,6 @@ function MissionControlInternal({
             onSend={onSend}
             onStop={stop}
             onCaptureMessage={handleCaptureMessage}
-            onCaptureFormula={handleCaptureFormula}
             inputValue={chatInputValue}
             setInputValue={setChatInputValue}
           />
@@ -281,13 +276,12 @@ type ChatPanelProps = {
   onSend: (text: string) => void;
   onStop: () => void;
   onCaptureMessage: (message: Message) => void;
-  onCaptureFormula: (formula: string) => void;
   inputValue: string;
   setInputValue: Dispatch<SetStateAction<string>>;
 };
 
 function ChatPanel({
-  messages, isLoading, onSend, onStop, onCaptureMessage, onCaptureFormula, inputValue, setInputValue
+  messages, isLoading, onSend, onStop, onCaptureMessage, inputValue, setInputValue
 }: ChatPanelProps) {
   return (
     <div
@@ -300,7 +294,6 @@ function ChatPanel({
         <ChatDisplay
           messages={messages}
           onCapture={onCaptureMessage}
-          onCaptureFormula={onCaptureFormula}
         />
       </div>
       <div className="mt-2 pt-2 border-t border-white/10">

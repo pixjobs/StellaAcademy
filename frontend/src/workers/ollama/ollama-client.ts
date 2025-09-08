@@ -72,13 +72,43 @@ export async function loadConfigFromSecrets(): Promise<void> {
           console.log(`[config] ✅ Successfully loaded secret: '${secretName}'`);
           return payload;
         }
-      } catch (error: any) {
-        if (error.code === 7) console.warn(`[config] 🟡 PERMISSION DENIED for secret '${secretName}'. Authenticate with 'gcloud auth application-default login'.`);
-        else if (error.code === 5) console.warn(`[config] 🟡 Secret named '${secretName}' NOT FOUND in GCP.`);
-        else console.warn(`[config] 🟡 Could not access secret '${secretName}'. Error: ${error.code}`);
+      } catch (error: unknown) {
+      // This is the most robust way to handle errors of an unknown type.
+      // First, we check if the thrown value is an actual Error object.
+      if (error instanceof Error) {
+        // Now that we know it's an Error, we can safely access `error.message`.
+        // We also cast it to a type that might have a `code` property, which is
+        // common for GCP and gRPC errors.
+        const err = error as { code?: number; message: string };
+
+        // A switch statement is cleaner and safer for handling specific codes.
+        switch (err.code) {
+          case 3: // INVALID_ARGUMENT
+            console.warn(`[config] 🟡 INVALID ARGUMENT for secret '${secretName}'. This usually means the secret name is malformed or contains invalid characters.`);
+            break;
+
+          case 5: // NOT_FOUND
+            console.warn(`[config] 🟡 Secret named '${secretName}' NOT FOUND in your GCP project. Please verify the name is correct.`);
+            break;
+
+          case 7: // PERMISSION_DENIED
+            console.warn(`[config] 🟡 PERMISSION DENIED for secret '${secretName}'. Ensure your application's service account has the "Secret Manager Secret Accessor" role. If running locally, you may need to re-authenticate with 'gcloud auth application-default login'.`);
+            break;
+          
+          default:
+            // This is the catch-all for any other type of error, including network
+            // issues or errors that don't have a specific code. It provides the most context.
+            console.warn(`[config] 🟡 An unexpected error occurred while accessing secret '${secretName}'. Code: ${err.code ?? 'N/A'}. Message: ${err.message}`);
+            break;
+        }
+      } else {
+        // This handles the rare case where something other than an Error object was thrown.
+        console.warn(`[config] 🟡 An unexpected non-error value was thrown while accessing secret '${secretName}':`, error);
       }
-      return undefined;
-    };
+    }
+    // This was part of your original code, so it's preserved.
+    return undefined;
+  };
 
     const [baseUrl, nasaKey, bearerToken, basicAuth] = await Promise.all([
       accessSecret(process.env.OLLAMA_BASE_URL_SECRET),
