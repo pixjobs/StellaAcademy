@@ -1,0 +1,44 @@
+# ---------- Build-only worker image (no Next.js) ----------
+# Save as: Dockerfile.worker
+
+ARG NODE_VERSION=20-alpine
+
+# 1) Base deps (with devDeps for TypeScript build)
+FROM node:${NODE_VERSION} AS deps
+WORKDIR /app
+RUN apk add --no-cache libc6-compat
+COPY package.json package-lock.json* ./
+RUN npm ci
+
+# 2) Build the worker (tsc + tsc-alias) using your worker tsconfig
+FROM deps AS build
+WORKDIR /app
+COPY tsconfig.json tsconfig.worker.json ./
+COPY src ./src
+# Compile ONLY the worker + server libs per tsconfig.worker.json
+RUN npm run build:worker
+
+# 3) Runtime (production-only deps)
+FROM node:${NODE_VERSION} AS runner
+WORKDIR /app
+RUN apk add --no-cache dumb-init curl
+
+# Cloud Run expects the app to listen on PORT; your worker’s health server uses it.
+ENV NODE_ENV=production \
+    PORT=8080 \
+    ENABLE_WEB_ENRICH=1
+
+# Install only prod dependencies
+COPY package.json package-lock.json* ./
+RUN npm ci --omit=dev && npm cache clean --force
+
+# Bring in compiled JS
+COPY --from=build /app/dist ./dist
+
+# Drop privileges
+RUN addgroup -S nodegrp && adduser -S nodeuser -G nodegrp
+USER nodeuser
+
+EXPOSE 8080
+ENTRYPOINT ["/usr/bin/dumb-init", "--"]
+CMD ["node", "dist/workers/ollama/worker.js"]

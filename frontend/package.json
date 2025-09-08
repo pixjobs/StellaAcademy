@@ -1,11 +1,26 @@
 {
   "name": "stella-frontend",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
+    "//": "----- Web (Next.js) -----",
     "dev": "next dev",
+    "dev:web": "next dev",
     "build": "next build",
-    "start": "next start",
-    "lint": "eslint",
-    "worker": "tsx src/workers/ollama/worker.ts"
+    "build:web": "next build",
+    "start": "next start -p ${PORT:-3000}",
+    "start:web": "next start -p ${PORT:-3000}",
+
+    "//2": "----- Worker (BullMQ/Ollama) -----",
+    "worker": "tsx src/workers/ollama/worker.ts",
+    "dev:worker": "tsx src/workers/ollama/worker.ts",
+    "build:worker": "tsc -p tsconfig.worker.json && tsc-alias -p tsconfig.worker.json",
+    "start:worker": "node dist/workers/ollama/worker.js",
+
+    "//3": "----- Misc -----",
+    "lint": "eslint"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.31.9",
@@ -65,6 +80,7 @@
     "server-only": "^0.0.1",
     "tailwindcss": "^3.4.13",
     "tsx": "^4.7.2",
+    "tsc-alias": "^1.8.10",
     "typescript": "^5"
   }
 }

@@ -1,0 +1,49 @@
+# cloudbuild.worker.yaml
+# Build & deploy the worker image to Cloud Run via Artifact Registry.
+
+timeout: "1200s"
+
+# Defaults (can be overridden via --substitutions)
+substitutions:
+  _REGION: europe-west1
+  _AR_REPO: stella
+  _SERVICE: stella-worker
+  _IMAGE_TAG: latest
+
+steps:
+  # 1) Build Docker image
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - -t
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPO}/${_SERVICE}:${_IMAGE_TAG}
+      - -f
+      - Dockerfile.worker
+      - .
+
+  # 2) Push image
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPO}/${_SERVICE}:${_IMAGE_TAG}
+
+  # 3) Deploy to Cloud Run
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+    entrypoint: gcloud
+    args:
+      - run
+      - deploy
+      - ${_SERVICE}
+      - --image=${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPO}/${_SERVICE}:${_IMAGE_TAG}
+      - --region=${_REGION}
+      - --no-allow-unauthenticated
+      - --set-secrets=REDIS_URL_ONLINE=REDIS_URL_ONLINE:latest,OLLAMA_BASE_URL=OLLAMA_BASE_URL:latest,NASA_API_KEY=NASA_API_KEY:latest,GOOGLE_CUSTOM_SEARCH_KEY=GOOGLE_CUSTOM_SEARCH_KEY:latest,GOOGLE_CUSTOM_SEARCH_CX=GOOGLE_CUSTOM_SEARCH_CX:latest
+      - --update-env-vars=LLM_QUEUE_NAME=llm-queue,FORCE_LOCAL_REDIS=0,NODE_ENV=production,OLLAMA_WORKER_CONCURRENCY=1
+      - --cpu=1
+      - --memory=512Mi
+      - --max-instances=3
+      # (Optional) use a custom service account:
+      # - --service-account=YOUR-SA@${PROJECT_ID}.iam.gserviceaccount.com
+
+images:
+  - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPO}/${_SERVICE}:${_IMAGE_TAG}

@@ -9,18 +9,31 @@ export type Apod = {
   date: string;
   title: string;
   explanation: string;
-  mediaType: string;
+  mediaType: 'image' | 'video' | '';
   bgUrl: string | null;
   credit: string;
 };
 
-const REVALIDATE_SECONDS =
-  Number(process.env.APOD_REVALIDATE_SEC ?? 60 * 60 * 24);
+type NasaApodResponse = {
+  date: string;
+  title: string;
+  explanation: string;
+  copyright?: string;
+  media_type: 'image' | 'video' | string;
+  hdurl?: string;
+  url?: string;
+  thumbnail_url?: string;
+};
+
+// Define a type for RequestInit that includes the Next.js `next` object for ISR.
+type NextRequestInit = RequestInit & {
+  next?: { revalidate: number | false | 0 };
+};
+
+const REVALIDATE_SECONDS = Number(process.env.APOD_REVALIDATE_SEC ?? 60 * 60 * 24);
 
 const DEBUG =
-  process.env.DEBUG_APOD === '1' ||
-  process.env.NEXT_DEBUG_APOD === '1' ||
-  false;
+  process.env.DEBUG_APOD === '1' || process.env.NEXT_DEBUG_APOD === '1' || false;
 
 function maskKey(k?: string) {
   if (!k) return '(none)';
@@ -28,10 +41,12 @@ function maskKey(k?: string) {
   return `${k.slice(0, 3)}***${k.slice(-2)}`;
 }
 
-function dbg(...args: any[]) {
+// FIX for ESLint errors: Use `unknown[]` instead of `any[]`.
+// This is the modern, type-safe way to create generic logger functions.
+function dbg(...args: unknown[]) {
   if (DEBUG) console.log('[APOD]', ...args);
 }
-function warn(...args: any[]) {
+function warn(...args: unknown[]) {
   console.warn('[APOD]', ...args);
 }
 
@@ -41,37 +56,44 @@ async function sleep(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
-/**
- * Fetch with timeout + retry/backoff. Retries on network errors (EAI_AGAIN, etc.) and 5xx.
- */
 async function fetchWithRetry(
   url: string,
-  init: RequestInit & { timeoutMs?: number } = {},
+  init: NextRequestInit & { timeoutMs?: number } = {},
   attempts = 4
 ): Promise<Response> {
   const { timeoutMs = 8000, ...rest } = init;
-  let lastErr: any;
+  let lastErr: unknown;
 
   for (let i = 0; i < attempts; i++) {
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), timeoutMs);
 
     try {
-      const res = await fetch(url, { ...rest, signal: ctrl.signal } as any);
+      const res = await fetch(url, { ...rest, signal: ctrl.signal });
       clearTimeout(timer);
 
       if (res.status >= 500) {
-        // retry on 5xx
         lastErr = new Error(`HTTP ${res.status}`);
       } else {
         return res;
       }
-    } catch (e: any) {
+    } catch (e: unknown) {
       clearTimeout(timer);
       lastErr = e;
 
-      const code = e?.code || e?.cause?.code;
-      const name = e?.name;
+      let code: string | undefined;
+      let name: string | undefined;
+      let message: string | undefined;
+
+      if (e instanceof Error) {
+        name = e.name;
+        message = e.message;
+        if ('code' in e) code = (e as { code?: string }).code;
+        if ('cause' in e && e.cause && typeof e.cause === 'object' && 'code' in e.cause) {
+          code = code || (e.cause as { code?: string }).code;
+        }
+      }
+
       const isAbort = name === 'AbortError';
       const transient =
         isAbort ||
@@ -79,12 +101,11 @@ async function fetchWithRetry(
         code === 'ECONNRESET' ||
         code === 'ETIMEDOUT' ||
         code === 'ENOTFOUND' ||
-        e?.message?.includes('fetch failed');
+        message?.includes('fetch failed');
 
       if (!transient) break;
     }
 
-    // exponential backoff with jitter (caps at ~12s)
     const backoff = Math.min(2000 * 2 ** i, 12_000) + Math.random() * 400;
     await sleep(backoff);
   }
@@ -94,17 +115,9 @@ async function fetchWithRetry(
 
 /* ------------------------------ Public API ------------------------------ */
 
-/**
- * Fetch APOD for today (default) or a specific date (YYYY-MM-DD).
- */
 export async function getApod(date?: string): Promise<Apod | null> {
   const started = Date.now();
-  dbg(
-    'getApod(): start',
-    date ? `date=${date}` : '(today)',
-    'runtime=',
-    process.env.NEXT_RUNTIME || 'node'
-  );
+  dbg('getApod(): start', date ? `date=${date}` : '(today)', 'runtime=', process.env.NEXT_RUNTIME || 'node');
 
   let key = await getSecret('nasa-api-key');
   if (!key) {
@@ -117,25 +130,14 @@ export async function getApod(date?: string): Promise<Apod | null> {
   if (date) params.set('date', date);
 
   const url = `https://api.nasa.gov/planetary/apod?${params.toString()}`;
-  dbg(
-    'fetch:',
-    url,
-    'revalidate=',
-    REVALIDATE_SECONDS,
-    'runtime=',
-    process.env.NEXT_RUNTIME || 'node'
-  );
+  dbg('fetch:', url, 'revalidate=', REVALIDATE_SECONDS);
 
   let res: Response;
   try {
-    // On Edge the `next` option is ignored; on Node it enables ISR revalidation.
-    res = await fetchWithRetry(
-      url,
-      { next: { revalidate: REVALIDATE_SECONDS } as any, timeoutMs: 8000 },
-      4
-    );
-  } catch (e: any) {
-    warn('fetch() network error (after retries):', e?.code || e?.message || e);
+    res = await fetchWithRetry(url, { next: { revalidate: REVALIDATE_SECONDS }, timeoutMs: 8000 }, 4);
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : String(e);
+    warn('fetch() network error (after retries):', message);
     return null;
   }
 
@@ -143,22 +145,24 @@ export async function getApod(date?: string): Promise<Apod | null> {
     let bodyPreview = '';
     try {
       bodyPreview = (await res.text()).slice(0, 300);
-    } catch {}
+    } catch {
+      // ignore
+    }
     warn('HTTP', res.status, res.statusText, 'bodyPreview=', bodyPreview);
     return null;
   }
 
-  let apod: any;
+  let apod: NasaApodResponse;
   try {
     apod = await res.json();
-  } catch (e: any) {
-    warn('JSON parse error:', e?.message || e);
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : String(e);
+    warn('JSON parse error:', message);
     return null;
   }
 
   const mediaTypeRaw = String(apod?.media_type ?? '').toLowerCase();
-  const mediaType =
-    mediaTypeRaw === 'video' ? 'video' : mediaTypeRaw === 'image' ? 'image' : '';
+  const mediaType = mediaTypeRaw === 'video' ? 'video' : mediaTypeRaw === 'image' ? 'image' : '' as const;
   const title = sanitizeText(apod?.title) || 'Astronomy Picture of the Day';
   const explanation = sanitizeText(apod?.explanation) || '';
   const credit = sanitizeText(apod?.copyright) || 'NASA/APOD';
@@ -194,7 +198,7 @@ function sanitizeText(v: unknown): string {
   return v.replace(/\s+\n/g, '\n').trim();
 }
 
-function pickBestMediaUrl(apod: any, mediaType: string): string | null {
+function pickBestMediaUrl(apod: NasaApodResponse, mediaType: Apod['mediaType']): string | null {
   if (mediaType === 'image') {
     return apod?.hdurl || apod?.url || null;
   }
@@ -217,6 +221,8 @@ function youtubeThumbFromUrl(url?: string): string | null {
       const id = u.pathname.split('/').filter(Boolean)[0];
       if (id) return `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
     }
-  } catch {}
+  } catch {
+    // ignore
+  }
   return null;
 }

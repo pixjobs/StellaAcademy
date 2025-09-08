@@ -6,19 +6,26 @@ export type Apod = {
   date: string;
   title: string;
   explanation: string;
-  mediaType: string;
+  mediaType: 'image' | 'video' | '';
   bgUrl: string | null;
   credit: string;
 };
 
-const REVALIDATE_SECONDS =
-  Number(process.env.APOD_REVALIDATE_SEC ?? 60 * 60 * 24);
+type NasaApodResponse = {
+  date: string;
+  title: string;
+  explanation: string;
+  copyright?: string;
+  media_type: 'image' | 'video' | string;
+  hdurl?: string;
+  url?: string;
+  thumbnail_url?: string;
+};
 
-// Enable with DEBUG_APOD=1 (server env). You can also flip at runtime via process.env.
+const REVALIDATE_SECONDS = Number(process.env.APOD_REVALIDATE_SEC ?? 60 * 60 * 24);
+
 const DEBUG =
-  process.env.DEBUG_APOD === '1' ||
-  process.env.NEXT_DEBUG_APOD === '1' ||
-  false;
+  process.env.DEBUG_APOD === '1' || process.env.NEXT_DEBUG_APOD === '1' || false;
 
 function maskKey(k?: string) {
   if (!k) return '(none)';
@@ -26,22 +33,22 @@ function maskKey(k?: string) {
   return `${k.slice(0, 3)}***${k.slice(-2)}`;
 }
 
-function dbg(...args: any[]) {
+// FIX for ESLint errors: Use `unknown[]` instead of `any[]`.
+// This is the modern, type-safe way to create generic logger functions.
+function dbg(...args: unknown[]) {
   if (DEBUG) console.log('[APOD]', ...args);
 }
-function warn(...args: any[]) {
+function warn(...args: unknown[]) {
   console.warn('[APOD]', ...args);
 }
 
 /**
  * Fetch APOD for today (default) or a specific date (YYYY-MM-DD).
- * Keeps the original return type so existing code continues to work.
  */
 export async function getApod(date?: string): Promise<Apod | null> {
   const started = Date.now();
   dbg('getApod(): start', date ? `date=${date}` : '(today)');
 
-  // Get key via Secret Manager helper; fall back to DEMO_KEY if unresolved.
   let key = await getSecret('nasa-api-key');
   if (!key) {
     warn('No NASA API key resolved from Secret Manager/env; falling back to DEMO_KEY (rate-limited).');
@@ -49,7 +56,6 @@ export async function getApod(date?: string): Promise<Apod | null> {
   }
   dbg('API key:', maskKey(key));
 
-  // Build URL
   const params = new URLSearchParams({
     api_key: key,
     thumbs: 'true',
@@ -62,8 +68,9 @@ export async function getApod(date?: string): Promise<Apod | null> {
   let res: Response;
   try {
     res = await fetch(url, { next: { revalidate: REVALIDATE_SECONDS } });
-  } catch (e: any) {
-    warn('fetch() network error:', e?.message || e);
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : String(e);
+    warn('fetch() network error:', message);
     return null;
   }
 
@@ -71,28 +78,28 @@ export async function getApod(date?: string): Promise<Apod | null> {
     let bodyPreview = '';
     try {
       bodyPreview = (await res.text()).slice(0, 300);
-    } catch {}
+    } catch {
+      // ignore
+    }
     warn('HTTP', res.status, res.statusText, 'bodyPreview=', bodyPreview);
     return null;
   }
 
-  let apod: any;
+  let apod: NasaApodResponse;
   try {
     apod = await res.json();
-  } catch (e: any) {
-    warn('JSON parse error:', e?.message || e);
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : String(e);
+    warn('JSON parse error:', message);
     return null;
   }
 
-  // Defensive normalization
   const mediaTypeRaw = String(apod?.media_type ?? '').toLowerCase();
-  const mediaType = mediaTypeRaw === 'video' ? 'video' : mediaTypeRaw === 'image' ? 'image' : '';
+  const mediaType = mediaTypeRaw === 'video' ? 'video' : mediaTypeRaw === 'image' ? 'image' : '' as const;
   const title = sanitizeText(apod?.title) || 'Astronomy Picture of the Day';
   const explanation = sanitizeText(apod?.explanation) || '';
   const credit = sanitizeText(apod?.copyright) || 'NASA/APOD';
   const dateOut = String(apod?.date ?? '');
-
-  // Choose the best background URL we can
   const bgUrl = pickBestMediaUrl(apod, mediaType);
 
   dbg('payload:', {
@@ -122,23 +129,16 @@ export async function getApod(date?: string): Promise<Apod | null> {
 
 function sanitizeText(v: unknown): string {
   if (typeof v !== 'string') return '';
-  // APOD text is usually plain, but normalize whitespace just in case
   return v.replace(/\s+\n/g, '\n').trim();
 }
 
-function pickBestMediaUrl(apod: any, mediaType: string): string | null {
+function pickBestMediaUrl(apod: NasaApodResponse, mediaType: Apod['mediaType']): string | null {
   if (mediaType === 'image') {
-    // Prefer HD if present; fall back to standard URL
     return apod?.hdurl || apod?.url || null;
   }
-
   if (mediaType === 'video') {
-    // APOD returns youtube/vimeo links in `url` and sometimes a `thumbnail_url`.
-    // Prefer provided thumbnail; otherwise try to build a YouTube thumbnail.
-    const thumb = apod?.thumbnail_url || youtubeThumbFromUrl(apod?.url) || null;
-    return thumb;
+    return apod?.thumbnail_url || youtubeThumbFromUrl(apod?.url) || null;
   }
-
   return null;
 }
 

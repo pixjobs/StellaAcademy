@@ -1,4 +1,3 @@
-// app/components/ConditionalBackgrounds.tsx
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -29,15 +28,26 @@ type Props = {
 
 const DEBUG = process.env.NEXT_PUBLIC_DEBUG_BG === '1';
 
+// [FIXED] Define a type for the window object that includes non-standard idle callback functions.
+type WindowWithIdleCallback = Window & {
+  requestIdleCallback: (
+    callback: () => void,
+    options?: { timeout?: number }
+  ) => number;
+  cancelIdleCallback: (handle: number) => void;
+};
+
 // Tiny module-level cache to prevent re-fetching APOD on every navigation
 let cachedBgUrl: string | undefined;
 let cachedAt = 0;
 
-function log(...args: any[]) {
+// [FIXED] Use 'unknown[]' for safer generic logging.
+function log(...args: unknown[]) {
   if (DEBUG) console.log('[ConditionalBackgrounds]', ...args);
 }
 
-function warn(...args: any[]) {
+// [FIXED] Use 'unknown[]' for safer generic logging.
+function warn(...args: unknown[]) {
   if (DEBUG) console.warn('[ConditionalBackgrounds]', ...args);
 }
 
@@ -51,18 +61,21 @@ function prefersReducedMotion(): boolean {
 }
 
 function runOnIdle(cb: () => void, timeout = 1200) {
-  // @ts-ignore
-  const ric: ((cb: () => void, opts?: { timeout?: number }) => number) =
-    typeof window !== 'undefined' && (window as any).requestIdleCallback;
-  if (ric) return ric(cb, { timeout });
+  // [FIXED] Check for requestIdleCallback in a type-safe way. No need for @ts-ignore or `any`.
+  if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+    const win = window as WindowWithIdleCallback;
+    return win.requestIdleCallback(cb, { timeout });
+  }
   const id = setTimeout(cb, timeout);
   return id as unknown as number;
 }
 
 function cancelIdle(handle: number) {
-  // @ts-ignore
-  const cic = typeof window !== 'undefined' && (window as any).cancelIdleCallback;
-  if (cic) return cic(handle);
+  // [FIXED] Check for cancelIdleCallback in a type-safe way.
+  if (typeof window !== 'undefined' && 'cancelIdleCallback' in window) {
+    const win = window as WindowWithIdleCallback;
+    return win.cancelIdleCallback(handle);
+  }
   clearTimeout(handle as unknown as ReturnType<typeof setTimeout>);
 }
 
@@ -80,17 +93,14 @@ export default function ConditionalBackgrounds({
   const pathname = usePathname();
   const motionReduced = prefersReducedMotion();
 
-  // Source of truth is the server-provided url first; normalize nullish to undefined
   const serverUrl = useMemo(() => url ?? undefined, [url]);
 
   const [bg, setBg] = useState<string | undefined>(() => {
-    // prefer server-provided; otherwise fall back to fresh-ish cache
     if (serverUrl) return serverUrl;
     if (cachedBgUrl && now() - cachedAt < maxCacheAgeMs) return cachedBgUrl;
     return undefined;
   });
 
-  // keep local state in sync with prop updates
   useEffect(() => {
     setBg(serverUrl);
     if (serverUrl) {
@@ -126,7 +136,6 @@ export default function ConditionalBackgrounds({
     abortRef.current = ctrl;
 
     try {
-      // Use force-cache so the CDN/SWR header from the API can do its job.
       const res = await fetch(apodEndpoint, { cache: 'force-cache', signal: ctrl.signal });
       if (!res.ok) {
         warn(apodEndpoint, 'responded with', res.status);
@@ -144,8 +153,9 @@ export default function ConditionalBackgrounds({
       } else {
         warn(apodEndpoint, 'returned no bgUrl');
       }
-    } catch (err: any) {
-      if (err?.name === 'AbortError') {
+    } catch (err: unknown) { // [FIXED] Catch as 'unknown' for type safety.
+      // [FIXED] Safely check if the error is an AbortError.
+      if (err instanceof Error && err.name === 'AbortError') {
         log('fetch aborted');
       } else {
         warn('Failed to fetch APOD bg:', err);
@@ -155,7 +165,6 @@ export default function ConditionalBackgrounds({
     }
   }
 
-  // Manual refresh hook via custom event (e.g., window.dispatchEvent(new Event('bg:refresh')))
   useEffect(() => {
     mountedRef.current = true;
     function onRefresh() {
@@ -175,28 +184,24 @@ export default function ConditionalBackgrounds({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Optionally fetch APOD after the warp event (only if route uses AppBackground)
   useEffect(() => {
     if (!loadAfterWarp) return;
-    if (pathname === '/about') return; // we're showing SolarSystemBackground instead
+    if (pathname === '/about') return;
 
     const onWarpDone = () => {
       fetchApodOnce();
     };
 
-    // If animations are reduced, we can fetch immediately rather than waiting for warp.
     if (motionReduced) {
       fetchApodOnce();
       return;
     }
 
-    // Listen for a single warp completion
     window.addEventListener(warpEventName, onWarpDone, { once: true });
     return () => window.removeEventListener(warpEventName, onWarpDone);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loadAfterWarp, warpEventName, pathname, motionReduced]);
 
-  // Optional: prefetch on idle if we still don't have a bg (and not on /about)
   useEffect(() => {
     if (!prefetchOnIdle) return;
     if (pathname === '/about') return;
@@ -224,6 +229,5 @@ export default function ConditionalBackgrounds({
   }
 
   log('route=', pathname, 'bg=', bg);
-  // If users prefer reduced motion, let AppBackground decide whether to warp or not.
   return <AppBackground url={bg} warpOnLoad={!motionReduced} />;
 }

@@ -1,0 +1,29 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "rootDir": ".",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  },
+  "include": [
+    "src/workers/**/*",
+    "src/lib/**/*",
+    "src/types/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    ".next",
+    "src/app/**/*",             // exclude Next.js app
+    "src/pages/**/*",
+    "src/components/**/*"
+  ]
+}

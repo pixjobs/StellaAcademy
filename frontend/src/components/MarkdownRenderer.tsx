@@ -1,7 +1,8 @@
-// components/MarkdownRenderer.tsx
 'use client';
 
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
+import type { ComponentProps } from 'react';
+import Image from 'next/image';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
@@ -9,19 +10,19 @@ import rehypeRaw from 'rehype-raw';
 import rehypeMathjax from 'rehype-mathjax/svg';
 import rehypeSlug from 'rehype-slug';
 import rehypeAutolinkHeadings from 'rehype-autolink-headings';
-// import rehypeSanitize from 'rehype-sanitize'; // <-- Uncomment if you want strict HTML sanitization
 
 import { visit } from 'unist-util-visit';
 import type { Plugin } from 'unified';
-import type { Root } from 'mdast';
+import type { Root, Code } from 'mdast';
 import type { Element } from 'hast';
 import { toString } from 'hast-util-to-string';
+import type { Node } from 'unist';
 
 import { Bookmark, ExternalLink, Copy } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 /* ---------------------------------------------------------------------------------------------- */
-/* Capture wrapper (unchanged behavior, slightly tidied)                                          */
+/* Capture wrapper                                                                                */
 /* ---------------------------------------------------------------------------------------------- */
 const Capturable = ({
   node,
@@ -65,12 +66,18 @@ const Capturable = ({
 /* ---------------------------------------------------------------------------------------------- */
 /* Convert fenced code in math/tex/latex to real math nodes                                       */
 /* ---------------------------------------------------------------------------------------------- */
+interface MathNode extends Node {
+  type: 'math';
+  value: string;
+}
+
 const remarkMathFromFencedCode: Plugin<[], Root> = () => (tree) => {
-  visit(tree, 'code', (node: any) => {
+  visit(tree, 'code', (node: Code) => {
     const lang = String(node.lang || '').toLowerCase();
     if (lang === 'math' || lang === 'tex' || lang === 'latex') {
-      node.type = 'math';
-      node.value = node.value || '';
+      const mathNode = node as unknown as MathNode;
+      mathNode.type = 'math';
+      mathNode.value = node.value || '';
     }
   });
 };
@@ -91,7 +98,7 @@ const copyToClipboard = async (text: string) => {
 };
 
 /* ---------------------------------------------------------------------------------------------- */
-/* Props                                                                                           */
+/* Props                                                                                          */
 /* ---------------------------------------------------------------------------------------------- */
 type Props = {
   children: string;
@@ -102,23 +109,9 @@ type Props = {
 /* Main renderer                                                                                  */
 /* ---------------------------------------------------------------------------------------------- */
 export default function MarkdownRenderer({ children, onCaptureFragment }: Props) {
-  // Memoized code block renderer so we don’t recreate handlers per line
   const CodeBlockWrapper = useCallback(
-    ({
-      node,
-      ...props
-    }: {
-      node?: Element;
-      children?: React.ReactNode;
-      className?: string;
-    }) => {
-      const rawText =
-        typeof props.children === 'string'
-          ? props.children
-          : Array.isArray(props.children)
-          ? props.children.join('')
-          : '';
-
+    ({ node, ...props }: ComponentProps<'pre'> & { node?: Element }) => {
+      const rawText = node ? toString(node) : '';
       const handleCopy = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
@@ -144,38 +137,24 @@ export default function MarkdownRenderer({ children, onCaptureFragment }: Props)
     [onCaptureFragment]
   );
 
-  // Custom anchor element: open in new tab, safe rel, subtle external icon
-  const Anchor = useCallback(
-    ({
-      node,
-      href,
-      children,
-      ...props
-    }: {
-      node?: Element;
-      href?: string;
-      children?: React.ReactNode;
-    }) => {
-      const external = isExternalHref(href);
-      return (
-        <a
-          href={href}
-          target={external ? '_blank' : undefined}
-          rel={external ? 'noopener noreferrer' : undefined}
-          className="text-sky-400 underline underline-offset-4 decoration-sky-400/60 hover:text-sky-300"
-          {...props}
-        >
-          {children}
-          {external && <ExternalLink className="inline-block ml-1 -mt-0.5 h-3.5 w-3.5 align-text-top opacity-80" />}
-        </a>
-      );
-    },
-    []
-  );
+  const Anchor = useCallback(({ href, children, ...props }: ComponentProps<'a'>) => {
+    const external = isExternalHref(href);
+    return (
+      <a
+        href={href}
+        target={external ? '_blank' : undefined}
+        rel={external ? 'noopener noreferrer' : undefined}
+        className="text-sky-400 underline underline-offset-4 decoration-sky-400/60 hover:text-sky-300"
+        {...props}
+      >
+        {children}
+        {external && <ExternalLink className="inline-block ml-1 -mt-0.5 h-3.5 w-3.5 align-text-top opacity-80" />}
+      </a>
+    );
+  }, []);
 
-  // Tight tables: keep them scrollable
   const Table = useCallback(
-    ({ node, ...props }: { node?: Element; children?: React.ReactNode }) => (
+    ({ node, ...props }: ComponentProps<'table'> & { node?: Element }) => (
       <Capturable node={node} onCapture={onCaptureFragment}>
         <div className="overflow-x-auto my-3">
           <table {...props} />
@@ -185,15 +164,53 @@ export default function MarkdownRenderer({ children, onCaptureFragment }: Props)
     [onCaptureFragment]
   );
 
-  // Headings with anchors are capturable too
-  const Heading =
-    (Tag: 'h1' | 'h2' | 'h3' | 'h4') =>
-    ({ node, ...props }: { node?: Element; children?: React.ReactNode }) =>
-      (
-        <Capturable node={node} onCapture={onCaptureFragment}>
-          <Tag {...props} />
-        </Capturable>
-      );
+  const Heading = (Tag: 'h1' | 'h2' | 'h3' | 'h4') => {
+    const Component = ({ node, ...props }: ComponentProps<typeof Tag> & { node?: Element }) => (
+      <Capturable node={node} onCapture={onCaptureFragment}>
+        <Tag {...props} />
+      </Capturable>
+    );
+    Component.displayName = `MarkdownHeading(${Tag})`;
+    return Component;
+  };
+
+  // FIX for `_node` is defined but never used:
+  // We explicitly destructure only the props we care about (`src` and `alt`)
+  // and ignore the rest, including the unused `node` prop. This is the cleanest fix.
+  const MarkdownImage = ({ src, alt }: ComponentProps<'img'>) => {
+    const [imageUrl, setImageUrl] = useState<string | null>(null);
+
+    useEffect(() => {
+      let objectUrl: string | null = null;
+      if (src instanceof Blob) {
+        objectUrl = URL.createObjectURL(src);
+        setImageUrl(objectUrl);
+      } else if (typeof src === 'string') {
+        setImageUrl(src);
+      }
+      return () => {
+        if (objectUrl) {
+          URL.revokeObjectURL(objectUrl);
+        }
+      };
+    }, [src]);
+
+    if (!imageUrl) {
+      return null;
+    }
+
+    return (
+      <div className="relative my-4 aspect-video overflow-hidden rounded-md border border-white/10 bg-black/20">
+        <Image
+          src={imageUrl}
+          alt={alt || 'Image from markdown'}
+          fill
+          className="object-contain"
+          sizes="(max-width: 768px) 100vw, 650px"
+        />
+      </div>
+    );
+  };
 
   return (
     <div className="prose prose-sm prose-invert max-w-none">
@@ -208,19 +225,18 @@ export default function MarkdownRenderer({ children, onCaptureFragment }: Props)
             {
               behavior: 'append',
               properties: { className: ['no-underline', 'ml-1', 'opacity-60', 'hover:opacity-90'] },
-              content: {
+             
+              content: (): Element[] => [{
                 type: 'element',
                 tagName: 'span',
-                properties: { ariaHidden: 'true' },
+                properties: { 'aria-hidden': true, className: 'anchor-icon' },
                 children: [{ type: 'text', value: '¶' }],
-              },
+              }],
             },
           ],
-          // rehypeSanitize, // <- enable if your content is untrusted HTML
         ]}
         components={{
           a: Anchor,
-          // paragraph / list items remain capturable
           p: ({ node, ...props }) => (
             <Capturable node={node} onCapture={onCaptureFragment}>
               <p {...props} />
@@ -236,16 +252,9 @@ export default function MarkdownRenderer({ children, onCaptureFragment }: Props)
               <blockquote {...props} />
             </Capturable>
           ),
-          // code fence wrapper with copy
           pre: CodeBlockWrapper,
-          // tables
           table: Table,
-          // images: add some niceties
-          img: ({ node, ...props }) => (
-            // not capturable by default; you can wrap with Capturable if desired
-            <img loading="lazy" className="rounded-md shadow-sm" {...props} />
-          ),
-          // headings with anchors
+          img: MarkdownImage,
           h1: Heading('h1'),
           h2: Heading('h2'),
           h3: Heading('h3'),

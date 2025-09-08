@@ -1,0 +1,71 @@
+# ---- Base versions ----
+ARG NODE_VERSION=20-alpine
+
+# =========================
+# 1) Dependencies layer
+# =========================
+FROM node:${NODE_VERSION} AS deps
+WORKDIR /app
+
+# Needed by some native deps & Next
+RUN apk add --no-cache libc6-compat
+
+# Install deps (cache-friendly)
+COPY package.json package-lock.json* ./
+RUN npm ci
+
+# =========================
+# 2) Build layer (Next.js)
+# =========================
+FROM deps AS builder
+WORKDIR /app
+
+# Copy source needed to build Next.js
+# (If you want to be extra strict, copy only ./app ./src ./public and config files)
+COPY . .
+
+# Disable telemetry in CI/builds & ensure prod build
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_ENV=production
+
+# Build Next.js (standalone output)
+# Requires: "build": "next build" in package.json
+RUN npm run build
+
+# =========================
+# 3) Runtime layer
+# =========================
+FROM node:${NODE_VERSION} AS runner
+WORKDIR /app
+
+# Tiny tools for graceful PID1 & simple health checks
+RUN apk add --no-cache curl dumb-init
+
+# Cloud Run runtime env
+ENV NODE_ENV=production \
+    PORT=8080 \
+    HOSTNAME=0.0.0.0 \
+    NEXT_TELEMETRY_DISABLED=1
+
+# Copy the standalone server and static assets from the build stage
+# This is the recommended Next.js pattern for lean images
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+
+# Non-root user for security
+USER node
+
+# Cloud Run listens on $PORT
+EXPOSE 8080
+
+# (Optional) Local container healthcheck.
+# Note: Cloud Run ignores Dockerfile HEALTHCHECK and uses its own health checks.
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
+  CMD curl -fsS "http://127.0.0.1:${PORT}/" || exit 1
+
+# Use dumb-init for proper signal handling
+ENTRYPOINT ["dumb-init", "--"]
+
+# Next.js standalone server entry is server.js at container root after copy
+CMD ["node", "server.js"]
