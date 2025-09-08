@@ -12,13 +12,11 @@
     "build:web": "next build",
     "start": "next start -p ${PORT:-3000}",
     "start:web": "next start -p ${PORT:-3000}",
-
     "//2": "----- Worker (BullMQ/Ollama) -----",
     "worker": "tsx src/workers/ollama/worker.ts",
     "dev:worker": "tsx src/workers/ollama/worker.ts",
     "build:worker": "tsc -p tsconfig.worker.json && tsc-alias -p tsconfig.worker.json",
     "start:worker": "node dist/workers/ollama/worker.js",
-
     "//3": "----- Misc -----",
     "lint": "eslint . --ext .ts,.tsx --max-warnings=0"
   },
@@ -56,6 +54,8 @@
     "tailwind-merge": "^3.3.1",
     "tailwindcss-animate": "^1.0.7",
     "three": "^0.179.1",
+    "tsconfig-paths": "^4.2.0",
+    "tsx": "^4.7.2",
     "unified": "^11.0.5",
     "unist-util-visit": "^5.0.0",
     "zod": "^4.1.5",
@@ -79,7 +79,6 @@
     "postcss": "^8.5.6",
     "server-only": "^0.0.1",
     "tailwindcss": "^3.4.13",
-    "tsx": "^4.7.2",
     "tsc-alias": "^1.8.10",
     "typescript": "^5"
   }
