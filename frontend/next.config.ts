@@ -1,26 +1,44 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  /**
+   * Enable Next.js "standalone" output. This generates a minimal server in
+   * `.next/standalone`, which your Dockerfile copies. Keeps prod images small.
+   */
+  output: "standalone",
+
+  /**
+   * Opt into stricter runtime checks & SWC minification.
+   */
+  reactStrictMode: true,
+  swcMinify: true,
+
   images: {
     /**
-     * A list of trusted remote domains for the next/image component.
-     * This is a security measure to prevent image abuse from arbitrary sources.
+     * Security: restrict remote images to trusted domains only.
+     * Use pathname: "/**" to explicitly allow all subpaths.
      */
     remotePatterns: [
-      // This single "wildcard" pattern is the most robust solution.
-      // It will automatically allow images from any NASA domain, such as:
-      // - epic.gsfc.nasa.gov (which caused your error)
-      // - mars.nasa.gov
-      // - images-assets.nasa.gov
-      // - apod.nasa.gov
-      // - and any others you might encounter.
       {
-        protocol: 'https',
-        hostname: '**.nasa.gov',
+        protocol: "https",
+        hostname: "**.nasa.gov",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "icons.duckduckgo.com",
+        pathname: "/**",
       },
     ],
   },
-  /* ... you can add other config options here if needed */
+
+  experimental: {
+    /**
+     * Tree-shake imports from heavy packages like lodash, date-fns, etc.
+     * Replace with the packages you actually use.
+     */
+    optimizePackageImports: ["lodash", "date-fns"],
+  },
 };
 
 export default nextConfig;

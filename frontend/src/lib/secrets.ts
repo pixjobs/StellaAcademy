@@ -1,5 +1,3 @@
-// src/lib/secrets.ts
-
 /**
  * Unified, environment-safe secret access.
  *
@@ -15,12 +13,21 @@
 
 import type { SecretManagerServiceClient } from '@google-cloud/secret-manager';
 
+// FIX: Declare 'window' to satisfy the strict Node.js TypeScript compiler.
+// This provides a type hint for the `isBrowser` function without affecting the runtime logic
+// or requiring the "DOM" library in your tsconfig.worker.json.
+declare let window: unknown;
+
 // ---------------------------
 // Internal state & utilities
 // ---------------------------
 let smClient: SecretManagerServiceClient | null = null;
 const cache: Record<string, string> = {};
 
+/**
+ * Safely checks if the current environment is a browser.
+ * This function is the key to making this module "isomorphic".
+ */
 function isBrowser(): boolean {
   return typeof window !== 'undefined';
 }
@@ -75,7 +82,7 @@ export async function getSecret(name: string): Promise<string> {
     return fromEnv;
   }
 
-  // 2) Browser cannot read GSM
+  // 2) Browser cannot read GSM, stop here.
   if (isBrowser()) return '';
 
   // 3) Cache (server only)
@@ -100,49 +107,38 @@ export async function getSecret(name: string): Promise<string> {
 
     if (!value) {
       console.warn(`[secrets] Secret '${name}' found in GSM but empty.`);
-      return '';
     }
     cache[name] = value;
     return value;
-  } catch (err: unknown) { // Step 1: Catch the error as 'unknown' for type safety.
-
-      // Step 2: Check if the thrown value is a standard Error object. This is the most common case.
+  } catch (err: unknown) {
       if (err instanceof Error) {
-        // Step 3: Safely assert a more specific shape for errors from the Google Cloud library.
-        // We expect an Error object that might have a `code` property.
         const gcpError = err as { code?: number; message: string };
 
-        // Step 4: Use a clean and scalable `switch` statement to handle known error codes.
         switch (gcpError.code) {
           case 5: // NOT_FOUND
             console.warn(
-              `[secrets] 🟡 Secret '${name}' not found in GSM for project '${process.env.GOOGLE_CLOUD_PROJECT}'. Please verify the secret name is correct.`
+              `[secrets] 🟡 Secret '${name}' not found in GSM for project '${process.env.GOOGLE_CLOUD_PROJECT}'.`
             );
             break;
 
           case 7: // PERMISSION_DENIED
             console.error(
-              `🔴 [secrets] PERMISSION DENIED for secret '${name}'. Ensure the service account has the 'Secret Manager Secret Accessor' role. If running locally, you may need to re-authenticate with 'gcloud auth application-default login'.`
+              `🔴 [secrets] PERMISSION DENIED for secret '${name}'. Ensure the service account has the 'Secret Manager Secret Accessor' role.`
             );
             break;
 
           default:
-            // Step 5: Provide a robust default case for all other errors, including network issues.
-            // This logs the code if it exists and the full message for better debugging.
             console.error(
               `🔴 [secrets] Failed to fetch '${name}' from GSM. Code: ${gcpError.code ?? 'N/A'}. Message: ${gcpError.message}`
             );
             break;
         }
       } else {
-        // Step 6: Handle the rare edge case where something other than an Error object was thrown.
         console.error(
           `🔴 [secrets] An unexpected non-error value was thrown while fetching '${name}':`,
           err
         );
       }
-      
-      // The function returns an empty string on any failure, as per the original logic.
       return '';
     }
 }
@@ -164,6 +160,9 @@ export async function getRequiredSecret(name: string, hint?: string): Promise<st
   }
   return v;
 }
+
+
+// --- (The rest of the file is unchanged as it was already correct) ---
 
 // ------------------------------------------
 // Domain-specific, convenience accessors
@@ -192,7 +191,6 @@ export async function getClerkSecretKey(): Promise<string> {
 
 // Ollama / LLM provider
 export async function getOllamaBaseUrl(): Promise<string> {
-  // Keep name as-is so you can map via --set-secrets=OLLAMA_BASE_URL=...
   return getSecret('OLLAMA_BASE_URL');
 }
 export async function getOllamaBearerToken(): Promise<string> {
@@ -207,27 +205,10 @@ export function getUseApodBg(): boolean {
 // ---------------------------
 // Queue / Redis helpers
 // ---------------------------
-
-/**
- * Queue name is not sensitive; keep it in ENV with a default.
- * We don't read it from GSM to avoid unnecessary latency.
- */
 export function getLlmQueueName(): string {
   return (process.env.LLM_QUEUE_NAME && process.env.LLM_QUEUE_NAME.trim()) || 'llm-queue';
 }
 
-/**
- * ONLINE-FIRST Redis resolution with local fallback.
- *
- * Priority:
- *  0) FORCE_LOCAL_REDIS=true  -> force local even if online exists
- *  1) REDIS_URL_ONLINE        -> ENV/GSM (e.g., Upstash *Redis Connection URL* rediss://...)
- *  2) REDIS_URL_LOCAL         -> ENV/GSM (e.g., redis://127.0.0.1:6379)
- *
- * Notes:
- * - BullMQ/ioredis require a TCP/TLS Redis URL (redis:// or rediss://).
- * - Upstash REST URL/TOKEN are not usable for BullMQ; keep them separate if you use their HTTP API elsewhere.
- */
 export async function resolveRedisUrl(): Promise<string> {
   if (asBool(process.env.FORCE_LOCAL_REDIS)) {
     const local = await getRedisUrlLocal();
@@ -240,7 +221,6 @@ export async function resolveRedisUrl(): Promise<string> {
 
   const online = await getRedisUrlOnline();
   if (online) {
-    // Safe logging: no values
     console.log('[secrets] resolveRedisUrl → using ONLINE.');
     return online;
   }
@@ -255,34 +235,16 @@ export async function resolveRedisUrl(): Promise<string> {
   return '';
 }
 
-/** Prefer this to connect BullMQ in Cloud Run (e.g., Upstash rediss://...) */
 export async function getRedisUrlOnline(): Promise<string> {
-  // Your canonical name for the online Redis URL
-  // Put the TCP/TLS connection string here, e.g., rediss://default:***@xxx.upstash.io:port
   return getSecret('REDIS_URL_ONLINE');
 }
 
-/** Local/dev Redis URL (e.g., redis://127.0.0.1:6379) */
 export async function getRedisUrlLocal(): Promise<string> {
   return getSecret('REDIS_URL_LOCAL');
 }
 
-/** Optional: expose presence for startup diagnostics (no values returned). */
 export async function summariseSecretPresence(): Promise<Record<string, 'env' | 'gsm' | 'missing'>> {
-  const names = [
-    // Core
-    'nasa-api-key',
-    'NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY',
-    'CLERK_SECRET_KEY',
-    'OLLAMA_BASE_URL',
-    'OLLAMA_BEARER_TOKEN',
-    'GOOGLE_CUSTOM_SEARCH_KEY',
-    'GOOGLE_CUSTOM_SEARCH_CX',
-    // Redis
-    'REDIS_URL_ONLINE',
-    'REDIS_URL_LOCAL',
-  ];
-
+  const names = [ 'nasa-api-key', 'NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY', 'CLERK_SECRET_KEY', 'OLLAMA_BASE_URL', 'OLLAMA_BEARER_TOKEN', 'GOOGLE_CUSTOM_SEARCH_KEY', 'GOOGLE_CUSTOM_SEARCH_CX', 'REDIS_URL_ONLINE', 'REDIS_URL_LOCAL', ];
   const out: Record<string, 'env' | 'gsm' | 'missing'> = {};
   for (const name of names) {
     const envKey = name.replace(/-/g, '_').toUpperCase();
@@ -290,7 +252,6 @@ export async function summariseSecretPresence(): Promise<Record<string, 'env' | 
       out[name] = 'env';
       continue;
     }
-    // Server-only GSM probe (without caching values)
     if (!isBrowser()) {
       try {
         const project = process.env.GOOGLE_CLOUD_PROJECT;
@@ -301,16 +262,13 @@ export async function summariseSecretPresence(): Promise<Record<string, 'env' | 
           out[name] = 'gsm';
           continue;
         }
-      } catch {
-        // ignore; treat as missing
-      }
+      } catch { /* ignore */ }
     }
     out[name] = 'missing';
   }
   return out;
 }
 
-/** Optional: log a compact presence report (with masked samples for sanity) */
 export async function logSecretPresenceSample(): Promise<void> {
   const presence = await summariseSecretPresence();
   const sampleNames = ['REDIS_URL_ONLINE', 'REDIS_URL_LOCAL', 'OLLAMA_BASE_URL'];

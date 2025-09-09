@@ -2,27 +2,36 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "dist",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
     "target": "ES2022",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
     "lib": ["ES2022"],
-    "skipLibCheck": true,
+    "noEmit": false,
     "sourceMap": true,
     "rootDir": ".",
     "baseUrl": ".",
-    "paths": { "@/*": ["src/*"] }
+    "paths": {
+      "@/*": ["src/*"]
+    }
   },
   "include": [
     "src/workers/**/*",
-    "src/workers/shims/**/*",
     "src/lib/**/*",
     "src/types/**/*"
   ],
   "exclude": [
     "node_modules",
     ".next",
+    "dist",
     "src/app/**/*",
     "src/pages/**/*",
-    "src/components/**/*"
+    "src/components/**/*",
+    "src/hooks/**/*",
+    "src/styles/**/*",
+    // --- THIS IS THE CRITICAL ADDITION ---
+    // Explicitly exclude browser-only library files that were causing errors.
+    "src/lib/notes/**/*",
+    "src/lib/store.ts",
+    "src/lib/warp.ts"
   ]
 }

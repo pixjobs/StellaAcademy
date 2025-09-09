@@ -1,4 +1,3 @@
-// src/lib/apod.shared.ts
 import 'server-only';
 import dns from 'node:dns';
 import { getSecret } from './secrets';
@@ -41,8 +40,6 @@ function maskKey(k?: string) {
   return `${k.slice(0, 3)}***${k.slice(-2)}`;
 }
 
-// FIX for ESLint errors: Use `unknown[]` instead of `any[]`.
-// This is the modern, type-safe way to create generic logger functions.
 function dbg(...args: unknown[]) {
   if (DEBUG) console.log('[APOD]', ...args);
 }
@@ -134,7 +131,12 @@ export async function getApod(date?: string): Promise<Apod | null> {
 
   let res: Response;
   try {
-    res = await fetchWithRetry(url, { next: { revalidate: REVALIDATE_SECONDS }, timeoutMs: 8000 }, 4);
+    // This fetch call uses a custom type that includes 'next', so it's already correct.
+    const fetchOptions: NextRequestInit = {};
+    if (process.env.NEXT_RUNTIME) {
+        fetchOptions.next = { revalidate: REVALIDATE_SECONDS };
+    }
+    res = await fetchWithRetry(url, { ...fetchOptions, timeoutMs: 8000 }, 4);
   } catch (e: unknown) {
     const message = e instanceof Error ? e.message : String(e);
     warn('fetch() network error (after retries):', message);
@@ -154,7 +156,9 @@ export async function getApod(date?: string): Promise<Apod | null> {
 
   let apod: NasaApodResponse;
   try {
-    apod = await res.json();
+    // THIS IS THE FIX: Add a type assertion to the result of res.json()
+    // This tells TypeScript to trust that the response will match the NasaApodResponse shape.
+    apod = (await res.json()) as NasaApodResponse;
   } catch (e: unknown) {
     const message = e instanceof Error ? e.message : String(e);
     warn('JSON parse error:', message);
@@ -162,7 +166,7 @@ export async function getApod(date?: string): Promise<Apod | null> {
   }
 
   const mediaTypeRaw = String(apod?.media_type ?? '').toLowerCase();
-  const mediaType = mediaTypeRaw === 'video' ? 'video' : mediaTypeRaw === 'image' ? 'image' : '' as const;
+  const mediaType = mediaTypeRaw === 'video' ? 'video' : mediaTypeRaw === 'image' ? 'image' : ('' as const);
   const title = sanitizeText(apod?.title) || 'Astronomy Picture of the Day';
   const explanation = sanitizeText(apod?.explanation) || '';
   const credit = sanitizeText(apod?.copyright) || 'NASA/APOD';

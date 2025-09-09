@@ -1,5 +1,6 @@
 # cloudbuild.worker.yaml
-# Build & deploy the worker image to Cloud Run via Artifact Registry.
+# Builds the worker Docker image, validates its TypeScript code,
+# and deploys the final image to Cloud Run.
 
 timeout: "1200s"
 
@@ -11,8 +12,16 @@ substitutions:
   _IMAGE_TAG: latest
 
 steps:
-  # 1) Build Docker image
+  # ------------------------------------------------------------------------------------
+  # STEP 1: Build the Docker image using the multi-stage Dockerfile.worker.
+  #
+  # This single command now implicitly performs the TypeScript validation because of the
+  # `RUN npx tsc -p tsconfig.worker.json --noEmit` command in the Dockerfile's
+  # "builder" stage. If there are any TypeScript errors, this entire step will fail,
+  # preventing a broken image from being built or deployed.
+  # ------------------------------------------------------------------------------------
   - name: gcr.io/cloud-builders/docker
+    id: Build
     args:
       - build
       - -t
@@ -21,14 +30,25 @@ steps:
       - Dockerfile.worker
       - .
 
-  # 2) Push image
+  # ------------------------------------------------------------------------------------
+  # STEP 2: Push the successfully built and validated image to Artifact Registry.
+  #
+  # This step only runs if Step 1 succeeds.
+  # ------------------------------------------------------------------------------------
   - name: gcr.io/cloud-builders/docker
+    id: Push
     args:
       - push
       - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPO}/${_SERVICE}:${_IMAGE_TAG}
 
-  # 3) Deploy to Cloud Run
+  # ------------------------------------------------------------------------------------
+  # STEP 3: Deploy the new image version to the specified Cloud Run service.
+  #
+  # This step uses the gcloud SDK to update the service with the newly pushed image.
+  # It correctly maps secrets from Secret Manager and sets environment variables.
+  # ------------------------------------------------------------------------------------
   - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+    id: Deploy
     entrypoint: gcloud
     args:
       - run
@@ -45,5 +65,7 @@ steps:
       # (Optional) use a custom service account:
       # - --service-account=YOUR-SA@${PROJECT_ID}.iam.gserviceaccount.com
 
+# This final section makes the built image available to other Cloud Build steps if needed,
+# and it's used by Cloud Build to show what images were created by this build.
 images:
   - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPO}/${_SERVICE}:${_IMAGE_TAG}

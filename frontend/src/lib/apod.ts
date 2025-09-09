@@ -1,6 +1,13 @@
-// src/lib/apod.ts
 import 'server-only';
 import { getSecret } from './secrets';
+
+// FIX 1: Define a custom RequestInit type that includes the Next.js-specific 'next' property.
+// This teaches the TypeScript compiler about the special property, resolving the static analysis error.
+interface NextRequestInit extends RequestInit {
+  next?: {
+    revalidate: number;
+  };
+}
 
 export type Apod = {
   date: string;
@@ -27,18 +34,16 @@ const REVALIDATE_SECONDS = Number(process.env.APOD_REVALIDATE_SEC ?? 60 * 60 * 2
 const DEBUG =
   process.env.DEBUG_APOD === '1' || process.env.NEXT_DEBUG_APOD === '1' || false;
 
-function maskKey(k?: string) {
+function maskKey(k?: string): string {
   if (!k) return '(none)';
   if (k.length <= 6) return `${k[0]}***`;
   return `${k.slice(0, 3)}***${k.slice(-2)}`;
 }
 
-// FIX for ESLint errors: Use `unknown[]` instead of `any[]`.
-// This is the modern, type-safe way to create generic logger functions.
-function dbg(...args: unknown[]) {
+function dbg(...args: unknown[]): void {
   if (DEBUG) console.log('[APOD]', ...args);
 }
-function warn(...args: unknown[]) {
+function warn(...args: unknown[]): void {
   console.warn('[APOD]', ...args);
 }
 
@@ -51,7 +56,7 @@ export async function getApod(date?: string): Promise<Apod | null> {
 
   let key = await getSecret('nasa-api-key');
   if (!key) {
-    warn('No NASA API key resolved from Secret Manager/env; falling back to DEMO_KEY (rate-limited).');
+    warn('No NASA API key resolved; falling back to DEMO_KEY (rate-limited).');
     key = 'DEMO_KEY';
   }
   dbg('API key:', maskKey(key));
@@ -65,9 +70,17 @@ export async function getApod(date?: string): Promise<Apod | null> {
   const url = `https://api.nasa.gov/planetary/apod?${params.toString()}`;
   dbg('fetch:', url, 'revalidate=', REVALIDATE_SECONDS, 'runtime=', process.env.NEXT_RUNTIME || 'node');
 
+  // FIX 2: Use our new custom type for the options object.
+  const fetchOptions: NextRequestInit = {};
+  if (process.env.NEXT_RUNTIME) {
+    // This assignment is now valid because NextRequestInit knows about 'next'.
+    fetchOptions.next = { revalidate: REVALIDATE_SECONDS };
+  }
+
   let res: Response;
   try {
-    res = await fetch(url, { next: { revalidate: REVALIDATE_SECONDS } });
+    // Use the conditionally-built, now type-safe, options object.
+    res = await fetch(url, fetchOptions);
   } catch (e: unknown) {
     const message = e instanceof Error ? e.message : String(e);
     warn('fetch() network error:', message);
@@ -87,7 +100,8 @@ export async function getApod(date?: string): Promise<Apod | null> {
 
   let apod: NasaApodResponse;
   try {
-    apod = await res.json();
+    // FIX 3: Use a type assertion `as` to fix the `unknown` type error.
+    apod = (await res.json()) as NasaApodResponse;
   } catch (e: unknown) {
     const message = e instanceof Error ? e.message : String(e);
     warn('JSON parse error:', message);
@@ -95,7 +109,7 @@ export async function getApod(date?: string): Promise<Apod | null> {
   }
 
   const mediaTypeRaw = String(apod?.media_type ?? '').toLowerCase();
-  const mediaType = mediaTypeRaw === 'video' ? 'video' : mediaTypeRaw === 'image' ? 'image' : '' as const;
+  const mediaType = mediaTypeRaw === 'video' ? 'video' : mediaTypeRaw === 'image' ? 'image' : ('' as const);
   const title = sanitizeText(apod?.title) || 'Astronomy Picture of the Day';
   const explanation = sanitizeText(apod?.explanation) || '';
   const credit = sanitizeText(apod?.copyright) || 'NASA/APOD';
@@ -147,7 +161,7 @@ function youtubeThumbFromUrl(url?: string): string | null {
   try {
     const u = new URL(url);
     const host = u.hostname.replace(/^www\./, '');
-    if (host === 'youtube.com' || host === 'm.youtube.com') {
+    if (host.endsWith('youtube.com')) {
       const id = u.searchParams.get('v');
       if (id) return `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
     }

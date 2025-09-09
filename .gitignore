@@ -83,23 +83,18 @@ cypress/screenshots/
 cypress/downloads/
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Backend (Python / Flask)
+# Backend (Python / Flask) — keep if you add any Python utilities
 # ─────────────────────────────────────────────────────────────────────────────
-# Byte-compiled / cache
 __pycache__/
 *.py[cod]
 *.pyo
 *.pyc
 *.pyd
-
-# Virtual envs
 .venv/
 venv/
 env/
 ENV/
-.python-version    # pyenv local version file (usually safe to ignore)
-
-# Tooling caches
+.python-version
 .mypy_cache/
 .pytest_cache/
 .ruff_cache/
@@ -110,23 +105,15 @@ coverage.xml
 htmlcov/
 .pyre/
 .hypothesis/
-
-# Flask specifics
-instance/          # Flask's instance folder (runtime config/DB)
+instance/
 *.pid
-
-# Requirements lock tools (keep lock files committed; just ignoring build artifacts)
 pip-wheel-metadata/
 pip-log.txt
-
-# Local databases
 *.db
 *.sqlite
 *.sqlite3
 *.sqlite-shm
 *.sqlite-wal
-
-# ML / model artifacts (keep large weights out of Git)
 *.pt
 *.bin
 *.safetensors
@@ -141,15 +128,20 @@ checkpoints/
 # ─────────────────────────────────────────────────────────────────────────────
 # Docker / Compose
 # ─────────────────────────────────────────────────────────────────────────────
-# Keep Dockerfiles in Git; ignore local-only compose overrides & envs
 docker-compose.override.yml
 docker-data/
 .docker/
 *.tar
 *.img
 
+# Keep Dockerfiles tracked
+!/Dockerfile
+!/Dockerfile.*
+!/dockerfiles/**
+# (If you use a subfolder for Dockerfiles, unignore above)
+
 # ─────────────────────────────────────────────────────────────────────────────
-# Images/Artifacts generated at build time
+# Build caches / temp
 # ─────────────────────────────────────────────────────────────────────────────
 *.map
 *.tmp
@@ -162,8 +154,17 @@ temp/
 stylelintcache
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Misc project-specific
+# Cloud Build & infra configs — keep tracked
 # ─────────────────────────────────────────────────────────────────────────────
-# If you export assets for the app at runtime
+cloudbuild.yaml
+cloudbuild.worker.yaml
+cloudbuild.web.yaml
+cloudbuild*.yaml
+!infra/**
+# (If you store IaC files under infra/, unignore above)
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Project-specific generated assets
+# ─────────────────────────────────────────────────────────────────────────────
 exports/
 generated/

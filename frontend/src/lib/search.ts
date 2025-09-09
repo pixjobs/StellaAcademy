@@ -69,7 +69,9 @@ export async function googleCustomSearch(q: string, num = 5): Promise<LinkPrevie
     if (!res.ok) {
       let detail: GoogleErrorResponse = {};
       try {
-        detail = await res.json();
+        // FIX 1: Add type assertion for the error response JSON.
+        // This resolves the `unknown` type error when handling failed API calls.
+        detail = (await res.json()) as GoogleErrorResponse;
       } catch {
         // Ignore if the error response isn't valid JSON
       }
@@ -78,18 +80,21 @@ export async function googleCustomSearch(q: string, num = 5): Promise<LinkPrevie
         statusText: res.statusText,
         errorMessage: detail.error?.message,
         errorStatus: detail.error?.status,
-        reasons: detail.error?.errors?.map(e => e.reason).join(', '),
+        reasons: detail.error?.errors?.map((e) => e.reason).join(', '),
       });
       return [];
     }
 
-    const data: GoogleSearchResponse = await res.json();
+    // FIX 2: Add type assertion for the success response JSON.
+    // This resolves the primary `unknown` type error for the search results.
+    const data = (await res.json()) as GoogleSearchResponse;
 
     if (!data.items || data.items.length === 0) {
       return [];
     }
 
-    return data.items.map((item): LinkPreview => {
+    // LINT FIX: Add explicit type for the 'item' parameter for maximum clarity.
+    return data.items.map((item: GoogleSearchItem): LinkPreview => {
       const url = String(item.link || '').trim();
       let faviconUrl = '';
       try {
@@ -102,19 +107,18 @@ export async function googleCustomSearch(q: string, num = 5): Promise<LinkPrevie
       return {
         url,
         title: String(item.title ?? 'Untitled'),
-        snippet: String(item.snippet ?? ''), // Use snippet for meta for consistency
+        snippet: String(item.snippet ?? ''),
         faviconUrl,
       };
     });
-  } catch (e: unknown) { // FIX for 'Unexpected any': Catch as 'unknown'
-    // Safely inspect the error object
+  } catch (e: unknown) {
+    // This catch block is already correctly typed using 'unknown'
     const error = e as Error;
     console.error('[search] An unexpected error occurred during the search operation:', error?.message || e);
     return [];
   }
 }
 
-// FIX for 'no-anonymous-default-export':
-// Assign the object to a named constant before exporting as default.
+// This pattern correctly avoids anonymous default export linting errors.
 const searchService = { googleCustomSearch };
 export default searchService;
