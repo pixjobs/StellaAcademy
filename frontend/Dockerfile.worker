@@ -1,0 +1,60 @@
+# ---- Versions ----
+ARG NODE_VERSION=20-alpine
+
+# ==================================
+# Stage 1: Builder & Type Validator
+# ==================================
+FROM node:20-alpine AS builder
+WORKDIR /app
+
+# Copy package files and tsconfigs for dependency installation and validation.
+COPY package.json package-lock.json* ./
+COPY tsconfig.json tsconfig.worker.json ./
+
+# Install ALL dependencies, including devDependencies for the build step.
+RUN npm ci
+
+# Copy the application source code.
+COPY src ./src
+
+# --- Type Validation Step ---
+# This command ensures your code is type-safe. If there are any TS errors,
+# the entire 'docker build' will stop here.
+RUN npx tsc -p tsconfig.worker.json --noEmit
+
+# =========================
+# Stage 2: Final Runtime
+# =========================
+FROM node:${NODE_VERSION}
+WORKDIR /app
+
+# Install curl for the health check.
+RUN apk add --no-cache curl
+
+# Copy only production dependency manifests from the builder stage.
+COPY --from=builder /app/package.json /app/package-lock.json* ./
+
+# Install ONLY production dependencies. This includes tsx and tsconfig-paths.
+RUN npm ci --omit=dev
+
+# Copy the validated source code and tsconfigs from the builder stage.
+COPY --from=builder /app/src ./src
+COPY --from=builder /app/tsconfig.json ./tsconfig.json
+COPY --from=builder /app/tsconfig.worker.json ./tsconfig.worker.json
+
+# Environment for Cloud Run.
+ENV NODE_ENV=production \
+    PORT=8080 \
+    ENABLE_WEB_ENRICH=1
+
+# Cloud Run health check configuration.
+EXPOSE 8080
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
+  CMD curl -fsS "http://12-7.0.0.1:${PORT}/" || exit 1
+
+# --- THIS IS THE FINAL FIX ---
+# This CMD is now simpler and more robust.
+# `npx tsx` automatically finds the correct `tsx` executable and runs it.
+# The `--require` flag is passed to the underlying `node` process by `tsx`.
+# We no longer need `dumb-init` as Cloud Run handles signals well for Node.js apps.
+CMD ["npx", "tsx", "--tsconfig", "tsconfig.worker.json", "src/workers/ollama/worker.ts"]

@@ -11,8 +11,12 @@ import {
   withJobHeaders,
   pollJobResponse,
 } from '@/lib/api/queueHttp';
-import { llmQueue } from '@/lib/queue';
+// ⬇️ NEW: we'll resolve the queue on-demand instead of importing a static llmQueue
+import { getQueue } from '@/lib/queue';
 import type { Role } from '@/types/llm';
+
+// Optional secrets (GCP Secret Manager via your helper)
+import { getSecret } from '@/lib/secrets';
 
 /* -------------------------------------------------------------------------- */
 /*                             Link helpers (local)                           */
@@ -40,7 +44,6 @@ function splitByCodeRegions(raw: string): Array<{ code: boolean; raw: string }> 
   const fenced = /```[\s\S]*?```/g;
   let last = 0;
   let m: RegExpExecArray | null;
-
   while ((m = fenced.exec(raw))) {
     if (m.index > last) splitInline(raw.slice(last, m.index), out);
     out.push({ code: true, raw: m[0] });
@@ -63,16 +66,15 @@ function splitInline(segment: string, out: Array<{ code: boolean; raw: string }>
 }
 
 function autolinkInTextBlock(block: string): string {
-  // IMPORTANT: do not rely on typed parameters for offset/string because capture groups change positions.
-  return block.replace(URL_RE, (match: string, ...args: any[]) => {
-    const offset = args[args.length - 2] as number;    // safe: second from last
-    const whole  = args[args.length - 1] as string;    // safe: last
+  return block.replace(URL_RE, (match: string, ...args: (string | number)[]) => {
+    const offset = args[args.length - 2] as number;
+    const whole = args[args.length - 1] as string;
 
-    // 1) Already a Markdown link target? ( ... ](URL) )
+    // Already part of a markdown link target?  …](URL)
     const before2 = whole.slice(Math.max(0, offset - 2), offset);
     if (before2 === '](') return match;
 
-    // 2) Already inside HTML attribute like href="URL"
+    // Inside href="URL"?
     const before6 = whole.slice(Math.max(0, offset - 6), offset).toLowerCase();
     if (before6.includes('href="') || before6.includes("href='")) return match;
 
@@ -85,7 +87,7 @@ function extractLinksFromText(text: string, cap = 8): LinkPreview[] {
   const links: string[] = [];
   const seen = new Set<string>();
 
-  // 1) URLs already in markdown: [label](url)
+  // 1) URLs in markdown: [label](url)
   const MD_RE = /\[[^\]]*?\]\((https?:\/\/[^\s)]+)\)/gi;
   let mdMatch: RegExpExecArray | null;
   while ((mdMatch = MD_RE.exec(text)) !== null) {
@@ -99,7 +101,7 @@ function extractLinksFromText(text: string, cap = 8): LinkPreview[] {
 
   // 2) Bare URLs
   if (links.length < cap) {
-    const BARE_RE = new RegExp(URL_RE.source, 'gi'); // fresh regex, own lastIndex
+    const BARE_RE = new RegExp(URL_RE.source, 'gi');
     let bareMatch: RegExpExecArray | null;
     while ((bareMatch = BARE_RE.exec(text)) !== null) {
       const u = stripTracking(bareMatch[0]);
@@ -133,6 +135,57 @@ function safeHost(url: string): string {
 }
 function safeHostname(url: string): string {
   try { return new URL(url).hostname; } catch { return ''; }
+}
+
+/* -------------------------------------------------------------------------- */
+/*                 Optional Google CSE enrichment (Secret Manager)           */
+/* -------------------------------------------------------------------------- */
+
+async function tryGoogleCse(query: string): Promise<LinkPreview[]> {
+  try {
+    // NOTE: Use CX, not ENGINE_ID (keeps consistent with your secrets.ts accessors)
+    const key = await getSecret('GOOGLE_CUSTOM_SEARCH_KEY');
+    const cx  = await getSecret('GOOGLE_CUSTOM_SEARCH_CX');
+    if (!key || !cx) return [];
+
+    const url = new URL('https://www.googleapis.com/customsearch/v1');
+    url.searchParams.set('key', key);
+    url.searchParams.set('cx', cx);
+    url.searchParams.set('num', '3'); // small, fast
+    url.searchParams.set('q', query);
+
+    const res = await fetch(url.toString(), { cache: 'no-store' });
+    if (!res.ok) throw new Error(`CSE ${res.status}`);
+    const data = (await res.json()) as {
+      items?: Array<{ title?: string; link?: string; snippet?: string }>;
+    };
+
+    const items = data.items ?? [];
+    return items
+      .filter(i => i.link)
+      .map((i) => ({
+        url: stripTracking(i.link!),
+        title: i.title || safeHost(i.link!),
+        meta: i.snippet,
+        faviconUrl: `https://icons.duckduckgo.com/ip3/${safeHostname(i.link!)}.ico`,
+      }));
+  } catch {
+    return []; // silently ignore if not configured / fails
+  }
+}
+
+function dedupeLinks(a: LinkPreview[], b: LinkPreview[]): LinkPreview[] {
+  const out: LinkPreview[] = [];
+  const seen = new Set<string>();
+  for (const list of [a, b]) {
+    for (const l of list) {
+      const key = stripTracking(l.url);
+      if (seen.has(key)) continue;
+      seen.add(key);
+      out.push({ ...l, url: key });
+    }
+  }
+  return out.slice(0, 8);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -247,10 +300,11 @@ export async function GET(req: NextRequest) {
   }
 
   if (list) {
+    const queue = await getQueue();
     const [waiting, active, delayed] = await Promise.all([
-      llmQueue.getJobs(['waiting'], 0, 20),
-      llmQueue.getJobs(['active'], 0, 20),
-      llmQueue.getJobs(['delayed'], 0, 20),
+      queue.getJobs(['waiting'], 0, 20),
+      queue.getJobs(['active'], 0, 20),
+      queue.getJobs(['delayed'], 0, 20),
     ]);
     return NextResponse.json(
       {
@@ -271,18 +325,27 @@ export async function GET(req: NextRequest) {
   try {
     const payload = await resp.json();
 
-    if (payload?.type === 'ask' && payload?.result?.answer) {
+    if (payload?.state && payload?.result?.answer) {
+      // Keep behaviour focused to ask jobs but tolerate shapes
       const rawAnswer: string = payload.result.answer;
 
-      // Convert bare URLs to Markdown links for your MarkdownRenderer
+      // 1) Convert any bare URLs to Markdown links for your MarkdownRenderer
       const answerWithLinks = markdownifyBareUrls(rawAnswer);
 
-      // Build structured links (if worker didn’t already provide)
+      // 2) Build structured links (if worker didn’t already provide)
       const existing: LinkPreview[] | undefined = payload.result.links;
-      const links: LinkPreview[] =
+      const textLinks: LinkPreview[] =
         Array.isArray(existing) && existing.length > 0
           ? existing
           : extractLinksFromText(answerWithLinks);
+
+      // 3) Optionally enrich with Google CSE (silently ignored if secrets/fetch fail)
+      const cseQuery =
+        payload?.result?.query ??
+        payload?.result?.normalizedPrompt ??
+        '';
+      const cseLinks = cseQuery ? await tryGoogleCse(cseQuery) : [];
+      const links: LinkPreview[] = dedupeLinks(textLinks, cseLinks);
 
       return NextResponse.json(
         { ...payload, result: { ...payload.result, answer: answerWithLinks, links } },
@@ -290,7 +353,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Not an ask result; return unchanged
+    // Not an ask-style result; return unchanged
     return NextResponse.json(payload, { status: 200 });
   } catch {
     // If pollJobResponse streamed or wasn’t JSON, just return it as-is

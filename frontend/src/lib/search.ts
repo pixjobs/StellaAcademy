@@ -1,8 +1,7 @@
 import { getGoogleCustomSearchKey, getGoogleCustomSearchCx } from '@/lib/secrets';
 import type { LinkPreview } from '@/types/llm';
 
-// --- Improved Type Definitions for API Response ---
-// REASON: Using specific types instead of `any` improves code safety and autocompletion.
+// --- Type Definitions for API Response ---
 type GoogleSearchItem = {
   title?: string;
   link?: string;
@@ -22,37 +21,26 @@ type GoogleErrorResponse = {
   };
 };
 
-// --- Helper Functions (Unchanged, but with comments) ---
+// --- Helper Functions ---
 
-/**
- * Removes bracketed tags like [mission] to avoid affecting search relevance.
- */
 function sanitizeQuery(q: string): string {
   return q.replace(/\[.*?\]/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
-/**
- * Ensures the number of search results is between 1 and 10.
- */
 function clampNum(n: number): number {
   if (!Number.isFinite(n)) return 5;
   return Math.max(1, Math.min(10, Math.floor(n)));
 }
 
-/**
- * Masks sensitive keys for safe logging.
- */
 function mask(val?: string, show = 3): string {
   if (!val) return '(unset)';
   if (val.length <= show + 2) return `${val[0]}***`;
   return `${val.slice(0, show)}***${val.slice(-2)}`;
 }
 
-// --- Main Search Function (Refactored) ---
+// --- Main Search Function ---
 
 export async function googleCustomSearch(q: string, num = 5): Promise<LinkPreview[]> {
-  // REASON: A top-level try/catch block is crucial. It catches errors from the `get...`
-  // functions (e.g., if secrets aren't found) and any other unexpected errors.
   try {
     const key = await getGoogleCustomSearchKey();
     const cx = await getGoogleCustomSearchCx();
@@ -68,10 +56,9 @@ export async function googleCustomSearch(q: string, num = 5): Promise<LinkPrevie
     const params = new URLSearchParams({
       key,
       cx,
-      q: sanitizeQuery(q).slice(0, 2048), // Google's limit is 2048 chars
+      q: sanitizeQuery(q).slice(0, 2048),
       num: String(clampNum(num)),
       safe: 'off',
-      // fields reduces response size/cost
       fields: 'items(title,link,snippet)',
     });
 
@@ -80,10 +67,11 @@ export async function googleCustomSearch(q: string, num = 5): Promise<LinkPrevie
     const res = await fetch(endpoint, { method: 'GET' });
 
     if (!res.ok) {
-      // Try to parse the error response for more detailed logging
       let detail: GoogleErrorResponse = {};
       try {
-        detail = await res.json();
+        // FIX 1: Add type assertion for the error response JSON.
+        // This resolves the `unknown` type error when handling failed API calls.
+        detail = (await res.json()) as GoogleErrorResponse;
       } catch {
         // Ignore if the error response isn't valid JSON
       }
@@ -92,40 +80,45 @@ export async function googleCustomSearch(q: string, num = 5): Promise<LinkPrevie
         statusText: res.statusText,
         errorMessage: detail.error?.message,
         errorStatus: detail.error?.status,
-        reasons: detail.error?.errors?.map(e => e.reason).join(', '),
+        reasons: detail.error?.errors?.map((e) => e.reason).join(', '),
       });
       return [];
     }
 
-    const data: GoogleSearchResponse = await res.json();
+    // FIX 2: Add type assertion for the success response JSON.
+    // This resolves the primary `unknown` type error for the search results.
+    const data = (await res.json()) as GoogleSearchResponse;
 
     if (!data.items || data.items.length === 0) {
-      return []; // No results found
+      return [];
     }
 
-    // Map results to the LinkPreview type
-    return data.items.map((item): LinkPreview => {
+    // LINT FIX: Add explicit type for the 'item' parameter for maximum clarity.
+    return data.items.map((item: GoogleSearchItem): LinkPreview => {
       const url = String(item.link || '').trim();
       let faviconUrl = '';
       try {
-        // Use a privacy-friendly favicon service
         const host = new URL(url).hostname;
         faviconUrl = `https://icons.duckduckgo.com/ip3/${host}.ico`;
       } catch {
-        // Silently fail if the URL is invalid, leaving faviconUrl empty
+        // Silently fail if the URL is invalid
       }
 
       return {
         url,
         title: String(item.title ?? 'Untitled'),
-        meta: String(item.snippet ?? ''),
+        snippet: String(item.snippet ?? ''),
         faviconUrl,
       };
     });
-  } catch (e: any) {
-    console.error('[search] An unexpected error occurred during the search operation:', e?.message || e);
-    return []; // Always return an empty array on failure
+  } catch (e: unknown) {
+    // This catch block is already correctly typed using 'unknown'
+    const error = e as Error;
+    console.error('[search] An unexpected error occurred during the search operation:', error?.message || e);
+    return [];
   }
 }
 
-export default { googleCustomSearch };
+// This pattern correctly avoids anonymous default export linting errors.
+const searchService = { googleCustomSearch };
+export default searchService;

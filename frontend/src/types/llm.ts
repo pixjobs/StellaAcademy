@@ -72,7 +72,7 @@ export type MarsPhoto = {
 
 /* ---------------------- Mission & Topic Data Structures ------------------- */
 
-export type Img = {
+export type MissionImage = {
   title: string;
   href: string;
 };
@@ -80,7 +80,7 @@ export type Img = {
 export type EnrichedTopic = {
   title: string;
   summary: string;
-  images: Img[];
+  images: MissionImage[];
   keywords?: string[];
 };
 
@@ -101,6 +101,9 @@ export type LinkPreview = {
   meta?: string;       // any extra meta you want to surface
 };
 
+// Handy function type for Google CSE
+export type GoogleSearchFn = (q: string, n?: number) => Promise<LinkPreview[]>;
+
 /** Optional inline citation marker (for superscripts/footnotes). */
 export type InlineCitation = {
   index: number;       // 1-based marker used in text, e.g. [^1] or ¹
@@ -113,17 +116,7 @@ export type ChatMessage = {
   id: string;
   role: 'stella' | 'user';
   text: string;
-
-  /**
-   * Optional: structured links to show under the message (e.g., “Sources”).
-   * UI can fall back to auto-extracting raw URLs from `text` if empty.
-   */
   links?: LinkPreview[];
-
-  /**
-   * Optional: inline citations you can map to superscripts in the rendered text.
-   * You can ignore this if you prefer simple `links` rendering.
-   */
   citations?: InlineCitation[];
 };
 
@@ -131,22 +124,11 @@ export type ChatMessage = {
 
 /** Controls for worker-side retrieval (e.g., Google CSE). */
 export type RetrievalOptions = {
-  /** Enable retrieval; if false/undefined, skip. */
   enable?: boolean;
-
-  /** Optional explicit query; otherwise worker derives from prompt/context. */
   qOverride?: string;
-
-  /** Number of results to fetch (worker may cap). */
   num?: number;
-
-  /** Timeout budget for retrieval in ms (independent of LLM time). */
   timeoutMs?: number;
-
-  /** Optional min score/quality if you introduce scoring/reranking. */
   minScore?: number;
-
-  /** Optional source tag to log which retriever was used ("cse", "bing", etc). */
   provider?: string;
 };
 
@@ -160,13 +142,13 @@ export type WorkerTiming = {
 
 /** Optional metadata for results (helps debugging/eval). */
 export type WorkerMeta = {
-  hadRetrieval?: boolean;       // whether retrieval actually ran
-  retrievedCount?: number;      // number of links kept
+  hadRetrieval?: boolean;
+  retrievedCount?: number;
   role?: Role;
   mission?: string;
   timing?: WorkerTiming;
-  model?: string;               // model id used by the worker
-  notes?: Record<string, unknown>; // arbitrary debug fields
+  model?: string;
+  notes?: Record<string, unknown>;
 };
 
 /* ---------------------- BullMQ Job & Payload Types ----------------------- */
@@ -181,27 +163,28 @@ export interface LlmAskPayload {
   context?: string;
   role?: Role;
   mission?: string;
-
-  /**
-   * Optional worker-side retrieval controls.
-   * If omitted or `enable=false`, the worker should skip retrieval.
-   */
   retrieval?: RetrievalOptions;
 }
 
+// ===== NEWLY DEFINED TYPES FOR TUTOR PREFLIGHT =====
+
 /**
- * Tutor Preflight
+ * The INPUT payload for a 'tutor-preflight' job.
  * Generates role-aware system prompt, starter messages, warmup, goals, and difficulty hints.
  */
-export type TutorPreflightInput = {
+export interface TutorPreflightPayload {
   mission: string;       // e.g., 'rocket-lab'
   topicTitle: string;    // e.g., 'Thrust'
   topicSummary: string;  // short summary text
   imageTitle?: string;   // selected image title (optional)
   role: Role;            // 'explorer' | 'cadet' | 'scholar'
-};
+}
 
-export type TutorPreflightOutput = {
+/**
+ * The OUTPUT (result) of a 'tutor-preflight' job.
+ * This is the data structure the LLM is expected to generate.
+ */
+export interface TutorPreflightOutput {
   systemPrompt: string;
   starterMessages: ChatMessage[]; // typically 1–2 Stella messages to open
   warmupQuestion: string;
@@ -211,9 +194,10 @@ export type TutorPreflightOutput = {
     standard: string;
     challenge: string;
   };
-  /** Optional observability for preflight generation. */
-  meta?: WorkerMeta;
-};
+}
+
+// ====================================================
+
 
 /* ----------------------------- Job Data (Union) -------------------------- */
 
@@ -229,9 +213,10 @@ export interface AskJobData {
   cacheKey?: string;
 }
 
+// --- ADDED: TutorPreflightJobData to the union ---
 export interface TutorPreflightJobData {
   type: 'tutor-preflight';
-  payload: TutorPreflightInput;
+  payload: TutorPreflightPayload;
   cacheKey?: string;
 }
 
@@ -244,23 +229,16 @@ export type LlmJobData =
 /* -------------------------- BullMQ Job Result Types ---------------------- */
 
 export interface AskResult {
-  /** Final Markdown answer (your UI renders via MarkdownRenderer). */
   answer: string;
-
-  /** Token/timing counters if you collect them. */
   tokens?: { input?: number; output?: number; timeMs?: number };
-
-  /** Optional structured links for the answer bubble. */
   links?: LinkPreview[];
-
-  /** Optional inline citations for superscripts/footnotes mapping. */
   citations?: InlineCitation[];
-
-  /** Optional observability for the ask pipeline. */
   meta?: WorkerMeta;
 }
 
+/** Union of all possible job results returned by the worker. */
 export type LlmJobResult =
   | { type: 'mission'; result: EnrichedMissionPlan; meta?: WorkerMeta }
-  | { type: 'ask'; result: AskResult }
-  | { type: 'tutor-preflight'; result: TutorPreflightOutput };
+  | { type: 'ask'; result: AskResult; meta?: WorkerMeta }
+  // --- ADDED: TutorPreflight result to the union ---
+  | { type: 'tutor-preflight'; result: TutorPreflightOutput; meta?: WorkerMeta };

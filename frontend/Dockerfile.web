@@ -1,0 +1,51 @@
+# ====================================================================================
+# 1. Base Dependencies Stage
+# ====================================================================================
+FROM node:20-alpine AS deps
+WORKDIR /app
+COPY package.json package-lock.json* ./
+RUN npm ci
+
+# ====================================================================================
+# 2. Build Stage
+# ====================================================================================
+FROM node:20-alpine AS builder
+WORKDIR /app
+
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+
+# Build arg for Clerk publishable key (injected from Cloud Build)
+ARG NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+ENV NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=$NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+
+# Build Next.js (standalone output is enabled in next.config)
+RUN npm run build
+
+# ====================================================================================
+# 3. Production Runner
+# ====================================================================================
+FROM node:20-alpine AS runner
+WORKDIR /app
+
+# Create non-root user
+RUN addgroup --system --gid 1001 nextjs \
+ && adduser --system --uid 1001 nextjs
+
+# Production env
+ENV NODE_ENV=production
+ENV PORT=8080
+ENV HOSTNAME=0.0.0.0
+
+# Copy build artifacts
+# includes server.js
+COPY --from=builder --chown=nextjs:nextjs /app/.next/standalone .
+COPY --from=builder --chown=nextjs:nextjs /app/.next/static ./.next/static
+# required for standalone
+COPY --from=builder --chown=nextjs:nextjs /app/public ./public
+COPY --from=builder --chown=nextjs:nextjs /app/package.json ./
+
+USER nextjs
+EXPOSE 8080
+
+CMD ["node", "server.js"]

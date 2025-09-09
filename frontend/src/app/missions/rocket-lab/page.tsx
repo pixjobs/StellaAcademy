@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useMissionPlanGenerator } from '@/hooks/useMissionPlanGenerator';
-import { useGame } from '@/lib/store'; // ← get the role the user picked on Home
+import { useGame } from '@/lib/store';
 import type { EnrichedMissionPlan, Img } from '@/types/mission';
 
 import MissionControl from '@/components/MissionControl';
@@ -14,21 +14,31 @@ import { Button } from '@/components/ui/button';
 /*                                    Types                                   */
 /* -------------------------------------------------------------------------- */
 
-// This pattern ensures data integrity before it's used in state or components.
 type TopicFromHook = EnrichedMissionPlan['topics'][number];
-// A stricter "clean" type that guarantees the images array is present and valid.
 type CleanTopic = Omit<TopicFromHook, 'images'> & { images: Img[] };
 
-// Preflight result (matches worker’s `tutor-preflight` result)
 type TutorPreflightResult = {
   systemPrompt: string;
-  starterMessages: Array<{ role: 'user' | 'assistant' | 'system'; text: string }>;
-  difficulty?: 'explorer' | 'cadet' | 'scholar' | string;
+  starterMessages: Array<{ id: string; role: 'stella' | 'user'; text: string }>;
+  warmupQuestion: string;
+  goalSuggestions: string[];
+  difficultyHints: {
+    easy: string;
+    standard: string;
+    challenge: string;
+  };
 };
 
 /* -------------------------------------------------------------------------- */
 /*                                   Helpers                                  */
 /* -------------------------------------------------------------------------- */
+
+const DEFAULT_BRIEFING = `Welcome to the Rocket Lab.
+Your mission is to analyze the provided technical data.
+1) Review the specifications for the selected component.
+2) Ask about its function or how it integrates with other systems.
+3) Inquire about the materials used or its performance metrics.
+Use “Quiz Me” to test your knowledge. Let's begin the analysis.`;
 
 function reorderImages(images: Img[], focusIndex: number): Img[] {
   if (images.length === 0) return [];
@@ -42,7 +52,6 @@ function buildContext(topic: CleanTopic, pickedIndex = 0): string {
   return `Objective: ${topic.title}. ${topic.summary}\n${chosenLine}`.trim();
 }
 
-// POST → /api/preFlight and return jobId
 async function startPreflight(payload: {
   mission: string;
   topicTitle: string;
@@ -50,36 +59,45 @@ async function startPreflight(payload: {
   imageTitle?: string;
   role: 'explorer' | 'cadet' | 'scholar';
 }) {
-  const res = await fetch('/api/preFlight', {
+  const res = await fetch('/api/llm/enqueue', {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
-    body: JSON.stringify(payload),
+    body: JSON.stringify({ type: 'tutor-preflight', payload }),
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data?.error || 'Failed to enqueue preflight.');
   return data.jobId as string;
 }
 
-// Poll GET → /api/preFlight?id=... until completed/failed
 async function waitForPreflight(jobId: string, { timeoutMs = 25_000, intervalMs = 700 } = {}) {
   const started = Date.now();
-  // eslint-disable-next-line no-constant-condition
-  while (true) {
-    const res = await fetch(`/api/preFlight?id=${encodeURIComponent(jobId)}`);
+  while (Date.now() - started < timeoutMs) {
+    const res = await fetch(`/api/llm/enqueue?id=${encodeURIComponent(jobId)}`);
     const data = await res.json();
     if (!res.ok) throw new Error(data?.error || 'Preflight status error.');
 
     if (data.state === 'completed') {
-      return data.result as TutorPreflightResult;
+      // ===== THE FIX IS HERE (same as the other pages) =====
+      // The actual result is nested one level deeper.
+      return data.result.result as TutorPreflightResult;
     }
     if (data.state === 'failed') {
       throw new Error(data?.error || 'Preflight job failed.');
     }
-    if (Date.now() - started > timeoutMs) {
-      throw new Error('Preflight timed out.');
-    }
     await new Promise((r) => setTimeout(r, intervalMs));
   }
+  throw new Error('Preflight timed out.');
+}
+
+// Data validation helper to prevent crashes
+function isValidPreflightResult(data: unknown): data is TutorPreflightResult {
+  if (typeof data !== 'object' || data === null) return false;
+  const result = data as TutorPreflightResult;
+  return (
+    typeof result.systemPrompt === 'string' &&
+    Array.isArray(result.starterMessages) &&
+    typeof result.warmupQuestion === 'string'
+  );
 }
 
 /* -------------------------------------------------------------------------- */
@@ -87,10 +105,8 @@ async function waitForPreflight(jobId: string, { timeoutMs = 25_000, intervalMs 
 /* -------------------------------------------------------------------------- */
 
 export default function RocketLabPage() {
-  // Role from global store (Explorer/Cadet/Scholar)
   const { role = 'explorer' } = useGame();
 
-  // Generate the topic/mission plan as before
   const { missionPlan, isLoading, error, generateNewPlan } = useMissionPlanGenerator('rocket-lab');
 
   const cleanMissionPlan = useMemo(() => {
@@ -109,15 +125,12 @@ export default function RocketLabPage() {
     };
   }, [missionPlan]);
 
-  // UI state
   const [selectedTopic, setSelectedTopic] = useState<CleanTopic | null>(null);
   const [selectedImageIdx, setSelectedImageIdx] = useState<number>(0);
-
-  // Preflight state
   const [preflightLoading, setPreflightLoading] = useState(false);
   const [preflightError, setPreflightError] = useState<string | null>(null);
   const [preflightBriefing, setPreflightBriefing] = useState<string | null>(null);
-  const lastRequestedRef = useRef<string | null>(null); // prevent race conditions
+  const lastRequestedRef = useRef<string | null>(null);
 
   const handleSelectTopic = useCallback((topic: CleanTopic, imageIndex: number) => {
     setSelectedTopic(topic);
@@ -126,26 +139,24 @@ export default function RocketLabPage() {
 
   const handleReturnToTopics = useCallback(() => {
     setSelectedTopic(null);
-    // reset preflight state
     setPreflightLoading(false);
     setPreflightError(null);
     setPreflightBriefing(null);
     lastRequestedRef.current = null;
   }, []);
 
-  // Kick off preflight whenever a topic is selected
   useEffect(() => {
     if (!selectedTopic) return;
 
-    const imageTitle = selectedTopic.images[selectedImageIdx]?.title || undefined;
-    const reqKey = `${selectedTopic.title}::${imageTitle}::${role}`;
+    const imageTitle = selectedTopic.images[selectedImageIdx]?.title;
+    const reqKey = `${selectedTopic.title}::${imageTitle ?? 'no-image'}::${role}`;
     lastRequestedRef.current = reqKey;
 
     setPreflightLoading(true);
     setPreflightError(null);
     setPreflightBriefing(null);
 
-    (async () => {
+    const runPreflight = async () => {
       try {
         const jobId = await startPreflight({
           mission: 'rocket-lab',
@@ -157,18 +168,20 @@ export default function RocketLabPage() {
 
         const result = await waitForPreflight(jobId);
 
-        // Build a single Markdown “briefing” out of starter messages
-        // Prefer the first assistant/system message if present
+        // Add the same robust validation check here
+        if (!isValidPreflightResult(result)) {
+          console.error("Invalid preflight data received from worker:", result);
+          throw new Error("Worker returned incomplete or malformed preflight data. Check the worker logs for LLM parsing errors.");
+        }
+
         const assistantFirst =
-          result.starterMessages.find((m) => m.role === 'assistant') ||
-          result.starterMessages.find((m) => m.role === 'system') ||
+          result.starterMessages.find((m) => m.role === 'stella') ||
           result.starterMessages[0];
 
         const briefingText =
           assistantFirst?.text?.trim() ||
           'Mission briefing ready. Choose a task to begin.';
 
-        // prevent setting state if a newer request superseded this one
         if (lastRequestedRef.current === reqKey) {
           setPreflightBriefing(briefingText);
           setPreflightLoading(false);
@@ -179,11 +192,11 @@ export default function RocketLabPage() {
           setPreflightLoading(false);
         }
       }
-    })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    };
+
+    runPreflight();
   }, [selectedTopic, selectedImageIdx, role]);
 
-  // RENDER: Loading or Error State for plan generation
   if (isLoading || error) {
     return (
       <section className="container mx-auto flex flex-col items-center justify-center p-4 text-center min-h-[60vh]">
@@ -201,7 +214,6 @@ export default function RocketLabPage() {
     );
   }
 
-  // RENDER: Main Content
   return (
     <section className="container mx-auto px-4 py-8 max-w-6xl">
       <div className="flex justify-between items-start mb-6">
@@ -229,7 +241,6 @@ export default function RocketLabPage() {
             <div className="flex gap-2">
               <Button
                 onClick={() => {
-                  // retrigger by re-setting the same selection
                   setSelectedTopic((t) => (t ? { ...t } : t));
                 }}
                 variant="secondary"
@@ -248,7 +259,7 @@ export default function RocketLabPage() {
             initialMessage={{
               id: 'stella-briefing',
               role: 'stella',
-              text: preflightBriefing ?? 'Mission briefing ready.',
+              text: preflightBriefing ?? DEFAULT_BRIEFING,
             }}
           />
         )

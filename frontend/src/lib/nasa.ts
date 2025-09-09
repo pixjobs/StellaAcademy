@@ -3,15 +3,21 @@
  * NASA API CLIENT
  *
  * This module is SOLELY responsible for interacting with all NASA APIs.
- * It correctly gets its API key from our central configuration module.
- *
- * All Ollama-related logic has been intentionally removed from this file
- * and now lives in `ollama-client.ts`.
+ * It is hardened to run in both Next.js (web) and Node.js (worker) environments.
  * =========================================================================
  */
 
-import { getNasaApiKey } from '@/workers/ollama/ollama-client';
+// FIX: Import from the generic secrets module, not a specific worker.
+import { getNasaApiKey } from '@/lib/secrets';
 import type { MarsPhoto } from '@/types/llm';
+
+// FIX 1: Define a custom RequestInit type that includes the Next.js-specific 'next' property.
+// This teaches the TypeScript compiler about this special property.
+interface NextRequestInit extends RequestInit {
+  next?: {
+    revalidate: number;
+  };
+}
 
 /* -------------------------------------------------------------------------- */
 /*                                    Types                                   */
@@ -35,6 +41,57 @@ export type NivlItem = {
   href: string | null;
 };
 
+// Internal types for parsing raw API responses
+type NasaApodResponse = {
+  date: string;
+  title: string;
+  explanation: string;
+  media_type: string;
+  hdurl?: string;
+  url?: string;
+  thumbnail_url?: string;
+  copyright?: string;
+};
+
+type NivlLink = {
+  render: 'image' | string;
+  href: string;
+};
+
+type NivlDataItem = {
+  nasa_id: string;
+  title: string;
+  description?: string;
+  date_created?: string;
+  keywords?: string[];
+};
+
+type NivlSearchItem = {
+  data?: NivlDataItem[];
+  links?: NivlLink[];
+};
+
+type NivlSearchResponse = {
+  collection: {
+    items: NivlSearchItem[];
+  };
+};
+
+type NivlAssetResponse = {
+  collection: {
+    items: { href: string }[];
+  };
+};
+
+type MarsRoverApiResponse = {
+  latest_photos: MarsPhoto[];
+};
+
+type EpicApiResponseItem = {
+  date: string;
+  image: string;
+};
+
 /* -------------------------------------------------------------------------- */
 /*                                   Config                                   */
 /* -------------------------------------------------------------------------- */
@@ -44,42 +101,42 @@ const REVALIDATE_HOUR = 60 * 60; // 1 hour in seconds
 const TIMEOUT_MS = Number(process.env.NASA_TIMEOUT_MS || 15_000);
 const DEBUG = process.env.DEBUG_NASA === '1';
 
-// A set of hostnames that should be automatically upgraded from http to https.
-const HTTPS_UPGRADE_HOSTS = new Set([
-  'apod.nasa.gov',
-  'images-assets.nasa.gov',
-  'images.nasa.gov',
-  'mars.nasa.gov',
-  'epic.gsfc.nasa.gov',
-]);
+const HTTPS_UPGRADE_HOSTS = new Set(['apod.nasa.gov', 'images-assets.nasa.gov', 'images.nasa.gov', 'mars.nasa.gov', 'epic.gsfc.nasa.gov']);
 
 /* -------------------------------------------------------------------------- */
 /*                                   Helpers                                  */
 /* -------------------------------------------------------------------------- */
 
-function log(...args: any[]) {
+function log(...args: unknown[]): void {
   if (DEBUG) console.log('[nasa]', ...args);
 }
-function warn(...args: any[]) {
+function warn(...args: unknown[]): void {
   console.warn('[nasa]', ...args);
 }
 
 /**
- * A wrapper around fetch that includes a timeout.
+ * A fetch wrapper that adds a timeout and conditionally applies Next.js caching.
  */
-async function timeoutFetch(url: string, init: RequestInit = {}, timeout = TIMEOUT_MS) {
+async function fetchWithCache(url: string, revalidateSeconds: number, timeout = TIMEOUT_MS): Promise<Response> {
   const controller = new AbortController();
-  const t = setTimeout(() => controller.abort(), timeout);
+  const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+  // FIX 2: Use our new custom type for the options object.
+  const options: NextRequestInit = {
+    signal: controller.signal,
+  };
+  if (process.env.NEXT_RUNTIME) {
+    // This assignment is now valid because NextRequestInit knows about 'next'.
+    options.next = { revalidate: revalidateSeconds };
+  }
+
   try {
-    return await fetch(url, { ...init, signal: controller.signal });
+    return await fetch(url, options);
   } finally {
-    clearTimeout(t);
+    clearTimeout(timeoutId);
   }
 }
 
-/**
- * Upgrades a URL from http to https if its hostname is in the trusted set.
- */
 function upgradeHttps(u: string | null | undefined): string | null {
   if (!u) return null;
   try {
@@ -90,35 +147,29 @@ function upgradeHttps(u: string | null | undefined): string | null {
     }
     return u;
   } catch {
-    return u; // Return original string if it's not a valid URL
+    return u;
   }
 }
 
-/**
- * Checks if a URL is reachable by making a HEAD request.
- */
-async function headReachable(url: string) {
+async function headReachable(url: string): Promise<boolean> {
   try {
-    const r = await timeoutFetch(url, { method: 'HEAD' }, 7_000);
-    return r.ok;
+    // Use HEAD method for a lighter check
+    const res = await fetch(url, { method: 'HEAD', signal: AbortSignal.timeout(7_000) });
+    return res.ok;
   } catch {
     return false;
   }
 }
 
-/**
- * Heuristically finds the largest image from a list of URLs based on common naming conventions.
- */
-function largestByNameGuess(list: string[]) {
-  const score = (s: string) => {
+function largestByNameGuess(list: string[]): string {
+  const score = (s: string): number => {
     let sc = 0;
     if (/_orig|_large|_full|_hi|_2048|_4096/i.test(s)) sc += 3;
     const m = s.match(/(\d{3,5})[^\d]+(\d{3,5})/);
     if (m) sc += Math.max(parseInt(m[1], 10), parseInt(m[2], 10)) / 1000;
     return sc;
   };
-  // Create a new sorted array without modifying the original
-  return [...list].sort((a, b) => score(b) - score(a))[0];
+  return [...list].sort((a, b) => score(b) - score(a))[0] ?? list[0] ?? '';
 }
 
 /* -------------------------------------------------------------------------- */
@@ -126,7 +177,7 @@ function largestByNameGuess(list: string[]) {
 /* -------------------------------------------------------------------------- */
 
 export async function fetchAPOD(opts?: { date?: string }): Promise<Apod> {
-  const apiKey = getNasaApiKey();
+  const apiKey = await getNasaApiKey();
   if (!apiKey) throw new Error('NASA API Key is not configured for APOD.');
 
   const params = new URLSearchParams({ api_key: apiKey, thumbs: 'true' });
@@ -134,24 +185,24 @@ export async function fetchAPOD(opts?: { date?: string }): Promise<Apod> {
   const url = `https://api.nasa.gov/planetary/apod?${params.toString()}`;
 
   log('APOD GET', url);
-  const r = await timeoutFetch(url, { next: { revalidate: REVALIDATE_DAY } });
+  const r = await fetchWithCache(url, REVALIDATE_DAY);
   if (!r.ok) {
     warn('APOD HTTP', r.status);
     throw new Error(`APOD API request failed with status ${r.status}`);
   }
 
-  const apod = await r.json();
+  // FIX 3: Add type assertion to resolve 'unknown' error
+  const apod = (await r.json()) as NasaApodResponse;
   const media = String(apod.media_type || '');
   let bgUrl = media === 'image' ? apod.hdurl || apod.url : apod.thumbnail_url || null;
 
-  // Verify the primary URL is reachable, otherwise try the alternative.
   bgUrl = upgradeHttps(bgUrl);
   if (bgUrl && !(await headReachable(bgUrl))) {
     const alt = upgradeHttps(bgUrl === apod.hdurl ? apod.url : apod.hdurl);
     if (alt && (await headReachable(alt))) {
       bgUrl = alt;
     } else {
-      bgUrl = null; // Set to null if neither URL is reachable
+      bgUrl = null;
     }
   }
 
@@ -178,36 +229,38 @@ export async function searchNIVL(
   const url = `https://images-api.nasa.gov/search?q=${encodeURIComponent(q)}&media_type=image&page=${page}`;
 
   log('NIVL search', { q, page, url });
-  const r = await timeoutFetch(url, { next: { revalidate: REVALIDATE_HOUR } });
+  const r = await fetchWithCache(url, REVALIDATE_HOUR);
   if (!r.ok) {
     warn('NIVL HTTP Error', { status: r.status, statusText: r.statusText });
     throw new Error(`NASA Image Library search failed for "${q}" with status ${r.status}.`);
   }
 
-  const j = await r.json();
-  if (!j.collection || !Array.isArray(j.collection.items)) {
+  const j = (await r.json()) as NivlSearchResponse;
+  if (!j.collection?.items) {
     warn('NIVL API returned an invalid response format.', j);
     return [];
   }
 
   const raw: NivlItem[] = j.collection.items
     .slice(0, limit)
-    .map((it: any): NivlItem => {
-      const data = it.data?.[0] || {};
-      const link = it.links?.find((l: any) => l.render === 'image') || null;
-      return {
+    .flatMap((it: NivlSearchItem): NivlItem[] => {
+      const data = it.data?.[0];
+      const link = it.links?.find((l: NivlLink) => l.render === 'image');
+
+      if (!data?.nasa_id || !data?.title) return []; // Skip invalid items
+
+      return [{
         nasaId: data.nasa_id,
         title: data.title,
         description: data.description,
         date: data.date_created,
         keywords: data.keywords || [],
-        href: upgradeHttps(link?.href),
-      };
+        href: upgradeHttps(link?.href) || null,
+      }];
     });
 
   if (!opts?.expandAssets) return raw;
 
-  // If expanding assets, find the best resolution for each image.
   const expanded = await Promise.allSettled(
     raw.map(async (it) => {
       if (!it.nasaId) return it;
@@ -219,35 +272,35 @@ export async function searchNIVL(
   return expanded.map((p, i) => (p.status === 'fulfilled' ? p.value : raw[i]));
 }
 
-async function pickBestNivlAsset(nasaId: string, prefer: 'orig' | 'large' | 'any' = 'orig') {
+async function pickBestNivlAsset(nasaId: string, prefer: 'orig' | 'large' | 'any' = 'orig'): Promise<string | null> {
   try {
     const url = `https://images-api.nasa.gov/asset/${encodeURIComponent(nasaId)}`;
-    const r = await timeoutFetch(url, { next: { revalidate: REVALIDATE_HOUR } });
+    const r = await fetchWithCache(url, REVALIDATE_HOUR);
     if (!r.ok) {
       warn('NIVL asset HTTP Error', { nasaId, status: r.status });
       return null;
     }
-    const j = await r.json();
-    if (!j.collection || !Array.isArray(j.collection.items)) {
+
+    const j = (await r.json()) as NivlAssetResponse;
+    if (!j.collection?.items) {
       warn('NIVL asset API returned an invalid format for', { nasaId });
       return null;
     }
 
-    const hrefs = j.collection.items.map((x: any) => upgradeHttps(x.href)).filter(Boolean) as string[];
+    const hrefs = j.collection.items.map((x) => upgradeHttps(x.href)).filter(Boolean) as string[];
     const jpgs = hrefs.filter((h) => /\.jpe?g($|\?)/i.test(h));
-    
+
     let pick = prefer === 'orig' ? jpgs.find((h) => /_orig\.jpe?g/i.test(h)) : null;
     pick = pick || largestByNameGuess(jpgs) || hrefs[0] || null;
 
     if (pick && (await headReachable(pick))) return pick;
 
-    // Fallback: check other URLs if the preferred one is unreachable.
     for (const h of hrefs) {
       if (await headReachable(h)) return h;
     }
     return null;
   } catch (e) {
-    warn(`NIVL asset error for nasaId "${nasaId}":`, String(e));
+    warn(`NIVL asset error for nasaId "${nasaId}":`, e instanceof Error ? e.message : String(e));
     return null;
   }
 }
@@ -256,107 +309,86 @@ async function pickBestNivlAsset(nasaId: string, prefer: 'orig' | 'large' | 'any
 /*                         Mars Rover Latest Photos                           */
 /* -------------------------------------------------------------------------- */
 
-export async function fetchLatestMarsPhotos(rover: string = 'curiosity'): Promise<MarsPhoto[]> {
-    const apiKey = getNasaApiKey();
-    if (!apiKey) throw new Error("NASA API Key is not configured for Mars Rover Photos.");
-    
-    const url = `https://api.nasa.gov/mars-photos/api/v1/rovers/${rover}/latest_photos?api_key=${apiKey}`;
-    log('Mars Latest GET', { rover, url });
+export async function fetchLatestMarsPhotos(rover = 'curiosity'): Promise<MarsPhoto[]> {
+  const apiKey = await getNasaApiKey();
+  if (!apiKey) throw new Error('NASA API Key is not configured for Mars Rover Photos.');
 
-    const r = await timeoutFetch(url, { next: { revalidate: REVALIDATE_HOUR } });
-    if (!r.ok) {
-        warn('Mars Latest HTTP Error', { status: r.status, statusText: r.statusText });
-        throw new Error(`NASA Mars Rover API failed with status ${r.status}.`);
-    }
-    const j = await r.json();
-    if (!j || !Array.isArray(j.latest_photos)) {
-        warn('Mars Rover API returned an invalid response format.', j);
-        return [];
-    }
+  const url = `https://api.nasa.gov/mars-photos/api/v1/rovers/${rover}/latest_photos?api_key=${apiKey}`;
+  log('Mars Latest GET', { rover, url });
 
-    const photos = j.latest_photos as any[];
-    if (photos.length === 0) {
-      warn(`Mars Rover API returned 0 photos for rover "${rover}".`);
-      return [];
-    }
-    
-    return photos.map((p): MarsPhoto => ({
-        id: p.id,
-        sol: p.sol,
-        camera: p.camera,
-        img_src: upgradeHttps(p.img_src) || p.img_src,
-        earth_date: p.earth_date,
-        rover: p.rover,
-    }));
+  const r = await fetchWithCache(url, REVALIDATE_HOUR);
+  if (!r.ok) {
+    warn('Mars Latest HTTP Error', { status: r.status, statusText: r.statusText });
+    throw new Error(`NASA Mars Rover API failed with status ${r.status}.`);
+  }
+
+  const j = (await r.json()) as MarsRoverApiResponse;
+  if (!j?.latest_photos) {
+    warn('Mars Rover API returned an invalid response format.', j);
+    return [];
+  }
+
+  const photos = j.latest_photos;
+  if (photos.length === 0) {
+    warn(`Mars Rover API returned 0 photos for rover "${rover}".`);
+  }
+
+  return photos.map((p: MarsPhoto): MarsPhoto => ({
+    ...p,
+    img_src: upgradeHttps(p.img_src) || p.img_src,
+  }));
 }
 
 /* -------------------------------------------------------------------------- */
 /*                 EPIC (Earth Polychromatic Imaging Camera)                  */
 /* -------------------------------------------------------------------------- */
 
-export async function fetchEPICImages({ count = 12 } = {}): Promise<{ date: string, href: string }[]> {
-    const apiKey = getNasaApiKey();
-    if (!apiKey) {
-      throw new Error("NASA API Key is not configured for EPIC.");
+export async function fetchEPICImages({ count = 12 } = {}): Promise<{ date: string; href: string }[]> {
+  const apiKey = await getNasaApiKey();
+  if (!apiKey) throw new Error('NASA API Key is not configured for EPIC.');
+
+  const primaryUrl = `https://api.nasa.gov/EPIC/api/natural/images?api_key=${apiKey}`;
+  const fallbackUrl = `https://epic.gsfc.nasa.gov/api/natural`;
+
+  let data: EpicApiResponseItem[];
+  try {
+    log('EPIC GET (Primary)', { url: primaryUrl });
+    const r = await fetchWithCache(primaryUrl, REVALIDATE_HOUR);
+    if (!r.ok) {
+      if (r.status >= 500) throw new Error(`Primary EPIC API failed with server error: ${r.status}`);
+      warn('EPIC HTTP Error on Primary', { status: r.status, statusText: r.statusText });
+      throw new Error(`The NASA EPIC API failed with status ${r.status}.`);
     }
 
-    // --- STRATEGY: TRY PRIMARY MIRROR, THEN FALL BACK TO DIRECT SOURCE ---
-    const primaryUrl = `https://api.nasa.gov/EPIC/api/natural/images?api_key=${apiKey}`;
-    const fallbackUrl = `https://epic.gsfc.nasa.gov/api/natural`; // Note: No API key needed for direct source
-
-    let data: any[];
+    data = (await r.json()) as EpicApiResponseItem[];
+  } catch (primaryError) {
+    warn('Primary EPIC API failed, trying direct fallback...', { error: (primaryError as Error).message });
     try {
-        log('EPIC GET (Primary)', { url: primaryUrl });
-        const r = await timeoutFetch(primaryUrl, { next: { revalidate: REVALIDATE_HOUR } });
-        if (!r.ok) {
-            // If the primary mirror fails with a server error, throw to trigger the fallback.
-            if (r.status >= 500) {
-              throw new Error(`Primary EPIC API failed with server error: ${r.status}`);
-            }
-            // For client errors (4xx), fail immediately as the fallback won't help.
-            warn('EPIC HTTP Error on Primary', { status: r.status, statusText: r.statusText });
-            throw new Error(`The NASA EPIC API failed with status ${r.status}.`);
-        }
-        data = await r.json();
-    } catch (primaryError) {
-        warn('Primary EPIC API failed, trying direct fallback...', { error: (primaryError as Error).message });
+      log('EPIC GET (Fallback)', { url: fallbackUrl });
+      const r = await fetchWithCache(fallbackUrl, REVALIDATE_HOUR);
+      if (!r.ok) throw new Error(`The fallback EPIC API also failed with status ${r.status}.`);
 
-        try {
-            log('EPIC GET (Fallback)', { url: fallbackUrl });
-            const r = await timeoutFetch(fallbackUrl, { next: { revalidate: REVALIDATE_HOUR } });
-            if (!r.ok) {
-                warn('EPIC HTTP Error on Fallback', { status: r.status, statusText: r.statusText });
-                throw new Error(`The fallback EPIC API also failed with status ${r.status}.`);
-            }
-            data = await r.json();
-        } catch (fallbackError) {
-            // If the fallback also fails, throw the final, comprehensive error.
-            console.error('[nasa] EPIC fetch failed on both primary and fallback endpoints.');
-            throw fallbackError;
-        }
+      data = (await r.json()) as EpicApiResponseItem[];
+    } catch (fallbackError) {
+      console.error('[nasa] EPIC fetch failed on both primary and fallback endpoints.');
+      throw fallbackError;
     }
+  }
 
-    // The rest of the logic is the same, as the data structure is identical.
-    if (!Array.isArray(data) || data.length === 0) {
-      warn('EPIC API returned an empty or invalid array.');
-      return [];
-    }
-    
-    return data.slice(0, count).map((img: any) => {
-        const date = new Date(img.date);
-        const year = date.getUTCFullYear();
-        const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-        const day = String(date.getUTCDate()).padStart(2, '0');
-        
-        const href = `https://epic.gsfc.nasa.gov/archive/natural/${year}/${month}/${day}/png/${img.image}.png`;
-        
-        return {
-            date: img.date,
-            href: upgradeHttps(href)!,
-        };
-    });
+  if (!Array.isArray(data) || data.length === 0) {
+    warn('EPIC API returned an empty or invalid array.');
+    return [];
+  }
+
+  return data.slice(0, count).map((img: EpicApiResponseItem) => {
+    const date = new Date(img.date);
+    const year = date.getUTCFullYear();
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(date.getUTCDate()).padStart(2, '0');
+    const href = `https://epic.gsfc.nasa.gov/archive/natural/${year}/${month}/${day}/png/${img.image}.png`;
+    return { date: img.date, href: upgradeHttps(href)! };
+  });
 }
-
 
 /* -------------------------------------------------------------------------- */
 /*               Context Builders (for feeding info to the LLM)               */

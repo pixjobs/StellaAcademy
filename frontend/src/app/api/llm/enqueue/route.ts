@@ -1,39 +1,86 @@
+// app/api/llm/enqueue/route.ts
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'node:crypto';
-import { Job } from 'bullmq';
-import { llmQueue, connection as redis } from '@/lib/queue';
-import type { LlmJobData, LlmJobResult } from '@/types/llm';
+import { Job, JobsOptions, JobState } from 'bullmq';
+import type { LlmJobData, LlmJobResult, TutorPreflightOutput } from '@/types/llm';
 
-// --- DEBUGGING FLAG & LOGGER ---
-// To enable, set the environment variable: DEBUG_LLM_ENQUEUE=1
-const DEBUG = process.env.DEBUG_LLM_ENQUEUE === '1';
-const log = (message: string, context: Record<string, any> = {}) => {
-  if (DEBUG) {
-    console.log(`[llm/enqueue] ${message}`, context);
-  }
+import {
+  enqueueIdempotent,
+  queueStats as queueStatsHelper,
+  redisPing as redisPingHelper,
+  withJobHeaders,
+} from '@/lib/api/queueHttp';
+import { getQueue } from '@/lib/queue';
+
+/* ─────────────────────────────────────────────────────────
+  TYPE DEFINITIONS & VALIDATION
+────────────────────────────────────────────────────────── */
+
+interface QueueStats {
+  isPaused?: boolean;
+  [key: string]: unknown;
+}
+
+type EnqueueResult = {
+  state: JobState | 'exists' | 'unknown';
 };
 
-// ---------- In-memory Cache Configuration ----------
+/**
+ * Type guard to validate that a job's return value matches the expected LlmJobResult shape.
+ * This is the critical fix to prevent malformed data from reaching the frontend.
+ */
+function isValidLlmJobResult(value: unknown): value is LlmJobResult {
+  if (typeof value !== 'object' || value === null) return false;
+
+  // Use `in` operator for safe property checking
+  if (!('type' in value) || !('result' in value)) return false;
+
+  const data = value as LlmJobResult;
+
+  if (data.type === 'tutor-preflight') {
+    if (typeof data.result !== 'object' || data.result === null) return false;
+    const result = data.result as TutorPreflightOutput;
+    return (
+      typeof result.systemPrompt === 'string' &&
+      Array.isArray(result.starterMessages) &&
+      typeof result.warmupQuestion === 'string'
+    );
+  }
+
+  // Add more specific checks for 'mission' and 'ask' results if needed for robustness.
+  // For now, a basic check is sufficient.
+  if (data.type === 'mission' || data.type === 'ask') {
+    return typeof data.result === 'object' && data.result !== null;
+  }
+
+  return false;
+}
+
+/* ─────────────────────────────────────────────────────────
+  DEBUG FLAG & CACHING
+────────────────────────────────────────────────────────── */
+const DEBUG = process.env.DEBUG_LLM_ENQUEUE === '1';
+const log = (msg: string, ctx: Record<string, unknown> = {}) => {
+  if (DEBUG) console.log(`[llm/enqueue] ${msg}`, ctx);
+};
+
 type CacheVal<T> = { value: T; fetchedAt: number; soft: number; hard: number };
 const CACHE = new Map<string, CacheVal<LlmJobResult>>();
 const SOFT_MS = Number(process.env.LLM_CACHE_SOFT_MS ?? 5 * 60 * 1000);
 const HARD_MS = Number(process.env.LLM_CACHE_HARD_MS ?? 30 * 60 * 1000);
 
-// --- Negative Cache Configuration ---
 type MissingInfo = { firstSeen: number; hits: number };
 const MISSING_IDS = new Map<string, MissingInfo>();
 const MISSING_TTL_MS = Number(process.env.LLM_MISSING_TTL_MS ?? 2 * 60 * 1000);
 const MISSING_MAX_HITS = Number(process.env.LLM_MISSING_MAX_HITS ?? 5);
 
-// --- Posted ID Tracking Configuration ---
 const POSTED_IDS = new Map<string, number>();
 const POSTED_GRACE_MS = Number(process.env.LLM_POSTED_GRACE_MS ?? 10 * 60 * 1000);
 
-// --- Log configuration on module load ---
-log('Module loaded with configuration:', {
+log('Module config', {
   SOFT_MS,
   HARD_MS,
   MISSING_TTL_MS,
@@ -43,8 +90,10 @@ log('Module loaded with configuration:', {
   LLM_KEEP_FAIL_AGE: process.env.LLM_KEEP_FAIL_AGE ?? '1800 (default)',
 });
 
-// ---------- Helpers ----------
-function hashId(o: unknown): string {
+/* ─────────────────────────────────────────────────────────
+  Small utils
+────────────────────────────────────────────────────────── */
+function hashId(o: unknown) {
   return crypto.createHash('sha256').update(JSON.stringify(o)).digest('hex');
 }
 
@@ -52,7 +101,7 @@ function getCached(id: string) {
   const v = CACHE.get(id);
   if (!v) return null;
   if (Date.now() > v.hard) {
-    log('Cache entry purged (hard TTL expired)', { jobId: id });
+    log('Cache hard TTL expired, purged', { jobId: id });
     CACHE.delete(id);
     return null;
   }
@@ -62,7 +111,7 @@ function getCached(id: string) {
 function setCached(id: string, value: LlmJobResult) {
   const now = Date.now();
   CACHE.set(id, { value, fetchedAt: now, soft: now + SOFT_MS, hard: now + HARD_MS });
-  log('Set cache for job', { jobId: id, softTTL: `${SOFT_MS/1000}s`, hardTTL: `${HARD_MS/1000}s` });
+  log('Cache set', { jobId: id, softSec: SOFT_MS / 1000, hardSec: HARD_MS / 1000 });
 }
 
 function noteMissing(id: string): '404' | '410' {
@@ -70,133 +119,134 @@ function noteMissing(id: string): '404' | '410' {
   const cur = MISSING_IDS.get(id);
   if (!cur || now - cur.firstSeen > MISSING_TTL_MS) {
     MISSING_IDS.set(id, { firstSeen: now, hits: 1 });
-    log('Noted missing ID (first hit or expired)', { jobId: id, status: '404' });
+    log('Missing id noted (new/expired)', { jobId: id });
     return '404';
   }
   cur.hits += 1;
-  const status = cur.hits >= MISSING_MAX_HITS ? '410' : '404';
-  log('Noted missing ID (subsequent hit)', { jobId: id, hits: cur.hits, maxHits: MISSING_MAX_HITS, status });
-  return status;
+  return cur.hits >= MISSING_MAX_HITS ? '410' : '404';
 }
 
-async function queueStats() {
-  const [waiting, active, delayed, failed, completed, isPaused, counts] = await Promise.all([
-    llmQueue.getWaitingCount(),
-    llmQueue.getActiveCount(),
-    llmQueue.getDelayedCount(),
-    llmQueue.getFailedCount(),
-    llmQueue.getCompletedCount(),
-    llmQueue.isPaused(),
-    llmQueue.getJobCounts('waiting', 'active', 'delayed', 'completed', 'failed'),
-  ]);
-  return { waiting, active, delayed, failed, completed, isPaused, counts };
-}
-
-async function redisPing() {
+async function queueStats(): Promise<QueueStats> {
   try {
-    const pong = await redis.ping();
-    return { ok: pong === 'PONG', pong };
-  } catch (e: unknown) {
-    return { ok: false, error: String((e as Error)?.message || e) };
+    return await queueStatsHelper();
+  } catch (e) {
+    return { error: String((e as Error)?.message || e) };
+  }
+}
+async function redisPing() {
+  return redisPingHelper();
+}
+async function getWorkersCount(): Promise<number> {
+  try {
+    const q = await getQueue();
+    const workers = await q.getWorkers();
+    return workers.length;
+  } catch {
+    return -1;
   }
 }
 
-function okJson(data: any, init?: number | ResponseInit) {
+function okJson(data: object, init?: number | ResponseInit) {
   const opts: ResponseInit | undefined = typeof init === 'number' ? { status: init } : init;
   return NextResponse.json(data, opts);
 }
 
-function withStdHeaders(res: NextResponse, id: string, state: string) {
-  res.headers.set('x-job-id', id);
-  res.headers.set('x-queue-state', state);
-  return res;
-}
-
-// ---------- POST (enqueue) ----------
+/* ─────────────────────────────────────────────────────────
+  POST (enqueue)
+────────────────────────────────────────────────────────── */
 export async function POST(req: NextRequest) {
   let jobId = 'unknown';
   try {
     const raw = await req.text();
-    if (!raw) return okJson({ error: 'Empty body; expected JSON.' }, 400);
+    if (!raw) return withJobHeaders(okJson({ error: 'Empty body; expected JSON.' }, 400), jobId, 'error');
 
     let body: LlmJobData;
-    try { body = JSON.parse(raw); } catch { return okJson({ error: 'Malformed JSON.' }, 400); }
+    try {
+      body = JSON.parse(raw);
+    } catch {
+      return withJobHeaders(okJson({ error: 'Malformed JSON.' }, 400), jobId, 'error');
+    }
 
-    if (body?.type !== 'mission' && body?.type !== 'ask') {
-      return okJson({ error: "Invalid 'type' (use 'mission' or 'ask')." }, 400);
+    if (body?.type !== 'mission' && body?.type !== 'ask' && body?.type !== 'tutor-preflight') {
+      return withJobHeaders(okJson({ error: "Invalid 'type' (use 'mission', 'ask', or 'tutor-preflight')." }, 400), jobId, 'error');
     }
     if (!body?.payload || typeof body.payload !== 'object') {
-      return okJson({ error: "Invalid 'payload'." }, 400);
+      return withJobHeaders(okJson({ error: "Invalid 'payload'." }, 400), jobId, 'error');
     }
 
-    const idSource = body.cacheKey ? 'cacheKey' : 'hash';
     jobId = body.cacheKey || hashId({ type: body.type, payload: body.payload });
-    log('[POST] Received request', { jobId, idSource, type: body.type });
+    log('POST received', { jobId, type: body.type, idSource: body.cacheKey ? 'cacheKey' : 'hash' });
 
     const cached = getCached(jobId);
-    if (cached) {
-      const isFresh = Date.now() < cached.soft;
-      log('[POST] Cache check result', { jobId, status: isFresh ? 'fresh' : 'stale', softTTLEndsAt: new Date(cached.soft).toISOString() });
-      if (isFresh) {
-        const res = okJson({
+    if (cached && Date.now() < cached.soft) {
+      const res = okJson(
+        {
           accepted: true,
           jobId,
           state: 'completed',
           result: cached.value,
           cache: { status: 'fresh', ageSeconds: Math.floor((Date.now() - cached.fetchedAt) / 1000) },
-        }, 200);
-        return withStdHeaders(res, jobId, 'completed');
-      }
-    } else {
-      log('[POST] Cache miss', { jobId });
+        },
+        200
+      );
+      return withJobHeaders(res, jobId, 'completed');
     }
 
-    const [ping, statsBefore, workers] = await Promise.all([redisPing(), queueStats(), llmQueue.getWorkers()]);
-    const isWorkerRunning = workers.length > 0;
-    log('[POST] Enqueuing job...', { jobId, isWorkerRunning });
+    const [ping, statsBefore, workerCount] = await Promise.all([redisPing(), queueStats(), getWorkersCount()]);
+    log('Enqueuing...', { jobId, workerCount });
 
-    try {
-      await llmQueue.add('llm', { ...body, cacheKey: jobId }, {
-        jobId,
-        attempts: 2,
-        backoff: { type: 'exponential', delay: 1500 },
-        removeOnComplete: { age: Number(process.env.LLM_KEEP_COMPLETE_AGE ?? 300), count: 1000 },
-        removeOnFail: { age: Number(process.env.LLM_KEEP_FAIL_AGE ?? 1800), count: 1000 },
-      });
-    } catch (e: unknown) {
-      const msg = String((e as Error)?.message || e);
-      if (!/already exists/i.test(msg)) {
-        console.error('[llm/enqueue][POST] add error:', msg);
-        return okJson({ error: 'Failed to enqueue job.' }, 500);
-      }
-      log('[POST] Job already exists in queue, ignoring add request (idempotent)', { jobId });
-    }
+    const addOpts: JobsOptions = {
+      jobId,
+      attempts: 2,
+      backoff: { type: 'exponential', delay: 1500 },
+      removeOnComplete: { age: Number(process.env.LLM_KEEP_COMPLETE_AGE ?? 300), count: 1000 },
+      removeOnFail: { age: Number(process.env.LLM_KEEP_FAIL_AGE ?? 1800), count: 1000 },
+    };
+
+    const { state } = (await enqueueIdempotent('llm', { ...body, cacheKey: jobId }, jobId, undefined, addOpts)) as EnqueueResult;
 
     POSTED_IDS.set(jobId, Date.now());
-    log('[POST] Recorded jobId in POSTED_IDS', { jobId, gracePeriodMs: POSTED_GRACE_MS });
+    log('Job recorded in POSTED_IDS', { jobId });
 
-    const job = await Job.fromId(llmQueue, jobId);
-    const state = job ? await job.getState() : 'queued';
-    log('[POST] Responding 202 Accepted', { jobId, state });
+    let currentState: JobState | 'exists' | 'unknown' = state;
+    try {
+      const q = await getQueue();
+      const job = await Job.fromId(q, jobId);
+      currentState = job ? await job.getState() : state;
+    } catch {
+      // ignore; we still respond 202
+    }
 
-    const res = okJson({
-      accepted: true,
-      jobId,
-      state,
-      workerStatus: { activeWorkers: workers.length, isPaused: statsBefore.isPaused },
-      queue: { before: statsBefore },
-      redis: ping,
-      message: isWorkerRunning ? 'Poll this endpoint with GET ?id=<jobId>' : 'Job accepted, but no active workers were found; it will remain queued.',
-    }, 202);
-    return withStdHeaders(res, jobId, state);
-  } catch (err: unknown) {
-    console.error('[llm/enqueue][POST] Unhandled error', { jobId, error: String(err) });
-    const res = okJson({ error: 'Failed to enqueue job.', details: String((err as Error)?.message || err) }, 500);
-    return withStdHeaders(res, jobId, 'error');
+    const res = okJson(
+      {
+        accepted: true,
+        jobId,
+        state: currentState,
+        workerStatus: { activeWorkers: workerCount, isPaused: statsBefore.isPaused ?? false },
+        queue: { before: statsBefore },
+        redis: ping,
+        message:
+          workerCount > 0
+            ? 'Poll this endpoint with GET ?id=<jobId>'
+            : 'Job accepted, but no active workers were found; it will remain queued.',
+      },
+      202
+    );
+    
+    const headerState = currentState === 'unknown' ? 'waiting' : currentState;
+    return withJobHeaders(res, jobId, headerState);
+
+  } catch (err) {
+    const msg = (err as Error)?.message || String(err);
+    console.error('[llm/enqueue][POST] Unhandled error', { jobId, error: msg });
+    const res = okJson({ error: 'Failed to enqueue job.', details: msg }, 500);
+    return withJobHeaders(res, jobId, 'error');
   }
 }
 
-// ---------- GET (status / debug / list / stats) ----------
+/* ─────────────────────────────────────────────────────────
+  GET (status / debug / list / stats)
+────────────────────────────────────────────────────────── */
 export async function GET(req: NextRequest) {
   const id = req.nextUrl.searchParams.get('id');
   const debug = req.nextUrl.searchParams.get('debug') === '1';
@@ -205,76 +255,143 @@ export async function GET(req: NextRequest) {
 
   try {
     if (statsOnly) {
-      const [ping, stats, workers] = await Promise.all([redisPing(), queueStats(), llmQueue.getWorkers()]);
-      return withStdHeaders(okJson({ queue: stats, workers: { activeWorkers: workers.length }, redis: ping }, 200), id ?? '', 'stats');
+      const [ping, stats, workers] = await Promise.all([redisPing(), queueStats(), getWorkersCount()]);
+      return withJobHeaders(okJson({ queue: stats, workers: { activeWorkers: workers }, redis: ping }, 200), id ?? '', 'stats');
     }
 
     if (list) {
+      const q = await getQueue();
       const [waiting, active, delayed] = await Promise.all([
-        llmQueue.getJobs(['waiting'], 0, 50),
-        llmQueue.getJobs(['active'], 0, 50),
-        llmQueue.getJobs(['delayed'], 0, 50),
+        q.getJobs(['waiting'], 0, 50),
+        q.getJobs(['active'], 0, 50),
+        q.getJobs(['delayed'], 0, 50),
       ]);
-      return withStdHeaders(okJson({ waiting: waiting.map((j) => j.id), active: active.map((j) => j.id), delayed: delayed.map((j) => j.id) }, 200), id ?? '', 'list');
+      return withJobHeaders(
+        okJson(
+          { waiting: waiting.map((j) => j.id), active: active.map((j) => j.id), delayed: delayed.map((j) => j.id) },
+          200
+        ),
+        id ?? '',
+        'list'
+      );
     }
 
     if (!id) return okJson({ error: 'Missing ?id=' }, 400);
-    log('[GET] Status check for job', { id });
+    log('GET status', { id });
 
-    const job = await Job.fromId(llmQueue, id);
+    const q = await getQueue();
+    const job = await Job.fromId(q, id);
     if (!job) {
-      log('[GET] Job not found in BullMQ. Determining reason for 404/410...', { id });
+      log('Job not found in BullMQ', { id });
       const postedAt = POSTED_IDS.get(id);
       let status: 404 | 410 = 404;
       let reason = '';
 
       if (postedAt && Date.now() - postedAt < POSTED_GRACE_MS) {
         status = 410;
-        reason = 'Job was recently created by this server but is already gone from queue (likely expired/removed).';
-        log(`[GET] ${reason}`, { id, postedAt: new Date(postedAt).toISOString() });
+        reason = 'Job was recently created here but already gone (expired/removed).';
+        log(reason, { id, postedAt: new Date(postedAt).toISOString() });
       } else {
-        const noteStatus = noteMissing(id);
-        status = noteStatus === '410' ? 410 : 404;
-        reason = status === 410 ? 'This unknown job ID has been requested too many times.' : 'Job was not found in the queue.';
-        log(`[GET] ${reason}`, { id });
+        status = noteMissing(id) === '410' ? 410 : 404;
+        reason =
+          status === 410
+            ? 'Unknown job ID requested too many times.'
+            : 'Job not found in queue.';
       }
 
-      const [ping, stats, workers] = await Promise.all([redisPing(), queueStats(), llmQueue.getWorkers()]);
-      const res = okJson({ error: status === 410 ? 'Job expired or was removed' : 'Job not found', id, reason,
-        likely: [ 'Polling the wrong jobId', 'Job was removed after completion (increase removeOnComplete.age while debugging)', 'Worker/route mismatch: different REDIS_URL or queue name',],
-        queue: stats, workers: { activeWorkers: workers.length }, redis: ping,
-      }, status);
+      const [ping, stats, workers] = await Promise.all([redisPing(), queueStats(), getWorkersCount()]);
+      const res = okJson(
+        {
+          error: status === 410 ? 'Job expired or was removed' : 'Job not found',
+          id,
+          reason,
+          likely: [
+            'Polling the wrong jobId',
+            'Job removed after completion (raise removeOnComplete.age while debugging)',
+            'Worker/route mismatch: different REDIS_URL or queue name',
+          ],
+          queue: stats,
+          workers: { activeWorkers: workers },
+          redis: ping,
+        },
+        status
+      );
       if (status === 410) res.headers.set('Retry-After', '30');
-      return withStdHeaders(res, id, status === 410 ? 'gone' : 'missing');
+      return withJobHeaders(res, id, status === 410 ? 'gone' : 'missing');
     }
 
     const state = await job.getState();
-    const progress = job.progress ?? 0;
-    log('[GET] Found job in BullMQ', { id, state });
+    const progress = (typeof job.progress === 'number' ? job.progress : 0) ?? 0;
+    log('Job found', { id, state });
 
     if (state === 'completed') {
-      const result = job.returnvalue as LlmJobResult;
-      setCached(id, result); // This function logs internally
+      const result = job.returnvalue;
 
-      const payload = debug ? {
-        state, progress, result, debug: { id: job.id, name: job.name, attemptsMade: job.attemptsMade, opts: job.opts,
-          dataPreviewBytes: (() => { try { return JSON.stringify(job.data).length; } catch { return -1; } })(),
-          timestamps: { queuedAtMs: job.timestamp, processedOnMs: job.processedOn, finishedOnMs: job.finishedOn }, stacktrace: job.stacktrace,
-        },
-      } : { state, progress, result };
-      return withStdHeaders(okJson(payload, 200), id, state);
+      // ===== THE FIX IS HERE =====
+      // Validate the job's return value before sending it to the client.
+      // If the data is malformed, treat the job as if it failed.
+      if (!isValidLlmJobResult(result)) {
+        console.error(`[llm/enqueue][GET] Job ${id} completed with malformed result.`, { result });
+        const payload = {
+          state: 'failed',
+          progress: 100, // It finished, but incorrectly.
+          error: 'Job completed but worker returned malformed or incomplete data. Check worker logs.',
+          debug: debug ? { rawReturnValue: result } : undefined,
+        };
+        return withJobHeaders(okJson(payload, 500), id, 'failed');
+      }
+      // ===========================
+
+      setCached(id, result);
+      const payload = debug
+        ? {
+            state,
+            progress,
+            result,
+            debug: {
+              id: job.id,
+              name: job.name,
+              attemptsMade: job.attemptsMade,
+              opts: job.opts,
+              dataPreviewBytes: (() => {
+                try {
+                  return JSON.stringify(job.data).length;
+                } catch {
+                  return -1;
+                }
+              })(),
+              timestamps: {
+                queuedAtMs: job.timestamp,
+                processedOnMs: job.processedOn,
+                finishedOnMs: job.finishedOn,
+              },
+              stacktrace: job.stacktrace,
+            },
+          }
+        : { state, progress, result };
+      return withJobHeaders(okJson(payload, 200), id, state);
     }
 
     if (state === 'failed') {
-      const payload = debug ? { state, progress, error: job.failedReason, stacktrace: job.stacktrace } : { state, progress, error: job.failedReason };
-      return withStdHeaders(okJson(payload, 500), id, state);
+      const payload = debug
+        ? { state, progress, error: job.failedReason, stacktrace: job.stacktrace }
+        : { state, progress, error: job.failedReason };
+      return withJobHeaders(okJson(payload, 500), id, state);
     }
 
-    const [workers, counts] = await Promise.all([llmQueue.getWorkers(), llmQueue.getJobCounts('waiting', 'active')]);
-    return withStdHeaders(okJson({ state, progress, workerStatus: { activeWorkers: workers.length, ...counts } }, 200), id, state);
-  } catch (err: unknown) {
-    console.error('[llm/enqueue][GET] Unhandled error', { id: req.nextUrl.searchParams.get('id'), error: String(err) });
-    const res = okJson({ error: 'Failed to read job status.', details: String((err as Error)?.message || err) }, 500);
-    return withStdHeaders(res, req.nextUrl.searchParams.get('id') ?? '', 'error');
+    const [workers, counts] = await Promise.all([
+      getWorkersCount(),
+      (await getQueue()).getJobCounts('waiting', 'active'),
+    ]);
+    return withJobHeaders(
+      okJson({ state, progress, workerStatus: { activeWorkers: workers, ...counts } }, 200),
+      id,
+      state
+    );
+  } catch (err) {
+    const msg = (err as Error)?.message || String(err);
+    console.error('[llm/enqueue][GET] Unhandled error', { id: req.nextUrl.searchParams.get('id'), error: msg });
+    const res = okJson({ error: 'Failed to read job status.', details: msg }, 500);
+    return withJobHeaders(res, req.nextUrl.searchParams.get('id') ?? '', 'error');
   }
 }

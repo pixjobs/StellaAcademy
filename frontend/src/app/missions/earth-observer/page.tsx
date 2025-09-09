@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo, useState, useEffect, useRef } from 'react';
 import { useMissionPlanGenerator } from '@/hooks/useMissionPlanGenerator';
-import { useGame } from '@/lib/store'; // ← role from global store
+import { useGame } from '@/lib/store';
 import type { EnrichedMissionPlan, Img } from '@/types/mission';
 
 import MissionControl from '@/components/MissionControl';
@@ -19,8 +19,14 @@ type CleanTopic = Omit<TopicFromHook, 'images'> & { images: Img[] };
 
 type TutorPreflightResult = {
   systemPrompt: string;
-  starterMessages: Array<{ role: 'user' | 'assistant' | 'system'; text: string }>;
-  difficulty?: string;
+  starterMessages: Array<{ id: string; role: 'stella' | 'user'; text: string }>;
+  warmupQuestion: string;
+  goalSuggestions: string[];
+  difficultyHints: {
+    easy: string;
+    standard: string;
+    challenge: string;
+  };
 };
 
 /* -------------------------------------------------------------------------- */
@@ -34,7 +40,6 @@ Your mission is to analyze these images of Earth from deep space.
 3) Inquire about the technology behind the DSCOVR satellite or its orbit.
 Use "Quiz Me" to test your observations. Let's begin the analysis.`;
 
-// Reorder images so the selected one is first
 function reorderImages(images: Img[], focusIndex: number): Img[] {
   if (images.length === 0) return [];
   const i = Math.max(0, Math.min(focusIndex, images.length - 1));
@@ -49,38 +54,51 @@ function buildContext(topic: CleanTopic, pickedIndex = 0): string {
 
 /* ----------------------------- Preflight helpers ------------------------- */
 
-// POST → /api/preFlight and return jobId
 async function startPreflight(payload: {
-  mission: string;          // 'earth-observer'
+  mission: string;
   topicTitle: string;
   topicSummary: string;
   imageTitle?: string;
   role: 'explorer' | 'cadet' | 'scholar';
 }) {
-  const res = await fetch('/api/preFlight', {
+  const res = await fetch('/api/llm/enqueue', {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
-    body: JSON.stringify(payload),
+    body: JSON.stringify({ type: 'tutor-preflight', payload }),
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data?.error || 'Failed to enqueue preflight.');
   return data.jobId as string;
 }
 
-// Poll GET → /api/preFlight?id=... until completed/failed
 async function waitForPreflight(jobId: string, { timeoutMs = 25_000, intervalMs = 700 } = {}) {
   const started = Date.now();
-  // eslint-disable-next-line no-constant-condition
-  while (true) {
-    const res = await fetch(`/api/preFlight?id=${encodeURIComponent(jobId)}`);
+  while (Date.now() - started < timeoutMs) {
+    const res = await fetch(`/api/llm/enqueue?id=${encodeURIComponent(jobId)}`);
     const data = await res.json();
     if (!res.ok) throw new Error(data?.error || 'Preflight status error.');
 
-    if (data.state === 'completed') return data.result as TutorPreflightResult;
+    if (data.state === 'completed') {
+      // ===== THE FIX IS HERE (same as the other pages) =====
+      // The API returns a nested structure, so we unwrap the inner result.
+      return data.result.result as TutorPreflightResult;
+    }
     if (data.state === 'failed') throw new Error(data?.error || 'Preflight job failed.');
-    if (Date.now() - started > timeoutMs) throw new Error('Preflight timed out.');
+    
     await new Promise((r) => setTimeout(r, intervalMs));
   }
+  throw new Error('Preflight timed out.');
+}
+
+// Data validation helper to prevent crashes
+function isValidPreflightResult(data: unknown): data is TutorPreflightResult {
+  if (typeof data !== 'object' || data === null) return false;
+  const result = data as TutorPreflightResult;
+  return (
+    typeof result.systemPrompt === 'string' &&
+    Array.isArray(result.starterMessages) &&
+    typeof result.warmupQuestion === 'string'
+  );
 }
 
 /* -------------------------------------------------------------------------- */
@@ -88,12 +106,11 @@ async function waitForPreflight(jobId: string, { timeoutMs = 25_000, intervalMs 
 /* -------------------------------------------------------------------------- */
 
 export default function EarthObserverPage() {
-  const { role = 'explorer' } = useGame(); // explorer|cadet|scholar
+  const { role = 'explorer' } = useGame();
 
   const { missionPlan, isLoading, error, generateNewPlan } =
     useMissionPlanGenerator('earth-observer');
 
-  // Clean plan with strict images
   const cleanMissionPlan = useMemo(() => {
     if (!missionPlan) return null;
     return {
@@ -110,15 +127,12 @@ export default function EarthObserverPage() {
     };
   }, [missionPlan]);
 
-  // UI state
   const [selectedTopic, setSelectedTopic] = useState<CleanTopic | null>(null);
   const [selectedImageIdx, setSelectedImageIdx] = useState<number>(0);
-
-  // Preflight state
   const [preflightLoading, setPreflightLoading] = useState(false);
   const [preflightError, setPreflightError] = useState<string | null>(null);
   const [preflightBriefing, setPreflightBriefing] = useState<string | null>(null);
-  const lastRequestedRef = useRef<string | null>(null); // race-guard
+  const lastRequestedRef = useRef<string | null>(null);
 
   const handleSelectTopic = useCallback((topic: CleanTopic, imageIndex: number) => {
     setSelectedTopic(topic);
@@ -127,26 +141,24 @@ export default function EarthObserverPage() {
 
   const handleReturnToTopics = useCallback(() => {
     setSelectedTopic(null);
-    // reset preflight state
     setPreflightLoading(false);
     setPreflightError(null);
     setPreflightBriefing(null);
     lastRequestedRef.current = null;
   }, []);
 
-  // Kick off preflight whenever a topic/image/role changes
   useEffect(() => {
     if (!selectedTopic) return;
 
-    const imageTitle = selectedTopic.images[selectedImageIdx]?.title || undefined;
-    const reqKey = `${selectedTopic.title}::${imageTitle}::${role}`;
+    const imageTitle = selectedTopic.images[selectedImageIdx]?.title;
+    const reqKey = `${selectedTopic.title}::${imageTitle ?? 'no-image'}::${role}`;
     lastRequestedRef.current = reqKey;
 
     setPreflightLoading(true);
     setPreflightError(null);
     setPreflightBriefing(null);
 
-    (async () => {
+    const runPreflight = async () => {
       try {
         const jobId = await startPreflight({
           mission: 'earth-observer',
@@ -158,10 +170,14 @@ export default function EarthObserverPage() {
 
         const result = await waitForPreflight(jobId);
 
-        // Favor the first assistant/system message; fall back to first entry; then default text
+        // Add the same robust validation check here
+        if (!isValidPreflightResult(result)) {
+          console.error("Invalid preflight data received from worker:", result);
+          throw new Error("Worker returned incomplete or malformed preflight data. Check the worker logs for LLM parsing errors.");
+        }
+
         const assistantFirst =
-          result.starterMessages.find((m) => m.role === 'assistant') ||
-          result.starterMessages.find((m) => m.role === 'system') ||
+          result.starterMessages.find((m) => m.role === 'stella') ||
           result.starterMessages[0];
 
         const briefingText = assistantFirst?.text?.trim() || DEFAULT_BRIEFING;
@@ -176,8 +192,9 @@ export default function EarthObserverPage() {
           setPreflightLoading(false);
         }
       }
-    })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    };
+    
+    runPreflight();
   }, [selectedTopic, selectedImageIdx, role]);
 
   /* ---------------------------- Render states ---------------------------- */
@@ -226,7 +243,6 @@ export default function EarthObserverPage() {
             <div className="flex gap-2">
               <Button
                 onClick={() => {
-                  // retrigger by re-setting the same selection
                   setSelectedTopic((t) => (t ? { ...t } : t));
                 }}
                 variant="secondary"

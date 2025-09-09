@@ -37,16 +37,16 @@ export default function Home() {
           onStart={() => {
             window.dispatchEvent(new Event('stella:warp'));
             setStarted(true);
-            window.scrollTo({ top: 0, behavior: 'instant' as any });
+            window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior  });
           }}
-          // Optional: customise headline/copy/badges/CTA/image
+
           title="Welcome to Stella Academy 🌟"
           copy="You’re signed in — great! I’m Stella, your interactive space tutor. Choose a learning path and I’ll guide you with quick, friendly challenges."
           badges={['Interactive Analysis', 'Creative Co-writing', 'Personalised Learning']}
           ctaLabel="▶ Press Start"
           imageSrc="/stella.png"
         >
-          {/* Optional slot — put the role selector here if you want it in the intro */}
+
           <div className="grid grid-cols-3 gap-2">
             {roles.map((r) => (
               <button

@@ -1,162 +1,281 @@
-// src/lib/secrets.ts
-
 /**
- * @file This module provides a unified and safe way to access secrets.
- * It is designed to work seamlessly in different environments:
- * - Next.js Server Components / API Routes
- * - Edge Middleware / Workers
- * - Local Development
+ * Unified, environment-safe secret access.
  *
- * It follows a specific precedence for resolving secret values:
- * 1. Environment Variables (e.g., process.env.MY_SECRET_KEY)
- * 2. In-memory Cache (to reduce redundant lookups in a single server instance)
- * 3. Google Cloud Secret Manager (for production and staging environments)
+ * Resolution order for secrets:
+ * 1) Environment variable (UPPER_SNAKE_CASE)
+ * 2) In-memory cache (server only)
+ * 3) Google Secret Manager (server only) by the same canonical name you pass in
  *
- * CRITICAL: This module should NEVER import 'server-only' as it needs to be
- * tree-shaken correctly to avoid shipping server code to the client. The logic
- * inside handles the environment checks safely.
+ * IMPORTANT:
+ * - No 'server-only' import here. We use dynamic import for '@google-cloud/secret-manager'
+ *   and guard with `isBrowser()` so nothing leaks into the client bundle.
  */
 
 import type { SecretManagerServiceClient } from '@google-cloud/secret-manager';
 
-// The SecretManagerServiceClient instance is loaded lazily to avoid bundling it on the client.
+// FIX: Declare 'window' to satisfy the strict Node.js TypeScript compiler.
+// This provides a type hint for the `isBrowser` function without affecting the runtime logic
+// or requiring the "DOM" library in your tsconfig.worker.json.
+declare let window: unknown;
+
+// ---------------------------
+// Internal state & utilities
+// ---------------------------
 let smClient: SecretManagerServiceClient | null = null;
-// A simple in-memory cache to prevent refetching secrets from GCP on every call.
 const cache: Record<string, string> = {};
 
 /**
- * Checks if the code is currently running in a browser environment.
- * @returns {boolean} True if in a browser, false otherwise.
+ * Safely checks if the current environment is a browser.
+ * This function is the key to making this module "isomorphic".
  */
 function isBrowser(): boolean {
   return typeof window !== 'undefined';
 }
 
-/**
- * Lazily initializes and returns a singleton instance of the Secret Manager client.
- * This function uses a dynamic import() to ensure the '@google-cloud/secret-manager'
- * module is never included in the client-side bundle.
- * @returns {Promise<SecretManagerServiceClient | null>} The client instance or null if unavailable/in browser.
- */
+/** Light parser for booleans ("true"/"1"/"yes") */
+function asBool(v: string | undefined | null, def = false): boolean {
+  if (!v) return def;
+  const t = v.trim().toLowerCase();
+  return t === 'true' || t === '1' || t === 'yes';
+}
+
+/** Mask a secret for logs (keeps first/last 2 chars) */
+function mask(s: string): string {
+  if (!s) return '';
+  if (s.length <= 6) return '*'.repeat(s.length);
+  return `${s.slice(0, 2)}${'*'.repeat(Math.max(1, s.length - 4))}${s.slice(-2)}`;
+}
+
+/** Dynamic load GSM client (server only) */
 async function getSecretManagerClient(): Promise<SecretManagerServiceClient | null> {
-  if (isBrowser()) {
-    return null;
-  }
-  if (smClient) {
-    return smClient;
-  }
+  if (isBrowser()) return null;
+  if (smClient) return smClient;
 
   try {
-    // Dynamic import is the key to preventing this server-side dependency from
-    // being bundled into client-side code.
     const { SecretManagerServiceClient } = await import('@google-cloud/secret-manager');
     smClient = new SecretManagerServiceClient();
     return smClient;
   } catch (err) {
     console.warn(
-      '[secrets] Google Secret Manager client is unavailable. This is expected in local development if the library is not installed or credentials are not set. Falling back to environment variables.',
+      '[secrets] Secret Manager client unavailable (likely local dev without creds). Falling back to env. Reason:',
       (err as Error)?.message || err
     );
     return null;
   }
 }
 
+// ---------------------------
+// Core secret resolution
+// ---------------------------
+
 /**
- * Fetches a secret value by its canonical name.
- * The function searches for the secret in the following order:
- * 1. Environment Variable: Checks for a variable named by converting the secret name
- *    from 'kebab-case' to 'UPPER_SNAKE_CASE' (e.g., 'my-secret' -> 'MY_SECRET').
- * 2. In-memory Cache: Returns the cached value if available (server-side only).
- * 3. GCP Secret Manager: Fetches the secret from GCP using its canonical name (server-side only).
- *
- * @param {string} name - The canonical name of the secret (e.g., 'nasa-api-key' or 'GOOGLE_CUSTOM_SEARCH_KEY').
- * @returns {Promise<string>} The secret value. Returns an empty string ('') if the secret
- *          cannot be found in any of the sources, allowing the application to fail gracefully.
+ * Resolve a secret by "canonical name".
+ * - If name is kebab-case (e.g. 'nasa-api-key'), ENV lookup uses 'NASA_API_KEY'
+ * - If name is already UPPER_SNAKE_CASE, it's used verbatim for ENV
+ * - GSM lookup always uses the canonical name you pass (exact match)
  */
 export async function getSecret(name: string): Promise<string> {
-  // 1. Check Environment Variables (works everywhere)
-  // Converts a name like 'nasa-api-key' to 'NASA_API_KEY'.
-  // If the name is already 'GOOGLE_CUSTOM_SEARCH_KEY', it remains unchanged.
+  // 1) ENV (works in browser/server)
   const envKey = name.replace(/-/g, '_').toUpperCase();
   const fromEnv = process.env[envKey];
   if (typeof fromEnv === 'string' && fromEnv.length > 0) {
     return fromEnv;
   }
 
-  // --- Server-Side Logic Begins Here ---
-  // If we are in a browser, we've already checked process.env, so we can stop.
-  if (isBrowser()) {
-    return '';
-  }
+  // 2) Browser cannot read GSM, stop here.
+  if (isBrowser()) return '';
 
-  // 2. Check In-Memory Cache (server-side only)
+  // 3) Cache (server only)
   if (cache[name]) {
     return cache[name];
   }
 
-  // 3. Fetch from GCP Secret Manager (server-side only)
+  // 4) GSM (server only)
   try {
-    // This env var is automatically set in most Google Cloud environments.
-    // For local development, it must be set in your .env.local file.
     const project = process.env.GOOGLE_CLOUD_PROJECT;
     if (!project) {
-      // This is a common misconfiguration, so we provide a clear warning.
-      console.warn(`[secrets] GOOGLE_CLOUD_PROJECT env var is not set. Cannot look up '${name}' in Secret Manager.`);
+      console.warn(`[secrets] GOOGLE_CLOUD_PROJECT not set; cannot fetch '${name}' from GSM.`);
       return '';
     }
 
     const client = await getSecretManagerClient();
-    if (!client) {
-      // The reason for the client being unavailable will have been logged in getSecretManagerClient().
-      return '';
-    }
+    if (!client) return '';
 
     const secretPath = `projects/${project}/secrets/${name}/versions/latest`;
     const [response] = await client.accessSecretVersion({ name: secretPath });
     const value = response.payload?.data?.toString('utf8') || '';
 
     if (!value) {
-      console.warn(`[secrets] Secret '${name}' was found in Secret Manager but its value is empty.`);
-      return '';
+      console.warn(`[secrets] Secret '${name}' found in GSM but empty.`);
     }
-
-    // Cache the successfully fetched secret to avoid future lookups.
     cache[name] = value;
     return value;
-  } catch (err: any) {
-    // Prettify common errors for better debuggability.
-    if (err.code === 5) { // 'NOT_FOUND' error code
-      console.warn(`[secrets] Secret '${name}' was not found in Secret Manager for project '${process.env.GOOGLE_CLOUD_PROJECT}'.`);
-    } else if (err.code === 7) { // 'PERMISSION_DENIED' error code
-      console.error(`🔴 [secrets] PERMISSION DENIED when trying to access secret '${name}'. Ensure the service account has the 'Secret Manager Secret Accessor' role.`);
-    } else {
-      console.error(`🔴 [secrets] Failed to fetch secret '${name}' from Secret Manager:`, err);
+  } catch (err: unknown) {
+      if (err instanceof Error) {
+        const gcpError = err as { code?: number; message: string };
+
+        switch (gcpError.code) {
+          case 5: // NOT_FOUND
+            console.warn(
+              `[secrets] 🟡 Secret '${name}' not found in GSM for project '${process.env.GOOGLE_CLOUD_PROJECT}'.`
+            );
+            break;
+
+          case 7: // PERMISSION_DENIED
+            console.error(
+              `🔴 [secrets] PERMISSION DENIED for secret '${name}'. Ensure the service account has the 'Secret Manager Secret Accessor' role.`
+            );
+            break;
+
+          default:
+            console.error(
+              `🔴 [secrets] Failed to fetch '${name}' from GSM. Code: ${gcpError.code ?? 'N/A'}. Message: ${gcpError.message}`
+            );
+            break;
+        }
+      } else {
+        console.error(
+          `🔴 [secrets] An unexpected non-error value was thrown while fetching '${name}':`,
+          err
+        );
+      }
+      return '';
     }
-    return '';
-  }
 }
 
-/* ========================================================================== */
-/*                  DOMAIN-SPECIFIC, CONVENIENCE ACCESSORS                    */
-/* ========================================================================== */
-// Using specific accessor functions is a best practice. It makes the code
-// more readable and reduces the chance of typos in secret names.
+/** Convenience: fetch with default */
+export async function getSecretOr(name: string, defaultValue: string): Promise<string> {
+  const v = await getSecret(name);
+  return v || defaultValue;
+}
 
+/** Convenience: fetch or throw a helpful error */
+export async function getRequiredSecret(name: string, hint?: string): Promise<string> {
+  const v = await getSecret(name);
+  if (!v) {
+    throw new Error(
+      `[secrets] Required secret '${name}' is missing. ` +
+      (hint ? `Hint: ${hint}` : `Set as ENV (${name.replace(/-/g, '_').toUpperCase()}) or create GSM secret '${name}'.`)
+    );
+  }
+  return v;
+}
+
+
+// --- (The rest of the file is unchanged as it was already correct) ---
+
+// ------------------------------------------
+// Domain-specific, convenience accessors
+// ------------------------------------------
+
+// NASA
 export async function getNasaApiKey(): Promise<string> {
-  // This uses a kebab-case name, which is a common convention.
   return getSecret('nasa-api-key');
 }
 
+// Google Custom Search (optional)
 export async function getGoogleCustomSearchKey(): Promise<string> {
-  // Using the original UPPER_SNAKE_CASE name as requested.
-  // This will work for both environment variables and Secret Manager,
-  // as long as the name is consistent in both places.
   return getSecret('GOOGLE_CUSTOM_SEARCH_KEY');
 }
-
 export async function getGoogleCustomSearchCx(): Promise<string> {
-  // --- BUG FIX ---
-  // This now correctly fetches its own secret instead of the search key's secret.
-  // The original name is preserved as requested.
   return getSecret('GOOGLE_CUSTOM_SEARCH_CX');
+}
+
+// Clerk
+export async function getClerkPublishableKey(): Promise<string> {
+  return getSecret('NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY');
+}
+export async function getClerkSecretKey(): Promise<string> {
+  return getSecret('CLERK_SECRET_KEY');
+}
+
+// Ollama / LLM provider
+export async function getOllamaBaseUrl(): Promise<string> {
+  return getSecret('OLLAMA_BASE_URL');
+}
+export async function getOllamaBearerToken(): Promise<string> {
+  return getSecret('OLLAMA_BEARER_TOKEN');
+}
+
+// Feature flags / general app config
+export function getUseApodBg(): boolean {
+  return asBool(process.env.USE_APOD_BG, true);
+}
+
+// ---------------------------
+// Queue / Redis helpers
+// ---------------------------
+export function getLlmQueueName(): string {
+  return (process.env.LLM_QUEUE_NAME && process.env.LLM_QUEUE_NAME.trim()) || 'llm-queue';
+}
+
+export async function resolveRedisUrl(): Promise<string> {
+  if (asBool(process.env.FORCE_LOCAL_REDIS)) {
+    const local = await getRedisUrlLocal();
+    if (local) {
+      console.log('[secrets] resolveRedisUrl → using LOCAL (forced).');
+      return local;
+    }
+    console.warn('[secrets] FORCE_LOCAL_REDIS set but REDIS_URL_LOCAL is empty.');
+  }
+
+  const online = await getRedisUrlOnline();
+  if (online) {
+    console.log('[secrets] resolveRedisUrl → using ONLINE.');
+    return online;
+  }
+
+  const local = await getRedisUrlLocal();
+  if (local) {
+    console.log('[secrets] resolveRedisUrl → using LOCAL (fallback).');
+    return local;
+  }
+
+  console.error('[secrets] resolveRedisUrl → no Redis URL configured.');
+  return '';
+}
+
+export async function getRedisUrlOnline(): Promise<string> {
+  return getSecret('REDIS_URL_ONLINE');
+}
+
+export async function getRedisUrlLocal(): Promise<string> {
+  return getSecret('REDIS_URL_LOCAL');
+}
+
+export async function summariseSecretPresence(): Promise<Record<string, 'env' | 'gsm' | 'missing'>> {
+  const names = [ 'nasa-api-key', 'NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY', 'CLERK_SECRET_KEY', 'OLLAMA_BASE_URL', 'OLLAMA_BEARER_TOKEN', 'GOOGLE_CUSTOM_SEARCH_KEY', 'GOOGLE_CUSTOM_SEARCH_CX', 'REDIS_URL_ONLINE', 'REDIS_URL_LOCAL', ];
+  const out: Record<string, 'env' | 'gsm' | 'missing'> = {};
+  for (const name of names) {
+    const envKey = name.replace(/-/g, '_').toUpperCase();
+    if (process.env[envKey]) {
+      out[name] = 'env';
+      continue;
+    }
+    if (!isBrowser()) {
+      try {
+        const project = process.env.GOOGLE_CLOUD_PROJECT;
+        const client = await getSecretManagerClient();
+        if (project && client) {
+          const path = `projects/${project}/secrets/${name}/versions/latest`;
+          await client.accessSecretVersion({ name: path });
+          out[name] = 'gsm';
+          continue;
+        }
+      } catch { /* ignore */ }
+    }
+    out[name] = 'missing';
+  }
+  return out;
+}
+
+export async function logSecretPresenceSample(): Promise<void> {
+  const presence = await summariseSecretPresence();
+  const sampleNames = ['REDIS_URL_ONLINE', 'REDIS_URL_LOCAL', 'OLLAMA_BASE_URL'];
+  const maskedSamples: Record<string, string> = {};
+  for (const n of sampleNames) {
+    const v = await getSecret(n);
+    maskedSamples[n] = mask(v);
+  }
+  console.log('[secrets] presence:', presence, 'samples:', maskedSamples);
 }

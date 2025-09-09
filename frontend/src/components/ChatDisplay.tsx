@@ -1,4 +1,3 @@
-// frontend/src/components/ChatDisplay.tsx
 'use client';
 
 import { useRef, useState, memo, useEffect, useCallback } from 'react';
@@ -7,6 +6,7 @@ import { Bookmark, ChevronDown } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import MarkdownRenderer from '@/components/MarkdownRenderer';
 import { normalizeMathForMarkdown } from '@/utils/normalizeMath';
+import type { CSSProperties } from 'react';
 
 export type Message = { id: string; role: 'user' | 'stella' | 'error'; text: string };
 
@@ -14,7 +14,13 @@ type ChatDisplayProps = {
   messages: Message[];
   maxLength?: number;
   onCapture: (message: Message) => void;
-  onCaptureFormula: (formula: string) => void;
+  // FIX: onCaptureFormula has been removed as it was unused.
+};
+
+// FIX for 'unexpected any': We create a type-safe style object that includes the
+// non-standard `overflowAnchor` property, satisfying TypeScript.
+const scrollContainerStyles: CSSProperties = {
+  overflowAnchor: 'auto',
 };
 
 const ROLE_STYLES = {
@@ -37,7 +43,6 @@ export default function ChatDisplay({
   messages,
   maxLength = 600,
   onCapture,
-  onCaptureFormula, // kept for API compatibility
 }: ChatDisplayProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -81,10 +86,9 @@ export default function ChatDisplay({
       ref={scrollRef}
       className={clsx(
         'h-full w-full overflow-y-auto overscroll-contain',
-        // ↓ tighter vertical spacing between messages
         'px-2 sm:px-3 space-y-2 sm:space-y-3 relative'
       )}
-      style={{ overflowAnchor: 'auto' as any }}
+      style={scrollContainerStyles}
     >
       {messages.length === 0 ? (
         <div className="text-muted-foreground font-sans text-[13.5px] sm:text-sm p-4 sm:p-6 text-center rounded-xl border border-white/10 bg-white/5">
@@ -106,7 +110,7 @@ export default function ChatDisplay({
           onClick={jumpToBottom}
           className={clsx(
             'sticky bottom-3 ml-auto mr-2 sm:mr-3',
-            'flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px]', // ↓ smaller chip
+            'flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px]',
             'bg-slate-900/70 border-white/10 text-slate-100 shadow-md backdrop-blur',
             'hover:bg-slate-900/80 transition-colors'
           )}
@@ -155,11 +159,9 @@ const MessageBubble = memo(function MessageBubble({
       ref={rootRef}
       className={clsx(
         isStella
-          // Full-bleed only on very small screens; otherwise normal width
           ? 'w-[calc(100%+0.75rem)] -mx-1.5 sm:mx-0 sm:w-full sm:rounded-2xl sm:border sm:shadow-lg'
           : 'max-w-[92%] sm:max-w-[80%] md:max-w-[70%] rounded-2xl border shadow-lg',
         'relative group backdrop-blur-xl',
-        // ↓ slightly smaller vertical padding
         'px-3 py-2 sm:px-3.5 sm:py-2.5',
         'transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl',
         'focus-within:outline-none focus-within:ring-2',
@@ -192,7 +194,7 @@ const MessageBubble = memo(function MessageBubble({
         </TooltipProvider>
       )}
 
-      {message.role === 'stella' && !message.text ? (
+      {isStella && !message.text ? (
         <span className="blinking-cursor text-gold">▍</span>
       ) : message.role === 'error' ? (
         <span>{display}</span>
@@ -200,12 +202,12 @@ const MessageBubble = memo(function MessageBubble({
         <div
           className={clsx(
             'prose prose-invert prose-theme max-w-none',
-            // ↓ slightly smaller text; tighter margins inside the bubble
             'text-[14px] sm:text-[14.5px] leading-relaxed',
             'prose-p:my-1.5 prose-ul:my-1.5 prose-ol:my-1.5 prose-li:my-0.5',
             'break-words'
           )}
         >
+          {/* We no longer pass the unused onCaptureFormula prop */}
           <MarkdownRenderer>{display}</MarkdownRenderer>
         </div>
       )}

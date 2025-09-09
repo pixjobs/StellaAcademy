@@ -4,8 +4,6 @@ import { useEffect, useMemo, useRef } from 'react';
 import gsap from 'gsap';
 import { useGame } from '@/lib/store';
 
-const APP_VERSION = process.env.NEXT_PUBLIC_APP_VERSION || 'dev';
-
 const QUOTES = [
   "That's one small step for [a] man, one giant leap for mankind. — Neil Armstrong",
   'The Earth is the cradle of humanity, but mankind cannot stay in the cradle forever. — Konstantin Tsiolkovsky',

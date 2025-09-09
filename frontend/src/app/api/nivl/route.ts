@@ -15,7 +15,16 @@ export async function GET(req: NextRequest) {
       .filter(i => !!i.href)
       .map(i => ({ title: i.title, href: i.href! }));
     return NextResponse.json({ ok: true, images });
-  } catch (e: any) {
-    return NextResponse.json({ ok: false, error: e?.message || 'fetch failed' }, { status: 500 });
+  } catch (e: unknown) {
+     let errorMessage = 'An unexpected error occurred during the search.';
+    
+    // We safely check if the caught value is an instance of Error.
+    if (e instanceof Error) {
+      // If it is, we can now safely access its `message` property.
+      errorMessage = e.message;
+    }
+    
+    // We return the safe error message.
+    return NextResponse.json({ ok: false, error: errorMessage }, { status: 500 });
   }
 }

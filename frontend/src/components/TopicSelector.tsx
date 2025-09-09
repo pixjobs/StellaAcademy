@@ -3,6 +3,8 @@
 import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { gsap } from 'gsap';
 import { useGSAP } from '@gsap/react';
+// ===== CHANGE #1: Import next/image =====
+import Image from 'next/image';
 import type { EnrichedMissionPlan } from '@/types/mission';
 
 /* ---------------- Types (Strict & Self-Documenting) ---------------- */
@@ -12,12 +14,10 @@ type MissionImage = {
   href: string;
 };
 
-// Extends the original topic type with a strictly-typed `images` array
 type Topic = EnrichedMissionPlan['topics'][number] & {
   images: MissionImage[];
 };
 
-// Represents the possible shapes of the raw image data before normalization
 type RawImage = {
   href?: string | null;
   imgSrc?: string | null;
@@ -26,14 +26,12 @@ type RawImage = {
   caption?: string | null;
 };
 
-// Props for the main component
 type TopicSelectorProps = {
   plan?: EnrichedMissionPlan;
   onSelect: (topic: Topic, imageIndex: number) => void;
   maxThumbs?: number;
 };
 
-// Props for the TopicCard sub-component
 type TopicCardProps = {
   topic: Topic;
   onViewSlideshow: () => void;
@@ -41,7 +39,6 @@ type TopicCardProps = {
   maxThumbs: number;
 };
 
-// Props for the Lightbox sub-component
 type LightboxProps = {
   topic: Topic;
   activeImageIndex: number;
@@ -56,17 +53,13 @@ function isRecord(x: unknown): x is Record<string, unknown> {
   return typeof x === 'object' && x !== null;
 }
 
-// Type-safe function to normalize unpredictable image data into a consistent format
 function normalizeImages(raw: unknown[]): MissionImage[] {
   const out: MissionImage[] = [];
   for (const item of raw) {
     if (!isRecord(item)) continue;
-
-    // Cast to our known possible shape
     const it = item as RawImage;
     const href = it.href ?? it.imgSrc ?? it.url;
     if (typeof href !== 'string' || !href) continue;
-
     const title = it.title ?? it.caption ?? 'Untitled';
     out.push({ href, title });
   }
@@ -161,14 +154,17 @@ function TopicCard({ topic, onViewSlideshow, onLearn, maxThumbs }: TopicCardProp
             <button
               key={`${topic.title}-thumb-${iIdx}`}
               onClick={onViewSlideshow}
-              className="group relative block rounded-md overflow-hidden border border-white/10 focus:outline-none focus:ring-2 focus:ring-gold"
+              // ===== CHANGE #2: Added h-16 to the parent for explicit sizing =====
+              className="group relative block h-16 rounded-md overflow-hidden border border-white/10 focus:outline-none focus:ring-2 focus:ring-gold"
               aria-label={`Open slideshow for ${topic.title}`}
             >
-              <img
+              {/* ===== CHANGE #3: Replaced <img> with next/image ===== */}
+              <Image
                 src={im.href}
                 alt={im.title}
-                className="w-full h-16 object-cover group-hover:scale-[1.03] transition-transform duration-200"
-                loading="lazy"
+                fill
+                className="object-cover group-hover:scale-[1.03] transition-transform duration-200"
+                sizes="(max-width: 640px) 25vw, (max-width: 1024px) 15vw, 10vw"
               />
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
             </button>
@@ -238,7 +234,14 @@ function Lightbox({ topic, activeImageIndex, onClose, onSelectImage, onSetActive
 
         <div className="relative aspect-video bg-black/30 rounded-xl overflow-hidden border border-white/10">
           {currentImage ? (
-            <img src={currentImage.href} alt={currentImage.title} className="w-full h-full object-contain" />
+            // ===== CHANGE #4: Replaced <img> with next/image =====
+            <Image
+              src={currentImage.href}
+              alt={currentImage.title}
+              fill
+              className="object-contain"
+              sizes="(max-width: 1280px) 90vw, 896px"
+            />
           ) : (
             <div className="flex items-center justify-center text-slate-400">No image</div>
           )}

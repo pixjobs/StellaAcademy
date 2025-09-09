@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo, useRef, useState, useEffect } from 'react';
 import { useMissionPlanGenerator } from '@/hooks/useMissionPlanGenerator';
-import { useGame } from '@/lib/store'; // ✅ get the picked role
+import { useGame } from '@/lib/store';
 import type { EnrichedMissionPlan, Img } from '@/types/mission';
 
 import MissionControl from '@/components/MissionControl';
@@ -10,14 +10,28 @@ import MissionStandby from '@/components/MissionStandby';
 import TopicSelector from '@/components/TopicSelector';
 import { Button } from '@/components/ui/button';
 
+/* -------------------------------------------------------------------------- */
+/*                                    Types                                   */
+/* -------------------------------------------------------------------------- */
+
 type TopicFromHook = EnrichedMissionPlan['topics'][number];
 type CleanTopic = Omit<TopicFromHook, 'images'> & { images: Img[] };
 
 type TutorPreflightResult = {
   systemPrompt: string;
-  starterMessages: Array<{ role: 'user' | 'assistant' | 'system'; text: string }>;
-  difficulty?: string;
+  starterMessages: Array<{ id: string; role: 'stella' | 'user'; text: string }>;
+  warmupQuestion: string;
+  goalSuggestions: string[];
+  difficultyHints: {
+    easy: string;
+    standard: string;
+    challenge: string;
+  };
 };
+
+/* -------------------------------------------------------------------------- */
+/*                                   Helpers                                  */
+/* -------------------------------------------------------------------------- */
 
 const DEFAULT_BRIEFING = `Welcome to Space Poster Studio.
 Your mission:
@@ -26,8 +40,6 @@ Your mission:
 3) Give one fun fact.
 4) Suggest a color palette (2–3 colors).
 Use “Quiz Me” to check understanding. Let’s design something stellar!`;
-
-/* ---------- Helpers ---------- */
 
 function reorderImages(images: Img[], focusIndex: number): Img[] {
   if (images.length === 0) return [];
@@ -41,47 +53,61 @@ function buildContext(topic: CleanTopic, pickedIndex = 0): string {
   return `Poster Theme: ${topic.title}. ${topic.summary}\n${chosenLine}`.trim();
 }
 
-// POST → /api/preFlight
 async function startPreflight(payload: {
-  mission: string; // 'space-poster'
+  mission: string;
   topicTitle: string;
   topicSummary: string;
   imageTitle?: string;
-  role: 'explorer' | 'cadet' | 'scholar'; // ✅ role required by API
+  role: 'explorer' | 'cadet' | 'scholar';
 }) {
-  const res = await fetch('/api/preFlight', {
+  const res = await fetch('/api/llm/enqueue', {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
-    body: JSON.stringify(payload),
+    body: JSON.stringify({ type: 'tutor-preflight', payload }),
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data?.error || 'Failed to enqueue preflight.');
   return data.jobId as string;
 }
 
-// Poll status
 async function waitForPreflight(jobId: string, { timeoutMs = 25_000, intervalMs = 700 } = {}) {
   const started = Date.now();
-  // eslint-disable-next-line no-constant-condition
-  while (true) {
-    const res = await fetch(`/api/preFlight?id=${encodeURIComponent(jobId)}`);
+  while (Date.now() - started < timeoutMs) {
+    const res = await fetch(`/api/llm/enqueue?id=${encodeURIComponent(jobId)}`);
     const data = await res.json();
     if (!res.ok) throw new Error(data?.error || 'Preflight status error.');
 
-    if (data.state === 'completed') return data.result as TutorPreflightResult;
+    if (data.state === 'completed') {
+      // ===== THE FIX IS HERE (same as the other pages) =====
+      // The API returns a nested structure: { result: { type: '...', result: {...} } }
+      // We need to return the inner `result` object.
+      return data.result.result as TutorPreflightResult;
+    }
     if (data.state === 'failed') throw new Error(data?.error || 'Preflight job failed.');
-    if (Date.now() - started > timeoutMs) throw new Error('Preflight timed out.');
+    
     await new Promise((r) => setTimeout(r, intervalMs));
   }
+  throw new Error('Preflight timed out.');
 }
 
-/* ---------- Page ---------- */
+function isValidPreflightResult(data: unknown): data is TutorPreflightResult {
+  if (typeof data !== 'object' || data === null) return false;
+  const result = data as TutorPreflightResult;
+  return (
+    typeof result.systemPrompt === 'string' &&
+    Array.isArray(result.starterMessages) &&
+    typeof result.warmupQuestion === 'string'
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/*                                 Component                                  */
+/* -------------------------------------------------------------------------- */
 
 export default function SpacePosterPage() {
   const { missionPlan, isLoading, error, generateNewPlan } = useMissionPlanGenerator('space-poster');
-  const { role = 'explorer' } = useGame(); // ✅ ensure we have a valid role
+  const { role = 'explorer' } = useGame();
 
-  // Clean/strict plan
   const cleanMissionPlan = useMemo(() => {
     if (!missionPlan) return null;
     return {
@@ -100,8 +126,6 @@ export default function SpacePosterPage() {
 
   const [selectedTopic, setSelectedTopic] = useState<CleanTopic | null>(null);
   const [selectedImageIdx, setSelectedImageIdx] = useState<number>(0);
-
-  // Preflight state
   const [preflightLoading, setPreflightLoading] = useState(false);
   const [preflightError, setPreflightError] = useState<string | null>(null);
   const [preflightBriefing, setPreflightBriefing] = useState<string | null>(null);
@@ -120,32 +144,35 @@ export default function SpacePosterPage() {
     lastRequestedRef.current = null;
   }, []);
 
-  // Kick off preflight when a topic is selected, image changes, or role changes
   useEffect(() => {
     if (!selectedTopic) return;
 
-    const imageTitle = selectedTopic.images[selectedImageIdx]?.title || undefined;
-    const reqKey = `${selectedTopic.title}::${imageTitle}::${role}`; // ✅ include role to avoid races
+    const imageTitle = selectedTopic.images[selectedImageIdx]?.title;
+    const reqKey = `${selectedTopic.title}::${imageTitle ?? 'no-image'}::${role}`;
     lastRequestedRef.current = reqKey;
 
     setPreflightLoading(true);
     setPreflightError(null);
     setPreflightBriefing(null);
 
-    (async () => {
+    const runPreflight = async () => {
       try {
         const jobId = await startPreflight({
           mission: 'space-poster',
           topicTitle: selectedTopic.title,
           topicSummary: selectedTopic.summary,
           imageTitle,
-          role, // ✅ pass role through
+          role,
         });
         const result = await waitForPreflight(jobId);
 
+        if (!isValidPreflightResult(result)) {
+          console.error("Invalid preflight data received from worker:", result);
+          throw new Error("Worker returned incomplete or malformed preflight data. Check the worker logs for LLM parsing errors.");
+        }
+
         const assistantFirst =
-          result.starterMessages.find((m) => m.role === 'assistant') ||
-          result.starterMessages.find((m) => m.role === 'system') ||
+          result.starterMessages.find((m) => m.role === 'stella') ||
           result.starterMessages[0];
 
         const briefingText = assistantFirst?.text?.trim() || DEFAULT_BRIEFING;
@@ -160,11 +187,11 @@ export default function SpacePosterPage() {
           setPreflightLoading(false);
         }
       }
-    })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedTopic, selectedImageIdx, role]); // ✅ depend on role, too
+    };
 
-  // Loading / Error for plan generation
+    runPreflight();
+  }, [selectedTopic, selectedImageIdx, role]);
+
   if (isLoading || error) {
     return (
       <section className="container mx-auto flex flex-col items-center justify-center p-4 text-center min-h-[60vh]">
@@ -182,7 +209,6 @@ export default function SpacePosterPage() {
     );
   }
 
-  // Main content
   return (
     <section className="container mx-auto px-4 py-8 max-w-6xl">
       <div className="flex justify-between items-start mb-6">

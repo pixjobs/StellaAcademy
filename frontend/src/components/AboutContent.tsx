@@ -50,9 +50,9 @@ type PlanetConfig = {
   texture: TextureKey;
   clouds?: TextureKey;
   rings?: TextureKey;
-  size: number;       // relative radius
-  distance: number;   // orbit radius
-  speed: number;      // angular speed
+  size: number; // relative radius
+  distance: number; // orbit radius
+  speed: number; // angular speed
   axialTilt?: number; // degrees
   inclination?: number; // radians
 };
@@ -80,12 +80,7 @@ function Sun() {
       {/* Basic material so the sun stays bright regardless of lights */}
       <meshBasicMaterial map={sunMap} toneMapped={false} />
       {/* Add a subtle glow to the sun */}
-      <pointLight
-        color={0xffffff}
-        intensity={1}
-        distance={7}
-        decay={2}
-      />
+      <pointLight color={0xffffff} intensity={1} distance={7} decay={2} />
     </mesh>
   );
 }
@@ -108,6 +103,20 @@ function Rings({ alphaUrl, size }: { alphaUrl: string; size: number }) {
   );
 }
 
+// [FIXED] Created a new component for clouds to avoid conditional hook calls
+function Clouds({ url, size }: { url: string; size: number }) {
+  const { gl } = useThree();
+  const cloudsMap = useTexture(url); // Hook is now called unconditionally
+  cloudsMap.colorSpace = THREE.SRGBColorSpace;
+  cloudsMap.anisotropy = Math.min(8, gl.capabilities.getMaxAnisotropy?.() ?? 8);
+  return (
+    <mesh castShadow receiveShadow>
+      <sphereGeometry args={[size * 1.01, 64, 64]} />
+      <meshStandardMaterial map={cloudsMap} transparent opacity={0.35} depthWrite={false} />
+    </mesh>
+  );
+}
+
 function Planet({
   textureUrl,
   cloudsUrl,
@@ -126,20 +135,15 @@ function Planet({
   colorMap.colorSpace = THREE.SRGBColorSpace;
   colorMap.anisotropy = Math.min(8, gl.capabilities.getMaxAnisotropy?.() ?? 8);
 
-  const cloudsMap = cloudsUrl ? useTexture(cloudsUrl) : undefined;
-  if (cloudsMap) {
-    cloudsMap.colorSpace = THREE.SRGBColorSpace;
-    cloudsMap.anisotropy = Math.min(8, gl.capabilities.getMaxAnisotropy?.() ?? 8);
-  }
-
   // Set axial tilt
   useEffect(() => {
     if (planetRef.current) planetRef.current.rotation.z = THREE.MathUtils.degToRad(axialTilt);
   }, [axialTilt]);
 
   // Self-rotation
-  useFrame((_, delta) => {
-    if (planetRef.current) planetRef.current.rotation.y += delta * 0.1;
+  // [FIXED] Renamed 'delta' to '_delta' to mark it as unused
+  useFrame((_, _delta) => {
+    if (planetRef.current) planetRef.current.rotation.y += _delta * 0.1;
   });
 
   return (
@@ -148,12 +152,8 @@ function Planet({
         <sphereGeometry args={[size, 64, 64]} />
         <meshStandardMaterial map={colorMap} metalness={0} roughness={0.8} />
       </mesh>
-      {cloudsMap && (
-        <mesh castShadow receiveShadow>
-          <sphereGeometry args={[size * 1.01, 64, 64]} />
-          <meshStandardMaterial map={cloudsMap} transparent opacity={0.35} depthWrite={false} />
-        </mesh>
-      )}
+      {/* [FIXED] Conditionally render the Clouds component instead of calling the hook conditionally */}
+      {cloudsUrl && <Clouds url={cloudsUrl} size={size} />}
     </group>
   );
 }
@@ -178,10 +178,10 @@ function OrbitingBody({
   }, [inclination]);
 
   // Orbit rotation
-  useFrame((state, delta) => {
+  useFrame((state) => {
     if (orbitRef.current) {
-        // Use elapsed time for consistent positioning regardless of frame rate
-        orbitRef.current.rotation.y = state.clock.getElapsedTime() * speed;
+      // Use elapsed time for consistent positioning regardless of frame rate
+      orbitRef.current.rotation.y = state.clock.getElapsedTime() * speed;
     }
   });
 
@@ -211,7 +211,7 @@ const EARTH_DISTANCE = 17;
 const ARRIVAL_SECONDS = 8; // synced with hero text reveal
 
 function CameraRig() {
-  const earthPosition = useMemo(() => new THREE.Vector3(EARTH_DISTANCE, 0, 0), []);
+  // [FIXED] Removed unused 'earthPosition' variable
   const curve = useMemo(
     () =>
       new THREE.CatmullRomCurve3(
@@ -232,18 +232,13 @@ function CameraRig() {
   const orbit = useMemo(() => new THREE.Vector3(), []);
   const earthWorldPos = useMemo(() => new THREE.Vector3(), []);
 
-
   useFrame((state, dt) => {
     const t = state.clock.getElapsedTime();
     const s = Math.min(t / ARRIVAL_SECONDS, 1);
-    
+
     // Calculate Earth's current world position based on its orbit
     const earthOrbitAngle = t * 0.15; // Earth's speed
-    earthWorldPos.set(
-        Math.cos(earthOrbitAngle) * EARTH_DISTANCE,
-        0,
-        -Math.sin(earthOrbitAngle) * EARTH_DISTANCE
-    );
+    earthWorldPos.set(Math.cos(earthOrbitAngle) * EARTH_DISTANCE, 0, -Math.sin(earthOrbitAngle) * EARTH_DISTANCE);
 
     if (s < 1) {
       curve.getPoint(s, tmp);
@@ -396,24 +391,28 @@ export default function AboutContent() {
       <div className="relative z-10 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
           <section className="min-h-[50vh] flex flex-col items-center justify-center text-center">
-        <div className="hero-text">
-            <h1 className="font-pixel text-4xl sm:text-5xl md:text-6xl text-gold mb-6">About Stella Academy</h1>
-            </div>
-            
             <div className="hero-text">
-                <p className="text-lg sm:text-xl md:text-2xl max-w-3xl text-foreground/90 leading-relaxed">
-                Your Personal Gateway to the Cosmos.
-                </p>
+              <h1 className="font-pixel text-4xl sm:text-5xl md:text-6xl text-gold mb-6">About Stella Academy</h1>
             </div>
-        </section>
+
+            <div className="hero-text">
+              <p className="text-lg sm:text-xl md:text-2xl max-w-3xl text-foreground/90 leading-relaxed">
+                Your Personal Gateway to the Cosmos.
+              </p>
+            </div>
+          </section>
 
           {/* --- CONTENT --- */}
           <ContentSection icon={<Sparkles className="w-12 h-12 text-gold" />} title="Our Mission">
             <p>
-                Our mission is to make learning about the cosmos fun, accessible, and deeply realistic. By integrating new AI technologies, we are breaking down the barriers between complex science and pure wonder, moving beyond static textbooks to create an interactive adventure of discovery.
+              Our mission is to make learning about the cosmos fun, accessible, and deeply realistic. By integrating new AI technologies, we
+              are breaking down the barriers between complex science and pure wonder, moving beyond static textbooks to create an interactive
+              adventure of discovery.
             </p>
             <p>
-                We believe that knowledge should be as boundless as space itself. As we grow, our aspiration is to become a non-profit organization dedicated to supporting education and empowering the next generation of explorers. Stella Academy is our first step toward that future.
+              We believe that knowledge should be as boundless as space itself. As we grow, our aspiration is to become a non-profit
+              organization dedicated to supporting education and empowering the next generation of explorers. Stella Academy is our first
+              step toward that future.
             </p>
           </ContentSection>
 
@@ -428,20 +427,22 @@ export default function AboutContent() {
                   <BrainCircuit className="w-10 h-10 text-sky-400 flex-shrink-0" />
                   <h3 className="text-xl font-bold text-sky-400">The Brains: GPT-OSS</h3>
                 </div>
+                {/* [FIXED] Escaped ' and " characters */}
                 <p className="text-sm text-foreground/80">
-                  At our core is Stella, a personal AI guide powered by a 20-billion parameter open-source LLM. She isn't just a search
-                  engine; she's a Socratic partner. Ask her to explain a formula simply, quiz you on a concept, or dream up a "what if"
+                  At our core is Stella, a personal AI guide powered by a 20-billion parameter open-source LLM. She isn&apos;t just a search
+                  engine; she&apos;s a Socratic partner. Ask her to explain a formula simply, quiz you on a concept, or dream up a &quot;what if&quot;
                   scenario. By building on open-source, we ensure our tools for learning remain transparent and community-driven.
                 </p>
               </div>
               <div className="tech-card rounded-2xl border border-white/10 bg-card/50 p-6 backdrop-blur-md">
                 <div className="flex items-center gap-4 mb-4">
                   <Telescope className="w-10 h-10 text-emerald-400 flex-shrink-0" />
-                  <h3 className="text-xl font-bold text-emerald-400">The Eyes: NASA's API</h3>
+                  <h3 className="text-xl font-bold text-emerald-400">The Eyes: NASA&apos;s API</h3>
                 </div>
+                {/* [FIXED] Escaped ' character */}
                 <p className="text-sm text-foreground/80">
-                  Knowledge needs a window to reality. We stream the cosmos to your screen via a live connection to NASA's Open APIs. The
-                  images you explore are not stock photos; they are authentic, up-to-the-minute dispatches from humanity's greatest
+                  Knowledge needs a window to reality. We stream the cosmos to your screen via a live connection to NASA&apos;s Open APIs. The
+                  images you explore are not stock photos; they are authentic, up-to-the-minute dispatches from humanity&apos;s greatest
                   scientific instruments. This is a living textbook, where the pages turn with every new discovery.
                 </p>
               </div>
@@ -455,10 +456,11 @@ export default function AboutContent() {
               flicker of wonder and fan it into a lifelong flame of discovery.
             </p>
             <p>
-              Stella Academy is our first step toward that future—a global, open-source classroom for the final frontier, empowering the next
-              generation of scientists, engineers, artists, and thinkers.
+              Stella Academy is our first step toward that future—a global, open-source classroom for the final frontier, empowering the
+              next generation of scientists, engineers, artists, and thinkers.
             </p>
-            <p className="font-pixel text-gold text-lg mt-6">The universe is calling. We're here to help you answer.</p>
+            {/* [FIXED] Escaped ' character */}
+            <p className="font-pixel text-gold text-lg mt-6">The universe is calling. We&apos;re here to help you answer.</p>
           </ContentSection>
 
           <div className="h-16" />

@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState, useCallback, ComponentType, Dispatch, SetStateAction } from 'react';
+// ===== CHANGE #1: Import next/image =====
+import Image from 'next/image';
 import { useGame } from '@/lib/store';
 import { NotesProvider, useNotes } from '@/lib/notes/NotesContext';
 import { useMissionChatQueued as useMissionChat } from '@/hooks/useMissionChatQueued';
@@ -97,10 +99,6 @@ function MissionControlInternal({
     );
   };
 
-  const handleCaptureFormula = (formulaText: string) => {
-    addNote({ type: 'formula', title: 'Captured Formula', body: formulaText });
-  };
-
   const handleNoteClick = useCallback((note: Note) => {
     let prompt = note.body || `Can you elaborate on "${note.title}"?`;
     if (note.type === 'reference' && note.url) prompt = `Tell me more about this link: ${note.url}`;
@@ -127,17 +125,10 @@ function MissionControlInternal({
 
   return (
     <TooltipProvider>
-      {/*
-        OPTIMIZATION:
-        - Changed the layout to `flex flex-col` on mobile/tablet. This allows the child elements to grow and fill the available space.
-        - On `xl` screens, it switches back to a `grid` layout for the two-column view.
-        - `min-h-0` is kept to prevent flex/grid children from overflowing their parent.
-      */}
       <div
         ref={rootRef}
         className="flex flex-col xl:grid xl:grid-cols-[1.05fr_1.95fr] gap-5 items-start min-h-0"
       >
-        {/* LEFT COLUMN: Contains Visuals and, on desktop, the Notebook */}
         <div className="flex flex-col gap-3 min-h-0">
           <VisualPanel
             currentImage={images[selImageIndex]}
@@ -149,17 +140,11 @@ function MissionControlInternal({
             onSaveImage={() => addNote({ type: 'image', title: images[selImageIndex].title, imgHref: images[selImageIndex].href })}
           />
 
-          {/* Mobile tab switcher */}
           <div className="flex items-center justify-center rounded-lg bg-black/20 p-1 xl:hidden">
             <TabButton icon={MessageSquare} label="Chat" isActive={mobileView === 'chat'} onClick={() => setMobileView('chat')} />
             <TabButton icon={BookOpen} label="Notebook" isActive={mobileView === 'notebook'} onClick={() => setMobileView('notebook')} />
           </div>
 
-          {/*
-            OPTIMIZATION:
-            - Added `flex-1` and `min-h-0` for the mobile notebook view.
-            - This makes the notebook panel expand to fill the remaining vertical space on the screen, improving mobile usability.
-          */}
           <div className={clsx({ hidden: mobileView !== 'notebook' }, 'xl:hidden flex-1 min-h-0')}>
             <NotebookPanel
               notes={notes}
@@ -169,7 +154,6 @@ function MissionControlInternal({
             />
           </div>
 
-          {/* DESKTOP Notes: shown below the image inside the same column */}
           <div className="hidden xl:block min-h-0">
             <div className="sticky top-4">
               <NotebookPanel
@@ -182,12 +166,6 @@ function MissionControlInternal({
           </div>
         </div>
 
-        {/*
-          OPTIMIZATION:
-          - This container now uses `flex-1` on mobile to fill available space.
-          - On desktop (`xl:block`), it acts as a standard grid cell.
-          - This ensures the ChatPanel inside it can use `h-full` effectively on all screen sizes.
-        */}
         <div className={clsx({ hidden: mobileView !== 'chat' }, 'xl:block flex-1 min-h-0')}>
           <ChatPanel
             messages={chatMessages}
@@ -195,7 +173,6 @@ function MissionControlInternal({
             onSend={onSend}
             onStop={stop}
             onCaptureMessage={handleCaptureMessage}
-            onCaptureFormula={handleCaptureFormula}
             inputValue={chatInputValue}
             setInputValue={setChatInputValue}
           />
@@ -256,7 +233,15 @@ function VisualPanel({ currentImage, imageIndex, imageCount, onPrev, onNext, onQ
   return (
     <div className="w-full h-full flex flex-col gap-3 sticky top-4">
       <div ref={imageRef} className="relative w-full aspect-video rounded-xl overflow-hidden border border-white/10 bg-black/50 group">
-        <img key={currentImage.href} src={currentImage.href} alt={currentImage.title} className="w-full h-full object-contain" />
+        {/* ===== CHANGE #2: Replaced <img> with next/image ===== */}
+        <Image
+          key={currentImage.href}
+          src={currentImage.href}
+          alt={currentImage.title}
+          fill
+          className="object-contain"
+          sizes="(max-width: 1279px) 90vw, 33vw"
+        />
         <div className="absolute bottom-0 left-0 right-0 px-3 py-2 text-xs bg-gradient-to-t from-black/80 to-transparent text-slate-200">
           {currentImage.title} • #{imageIndex + 1}/{imageCount}
         </div>
@@ -291,22 +276,14 @@ type ChatPanelProps = {
   onSend: (text: string) => void;
   onStop: () => void;
   onCaptureMessage: (message: Message) => void;
-  onCaptureFormula: (formula: string) => void;
   inputValue: string;
   setInputValue: Dispatch<SetStateAction<string>>;
 };
 
 function ChatPanel({
-  messages, isLoading, onSend, onStop, onCaptureMessage, onCaptureFormula, inputValue, setInputValue
+  messages, isLoading, onSend, onStop, onCaptureMessage, inputValue, setInputValue
 }: ChatPanelProps) {
   return (
-    /*
-      OPTIMIZATION:
-      - Removed the rigid, viewport-based height classes (e.g., `h-[50vh]`, `lg:h-[calc(100vh-10rem)]`).
-      - Added `h-full`, which makes the chat panel fill the height of its parent container.
-      - This single change makes the component flexible. It will be taller on desktop without pushing down the footer,
-        and it will correctly fill the remaining space on mobile screens.
-    */
     <div
       className="
         chat-interface flex flex-col rounded-xl bg-white/5 border border-white/10
@@ -317,7 +294,6 @@ function ChatPanel({
         <ChatDisplay
           messages={messages}
           onCapture={onCaptureMessage}
-          onCaptureFormula={onCaptureFormula}
         />
       </div>
       <div className="mt-2 pt-2 border-t border-white/10">
