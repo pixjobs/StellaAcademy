@@ -1,4 +1,4 @@
-# 🚀 Deployment Guide (Cloud Run)
+# 🚀 Deployment & Testing Guide (Cloud Run + Local)
 
 This project is productionised for **Google Cloud Run** with **Cloud Build**.  
 Two services are deployed:  
@@ -28,17 +28,17 @@ Use **Google Secret Manager (GSM)** to store credentials:
 
 Submit from repo root:
 
-```
+
 gcloud builds submit --config cloudbuild.web.yaml .
 gcloud builds submit --config cloudbuild.worker.yaml .
-```
+
 
 ---
 
 ## 3. Quirks & gotchas
 
 - Clerk requires **both** `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` and `CLERK_PUBLISHABLE_KEY`.  
-  - In production we mapped them to the same secret for reliability.  
+- In production we mapped them to the same secret for reliability.  
 - If secrets are missing, middleware runs in “Clerk disabled” mode.  
 - Cloud Run sometimes caches old secrets — redeploy to force refresh.  
 - `.dockerignore` and `.gcloudignore` must exclude heavy files (`node_modules`, `.next`) or builds will bloat to gigabytes.  
@@ -47,15 +47,47 @@ gcloud builds submit --config cloudbuild.worker.yaml .
 ---
 
 ## 4. Worker notes
+
 - Worker runs headless (no public URL).  
 - Connected to the same Redis queue as web.  
 - Controlled via env var `LLM_QUEUE_NAME`.
 
 ---
 
-## 5. Local development
-- Copy `.env.example` → `.env.local`.  
-- Requires Node 18+, Ollama, Clerk keys.  
-- Run with `npm run dev` (web) and `npm run worker` (jobs).  
+## 5. Local development & testing
 
----
+You can run the app locally in two modes:
+
+### **Mode 1: Fully Local Setup (Recommended)**  
+This mode is isolated from cloud services.  
+- Copy `.env.example` → `.env.local`.  
+- Fill in Clerk API keys.  
+- Start a local Redis container:  
+ 
+  docker run --name local-redis -p 6379:6379 -d redis
+
+- Ensure `.env.local` includes:  
+
+  REDIS_URL="redis://localhost:6379"
+
+- Run in two terminals:  
+
+  # Terminal 1
+  npm run dev   # web
+  # Terminal 2
+  npm run worker   # jobs
+
+
+### **Mode 2: Hybrid Setup (Cloud-Connected)**  
+This runs locally but connects to **cloud Redis (Upstash)** and **Google Secret Manager**.  
+- Authenticate with Google Cloud:  
+
+  gcloud auth application-default login
+
+- In `.env.local`:  
+  - Set Clerk keys.  
+  - **Do not** set `REDIS_URL`.  
+  - The app will fetch `REDIS_URL_ONLINE` from GSM automatically.  
+- Run as in Mode 1.  
+
+⚠️ **Warning**: In this mode your local code interacts with **live cloud resources** (production-like). Use carefully.
