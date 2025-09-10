@@ -50,7 +50,7 @@ ENV NODE_ENV=production \
 # Cloud Run health check configuration.
 EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
-  CMD curl -fsS "http://12-7.0.0.1:${PORT}/" || exit 1
+  CMD curl -fsS "http://127.0.0.1:${PORT}/healthz" || exit 1
 
 # --- THIS IS THE FINAL FIX ---
 # This CMD is now simpler and more robust.
