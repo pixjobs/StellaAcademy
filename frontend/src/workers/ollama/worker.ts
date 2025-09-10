@@ -1,10 +1,18 @@
-import { bootstrap } from './boot';
+// src/workers/ollama/worker.ts
+
+// --- Core Imports from Node and BullMQ ---
 import http from 'http';
 import type { Server } from 'http';
 import type { Redis } from 'ioredis';
 import { Worker, QueueEvents } from 'bullmq';
+
+// --- Imports from your new, modular library files ---
+// This is the key change: We use the centralized connection logic.
 import { getConnection, getQueueName } from '@/lib/queue';
 import { resolveRedisUrl } from '@/lib/secrets';
+
+// --- Imports for your specific worker's business logic (KEEP ALL OF THESE) ---
+import { bootstrap } from './boot'; // Assuming this file exists alongside your worker
 import {
   clampInt,
   maskRedisUrl,
@@ -12,10 +20,10 @@ import {
   buildTutorUser,
   hardenAskPrompt,
   extractJson,
-} from './utils';
-import { getOllamaInfo, callOllama, pingOllama } from './ollama-client';
-import { computeMission } from './mission-computer';
-import { postProcessLlmResponse } from './llm-post-processing';
+} from './utils'; // Assuming this file exists
+import { getOllamaInfo, callOllama, pingOllama } from './ollama-client'; // Assuming this file exists
+import { computeMission } from './mission-computer'; // Assuming this file exists
+import { postProcessLlmResponse } from './llm-post-processing'; // Assuming this file exists
 import { markdownifyBareUrls, extractLinksFromText } from '@/lib/llm/links';
 import type {
   LlmJobData,
@@ -24,6 +32,8 @@ import type {
   LinkPreview,
 } from '@/types/llm';
 
+
+// --- Web Search Enrichment Logic (from your working file) ---
 type GoogleSearchFn = (q: string, n?: number) => Promise<LinkPreview[]>;
 interface SearchModule {
   googleCustomSearch?: GoogleSearchFn;
@@ -58,13 +68,16 @@ async function resolveGoogleSearch(): Promise<GoogleSearchFn | undefined> {
   }
 }
 
+// --- Main Application Logic (from your working file) ---
 async function startApp() {
   const CONCURRENCY = clampInt(process.env.OLLAMA_WORKER_CONCURRENCY, 1, 8, 1);
   const DEBUG = process.env.DEBUG_WORKER === '1';
 
   let primaryConn: Redis | null = null;
 
+  // Your superior, state-aware health check server
   const healthServer: Server = http.createServer((_req, res) => {
+    // This correctly checks the LIVE status of the Redis connection object.
     const isHealthy = primaryConn?.status === 'ready';
     res.writeHead(isHealthy ? 200 : 503, { 'Content-Type': 'text/plain' });
     res.end(isHealthy ? 'ok' : 'service unavailable');
@@ -78,10 +91,10 @@ async function startApp() {
   try {
     const [ollamaOk, resolvedRedisUrl] = await Promise.all([
       pingOllama(),
-      resolveRedisUrl(),
+      resolveRedisUrl(), // From secrets.ts
     ]);
 
-    const queueName = getQueueName();
+    const queueName = getQueueName(); // From queue.ts
     if (!queueName || typeof queueName !== 'string') {
       throw new Error('Queue name resolved empty/invalid. Check getQueueName().');
     }
@@ -95,8 +108,10 @@ async function startApp() {
       webEnrich: process.env.ENABLE_WEB_ENRICH ?? '(unset)',
     });
 
+    // CRITICAL: Use getConnection() from queue.ts to get the shared, robust connection
     primaryConn = await getConnection();
 
+    // Your complete, correct worker implementation
     const worker = new Worker<LlmJobData, LlmJobResult>(
       queueName,
       async (job) => {
@@ -153,7 +168,6 @@ async function startApp() {
             return { type: 'tutor-preflight', result: parsed };
           }
 
-          // This will cause a TypeScript error if a job type is not handled, ensuring exhaustive checks.
           const _exhaustiveCheck: never = data;
           throw new Error(`Unhandled job type: ${(_exhaustiveCheck as LlmJobData).type}`);
 
@@ -165,12 +179,9 @@ async function startApp() {
         }
       },
       {
-        connection: primaryConn,
+        connection: primaryConn, // Use the connection from getConnection()
         concurrency: CONCURRENCY,
-        lockDuration: 90_000, // 90 seconds
-        // --- OPTIMIZATIONS FOR UPSTASH/REDIS EFFICIENCY ---
-        // Reduce background checks for stalled jobs to once every 5 minutes.
-        // This drastically cuts down on commands during idle periods. Default is 30s.
+        lockDuration: 90_000,
         stalledInterval: 300_000,
       }
     );
@@ -184,17 +195,18 @@ async function startApp() {
     worker.on('ready', () => console.log(`[worker] ready on "${queueName}"`));
     worker.on('error', (e) => console.error('[worker] error', e));
 
+    // Your superior, state-aware shutdown function
     const shutdown = async () => {
       console.log('[worker] shutting down...');
       await new Promise<void>((resolve) => healthServer.close(() => resolve()));
       await worker.close();
       await events.close();
-      // Optional chaining in case connection failed during boot
       await primaryConn?.quit().catch(() => { /* ignore errors on quit */ });
       console.log('[worker] shutdown complete.');
       process.exit(0);
     };
 
+    // Use your shutdown function, NOT the generic one from queue.ts
     process.on('SIGINT', shutdown);
     process.on('SIGTERM', shutdown);
 
@@ -204,4 +216,5 @@ async function startApp() {
   }
 }
 
+// Keep your bootstrap logic
 bootstrap().then(startApp);
