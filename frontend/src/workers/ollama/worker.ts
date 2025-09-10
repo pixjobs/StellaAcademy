@@ -1,5 +1,3 @@
-// src/workers/ollama/worker.ts
-
 import { bootstrap } from './boot';
 import http from 'http';
 import type { Server } from 'http';
@@ -66,9 +64,7 @@ async function startApp() {
 
   let primaryConn: Redis | null = null;
 
-  // FIX: Use 'const' as healthServer is declared and assigned once.
-  // This resolves the 'prefer-const' ESLint error.
-  const healthServer: Server = http.createServer((req, res) => {
+  const healthServer: Server = http.createServer((_req, res) => {
     const isHealthy = primaryConn?.status === 'ready';
     res.writeHead(isHealthy ? 200 : 503, { 'Content-Type': 'text/plain' });
     res.end(isHealthy ? 'ok' : 'service unavailable');
@@ -113,7 +109,6 @@ async function startApp() {
             const { missionType, role } = data.payload;
             await job.updateProgress(5);
             const mission = await computeMission(role, missionType);
-            await job.updateProgress(100);
             return { type: 'mission', result: mission };
           }
 
@@ -137,13 +132,11 @@ async function startApp() {
             } catch (e) {
               console.warn(`${logPrefix} link enrichment failed (continuing):`, (e as Error)?.message || e);
             }
-            await job.updateProgress(100);
             return { type: 'ask', result: { answer: answerWithLinks, links } };
           }
 
           if (data.type === 'tutor-preflight') {
-            const payload = data.payload;
-            const { mission, topicTitle, topicSummary, imageTitle, role } = payload;
+            const { mission, topicTitle, topicSummary, imageTitle, role } = data.payload;
             if (!mission || !topicTitle || !topicSummary || !role) {
               throw new Error('Invalid tutor-preflight payload: mission, topicTitle, topicSummary, and role are required.');
             }
@@ -157,10 +150,10 @@ async function startApp() {
               console.error(`${logPrefix} tutor-preflight validation failed.`, { parsedObject: parsed, rawResponse: raw });
               throw new Error('Tutor-preflight: LLM returned incomplete or malformed JSON. Check worker logs for the raw response.');
             }
-            await job.updateProgress(100);
             return { type: 'tutor-preflight', result: parsed };
           }
 
+          // This will cause a TypeScript error if a job type is not handled, ensuring exhaustive checks.
           const _exhaustiveCheck: never = data;
           throw new Error(`Unhandled job type: ${(_exhaustiveCheck as LlmJobData).type}`);
 
@@ -172,13 +165,17 @@ async function startApp() {
         }
       },
       {
-        connection: primaryConn!,
+        connection: primaryConn,
         concurrency: CONCURRENCY,
-        lockDuration: 90_000,
+        lockDuration: 90_000, // 90 seconds
+        // --- OPTIMIZATIONS FOR UPSTASH/REDIS EFFICIENCY ---
+        // Reduce background checks for stalled jobs to once every 5 minutes.
+        // This drastically cuts down on commands during idle periods. Default is 30s.
+        stalledInterval: 300_000,
       }
     );
 
-    const events = new QueueEvents(queueName, { connection: primaryConn! });
+    const events = new QueueEvents(queueName, { connection: primaryConn });
     events.on('failed', ({ jobId, failedReason }) => console.error(`[worker] job failed`, { jobId, failedReason }));
     if (DEBUG) {
       events.on('active', ({ jobId }) => console.log(`[worker] active`, { jobId }));
@@ -192,7 +189,8 @@ async function startApp() {
       await new Promise<void>((resolve) => healthServer.close(() => resolve()));
       await worker.close();
       await events.close();
-      await primaryConn?.quit().catch(() => {});
+      // Optional chaining in case connection failed during boot
+      await primaryConn?.quit().catch(() => { /* ignore errors on quit */ });
       console.log('[worker] shutdown complete.');
       process.exit(0);
     };
