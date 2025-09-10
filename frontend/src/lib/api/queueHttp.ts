@@ -4,10 +4,45 @@ import { Job, JobsOptions, Queue, JobState } from 'bullmq';
 import { NextResponse } from 'next/server';
 import type { LlmJobResult } from '@/types/llm';
 import { getQueue as _getQueue, getConnection } from '@/lib/queue';
+// ===== START: ADDED FOR DEBUGGING =====
+import { resolveRedisUrl } from '@/lib/secrets';
+// ===== END: ADDED FOR DEBUGGING =====
 
-/* -----------------------------------------------------------------------------
+/* ─────────────────────────────────────────────────────────
+  START: ADDED DEBUGGING BLOCK
+────────────────────────────────────────────────────────── */
+
+/** Masks the password in a Redis URL for safe logging. */
+function maskRedisUrl(url: string | null): string {
+  if (!url) return 'N/A (check REDIS_URL env vars)';
+  try {
+    const u = new URL(url);
+    if (u.password) {
+      u.password = '*****';
+    }
+    // For local dev, show the full URL. For prod, just the host.
+    return u.hostname === 'localhost' ? u.toString() : `rediss://${u.hostname}:${u.port}`;
+  } catch {
+    return 'Malformed Redis URL';
+  }
+}
+
+// This IIFE (Immediately Invoked Function Expression) runs once when the module loads.
+(async () => {
+  try {
+    const redisUrl = await resolveRedisUrl();
+    console.log('\n╔══════════════════════════════════════════════════════════════╗');
+    console.log('║ [Library: queueHttp] Redis Connection Target                 ║');
+    console.log(`║  -> ${maskRedisUrl(redisUrl).padEnd(53, ' ')}║`);
+    console.log('╚══════════════════════════════════════════════════════════════╝\n');
+  } catch (e) {
+    console.error('[queueHttp] Failed to resolve Redis URL on init', e);
+  }
+})();
+
+/* ─────────────────────────────────────────────────────────
  * Utils & typed aliases (no `any`)
- * -------------------------------------------------------------------------- */
+ * ────────────────────────────────────────────────────────── */
 
 export function hashId(o: unknown): string {
   return crypto.createHash('sha256').update(JSON.stringify(o)).digest('hex');
@@ -22,9 +57,9 @@ const getQueueTyped = _getQueue as unknown as <D, R, N extends string>() => Prom
 
 const ALREADY_EXISTS_RE = /already exists/i;
 
-/* -----------------------------------------------------------------------------
+/* ─────────────────────────────────────────────────────────
  * Queue stats & Redis health
- * -------------------------------------------------------------------------- */
+ * ────────────────────────────────────────────────────────── */
 
 export async function queueStats(q?: Queue) {
   try {
@@ -53,9 +88,9 @@ export async function redisPing() {
   }
 }
 
-/* -----------------------------------------------------------------------------
+/* ─────────────────────────────────────────────────────────
  * Defaults for adding jobs
- * -------------------------------------------------------------------------- */
+ * ────────────────────────────────────────────────────────── */
 
 export const DEFAULT_ADD_OPTS: JobsOptions = {
   attempts: 2,
@@ -64,9 +99,9 @@ export const DEFAULT_ADD_OPTS: JobsOptions = {
   removeOnFail: { age: 86400, count: 1000 },    // 1d
 };
 
-/* -----------------------------------------------------------------------------
+/* ─────────────────────────────────────────────────────────
  * Idempotent enqueue (overloads)
- * -------------------------------------------------------------------------- */
+ * ────────────────────────────────────────────────────────── */
 
 /**
  * Overload A: named-job map. DMap keys are job names; data matches DMap[N].
@@ -124,9 +159,9 @@ export async function enqueueIdempotent(
   return { job, state };
 }
 
-/* -----------------------------------------------------------------------------
+/* ─────────────────────────────────────────────────────────
  * HTTP helpers + adaptive polling
- * -------------------------------------------------------------------------- */
+ * ────────────────────────────────────────────────────────── */
 
 export type QueueStateHeader = JobState | 'unknown' | 'missing' | 'error';
 
@@ -208,9 +243,9 @@ function withRetryAfter(res: NextResponse, seconds: number) {
   return res;
 }
 
-/* -----------------------------------------------------------------------------
+/* ─────────────────────────────────────────────────────────
  * Poll a job (debug-friendly + adaptive backoff)
- * -------------------------------------------------------------------------- */
+ * ────────────────────────────────────────────────────────── */
 
 export async function pollJobResponse(id: string, debug = false) {
   const queue = await _getQueue();
