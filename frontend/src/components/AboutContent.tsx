@@ -103,7 +103,7 @@ function Rings({ alphaUrl, size }: { alphaUrl: string; size: number }) {
   );
 }
 
-// [FIXED] Created a new component for clouds to avoid conditional hook calls
+// Created a new component for clouds to avoid conditional hook calls
 function Clouds({ url, size }: { url: string; size: number }) {
   const { gl } = useThree();
   const cloudsMap = useTexture(url); // Hook is now called unconditionally
@@ -141,9 +141,8 @@ function Planet({
   }, [axialTilt]);
 
   // Self-rotation
-  // [FIXED] Renamed 'delta' to '_delta' to mark it as unused
-  useFrame((_, _delta) => {
-    if (planetRef.current) planetRef.current.rotation.y += _delta * 0.1;
+  useFrame((_, delta) => {
+    if (planetRef.current) planetRef.current.rotation.y += delta * 0.1;
   });
 
   return (
@@ -152,7 +151,7 @@ function Planet({
         <sphereGeometry args={[size, 64, 64]} />
         <meshStandardMaterial map={colorMap} metalness={0} roughness={0.8} />
       </mesh>
-      {/* [FIXED] Conditionally render the Clouds component instead of calling the hook conditionally */}
+      {/* Conditionally render the Clouds component instead of calling the hook conditionally */}
       {cloudsUrl && <Clouds url={cloudsUrl} size={size} />}
     </group>
   );
@@ -211,7 +210,6 @@ const EARTH_DISTANCE = 17;
 const ARRIVAL_SECONDS = 8; // synced with hero text reveal
 
 function CameraRig() {
-  // [FIXED] Removed unused 'earthPosition' variable
   const curve = useMemo(
     () =>
       new THREE.CatmullRomCurve3(
@@ -329,63 +327,65 @@ export default function AboutContent() {
   return (
     <div ref={rootRef} className="relative text-foreground bg-black">
       {isClient && (
-        <div className="fixed inset-0 z-0 pointer-events-none">
-          <Canvas
-            camera={{ fov: 60, position: [100, 40, 150], near: 0.1, far: 2000 }} // Increased far plane
-            dpr={[1, 2]}
-            shadows
-            gl={{ antialias: true, powerPreference: 'high-performance' }}
-            onCreated={({ gl }) => {
-              gl.toneMapping = THREE.ACESFilmicToneMapping;
-              gl.toneMappingExposure = 1.15;
-            }}
-          >
-            <color attach="background" args={['#000']} />
-            <Suspense fallback={null}>
-              <ambientLight intensity={0.2} />
+        <>
+          <div className="fixed inset-0 z-0 pointer-events-none">
+            <Canvas
+              camera={{ fov: 60, position: [100, 40, 150], near: 0.1, far: 2000 }} // Increased far plane
+              dpr={[1, 2]}
+              shadows
+              gl={{ antialias: true, powerPreference: 'high-performance' }}
+              onCreated={({ gl }) => {
+                gl.toneMapping = THREE.ACESFilmicToneMapping;
+                gl.toneMappingExposure = 1.15;
+              }}
+            >
+              <color attach="background" args={['#000']} />
+              <Suspense fallback={null}>
+                <ambientLight intensity={0.2} />
 
-              <pointLight
-                color={0xffdcb1}
-                position={[0, 0, 0]}
-                intensity={10000}
-                distance={0}
-                decay={2}
-                castShadow
-                shadow-mapSize-width={1024}
-                shadow-mapSize-height={1024}
-                shadow-bias={-0.0001}
-              />
+                <pointLight
+                  color={0xffdcb1}
+                  position={[0, 0, 0]}
+                  intensity={10000}
+                  distance={0}
+                  decay={2}
+                  castShadow
+                  shadow-mapSize-width={1024}
+                  shadow-mapSize-height={1024}
+                  shadow-bias={-0.0001}
+                />
 
-              <Stars radius={400} depth={50} count={9000} factor={5} saturation={0} fade speed={1} />
+                <Stars radius={400} depth={50} count={9000} factor={5} saturation={0} fade speed={1} />
 
-              <Sun />
+                <Sun />
 
-              <OrbitingBody distance={EARTH_DISTANCE} speed={0.15} inclination={0.01}>
-                <Planet textureUrl={tx('earth')} cloudsUrl={tx('earthClouds')} size={1} axialTilt={23.5} />
-                <OrbitingBody distance={2.5} speed={0.8}>
-                  <Planet textureUrl={tx('moon')} size={0.27} />
+                <OrbitingBody distance={EARTH_DISTANCE} speed={0.15} inclination={0.01}>
+                  <Planet textureUrl={tx('earth')} cloudsUrl={tx('earthClouds')} size={1} axialTilt={23.5} />
+                  <OrbitingBody distance={2.5} speed={0.8}>
+                    <Planet textureUrl={tx('moon')} size={0.27} />
+                  </OrbitingBody>
                 </OrbitingBody>
-              </OrbitingBody>
 
-              {planetData.map((data) => (
-                <OrbitingBody key={data.name} distance={data.distance} speed={data.speed} inclination={data.inclination ?? 0}>
-                  <Planet
-                    textureUrl={tx(data.texture)}
-                    cloudsUrl={data.clouds ? tx(data.clouds) : undefined}
-                    size={data.size}
-                    axialTilt={data.axialTilt ?? 0}
-                  />
-                  {data.rings && <Rings alphaUrl={tx(data.rings)} size={data.size} />}
-                </OrbitingBody>
-              ))}
+                {planetData.map((data) => (
+                  <OrbitingBody key={data.name} distance={data.distance} speed={data.speed} inclination={data.inclination ?? 0}>
+                    <Planet
+                      textureUrl={tx(data.texture)}
+                      cloudsUrl={data.clouds ? tx(data.clouds) : undefined}
+                      size={data.size}
+                      axialTilt={data.axialTilt ?? 0}
+                    />
+                    {data.rings && <Rings alphaUrl={tx(data.rings)} size={data.size} />}
+                  </OrbitingBody>
+                ))}
 
-              <CameraRig />
-              <Preload all />
-            </Suspense>
-
-            <Loader containerStyles={{ pointerEvents: 'none' }} />
-          </Canvas>
-        </div>
+                <CameraRig />
+                <Preload all />
+              </Suspense>
+            </Canvas>
+          </div>
+          {/* [FIXED] Loader is now a sibling to the Canvas container, not a child of Canvas */}
+          <Loader />
+        </>
       )}
 
       <div className="relative z-10 px-4 sm:px-6 lg:px-8">
@@ -427,7 +427,6 @@ export default function AboutContent() {
                   <BrainCircuit className="w-10 h-10 text-sky-400 flex-shrink-0" />
                   <h3 className="text-xl font-bold text-sky-400">The Brains: GPT-OSS</h3>
                 </div>
-                {/* [FIXED] Escaped ' and " characters */}
                 <p className="text-sm text-foreground/80">
                   At our core is Stella, a personal AI guide powered by a 20-billion parameter open-source LLM. She isn&apos;t just a search
                   engine; she&apos;s a Socratic partner. Ask her to explain a formula simply, quiz you on a concept, or dream up a &quot;what if&quot;
@@ -439,7 +438,6 @@ export default function AboutContent() {
                   <Telescope className="w-10 h-10 text-emerald-400 flex-shrink-0" />
                   <h3 className="text-xl font-bold text-emerald-400">The Eyes: NASA&apos;s API</h3>
                 </div>
-                {/* [FIXED] Escaped ' character */}
                 <p className="text-sm text-foreground/80">
                   Knowledge needs a window to reality. We stream the cosmos to your screen via a live connection to NASA&apos;s Open APIs. The
                   images you explore are not stock photos; they are authentic, up-to-the-minute dispatches from humanity&apos;s greatest
@@ -459,7 +457,6 @@ export default function AboutContent() {
               Stella Academy is our first step toward that future—a global, open-source classroom for the final frontier, empowering the
               next generation of scientists, engineers, artists, and thinkers.
             </p>
-            {/* [FIXED] Escaped ' character */}
             <p className="font-pixel text-gold text-lg mt-6">The universe is calling. We&apos;re here to help you answer.</p>
           </ContentSection>
 
