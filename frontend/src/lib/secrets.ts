@@ -13,9 +13,8 @@
 
 import type { SecretManagerServiceClient } from '@google-cloud/secret-manager';
 
-// FIX: Declare 'window' to satisfy the strict Node.js TypeScript compiler.
-// This provides a type hint for the `isBrowser` function without affecting the runtime logic
-// or requiring the "DOM" library in your tsconfig.worker.json.
+// This provides a type hint for the `isBrowser` function without requiring the "DOM"
+// library in your tsconfig, which is ideal for Node.js/worker environments.
 declare let window: unknown;
 
 // ---------------------------
@@ -46,7 +45,7 @@ function mask(s: string): string {
   return `${s.slice(0, 2)}${'*'.repeat(Math.max(1, s.length - 4))}${s.slice(-2)}`;
 }
 
-/** Dynamic load GSM client (server only) */
+/** Dynamic load GSM client (server only), memoized for performance. */
 async function getSecretManagerClient(): Promise<SecretManagerServiceClient | null> {
   if (isBrowser()) return null;
   if (smClient) return smClient;
@@ -57,7 +56,7 @@ async function getSecretManagerClient(): Promise<SecretManagerServiceClient | nu
     return smClient;
   } catch (err) {
     console.warn(
-      '[secrets] Secret Manager client unavailable (likely local dev without creds). Falling back to env. Reason:',
+      '[secrets] Secret Manager client unavailable. Falling back to env vars. Reason:',
       (err as Error)?.message || err
     );
     return null;
@@ -85,7 +84,7 @@ export async function getSecret(name: string): Promise<string> {
   // 2) Browser cannot read GSM, stop here.
   if (isBrowser()) return '';
 
-  // 3) Cache (server only)
+  // 3) Cache (server only, for performance)
   if (cache[name]) {
     return cache[name];
   }
@@ -106,42 +105,46 @@ export async function getSecret(name: string): Promise<string> {
     const value = response.payload?.data?.toString('utf8') || '';
 
     if (!value) {
-      console.warn(`[secrets] Secret '${name}' found in GSM but empty.`);
+      console.warn(`[secrets] Secret '${name}' found in GSM but was empty.`);
     }
-    cache[name] = value;
+    cache[name] = value; // Cache the result (even if empty) to prevent re-fetching.
     return value;
   } catch (err: unknown) {
-      if (err instanceof Error) {
-        const gcpError = err as { code?: number; message: string };
-
-        switch (gcpError.code) {
-          case 5: // NOT_FOUND
-            console.warn(
-              `[secrets] 🟡 Secret '${name}' not found in GSM for project '${process.env.GOOGLE_CLOUD_PROJECT}'.`
-            );
-            break;
-
-          case 7: // PERMISSION_DENIED
-            console.error(
-              `🔴 [secrets] PERMISSION DENIED for secret '${name}'. Ensure the service account has the 'Secret Manager Secret Accessor' role.`
-            );
-            break;
-
-          default:
-            console.error(
-              `🔴 [secrets] Failed to fetch '${name}' from GSM. Code: ${gcpError.code ?? 'N/A'}. Message: ${gcpError.message}`
-            );
-            break;
-        }
-      } else {
-        console.error(
-          `🔴 [secrets] An unexpected non-error value was thrown while fetching '${name}':`,
-          err
-        );
+      const gcpError = err as { code?: number; message: string };
+      const errorMessage = gcpError.message || String(err);
+      
+      // --- PATCH START: Developer-friendly authentication prompt ---
+      const isAuthError = errorMessage.includes('invalid_grant') || errorMessage.includes('invalid_rapt');
+      if (isAuthError && (process.env.NODE_ENV === 'development' || !process.env.NODE_ENV)) {
+          console.error('\n' + '╔'.padEnd(79, '═') + '╗');
+          console.error('║' + ' '.padEnd(78) + '║');
+          console.error('║' + '  ACTION REQUIRED: Google Cloud Authentication Expired  '.padStart(62) + ' '.padEnd(16) + '║');
+          console.error('║' + ' '.padEnd(78) + '║');
+          console.error('║' + "  Your local credentials for Google Cloud have expired. This is expected.".padEnd(78) + '║');
+          console.error('║' + '  Run the following command in your terminal to log in again:'.padEnd(78) + '║');
+          console.error('║' + ' '.padEnd(78) + '║');
+          console.error('║' + '    gcloud auth application-default login'.padEnd(74) + '║');
+          console.error('║' + ' '.padEnd(78) + '║');
+          console.error('╚'.padEnd(79, '═') + '╝' + '\n');
+          process.exit(1); // Exit cleanly to force the developer to fix the issue.
       }
-      return '';
+      // --- PATCH END ---
+
+      switch (gcpError.code) {
+        case 5: // NOT_FOUND
+          console.warn(`[secrets] 🟡 Secret '${name}' not found in GSM for project '${process.env.GOOGLE_CLOUD_PROJECT}'.`);
+          break;
+        case 7: // PERMISSION_DENIED
+          console.error(`🔴 [secrets] PERMISSION DENIED for secret '${name}'. Ensure the service account has the 'Secret Manager Secret Accessor' role.`);
+          break;
+        default:
+          console.error(`🔴 [secrets] Failed to fetch '${name}' from GSM. Code: ${gcpError.code ?? 'N/A'}. Message: ${errorMessage}`);
+          break;
+      }
+      return ''; // Fail soft, allowing fallback to default values.
     }
 }
+
 
 /** Convenience: fetch with default */
 export async function getSecretOr(name: string, defaultValue: string): Promise<string> {
@@ -160,9 +163,6 @@ export async function getRequiredSecret(name: string, hint?: string): Promise<st
   }
   return v;
 }
-
-
-// --- (The rest of the file is unchanged as it was already correct) ---
 
 // ------------------------------------------
 // Domain-specific, convenience accessors
@@ -243,14 +243,19 @@ export async function getRedisUrlLocal(): Promise<string> {
   return getSecret('REDIS_URL_LOCAL');
 }
 
+
+// --- PERFORMANCE PATCH START ---
+// The original functions used sequential `await`s in loops, which is very slow.
+// These have been refactored to use `Promise.allSettled` for parallel execution.
+
 export async function summariseSecretPresence(): Promise<Record<string, 'env' | 'gsm' | 'missing'>> {
   const names = [ 'nasa-api-key', 'NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY', 'CLERK_SECRET_KEY', 'OLLAMA_BASE_URL', 'OLLAMA_BEARER_TOKEN', 'GOOGLE_CUSTOM_SEARCH_KEY', 'GOOGLE_CUSTOM_SEARCH_CX', 'REDIS_URL_ONLINE', 'REDIS_URL_LOCAL', ];
   const out: Record<string, 'env' | 'gsm' | 'missing'> = {};
-  for (const name of names) {
+  
+  const checkPromises = names.map(async (name) => {
     const envKey = name.replace(/-/g, '_').toUpperCase();
     if (process.env[envKey]) {
-      out[name] = 'env';
-      continue;
+      return { name, status: 'env' };
     }
     if (!isBrowser()) {
       try {
@@ -258,14 +263,23 @@ export async function summariseSecretPresence(): Promise<Record<string, 'env' | 
         const client = await getSecretManagerClient();
         if (project && client) {
           const path = `projects/${project}/secrets/${name}/versions/latest`;
-          await client.accessSecretVersion({ name: path });
-          out[name] = 'gsm';
-          continue;
+          // We only need to check for existence, not access the payload.
+          await client.getSecretVersion({ name: path }); 
+          return { name, status: 'gsm' };
         }
-      } catch { /* ignore */ }
+      } catch { /* ignore for presence check */ }
     }
-    out[name] = 'missing';
-  }
+    return { name, status: 'missing' };
+  });
+
+  const results = await Promise.allSettled(checkPromises);
+  
+  results.forEach(result => {
+    if (result.status === 'fulfilled') {
+      out[result.value.name] = result.value.status as 'env' | 'gsm' | 'missing';
+    }
+  });
+
   return out;
 }
 
@@ -273,9 +287,14 @@ export async function logSecretPresenceSample(): Promise<void> {
   const presence = await summariseSecretPresence();
   const sampleNames = ['REDIS_URL_ONLINE', 'REDIS_URL_LOCAL', 'OLLAMA_BASE_URL'];
   const maskedSamples: Record<string, string> = {};
-  for (const n of sampleNames) {
-    const v = await getSecret(n);
-    maskedSamples[n] = mask(v);
+
+  const samplePromises = sampleNames.map(name => getSecret(name));
+  const sampleResults = await Promise.all(samplePromises);
+
+  for (let i = 0; i < sampleNames.length; i++) {
+    maskedSamples[sampleNames[i]] = mask(sampleResults[i]);
   }
+  
   console.log('[secrets] presence:', presence, 'samples:', maskedSamples);
 }
+// --- PERFORMANCE PATCH END ---

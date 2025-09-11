@@ -16,12 +16,14 @@ import { getSecret } from '@/lib/secrets';
 
 /* ------------------------------ helpers --------------------------------- */
 
+// THIS IS THE MASK FUNCTION YOU NEED
 function mask(val?: string, show = 3) {
   if (!val) return '(unset)';
   if (val.length <= show + 2) return `${val[0]}***`;
   return `${val.slice(0, show)}***${val.slice(-2)}`;
 }
 
+// THIS IS THE loadEnvFiles FUNCTION YOU NEED
 function loadEnvFiles() {
   const root = process.cwd();
   const dotEnvLocal = path.resolve(root, '.env.local');
@@ -49,7 +51,7 @@ interface SearchModule {
   default?: ((...args: never[]) => unknown) | { googleCustomSearch?: (...args: never[]) => unknown };
 }
 
-
+// THIS IS THE checkSearchModuleResolvable FUNCTION YOU NEED
 async function checkSearchModuleResolvable() {
   try {
     // FIX for 'Unexpected any': Cast the dynamic import to our defined interface.
@@ -75,18 +77,20 @@ async function checkSearchModuleResolvable() {
 
 /* -------------------------------- boot ---------------------------------- */
 
+// THIS IS THE NEW, FASTER BOOTSTRAP FUNCTION
 export async function bootstrap() {
   console.log('\n╔══════════════════════════════════════════╗');
   console.log('║           BOOTSTRAP & ENV CHECK          ║');
   console.log('╚══════════════════════════════════════════╝');
 
-  const used = loadEnvFiles();
+  // --- Step 1: Handle synchronous setup first ---
+  const used = loadEnvFiles(); // This will now work
   console.log(`[dotenv] Loaded: ${used.kind}  @  ${used.path}`);
 
   const summary = {
     NODE_ENV: process.env.NODE_ENV || '(unset)',
     GOOGLE_CLOUD_PROJECT: process.env.GOOGLE_CLOUD_PROJECT || '(unset)',
-    REDIS_URL: mask(process.env.REDIS_URL),
+    REDIS_URL: mask(process.env.REDIS_URL), // This will now work
     OLLAMA_HOST: process.env.OLLAMA_HOST || '(unset)',
     OLLAMA_MODEL: process.env.OLLAMA_MODEL || '(unset)',
     ENABLE_WEB_ENRICH: process.env.ENABLE_WEB_ENRICH ?? '(unset)',
@@ -101,44 +105,54 @@ export async function bootstrap() {
     );
   }
 
-  try {
-    await loadConfigFromSecrets();
+  // --- Step 2: Fire off all async operations in parallel ---
+  console.log('[bootstrap] Warming secrets and checking modules in parallel...');
+
+  const [
+    ollamaResult,
+    searchKeyResult,
+    searchCxResult,
+    searchModuleResult,
+  ] = await Promise.allSettled([
+    loadConfigFromSecrets(),
+    getSecret('google-custom-search-key'),
+    getSecret('google-custom-search-cx'),
+    checkSearchModuleResolvable(), // This will now work
+  ]);
+
+  // --- Step 3: Process the results of the parallel operations ---
+
+  if (ollamaResult.status === 'fulfilled') {
     console.log('[bootstrap] ✅ Secrets loaded (ollama-client).');
-  } catch (err: unknown) { // FIX for 'Unexpected any': Catch as 'unknown' and then safely cast to Error.
-    const error = err as Error;
+  } else {
     console.warn(
       '[bootstrap] ⚠️ Non-fatal: loadConfigFromSecrets() failed. Continuing with existing env.',
-      error?.message || err
+      (ollamaResult.reason as Error)?.message || ollamaResult.reason
     );
   }
 
-  try {
-    const key =
-      process.env.GOOGLE_CUSTOM_SEARCH_KEY ||
-      (await getSecret('google-custom-search-key'));
-    const cx =
-      process.env.GOOGLE_CUSTOM_SEARCH_CX ||
-      (await getSecret('google-custom-search-cx'));
-
-    if (key && !process.env.GOOGLE_CUSTOM_SEARCH_KEY) {
-      process.env.GOOGLE_CUSTOM_SEARCH_KEY = key;
-    }
-    if (cx && !process.env.GOOGLE_CUSTOM_SEARCH_CX) {
-      process.env.GOOGLE_CUSTOM_SEARCH_CX = cx;
-    }
-
-    console.log('[bootstrap] Google Custom Search:', {
-      key: mask(process.env.GOOGLE_CUSTOM_SEARCH_KEY),
-      cx: mask(process.env.GOOGLE_CUSTOM_SEARCH_CX),
-    });
-  } catch (e: unknown) {
-    console.warn(
-      '[bootstrap] ⚠️ Failed to warm Google Custom Search secrets (continuing):',
-      (e as Error)?.message || e
-    );
+  if (searchKeyResult.status === 'fulfilled' && searchKeyResult.value && !process.env.GOOGLE_CUSTOM_SEARCH_KEY) {
+    process.env.GOOGLE_CUSTOM_SEARCH_KEY = searchKeyResult.value;
+  }
+  if (searchCxResult.status === 'fulfilled' && searchCxResult.value && !process.env.GOOGLE_CUSTOM_SEARCH_CX) {
+    process.env.GOOGLE_CUSTOM_SEARCH_CX = searchCxResult.value;
   }
 
-  await checkSearchModuleResolvable();
+  if (searchKeyResult.status === 'rejected') {
+     console.warn('[bootstrap] ⚠️ Failed to warm GOOGLE_CUSTOM_SEARCH_KEY secret:', (searchKeyResult.reason as Error)?.message);
+  }
+   if (searchCxResult.status === 'rejected') {
+     console.warn('[bootstrap] ⚠️ Failed to warm GOOGLE_CUSTOM_SEARCH_CX secret:', (searchCxResult.reason as Error)?.message);
+  }
+  
+  console.log('[bootstrap] Google Custom Search:', {
+    key: mask(process.env.GOOGLE_CUSTOM_SEARCH_KEY),
+    cx: mask(process.env.GOOGLE_CUSTOM_SEARCH_CX),
+  });
+
+  if (searchModuleResult.status === 'rejected') {
+      console.warn('[bootstrap] ⚠️ The checkSearchModuleResolvable() promise failed unexpectedly.', searchModuleResult.reason);
+  }
 
   console.log('--------------------------------------------\n');
 }
