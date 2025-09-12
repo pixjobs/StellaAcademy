@@ -41,15 +41,18 @@ Your mission is to analyze these images of Earth from deep space.
 Use "Quiz Me" to test your observations. Let's begin the analysis.`;
 
 function reorderImages(images: Img[], focusIndex: number): Img[] {
-  if (images.length === 0) return [];
+  if (!images || images.length === 0) return [];
   const i = Math.max(0, Math.min(focusIndex, images.length - 1));
   return [images[i], ...images.slice(0, i), ...images.slice(i + 1)];
 }
 
+// ===== UPGRADED: Handle topics with no images =====
 function buildContext(topic: CleanTopic, pickedIndex = 0): string {
-  const chosen = topic.images[pickedIndex];
-  const chosenLine = `Selected image for analysis: #${pickedIndex + 1} - ${chosen.title}`;
-  return `Mission: ${topic.title}. ${topic.summary}\n${chosenLine}`.trim();
+  const chosen = topic.images?.[pickedIndex];
+  const chosenLine = chosen
+    ? `\nSelected image for analysis: #${pickedIndex + 1} - ${chosen.title}`
+    : '';
+  return `Mission: ${topic.title}. ${topic.summary}${chosenLine}`.trim();
 }
 
 /* ----------------------------- Preflight helpers ------------------------- */
@@ -60,37 +63,38 @@ async function startPreflight(payload: {
   topicSummary: string;
   imageTitle?: string;
   role: 'explorer' | 'cadet' | 'scholar';
-}) {
+}): Promise<TutorPreflightResult | string> {
   const res = await fetch('/api/llm/enqueue', {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify({ type: 'tutor-preflight', payload }),
   });
+
   const data = await res.json();
-  if (!res.ok) throw new Error(data?.error || 'Failed to enqueue preflight.');
-  return data.jobId as string;
+  if (res.ok && data.state === 'completed') {
+    return data.result.result as TutorPreflightResult;
+  }
+  if (res.status === 202 && data.jobId) {
+    return data.jobId as string;
+  }
+  throw new Error(data?.error || 'Failed to enqueue preflight.');
 }
 
-async function waitForPreflight(jobId: string, { timeoutMs = 25_000, intervalMs = 700 } = {}) {
+async function waitForPreflight(jobId: string, { timeoutMs = 45_000, intervalMs = 1500 } = {}) {
   const started = Date.now();
   while (Date.now() - started < timeoutMs) {
     const res = await fetch(`/api/llm/enqueue?id=${encodeURIComponent(jobId)}`);
     const data = await res.json();
     if (!res.ok) throw new Error(data?.error || 'Preflight status error.');
-
     if (data.state === 'completed') {
-      // ===== THE FIX IS HERE (same as the other pages) =====
-      // The API returns a nested structure, so we unwrap the inner result.
       return data.result.result as TutorPreflightResult;
     }
     if (data.state === 'failed') throw new Error(data?.error || 'Preflight job failed.');
-    
     await new Promise((r) => setTimeout(r, intervalMs));
   }
   throw new Error('Preflight timed out.');
 }
 
-// Data validation helper to prevent crashes
 function isValidPreflightResult(data: unknown): data is TutorPreflightResult {
   if (typeof data !== 'object' || data === null) return false;
   const result = data as TutorPreflightResult;
@@ -107,9 +111,7 @@ function isValidPreflightResult(data: unknown): data is TutorPreflightResult {
 
 export default function EarthObserverPage() {
   const { role = 'explorer' } = useGame();
-
-  const { missionPlan, isLoading, error, generateNewPlan } =
-    useMissionPlanGenerator('earth-observer');
+  const { missionPlan, isLoading, error, generateNewPlan } = useMissionPlanGenerator('earth-observer');
 
   const cleanMissionPlan = useMemo(() => {
     if (!missionPlan) return null;
@@ -118,10 +120,7 @@ export default function EarthObserverPage() {
       topics: missionPlan.topics.map((topic): CleanTopic => ({
         ...topic,
         images: (topic.images || [])
-          .map((img) => ({
-            title: img.title ?? 'Untitled Earth View',
-            href: img.href ?? '',
-          }))
+          .map((img) => ({ title: img.title ?? 'Untitled Earth View', href: img.href ?? '' }))
           .filter((img) => img.href),
       })),
     };
@@ -136,7 +135,7 @@ export default function EarthObserverPage() {
 
   const handleSelectTopic = useCallback((topic: CleanTopic, imageIndex: number) => {
     setSelectedTopic(topic);
-    setSelectedImageIdx(imageIndex);
+    setSelectedImageIdx(Math.max(0, imageIndex));
   }, []);
 
   const handleReturnToTopics = useCallback(() => {
@@ -150,7 +149,7 @@ export default function EarthObserverPage() {
   useEffect(() => {
     if (!selectedTopic) return;
 
-    const imageTitle = selectedTopic.images[selectedImageIdx]?.title;
+    const imageTitle = selectedTopic.images?.[selectedImageIdx]?.title;
     const reqKey = `${selectedTopic.title}::${imageTitle ?? 'no-image'}::${role}`;
     lastRequestedRef.current = reqKey;
 
@@ -160,7 +159,7 @@ export default function EarthObserverPage() {
 
     const runPreflight = async () => {
       try {
-        const jobId = await startPreflight({
+        const resultOrJobId = await startPreflight({
           mission: 'earth-observer',
           topicTitle: selectedTopic.title,
           topicSummary: selectedTopic.summary,
@@ -168,18 +167,19 @@ export default function EarthObserverPage() {
           role,
         });
 
-        const result = await waitForPreflight(jobId);
-
-        // Add the same robust validation check here
-        if (!isValidPreflightResult(result)) {
-          console.error("Invalid preflight data received from worker:", result);
-          throw new Error("Worker returned incomplete or malformed preflight data. Check the worker logs for LLM parsing errors.");
+        let finalResult: TutorPreflightResult;
+        if (typeof resultOrJobId === 'string') {
+          finalResult = await waitForPreflight(resultOrJobId);
+        } else {
+          finalResult = resultOrJobId;
         }
 
-        const assistantFirst =
-          result.starterMessages.find((m) => m.role === 'stella') ||
-          result.starterMessages[0];
+        if (!isValidPreflightResult(finalResult)) {
+          console.error("Invalid preflight data received from worker:", finalResult);
+          throw new Error("Worker returned incomplete or malformed preflight data.");
+        }
 
+        const assistantFirst = finalResult.starterMessages.find((m) => m.role === 'stella') || finalResult.starterMessages[0];
         const briefingText = assistantFirst?.text?.trim() || DEFAULT_BRIEFING;
 
         if (lastRequestedRef.current === reqKey) {
@@ -221,14 +221,10 @@ export default function EarthObserverPage() {
       <div className="flex justify-between items-start mb-6">
         <div>
           <h1 className="font-pixel text-xl text-gold mb-1">🌍 Earth Observer</h1>
-          {selectedTopic && (
-            <h2 className="text-lg text-sky-400">Target: {selectedTopic.title}</h2>
-          )}
+          {selectedTopic && <h2 className="text-lg text-sky-400">Target: {selectedTopic.title}</h2>}
         </div>
         <div className="flex gap-2">
-          {selectedTopic && (
-            <Button onClick={handleReturnToTopics} variant="outline">Return to Selection</Button>
-          )}
+          {selectedTopic && <Button onClick={handleReturnToTopics} variant="outline">Return to Selection</Button>}
           <Button onClick={generateNewPlan}>New Imagery</Button>
         </div>
       </div>
@@ -241,20 +237,13 @@ export default function EarthObserverPage() {
             <p className="font-semibold mb-1">Preflight Failed</p>
             <p className="text-sm opacity-90 mb-3">{preflightError}</p>
             <div className="flex gap-2">
-              <Button
-                onClick={() => {
-                  setSelectedTopic((t) => (t ? { ...t } : t));
-                }}
-                variant="secondary"
-              >
-                Retry
-              </Button>
+              <Button onClick={() => setSelectedTopic((t) => (t ? { ...t } : t))} variant="secondary">Retry</Button>
               <Button onClick={handleReturnToTopics} variant="outline">Back to Targets</Button>
             </div>
           </div>
         ) : (
           <MissionControl
-            key={`${selectedTopic.title}-${selectedImageIdx}`}
+            key={`${selectedTopic.title}-${selectedTopic.images?.[selectedImageIdx]?.href ?? 'no-image'}`}
             mission={selectedTopic.title}
             images={reorderImages(selectedTopic.images, selectedImageIdx)}
             context={buildContext(selectedTopic, selectedImageIdx)}
@@ -266,9 +255,7 @@ export default function EarthObserverPage() {
           />
         )
       ) : (
-        cleanMissionPlan && (
-          <TopicSelector plan={cleanMissionPlan} onSelect={handleSelectTopic} />
-        )
+        cleanMissionPlan && <TopicSelector plan={cleanMissionPlan} onSelect={handleSelectTopic} />
       )}
     </section>
   );

@@ -1,25 +1,22 @@
-// app/api/ask/route.ts
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-
 import { NextRequest, NextResponse } from 'next/server';
+import { Job } from 'bullmq'; // Import the Job type for type safety
 import {
   hashId,
-  queueStats,
-  redisPing,
   enqueueIdempotent,
   withJobHeaders,
   pollJobResponse,
 } from '@/lib/api/queueHttp';
-// ⬇️ NEW: we'll resolve the queue on-demand instead of importing a static llmQueue
-import { getQueue } from '@/lib/queue';
+import { getQueues } from '@/lib/bullmq/queues';
+import { INTERACTIVE_QUEUE_NAME, BACKGROUND_QUEUE_NAME } from '@/lib/queue';
+import { getSecret } from '@/lib/secrets';
+import { isRole } from '@/workers/ollama/utils';
 import type { Role } from '@/types/llm';
 
-// Optional secrets (GCP Secret Manager via your helper)
-import { getSecret } from '@/lib/secrets';
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 /* -------------------------------------------------------------------------- */
-/*                             Link helpers (local)                           */
+/*                                Local Types                                 */
 /* -------------------------------------------------------------------------- */
 
 type LinkPreview = {
@@ -29,16 +26,37 @@ type LinkPreview = {
   meta?: string;
 };
 
-// Not-too-greedy bare URL regex (exclude trailing punctuation)
+type AskPayload = {
+  prompt: string;
+  context?: string;
+  role?: Role;
+  mission?: string;
+};
+
+type CseItem = {
+  title?: string;
+  link?: string;
+  snippet?: string;
+};
+
+type CseResponse = {
+  items?: CseItem[];
+};
+
+/* -------------------------------------------------------------------------- */
+/*                             Link Helpers (local)                           */
+/* -------------------------------------------------------------------------- */
+
+// This section contains your robust link parsing and enrichment logic.
+// It is well-structured and does not require changes.
+
 const URL_RE = /(https?:\/\/[^\s<>()\][}{"']+?[^\s<>()\][}{"'.,!?;:])/gi;
 
-/** Convert bare URLs in normal text to `[host](url)`; skip fenced & inline code and existing md/html links. */
 function markdownifyBareUrls(text: string): string {
   const parts = splitByCodeRegions(text);
   return parts.map(p => (p.code ? p.raw : autolinkInTextBlock(p.raw))).join('');
 }
 
-/** Split by fenced blocks ```...``` and inline code `...` while preserving raw chunks. */
 function splitByCodeRegions(raw: string): Array<{ code: boolean; raw: string }> {
   const out: Array<{ code: boolean; raw: string }> = [];
   const fenced = /```[\s\S]*?```/g;
@@ -69,15 +87,10 @@ function autolinkInTextBlock(block: string): string {
   return block.replace(URL_RE, (match: string, ...args: (string | number)[]) => {
     const offset = args[args.length - 2] as number;
     const whole = args[args.length - 1] as string;
-
-    // Already part of a markdown link target?  …](URL)
     const before2 = whole.slice(Math.max(0, offset - 2), offset);
     if (before2 === '](') return match;
-
-    // Inside href="URL"?
     const before6 = whole.slice(Math.max(0, offset - 6), offset).toLowerCase();
     if (before6.includes('href="') || before6.includes("href='")) return match;
-
     const host = safeHost(match);
     return `[${host}](${stripTracking(match)})`;
   });
@@ -86,8 +99,6 @@ function autolinkInTextBlock(block: string): string {
 function extractLinksFromText(text: string, cap = 8): LinkPreview[] {
   const links: string[] = [];
   const seen = new Set<string>();
-
-  // 1) URLs in markdown: [label](url)
   const MD_RE = /\[[^\]]*?\]\((https?:\/\/[^\s)]+)\)/gi;
   let mdMatch: RegExpExecArray | null;
   while ((mdMatch = MD_RE.exec(text)) !== null) {
@@ -98,8 +109,6 @@ function extractLinksFromText(text: string, cap = 8): LinkPreview[] {
       if (links.length >= cap) break;
     }
   }
-
-  // 2) Bare URLs
   if (links.length < cap) {
     const BARE_RE = new RegExp(URL_RE.source, 'gi');
     let bareMatch: RegExpExecArray | null;
@@ -112,7 +121,6 @@ function extractLinksFromText(text: string, cap = 8): LinkPreview[] {
       }
     }
   }
-
   return links.map((url) => ({
     url,
     title: safeHost(url),
@@ -126,24 +134,19 @@ function stripTracking(rawUrl: string): string {
     const toDelete = ['utm_source','utm_medium','utm_campaign','utm_term','utm_content','gclid','fbclid'];
     toDelete.forEach(p => u.searchParams.delete(p));
     return u.toString();
-  } catch {
-    return rawUrl;
-  }
+  } catch { return rawUrl; }
 }
+
 function safeHost(url: string): string {
   try { return new URL(url).hostname.replace(/^www\./, ''); } catch { return url; }
 }
+
 function safeHostname(url: string): string {
   try { return new URL(url).hostname; } catch { return ''; }
 }
 
-/* -------------------------------------------------------------------------- */
-/*                 Optional Google CSE enrichment (Secret Manager)           */
-/* -------------------------------------------------------------------------- */
-
 async function tryGoogleCse(query: string): Promise<LinkPreview[]> {
   try {
-    // NOTE: Use CX, not ENGINE_ID (keeps consistent with your secrets.ts accessors)
     const key = await getSecret('GOOGLE_CUSTOM_SEARCH_KEY');
     const cx  = await getSecret('GOOGLE_CUSTOM_SEARCH_CX');
     if (!key || !cx) return [];
@@ -151,26 +154,24 @@ async function tryGoogleCse(query: string): Promise<LinkPreview[]> {
     const url = new URL('https://www.googleapis.com/customsearch/v1');
     url.searchParams.set('key', key);
     url.searchParams.set('cx', cx);
-    url.searchParams.set('num', '3'); // small, fast
+    url.searchParams.set('num', '3');
     url.searchParams.set('q', query);
 
     const res = await fetch(url.toString(), { cache: 'no-store' });
-    if (!res.ok) throw new Error(`CSE ${res.status}`);
-    const data = (await res.json()) as {
-      items?: Array<{ title?: string; link?: string; snippet?: string }>;
-    };
+    if (!res.ok) throw new Error(`Google Custom Search API returned status ${res.status}`);
+    const data = (await res.json()) as CseResponse;
 
-    const items = data.items ?? [];
-    return items
-      .filter(i => i.link)
+    return (data.items ?? [])
+      .filter((i): i is Required<CseItem> => !!i.link)
       .map((i) => ({
-        url: stripTracking(i.link!),
-        title: i.title || safeHost(i.link!),
+        url: stripTracking(i.link),
+        title: i.title || safeHost(i.link),
         meta: i.snippet,
-        faviconUrl: `https://icons.duckduckgo.com/ip3/${safeHostname(i.link!)}.ico`,
+        faviconUrl: `https://icons.duckduckgo.com/ip3/${safeHostname(i.link)}.ico`,
       }));
-  } catch {
-    return []; // silently ignore if not configured / fails
+  } catch (error) {
+    console.warn('[ask][GET] Google CSE enrichment failed:', error instanceof Error ? error.message : String(error));
+    return [];
   }
 }
 
@@ -189,89 +190,31 @@ function dedupeLinks(a: LinkPreview[], b: LinkPreview[]): LinkPreview[] {
 }
 
 /* -------------------------------------------------------------------------- */
-/*                         Model output formatting guardrails                 */
+/*                               POST (Enqueue Job)                           */
 /* -------------------------------------------------------------------------- */
-
-const FORMATTING_INSTRUCTIONS = `
-You are Stella, a helpful AI assistant.
-
-Your entire response MUST be a single, valid **Markdown** document.
-Do NOT use LaTeX doc scaffolding like \\documentclass.
-
-**Formatting Rules**
-- Use Markdown headings (#), lists (*), and tables (|).
-- Use $$ ... $$ for block math; $ ... $ for inline math.
-- When you include a web reference, write it as a Markdown link: [short title or host](https://example.com).
-- Prefer short, descriptive link text (never paste long raw URLs into the prose).
-- Keep responses concise and scannable.
-
-Example (block math + link):
-The area of a circle is
-$$
-A = \\pi r^2
-$$
-
-More details: [wikipedia.org](https://en.wikipedia.org/wiki/Area_of_a_circle)
-`.trim();
-
-type AskPayload = {
-  prompt: string;
-  context?: string;
-  role?: Role;
-  mission?: string;
-};
-
-/* ----------------------------- POST (enqueue) ----------------------------- */
-export async function POST(req: NextRequest) {
+export async function POST(req: NextRequest): Promise<NextResponse> {
   let jobId = 'unknown';
-
   try {
-    const raw = await req.text();
-    if (!raw) return NextResponse.json({ error: 'Empty request body; expected JSON.' }, { status: 400 });
+    const body = await req.json() as AskPayload;
+    const role: Role = body.role ?? 'explorer';
+    const prompt = body.prompt?.trim();
 
-    let body: AskPayload;
-    try { body = JSON.parse(raw); }
-    catch { return NextResponse.json({ error: 'Malformed JSON body.' }, { status: 400 }); }
+    if (!prompt || prompt.length > 4000) return NextResponse.json({ error: "Invalid 'prompt'." }, { status: 400 });
+    if (!isRole(role)) return NextResponse.json({ error: "Invalid 'role'." }, { status: 400 });
+    if (body.context && (typeof body.context !== 'string' || body.context.length > 20000)) return NextResponse.json({ error: "Invalid 'context'." }, { status: 400 });
 
-    const role: Role = (body.role as Role) ?? 'explorer';
-    const prompt = typeof body.prompt === 'string' ? body.prompt.trim() : '';
-
-    if (!prompt || prompt.length > 4000)
-      return NextResponse.json({ error: "Invalid 'prompt'. Provide a non-empty string up to 4000 chars." }, { status: 400 });
-
-    if (body.context && (typeof body.context !== 'string' || body.context.length > 20000))
-      return NextResponse.json({ error: "Invalid 'context'. Must be a string up to 20000 chars." }, { status: 400 });
-
-    if (role !== 'explorer' && role !== 'cadet' && role !== 'scholar')
-      return NextResponse.json({ error: "Invalid 'role'. Use explorer|cadet|scholar." }, { status: 400 });
-
-    // Merge guardrails + (optional) context + user question
-    const finalPrompt = [
-      FORMATTING_INSTRUCTIONS,
-      body.context?.trim()
-        ? `\n--- CONTEXT START ---\n${body.context.trim()}\n--- CONTEXT END ---`
-        : '',
-      '\n--- USER PROMPT ---\n',
-      prompt,
-    ].join('');
-
-    const payloadForQueue = { ...body, role, prompt: finalPrompt };
-
-    // Stable job id for idempotency (same request → same job)
+    const payloadForQueue = { ...body, role, prompt };
     jobId = hashId({ type: 'ask', payload: payloadForQueue });
 
-    const [ping] = await Promise.all([redisPing()]);
-    console.log('[ask][POST] enqueuing', {
-      jobId,
-      role,
-      mission: body.mission ?? 'general',
-      redis: ping,
-    });
+    console.log('[ask][POST] enqueuing', { jobId, role, mission: body.mission ?? 'general' });
+
+    const { interactiveQueue } = await getQueues();
 
     const { state } = await enqueueIdempotent(
-      'llm',
-      { type: 'ask', payload: payloadForQueue, cacheKey: jobId },
-      jobId
+      'user-question',
+      { type: 'ask', payload: payloadForQueue },
+      jobId,
+      interactiveQueue
     );
 
     const res = NextResponse.json({ accepted: true, jobId, state }, { status: 202 });
@@ -279,84 +222,82 @@ export async function POST(req: NextRequest) {
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
     console.error('[ask][POST] error', { jobId, error: msg });
-    const res = NextResponse.json({ error: 'Failed to enqueue ask.', details: msg }, { status: 500 });
+    const res = NextResponse.json({ error: 'Failed to enqueue ask job.', details: msg }, { status: 500 });
     return withJobHeaders(res, jobId, 'error');
   }
 }
 
-/* ---------------- GET (status / debug / list / stats) ---------------- */
-export async function GET(req: NextRequest) {
+/* -------------------------------------------------------------------------- */
+/*                      GET (Poll Status / Debug)                             */
+/* -------------------------------------------------------------------------- */
+export async function GET(req: NextRequest): Promise<NextResponse> {
   const id = req.nextUrl.searchParams.get('id');
   const debug = req.nextUrl.searchParams.get('debug') === '1';
   const statsOnly = req.nextUrl.searchParams.get('stats') === '1';
   const list = req.nextUrl.searchParams.get('list') === '1';
 
-  if (statsOnly) {
-    const [ping, stats] = await Promise.all([redisPing(), queueStats()]);
-    return NextResponse.json(
-      { queue: stats, redis: ping, server: { pid: process.pid, now: new Date().toISOString() } },
-      { status: 200 }
-    );
-  }
+  if (statsOnly || list) {
+    const { interactiveQueue, backgroundQueue } = await getQueues();
+    if (statsOnly) {
+      const [interactiveStats, backgroundStats] = await Promise.all([
+        interactiveQueue.getJobCounts('wait', 'active', 'completed', 'failed', 'delayed'),
+        backgroundQueue.getJobCounts('wait', 'active', 'completed', 'failed', 'delayed'),
+      ]);
+      return NextResponse.json({
+        queues: { [INTERACTIVE_QUEUE_NAME]: interactiveStats, [BACKGROUND_QUEUE_NAME]: backgroundStats },
+      });
+    }
 
-  if (list) {
-    const queue = await getQueue();
-    const [waiting, active, delayed] = await Promise.all([
-      queue.getJobs(['waiting'], 0, 20),
-      queue.getJobs(['active'], 0, 20),
-      queue.getJobs(['delayed'], 0, 20),
+    // --- CORRECTED LOGIC for ?list=1 ---
+    const [iJobs, bJobs] = await Promise.all([
+      interactiveQueue.getJobs(['active', 'waiting', 'delayed'], 0, 20),
+      backgroundQueue.getJobs(['active', 'waiting', 'delayed'], 0, 20),
     ]);
-    return NextResponse.json(
-      {
-        waiting: waiting.map((j) => j.id),
-        active: active.map((j) => j.id),
-        delayed: delayed.map((j) => j.id),
-      },
-      { status: 200 }
-    );
+
+    // Helper function to asynchronously get the state for each job
+    const jobToJSON = async (j: Job) => ({
+        id: j.id,
+        name: j.name,
+        state: await j.getState(),
+    });
+
+    // Process all jobs in parallel to get their states
+    const [iJobsWithState, bJobsWithState] = await Promise.all([
+        Promise.all(iJobs.map(jobToJSON)),
+        Promise.all(bJobs.map(jobToJSON)),
+    ]);
+
+    return NextResponse.json({
+      [INTERACTIVE_QUEUE_NAME]: iJobsWithState,
+      [BACKGROUND_QUEUE_NAME]: bJobsWithState,
+    });
   }
 
-  if (!id) return NextResponse.json({ error: 'Missing ?id=' }, { status: 400 });
+  if (!id) return NextResponse.json({ error: 'Missing job ?id=' }, { status: 400 });
 
-  // Poll the worker result
   const resp = await pollJobResponse(id, debug);
 
-  // Enrich ask results with clickable links + structured links (non-destructive for other job types)
+  // The enrichment logic below is queue-agnostic and works perfectly as is.
   try {
-    const payload = await resp.json();
+    const payload = await resp.clone().json();
 
-    if (payload?.state && payload?.result?.answer) {
-      // Keep behaviour focused to ask jobs but tolerate shapes
+    if (payload?.state === 'completed' && payload.result?.answer) {
       const rawAnswer: string = payload.result.answer;
-
-      // 1) Convert any bare URLs to Markdown links for your MarkdownRenderer
       const answerWithLinks = markdownifyBareUrls(rawAnswer);
-
-      // 2) Build structured links (if worker didn’t already provide)
       const existing: LinkPreview[] | undefined = payload.result.links;
-      const textLinks: LinkPreview[] =
-        Array.isArray(existing) && existing.length > 0
-          ? existing
-          : extractLinksFromText(answerWithLinks);
-
-      // 3) Optionally enrich with Google CSE (silently ignored if secrets/fetch fail)
-      const cseQuery =
-        payload?.result?.query ??
-        payload?.result?.normalizedPrompt ??
-        '';
+      const textLinks: LinkPreview[] = Array.isArray(existing) && existing.length > 0 ? existing : extractLinksFromText(answerWithLinks);
+      const cseQuery = payload?.job?.data?.payload?.prompt ?? '';
       const cseLinks = cseQuery ? await tryGoogleCse(cseQuery) : [];
       const links: LinkPreview[] = dedupeLinks(textLinks, cseLinks);
 
       return NextResponse.json(
         { ...payload, result: { ...payload.result, answer: answerWithLinks, links } },
-        { status: 200 }
+        { status: resp.status, headers: resp.headers }
       );
     }
-
-    // Not an ask-style result; return unchanged
-    return NextResponse.json(payload, { status: 200 });
+    return resp;
   } catch {
-    // If pollJobResponse streamed or wasn’t JSON, just return it as-is
+    // If the response wasn't JSON or something else failed, return the original response.
     return resp;
   }
 }

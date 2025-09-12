@@ -42,15 +42,19 @@ Your mission:
 Use “Quiz Me” to check understanding. Let’s design something stellar!`;
 
 function reorderImages(images: Img[], focusIndex: number): Img[] {
-  if (images.length === 0) return [];
+  if (!images || images.length === 0) return [];
   const i = Math.max(0, Math.min(focusIndex, images.length - 1));
   return [images[i], ...images.slice(0, i), ...images.slice(i + 1)];
 }
 
+// ===== CORRECTION 1: Handle topics with no images =====
 function buildContext(topic: CleanTopic, pickedIndex = 0): string {
-  const chosen = topic.images[pickedIndex];
-  const chosenLine = `Selected poster base: #${pickedIndex + 1} ${chosen.title}`;
-  return `Poster Theme: ${topic.title}. ${topic.summary}\n${chosenLine}`.trim();
+  const chosen = topic.images?.[pickedIndex];
+  // Only add the "Selected poster base" line if an image was actually chosen.
+  const chosenLine = chosen
+    ? `\nSelected poster base: #${pickedIndex + 1} ${chosen.title}`
+    : '';
+  return `Poster Theme: ${topic.title}. ${topic.summary}${chosenLine}`.trim();
 }
 
 async function startPreflight(payload: {
@@ -59,18 +63,26 @@ async function startPreflight(payload: {
   topicSummary: string;
   imageTitle?: string;
   role: 'explorer' | 'cadet' | 'scholar';
-}) {
+}): Promise<TutorPreflightResult | string> {
   const res = await fetch('/api/llm/enqueue', {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify({ type: 'tutor-preflight', payload }),
   });
+
   const data = await res.json();
-  if (!res.ok) throw new Error(data?.error || 'Failed to enqueue preflight.');
-  return data.jobId as string;
+
+  if (res.ok && data.state === 'completed') {
+    return data.result.result as TutorPreflightResult;
+  }
+  if (res.status === 202 && data.jobId) {
+    return data.jobId as string;
+  }
+  
+  throw new Error(data?.error || 'Failed to enqueue preflight.');
 }
 
-async function waitForPreflight(jobId: string, { timeoutMs = 25_000, intervalMs = 700 } = {}) {
+async function waitForPreflight(jobId: string, { timeoutMs = 45_000, intervalMs = 1500 } = {}) {
   const started = Date.now();
   while (Date.now() - started < timeoutMs) {
     const res = await fetch(`/api/llm/enqueue?id=${encodeURIComponent(jobId)}`);
@@ -78,9 +90,6 @@ async function waitForPreflight(jobId: string, { timeoutMs = 25_000, intervalMs 
     if (!res.ok) throw new Error(data?.error || 'Preflight status error.');
 
     if (data.state === 'completed') {
-      // ===== THE FIX IS HERE (same as the other pages) =====
-      // The API returns a nested structure: { result: { type: '...', result: {...} } }
-      // We need to return the inner `result` object.
       return data.result.result as TutorPreflightResult;
     }
     if (data.state === 'failed') throw new Error(data?.error || 'Preflight job failed.');
@@ -114,6 +123,7 @@ export default function SpacePosterPage() {
       ...missionPlan,
       topics: missionPlan.topics.map((topic): CleanTopic => ({
         ...topic,
+        // Ensure images is always a valid array, even if it's empty.
         images: (topic.images || [])
           .map((img) => ({
             title: img.title ?? 'Untitled Image',
@@ -133,7 +143,8 @@ export default function SpacePosterPage() {
 
   const handleSelectTopic = useCallback((topic: CleanTopic, imageIndex: number) => {
     setSelectedTopic(topic);
-    setSelectedImageIdx(imageIndex);
+    // If imageIndex is invalid (e.g., -1 for no image), default to 0.
+    setSelectedImageIdx(Math.max(0, imageIndex));
   }, []);
 
   const handleReturnToTopics = useCallback(() => {
@@ -147,7 +158,8 @@ export default function SpacePosterPage() {
   useEffect(() => {
     if (!selectedTopic) return;
 
-    const imageTitle = selectedTopic.images[selectedImageIdx]?.title;
+    // ===== CORRECTION 2: Gracefully handle topics with no images =====
+    const imageTitle = selectedTopic.images?.[selectedImageIdx]?.title;
     const reqKey = `${selectedTopic.title}::${imageTitle ?? 'no-image'}::${role}`;
     lastRequestedRef.current = reqKey;
 
@@ -157,23 +169,30 @@ export default function SpacePosterPage() {
 
     const runPreflight = async () => {
       try {
-        const jobId = await startPreflight({
+        const resultOrJobId = await startPreflight({
           mission: 'space-poster',
           topicTitle: selectedTopic.title,
           topicSummary: selectedTopic.summary,
-          imageTitle,
+          imageTitle, // This is now safely `undefined` if there are no images.
           role,
         });
-        const result = await waitForPreflight(jobId);
 
-        if (!isValidPreflightResult(result)) {
-          console.error("Invalid preflight data received from worker:", result);
-          throw new Error("Worker returned incomplete or malformed preflight data. Check the worker logs for LLM parsing errors.");
+        let finalResult: TutorPreflightResult;
+
+        if (typeof resultOrJobId === 'string') {
+          finalResult = await waitForPreflight(resultOrJobId);
+        } else {
+          finalResult = resultOrJobId;
+        }
+
+        if (!isValidPreflightResult(finalResult)) {
+          console.error("Invalid preflight data received from worker:", finalResult);
+          throw new Error("Worker returned incomplete or malformed preflight data.");
         }
 
         const assistantFirst =
-          result.starterMessages.find((m) => m.role === 'stella') ||
-          result.starterMessages[0];
+          finalResult.starterMessages.find((m) => m.role === 'stella') ||
+          finalResult.starterMessages[0];
 
         const briefingText = assistantFirst?.text?.trim() || DEFAULT_BRIEFING;
 
@@ -230,15 +249,14 @@ export default function SpacePosterPage() {
             <p className="font-semibold mb-1">Preflight Failed</p>
             <p className="text-sm opacity-90 mb-3">{preflightError}</p>
             <div className="flex gap-2">
-              <Button onClick={() => setSelectedTopic((t) => (t ? { ...t } : t))} variant="secondary">
-                Retry
-              </Button>
+              <Button onClick={() => setSelectedTopic((t) => (t ? { ...t } : t))} variant="secondary">Retry</Button>
               <Button onClick={handleReturnToTopics} variant="outline">Back to Themes</Button>
             </div>
           </div>
         ) : (
           <MissionControl
-            key={`${selectedTopic.title}-${selectedImageIdx}`}
+            // ===== CORRECTION 3: More robust key =====
+            key={`${selectedTopic.title}-${selectedTopic.images?.[selectedImageIdx]?.href ?? 'no-image'}`}
             mission={selectedTopic.title}
             images={reorderImages(selectedTopic.images, selectedImageIdx)}
             context={buildContext(selectedTopic, selectedImageIdx)}

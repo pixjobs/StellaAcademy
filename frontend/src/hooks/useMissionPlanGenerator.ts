@@ -67,13 +67,12 @@ function isCachedResponse(data: unknown): data is { result: PollCompleted['resul
 /* -------------------------------------------------------------------------- */
 
 const MAX_ENQUEUE_RETRIES = 3;
-const ENQUEUE_RETRY_DELAY_MS = 1000;
+const ENQUEUE_RETRY_DELAY_MS = 1500; // Slightly increased base retry
 
 function clamp(n: number, lo: number, hi: number): number {
   return Math.max(lo, Math.min(hi, n));
 }
 
-/** Parse Retry-After (seconds or HTTP-date) and prefer X-Poll-After-Ms if present. */
 function suggestedRetryDelayMs(res: Response, fallbackMs: number): number {
   const pollAfter = res.headers.get('X-Poll-After-Ms');
   if (pollAfter) {
@@ -137,7 +136,6 @@ export function useMissionPlanGenerator(missionType: MissionType) {
             cache: 'no-store',
           });
 
-          // 202 Accepted: poll with the provided jobId
           if (res.status === 202) {
             const data = (await res.json()) as { jobId?: string };
             if (!data.jobId) throw new Error('API returned 202 but no jobId.');
@@ -145,7 +143,6 @@ export function useMissionPlanGenerator(missionType: MissionType) {
             return;
           }
 
-          // 200 OK: cached result path
           if (res.ok) {
             const data = (await res.json()) as unknown;
             const plan = isCachedResponse(data) ? extractPlan(data.result) : null;
@@ -159,20 +156,17 @@ export function useMissionPlanGenerator(missionType: MissionType) {
             throw new Error(`Invalid cached response received: ${JSON.stringify(data)}`);
           }
 
-          // 503/429 → backoff using server hint then retry
           if (res.status === 503 || res.status === 429) {
             const delay = suggestedRetryDelayMs(res, ENQUEUE_RETRY_DELAY_MS * attempt);
             await new Promise((r) => setTimeout(r, delay));
             continue;
           }
 
-          // 4xx other than 429: do not retry
           if (res.status >= 400 && res.status < 500) {
             const txt = await res.text();
             throw new Error(`Failed to start mission generation (${res.status}): ${txt}`);
           }
 
-          // 5xx: retry
           const txt = await res.text();
           throw new Error(`Server error (${res.status}): ${txt}`);
         } catch (e) {
@@ -209,8 +203,11 @@ export function useMissionPlanGenerator(missionType: MissionType) {
     let stopped = false;
     let pollCount = 0;
 
+    // ===== CORRECTION 2: INCREASE TIME BETWEEN REQUESTS =====
+    // This function makes the polling more patient.
     const schedule = (ms: number) => {
-      setTimeout(poll, clamp(ms, 500, 10_000));
+      // Increased the minimum delay to 1000ms and the maximum to 15,000ms
+      setTimeout(poll, clamp(ms, 1000, 15_000));
     };
 
     const poll = async () => {
@@ -223,34 +220,30 @@ export function useMissionPlanGenerator(missionType: MissionType) {
           cache: 'no-store',
         });
 
-        // Handle throttling / temporary unavailability as retryable
         if (res.status === 503 || res.status === 429) {
           setStatus('waiting');
-          const delay = suggestedRetryDelayMs(res, 2000);
+          const delay = suggestedRetryDelayMs(res, 3000); // Increased fallback
           schedule(delay);
           return;
         }
 
-        // 410 Gone → stop polling; the job expired/removed
         if (res.status === 410) {
           const txt = await res.text();
           throw new Error(`Job no longer available (410). ${txt}`);
         }
 
-        // 404 Not found → brief retries (queue propagation / eventual consistency)
         if (res.status === 404) {
           setStatus('waiting');
           pollCount += 1;
-          const delay = clamp(1000 + pollCount * 400, 1000, 5000);
+          const delay = clamp(1500 + pollCount * 500, 1500, 6000); // Slower retries on 404
           schedule(delay);
           return;
         }
 
         if (!res.ok) {
-          // Other non-OK → treat as transient once, then escalate.
           pollCount += 1;
           if (pollCount <= 2) {
-            const delay = clamp(1500 * pollCount, 1000, 5000);
+            const delay = clamp(2000 * pollCount, 2000, 6000);
             schedule(delay);
             return;
           }
@@ -270,24 +263,48 @@ export function useMissionPlanGenerator(missionType: MissionType) {
         }
 
         if (json.state === 'failed') {
+          // Pass the specific error from the backend instead of a generic one
           throw new Error(json.error || 'The mission generation process failed.');
         }
 
-        // waiting/active/delayed/paused
         setStatus(json.state === 'active' ? 'generating' : 'waiting');
         pollCount += 1;
 
-        // Prefer server hint for next poll
-        const hintedDelay = suggestedRetryDelayMs(res, 1500);
-        const expBackoff = clamp(Math.round(1500 * Math.pow(1.2, pollCount)), 1000, 8000);
+        // More patient backoff calculation
+        const hintedDelay = suggestedRetryDelayMs(res, 2500);
+        // Increased base delay and growth factor, with a higher ceiling
+        const expBackoff = clamp(Math.round(2500 * Math.pow(1.25, pollCount)), 1000, 12000);
         const delay = Math.max(hintedDelay, expBackoff);
         schedule(delay);
+
       } catch (e) {
-        if (!stopped && (e as Error).name !== 'AbortError') {
-          console.error('Polling error:', e);
-          setError('An error occurred while fetching the mission plan. Please try again.');
-          setStatus('error');
+        if (stopped || (e as Error).name === 'AbortError') return;
+
+        // ===== CORRECTION 1: SEE THE ACTUAL ERROR =====
+        // This block now extracts the specific error message from the backend
+        // instead of showing a generic one.
+        console.error('Polling error:', e);
+        let specificError = 'An error occurred while fetching the mission plan.';
+        if (e instanceof Error) {
+            // Check if the error message is the JSON response from our API
+            if (e.message.includes('{') && e.message.includes('state') && e.message.includes('error')) {
+                try {
+                    const jsonText = e.message.substring(e.message.indexOf('{'));
+                    const errorPayload = JSON.parse(jsonText) as { error?: string };
+                    if (errorPayload.error) {
+                        specificError = errorPayload.error;
+                    }
+                } catch { /* Ignore parsing errors, use the full message */ 
+                    specificError = e.message;
+                }
+            } else {
+                // Use the error's message directly if it's not our specific JSON format
+                specificError = e.message;
+            }
         }
+        setError(`Mission Failed: ${specificError}`);
+        // =======================================================
+        setStatus('error');
       }
     };
 
