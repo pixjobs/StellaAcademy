@@ -7,17 +7,17 @@ import * as tls from 'tls';
 import * as fs from 'fs';
 import { promises as dnsPromises, lookup as dnsLookupNative } from 'dns';
 
-// ────────────────────────────────────────────────────────────────────────────────
-// Module State
-// ────────────────────────────────────────────────────────────────────────────────
+/* ─────────────────────────────────────────────────────────
+   Module State
+────────────────────────────────────────────────────────── */
 let connection: Redis | null = null;
 let connectionPromise: Promise<Redis> | null = null;
 let queue: Queue | null = null;
 let heartbeatTimer: ReturnType<typeof setInterval> | null = null;
 
-// ────────────────────────────────────────────────────────────────────────────────
-// Types & utils
-// ────────────────────────────────────────────────────────────────────────────────
+/* ─────────────────────────────────────────────────────────
+   Types & Utils
+────────────────────────────────────────────────────────── */
 type ErrnoLike = { code?: string; message?: string; stack?: string };
 function isErrnoLike(e: unknown): e is ErrnoLike {
   return !!e && typeof e === 'object' && ('message' in (e as Record<string, unknown>) || 'code' in (e as Record<string, unknown>));
@@ -42,9 +42,9 @@ function asRegexEnv(name: string): RegExp | null {
   try { return new RegExp(raw); } catch { return null; }
 }
 
-// ────────────────────────────────────────────────────────────────────────────────
-// TLS policy helpers
-// ────────────────────────────────────────────────────────────────────────────────
+/* ─────────────────────────────────────────────────────────
+   TLS policy helpers
+────────────────────────────────────────────────────────── */
 const MANAGED_TLS_HOST_REGEX_DEFAULT = /(?:^|\.)(upstash\.io)$/i;
 function shouldUseTLS(u: URL): boolean {
   if (asBoolEnv('REDIS_FORCE_TLS')) return true;
@@ -76,46 +76,63 @@ function assertSecureInProd(url: string): void {
   if (isProd && allow && !allow.test(u.hostname)) throw new Error(`❌ Host not allowed in production: ${u.hostname}`);
 }
 
-// ────────────────────────────────────────────────────────────────────────────────
-// DNS cache (TTL-aware). IPv4 preferred.
-// ────────────────────────────────────────────────────────────────────────────────
-type CacheKey = `${string}|${4|6}`;
-type CachedAddr = { address: string; family: 4|6; expiresAt: number };
-type ResolveWithTtl4 = { address: string; ttl: number };
-type ResolveWithTtl6 = { address: string; ttl: number };
+/* ─────────────────────────────────────────────────────────
+   DNS cache (TTL-aware, IPv4 preferred, bad-IP eviction)
+────────────────────────────────────────────────────────── */
+type CacheKey = `${string}|${4 | 6}`;
+type CachedAddr = { address: string; family: 4 | 6; expiresAt: number };
+
+// Node's resolve4/6({ttl:true}) types don't surface ttl in @types/node
+interface ResolveWithTtl4 { address: string; ttl: number }
+interface ResolveWithTtl6 { address: string; ttl: number }
 
 const dnsCache = new Map<CacheKey, CachedAddr>();
-const DNS_TTL_CAP_MS = asIntEnv('REDIS_DNS_TTL_CAP_MS', 5 * 60_000);
+const DNS_TTL_CAP_MS = asIntEnv('REDIS_DNS_TTL_CAP_MS', 30_000);
 const DNS_NEG_TTL_MS = asIntEnv('REDIS_DNS_NEG_TTL_MS', 5_000);
-const preferFamily: 4|6 = process.env.REDIS_FAMILY === '6' ? 6 : 4;
+const DNS_CACHE_MAX = asIntEnv('REDIS_DNS_CACHE_MAX', 128);
+const preferFamily: 4 | 6 = process.env.REDIS_FAMILY === '6' ? 6 : 4;
 
 const now = () => Date.now();
 
-async function resolveWithTtl(hostname: string, family: 4|6): Promise<CachedAddr> {
+function dnsCacheSet(key: CacheKey, entry: CachedAddr): void {
+  if (dnsCache.size >= DNS_CACHE_MAX) {
+    const first = dnsCache.keys().next().value as CacheKey | undefined;
+    if (first) dnsCache.delete(first);
+  }
+  dnsCache.set(key, entry);
+}
+
+function evictDnsCacheFor(hostname: string, family: 4 | 6): void {
+  dnsCache.delete(`${hostname}|${family}` as CacheKey);
+}
+
+async function resolveWithTtl(hostname: string, family: 4 | 6): Promise<CachedAddr> {
   const key: CacheKey = `${hostname}|${family}`;
   const cached = dnsCache.get(key);
   if (cached && cached.expiresAt > now()) return cached;
 
   try {
     if (family === 4) {
-      const answers: ResolveWithTtl4[] = await dnsPromises.resolve4(hostname, { ttl: true }) as unknown as ResolveWithTtl4[];
+      const answers = (await dnsPromises.resolve4(hostname, { ttl: true })) as unknown as ResolveWithTtl4[];
       if (answers.length) {
         const a = answers[0];
         const ttlMs = Math.min((a.ttl ? a.ttl * 1000 : DNS_TTL_CAP_MS), DNS_TTL_CAP_MS);
         const entry: CachedAddr = { address: a.address, family: 4, expiresAt: now() + ttlMs };
-        dnsCache.set(key, entry); return entry;
+        dnsCacheSet(key, entry);
+        return entry;
       }
     } else {
-      const answers: ResolveWithTtl6[] = await dnsPromises.resolve6(hostname, { ttl: true }) as unknown as ResolveWithTtl6[];
+      const answers = (await dnsPromises.resolve6(hostname, { ttl: true })) as unknown as ResolveWithTtl6[];
       if (answers.length) {
         const a = answers[0];
         const ttlMs = Math.min((a.ttl ? a.ttl * 1000 : DNS_TTL_CAP_MS), DNS_TTL_CAP_MS);
         const entry: CachedAddr = { address: a.address, family: 6, expiresAt: now() + ttlMs };
-        dnsCache.set(key, entry); return entry;
+        dnsCacheSet(key, entry);
+        return entry;
       }
     }
     const neg: CachedAddr = { address: '', family, expiresAt: now() + DNS_NEG_TTL_MS };
-    dnsCache.set(key, neg);
+    dnsCacheSet(key, neg);
     throw new Error('NO_DNS_RESULTS');
   } catch (e) {
     // Fallback to OS resolver
@@ -123,25 +140,25 @@ async function resolveWithTtl(hostname: string, family: 4|6): Promise<CachedAddr
       dnsLookupNative(hostname, { family, all: false }, (err, address, fam) => {
         if (err || !address) {
           const neg: CachedAddr = { address: '', family, expiresAt: now() + DNS_NEG_TTL_MS };
-          dnsCache.set(key, neg);
+          dnsCacheSet(key, neg);
           reject(e instanceof Error ? e : new Error(String(e)));
           return;
         }
         const entry: CachedAddr = {
           address,
-          family: (fam === 6 ? 6 : 4),
-          expiresAt: now() + DNS_TTL_CAP_MS
+          family: fam === 6 ? 6 : 4,
+          expiresAt: now() + DNS_TTL_CAP_MS,
         };
-        dnsCache.set(key, entry);
+        dnsCacheSet(key, entry);
         resolve(entry);
       });
     });
   }
 }
 
-// ────────────────────────────────────────────────────────────────────────────────
-// Redis options & backoff
-// ────────────────────────────────────────────────────────────────────────────────
+/* ─────────────────────────────────────────────────────────
+   Redis options & backoff
+────────────────────────────────────────────────────────── */
 function expBackoffWithJitter(times: number, capMs: number): number {
   const base = Math.min(1500 * 2 ** times, capMs);
   return Math.floor(Math.random() * base);
@@ -167,7 +184,7 @@ function buildRedisOptions(url: string, overrideHost?: string): RedisOptions {
     lazyConnect: true,
 
     // Networking
-    host: overrideHost || undefined,
+    host: overrideHost || undefined, // use pre-resolved IP to avoid repeated DNS
     family: preferFamily,
     connectTimeout,
     keepAlive: keepAliveMs,
@@ -189,7 +206,7 @@ function buildRedisOptions(url: string, overrideHost?: string): RedisOptions {
 
   if (useTLS) {
     base.tls = {
-      servername: u.hostname,
+      servername: u.hostname, // SNI must remain the hostname, even if host is an IP
       rejectUnauthorized: !insecureTLS,
       minVersion: 'TLSv1.2',
       maxVersion: 'TLSv1.3',
@@ -199,17 +216,15 @@ function buildRedisOptions(url: string, overrideHost?: string): RedisOptions {
   return base;
 }
 
-// ────────────────────────────────────────────────────────────────────────────────
-// TLS probe (non-fatal)
-// ────────────────────────────────────────────────────────────────────────────────
+/* ─────────────────────────────────────────────────────────
+   TLS probe (non-fatal)
+────────────────────────────────────────────────────────── */
 function getCertFields(cert: tls.PeerCertificate | tls.DetailedPeerCertificate): { cn: string; san: string } {
   const detailed = cert as tls.DetailedPeerCertificate;
 
-  // CN
   const cnRaw: unknown = detailed?.subject?.CN;
   const cn: string = typeof cnRaw === 'string' && cnRaw.length > 0 ? cnRaw : '?';
 
-  // SAN (Node exposes as a string like: 'DNS:example.com, DNS:*.example.com')
   const sanRaw: unknown = detailed?.subjectaltname;
   const san: string = typeof sanRaw === 'string' && sanRaw.length > 0 ? sanRaw : '?';
 
@@ -231,7 +246,7 @@ async function probeTls(host: string, port: number): Promise<void> {
       t.on('error', (er: unknown) => {
         const code = isErrnoLike(er) && er.code ? er.code : 'TLS_ERROR';
         console.error('[redis][tls] FAIL', code, formatErrorBrief(er));
-        try { t.destroy(); } catch {}
+        try { t.destroy(); } catch { /* ignore */ }
         resolve();
       });
     });
@@ -239,25 +254,58 @@ async function probeTls(host: string, port: number): Promise<void> {
       console.error('[redis][tcp] FAIL', (isErrnoLike(er) && er.code) || 'TCP_ERROR', formatErrorBrief(er));
       resolve();
     });
-    sock.on('timeout', () => { console.error('[redis][tcp] TIMEOUT'); try { sock.destroy(); } catch {} resolve(); });
+    sock.on('timeout', () => { console.error('[redis][tcp] TIMEOUT'); try { sock.destroy(); } catch { /* ignore */ } resolve(); });
   });
 }
 
-// ────────────────────────────────────────────────────────────────────────────────
+/* ─────────────────────────────────────────────────────────
+   LOADING/boot-aware retry helpers
+────────────────────────────────────────────────────────── */
+function isRedisLoadingError(e: unknown): boolean {
+  const msg = (e instanceof Error ? e.message : String(e)).toUpperCase();
+  return msg.includes('LOADING REDIS IS LOADING');
+}
+function isHardNetworkRefusal(e: unknown): boolean {
+  const msg = (e instanceof Error ? e.message : String(e)).toUpperCase();
+  return /ECONNREFUSED|EHOSTUNREACH|ENETUNREACH/.test(msg);
+}
+async function untilOk<T>(
+  fn: () => Promise<T>,
+  attempts = 5,
+  baseMs = 250,
+  maxMs = 1500
+): Promise<T> {
+  let i = 0;
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    try { return await fn(); }
+    catch (e) {
+      i += 1;
+      if (i >= attempts || (!isRedisLoadingError(e) && !isHardNetworkRefusal(e))) throw e;
+      const backoff = Math.min(baseMs * 2 ** (i - 1), maxMs);
+      const jitter = Math.round(backoff * (0.6 + Math.random() * 0.8));
+      await new Promise((r) => setTimeout(r, jitter));
+    }
+  }
+}
+
+/* ─────────────────────────────────────────────────────────
+   Heartbeat
+────────────────────────────────────────────────────────── */
 function startHeartbeat(client: Redis): void {
   const interval = asIntEnv('REDIS_HEARTBEAT_MS', 15_000);
   if (interval <= 0) return;
   stopHeartbeat();
-  heartbeatTimer = setInterval(() => { void client.ping().catch(() => {}); }, interval);
+  heartbeatTimer = setInterval(() => { void client.ping().catch(() => { /* ioredis will reconnect */ }); }, interval);
   (heartbeatTimer as unknown as { unref?: () => void }).unref?.();
 }
 function stopHeartbeat(): void {
   if (heartbeatTimer) { clearInterval(heartbeatTimer); heartbeatTimer = null; }
 }
 
-// ────────────────────────────────────────────────────────────────────────────────
-// Public API
-// ────────────────────────────────────────────────────────────────────────────────
+/* ─────────────────────────────────────────────────────────
+   Public API
+────────────────────────────────────────────────────────── */
 export async function getConnection(): Promise<Redis> {
   if (connection) return connection;
   if (connectionPromise) return connectionPromise;
@@ -283,6 +331,7 @@ export async function getConnection(): Promise<Redis> {
 
     if (useTLS) await probeTls(host, port);
 
+    // Resolve (with TTL cache) before connect to avoid repeated DNS & to quickly failover
     let resolvedHost = host;
     try {
       const addr = await resolveWithTtl(host, preferFamily);
@@ -300,18 +349,23 @@ export async function getConnection(): Promise<Redis> {
     client.on('close', () => console.warn('[redis] close'));
     client.on('error', (er: unknown) => {
       const msg = formatErrorBrief(er);
-      if (/EPIPE|ECONNRESET|ETIMEDOUT|NR_CLOSED|READONLY|ENODNS/i.test(msg)) {
+      const upper = msg.toUpperCase();
+
+      // If we hit a hard refusal/route issue, evict the cached IP for the hostname/family
+      if (/ECONNREFUSED|EHOSTUNREACH|ENETUNREACH|EAI_AGAIN/.test(upper)) {
+        evictDnsCacheFor(host, preferFamily);
+      }
+
+      if (/(EPIPE|ECONNRESET|ETIMEDOUT|NR_CLOSED|READONLY|ENODNS|ECANCELED)/.test(upper)) {
         console.warn('[redis] transient error:', msg);
       } else {
         console.error('[redis] error:', msg);
       }
     });
 
-    await client.connect();
-    await Promise.race([
-      client.ping(),
-      new Promise<void>((_resolve, reject) => setTimeout(() => reject(new Error('PING_TIMEOUT')), 3000)),
-    ]);
+    // Boot-time connect & ping with small retries (covers LOADING and brief refusals)
+    await untilOk(() => client.connect(), 5, 250, 1500);
+    await untilOk(() => client.ping(), 5, 250, 1500);
 
     startHeartbeat(client);
     connection = client;
@@ -334,8 +388,8 @@ export async function getQueue(): Promise<Queue> {
 
 export async function closeQueue(): Promise<void> {
   stopHeartbeat();
-  if (queue) { try { await queue.close(); } catch {} queue = null; }
-  if (connection) { try { await connection.quit(); } catch {} connection = null; }
+  if (queue) { try { await queue.close(); } catch { /* ignore */ } queue = null; }
+  if (connection) { try { await connection.quit(); } catch { /* ignore */ } connection = null; }
   connectionPromise = null;
 }
 
