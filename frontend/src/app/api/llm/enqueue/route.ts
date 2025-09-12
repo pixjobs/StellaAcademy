@@ -5,8 +5,8 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'node:crypto';
 import { Job, JobsOptions, JobState } from 'bullmq';
-import type { LlmJobData, LlmJobResult, TutorPreflightOutput } from '@/types/llm';
 
+import type { LlmJobData, LlmJobResult, TutorPreflightOutput } from '@/types/llm';
 import {
   enqueueIdempotent,
   queueStats as queueStatsHelper,
@@ -16,11 +16,13 @@ import {
 import { getQueue } from '@/lib/queue';
 
 /* ─────────────────────────────────────────────────────────
-  TYPE DEFINITIONS & VALIDATION
+  TYPES & VALIDATION
 ────────────────────────────────────────────────────────── */
 
 interface QueueStats {
   isPaused?: boolean;
+  waiting?: number;
+  active?: number;
   [key: string]: unknown;
 }
 
@@ -28,31 +30,31 @@ type EnqueueResult = {
   state: JobState | 'exists' | 'unknown';
 };
 
+type CacheVal<T> = { value: T; fetchedAt: number; soft: number; hard: number };
+type MissingInfo = { firstSeen: number; hits: number };
+
 /**
- * Type guard to validate that a job's return value matches the expected LlmJobResult shape.
- * This is the critical fix to prevent malformed data from reaching the frontend.
+ * Validate that a job's return value matches expected LlmJobResult shape.
  */
 function isValidLlmJobResult(value: unknown): value is LlmJobResult {
   if (typeof value !== 'object' || value === null) return false;
-
-  // Use `in` operator for safe property checking
   if (!('type' in value) || !('result' in value)) return false;
 
-  const data = value as LlmJobResult;
+  const data = value as { type: unknown; result: unknown };
+  const t = data.type;
 
-  if (data.type === 'tutor-preflight') {
-    if (typeof data.result !== 'object' || data.result === null) return false;
-    const result = data.result as TutorPreflightOutput;
+  if (t === 'tutor-preflight') {
+    const r = data.result;
+    if (typeof r !== 'object' || r === null) return false;
+    const rr = r as TutorPreflightOutput;
     return (
-      typeof result.systemPrompt === 'string' &&
-      Array.isArray(result.starterMessages) &&
-      typeof result.warmupQuestion === 'string'
+      typeof rr.systemPrompt === 'string' &&
+      Array.isArray(rr.starterMessages) &&
+      typeof rr.warmupQuestion === 'string'
     );
   }
 
-  // Add more specific checks for 'mission' and 'ask' results if needed for robustness.
-  // For now, a basic check is sufficient.
-  if (data.type === 'mission' || data.type === 'ask') {
+  if (t === 'mission' || t === 'ask') {
     return typeof data.result === 'object' && data.result !== null;
   }
 
@@ -60,25 +62,24 @@ function isValidLlmJobResult(value: unknown): value is LlmJobResult {
 }
 
 /* ─────────────────────────────────────────────────────────
-  DEBUG FLAG & CACHING
+  DEBUG, CACHES, CONSTANTS
 ────────────────────────────────────────────────────────── */
+
 const DEBUG = process.env.DEBUG_LLM_ENQUEUE === '1';
 const log = (msg: string, ctx: Record<string, unknown> = {}) => {
   if (DEBUG) console.log(`[llm/enqueue] ${msg}`, ctx);
 };
 
-type CacheVal<T> = { value: T; fetchedAt: number; soft: number; hard: number };
 const CACHE = new Map<string, CacheVal<LlmJobResult>>();
-const SOFT_MS = Number(process.env.LLM_CACHE_SOFT_MS ?? 5 * 60 * 1000);
-const HARD_MS = Number(process.env.LLM_CACHE_HARD_MS ?? 30 * 60 * 1000);
+const SOFT_MS = Number(process.env.LLM_CACHE_SOFT_MS ?? 5 * 60 * 1000);  // 5 min
+const HARD_MS = Number(process.env.LLM_CACHE_HARD_MS ?? 30 * 60 * 1000); // 30 min
 
-type MissingInfo = { firstSeen: number; hits: number };
 const MISSING_IDS = new Map<string, MissingInfo>();
-const MISSING_TTL_MS = Number(process.env.LLM_MISSING_TTL_MS ?? 2 * 60 * 1000);
+const MISSING_TTL_MS = Number(process.env.LLM_MISSING_TTL_MS ?? 2 * 60 * 1000); // 2 min window
 const MISSING_MAX_HITS = Number(process.env.LLM_MISSING_MAX_HITS ?? 5);
 
 const POSTED_IDS = new Map<string, number>();
-const POSTED_GRACE_MS = Number(process.env.LLM_POSTED_GRACE_MS ?? 10 * 60 * 1000);
+const POSTED_GRACE_MS = Number(process.env.LLM_POSTED_GRACE_MS ?? 10 * 60 * 1000); // 10 min grace
 
 log('Module config', {
   SOFT_MS,
@@ -91,13 +92,18 @@ log('Module config', {
 });
 
 /* ─────────────────────────────────────────────────────────
-  Small utils
+  SMALL UTILS
 ────────────────────────────────────────────────────────── */
-function hashId(o: unknown) {
+
+function hashId(o: unknown): string {
   return crypto.createHash('sha256').update(JSON.stringify(o)).digest('hex');
 }
 
-function getCached(id: string) {
+function isRecord(x: unknown): x is Record<string, unknown> {
+  return typeof x === 'object' && x !== null;
+}
+
+function getCached(id: string): CacheVal<LlmJobResult> | null {
   const v = CACHE.get(id);
   if (!v) return null;
   if (Date.now() > v.hard) {
@@ -108,7 +114,7 @@ function getCached(id: string) {
   return v;
 }
 
-function setCached(id: string, value: LlmJobResult) {
+function setCached(id: string, value: LlmJobResult): void {
   const now = Date.now();
   CACHE.set(id, { value, fetchedAt: now, soft: now + SOFT_MS, hard: now + HARD_MS });
   log('Cache set', { jobId: id, softSec: SOFT_MS / 1000, hardSec: HARD_MS / 1000 });
@@ -151,6 +157,50 @@ function okJson(data: object, init?: number | ResponseInit) {
   return NextResponse.json(data, opts);
 }
 
+function clamp(n: number, lo: number, hi: number): number {
+  return Math.max(lo, Math.min(hi, n));
+}
+
+/**
+ * Compute client polling delay with jitter, based on job state and queue pressure.
+ * Uses a switch to avoid comparing against states not present in JobState types.
+ */
+function computePollAfterMs(
+  state: JobState | 'exists' | 'unknown',
+  opts: { workers: number; waiting?: number; active?: number }
+): number {
+  let base: number;
+  switch (state) {
+    case 'waiting':
+      base = 1500;
+      break;
+    case 'active':
+      base = 1200;
+      break;
+    case 'delayed':
+      base = 2000;
+      break;
+    default:
+      // completed/failed/prioritized/waiting-children/exists/unknown/etc.
+      base = 1500;
+      break;
+  }
+
+  // No workers → slow down
+  if (opts.workers <= 0) base = Math.max(base, 5000);
+
+  // Pressure-based backoff
+  const w = typeof opts.waiting === 'number' ? opts.waiting : 0;
+  const a = typeof opts.active === 'number' ? opts.active : 0;
+  const ratio = a > 0 ? w / a : w;
+  if (ratio > 10) base = Math.max(base, 4000);
+  else if (ratio > 3) base = Math.max(base, 2500);
+
+  // Jitter to de-sync many clients
+  const jitter = base * (0.6 + Math.random() * 0.8); // 0.6x..1.4x
+  return clamp(Math.round(jitter), 800, 8000);
+}
+
 /* ─────────────────────────────────────────────────────────
   POST (enqueue)
 ────────────────────────────────────────────────────────── */
@@ -162,13 +212,17 @@ export async function POST(req: NextRequest) {
 
     let body: LlmJobData;
     try {
-      body = JSON.parse(raw);
+      body = JSON.parse(raw) as LlmJobData;
     } catch {
       return withJobHeaders(okJson({ error: 'Malformed JSON.' }, 400), jobId, 'error');
     }
 
     if (body?.type !== 'mission' && body?.type !== 'ask' && body?.type !== 'tutor-preflight') {
-      return withJobHeaders(okJson({ error: "Invalid 'type' (use 'mission', 'ask', or 'tutor-preflight')." }, 400), jobId, 'error');
+      return withJobHeaders(
+        okJson({ error: "Invalid 'type' (use 'mission', 'ask', or 'tutor-preflight')." }, 400),
+        jobId,
+        'error'
+      );
     }
     if (!body?.payload || typeof body.payload !== 'object') {
       return withJobHeaders(okJson({ error: "Invalid 'payload'." }, 400), jobId, 'error');
@@ -177,6 +231,7 @@ export async function POST(req: NextRequest) {
     jobId = body.cacheKey || hashId({ type: body.type, payload: body.payload });
     log('POST received', { jobId, type: body.type, idSource: body.cacheKey ? 'cacheKey' : 'hash' });
 
+    // Fresh cache hit → return completed immediately
     const cached = getCached(jobId);
     if (cached && Date.now() < cached.soft) {
       const res = okJson(
@@ -192,7 +247,11 @@ export async function POST(req: NextRequest) {
       return withJobHeaders(res, jobId, 'completed');
     }
 
-    const [ping, statsBefore, workerCount] = await Promise.all([redisPing(), queueStats(), getWorkersCount()]);
+    // Optional diagnostics (avoid extra load when DEBUG is off)
+    const [ping, statsBefore, workerCount] = DEBUG
+      ? await Promise.all([redisPing(), queueStats(), getWorkersCount()])
+      : [undefined, {} as QueueStats, -1];
+
     log('Enqueuing...', { jobId, workerCount });
 
     const addOpts: JobsOptions = {
@@ -203,39 +262,56 @@ export async function POST(req: NextRequest) {
       removeOnFail: { age: Number(process.env.LLM_KEEP_FAIL_AGE ?? 1800), count: 1000 },
     };
 
-    const { state } = (await enqueueIdempotent('llm', { ...body, cacheKey: jobId }, jobId, undefined, addOpts)) as EnqueueResult;
+    const { state } = (await enqueueIdempotent(
+      'llm',
+      { ...body, cacheKey: jobId },
+      jobId,
+      undefined,
+      addOpts
+    )) as EnqueueResult;
 
     POSTED_IDS.set(jobId, Date.now());
     log('Job recorded in POSTED_IDS', { jobId });
 
+    // Get current state if possible
     let currentState: JobState | 'exists' | 'unknown' = state;
     try {
       const q = await getQueue();
       const job = await Job.fromId(q, jobId);
       currentState = job ? await job.getState() : state;
     } catch {
-      // ignore; we still respond 202
+      // ignore; still return 202
     }
+
+    // Coerce 'exists' / 'unknown' to a concrete JobState for headers/backoff
+    const headerState: JobState =
+      currentState === 'unknown' || currentState === 'exists' ? 'waiting' : currentState;
 
     const res = okJson(
       {
         accepted: true,
         jobId,
         state: currentState,
-        workerStatus: { activeWorkers: workerCount, isPaused: statsBefore.isPaused ?? false },
-        queue: { before: statsBefore },
-        redis: ping,
+        workerStatus: DEBUG ? { activeWorkers: workerCount, isPaused: statsBefore.isPaused ?? false } : undefined,
+        queue: DEBUG ? { before: statsBefore } : undefined,
+        redis: DEBUG ? ping : undefined,
         message:
-          workerCount > 0
+          workerCount > 0 || !DEBUG
             ? 'Poll this endpoint with GET ?id=<jobId>'
             : 'Job accepted, but no active workers were found; it will remain queued.',
       },
       202
     );
-    
-    const headerState = currentState === 'unknown' ? 'waiting' : currentState;
-    return withJobHeaders(res, jobId, headerState);
 
+    const pollAfterMs = computePollAfterMs(headerState, {
+      workers: DEBUG ? workerCount : -1,
+      waiting: DEBUG ? Number(statsBefore.waiting ?? 0) : undefined,
+      active: DEBUG ? Number(statsBefore.active ?? 0) : undefined,
+    });
+    res.headers.set('Retry-After', String(Math.ceil(pollAfterMs / 1000)));
+    res.headers.set('X-Poll-After-Ms', String(pollAfterMs));
+
+    return withJobHeaders(res, jobId, headerState);
   } catch (err) {
     const msg = (err as Error)?.message || String(err);
     console.error('[llm/enqueue][POST] Unhandled error', { jobId, error: msg });
@@ -252,11 +328,16 @@ export async function GET(req: NextRequest) {
   const debug = req.nextUrl.searchParams.get('debug') === '1';
   const list = req.nextUrl.searchParams.get('list') === '1';
   const statsOnly = req.nextUrl.searchParams.get('stats') === '1';
+  const lite = req.nextUrl.searchParams.get('lite') === '1';
 
   try {
     if (statsOnly) {
       const [ping, stats, workers] = await Promise.all([redisPing(), queueStats(), getWorkersCount()]);
-      return withJobHeaders(okJson({ queue: stats, workers: { activeWorkers: workers }, redis: ping }, 200), id ?? '', 'stats');
+      return withJobHeaders(
+        okJson({ queue: stats, workers: { activeWorkers: workers }, redis: ping }, 200),
+        id ?? '',
+        'stats'
+      );
     }
 
     if (list) {
@@ -281,8 +362,10 @@ export async function GET(req: NextRequest) {
 
     const q = await getQueue();
     const job = await Job.fromId(q, id);
+
     if (!job) {
       log('Job not found in BullMQ', { id });
+
       const postedAt = POSTED_IDS.get(id);
       let status: 404 | 410 = 404;
       let reason = '';
@@ -299,23 +382,15 @@ export async function GET(req: NextRequest) {
             : 'Job not found in queue.';
       }
 
-      const [ping, stats, workers] = await Promise.all([redisPing(), queueStats(), getWorkersCount()]);
-      const res = okJson(
-        {
-          error: status === 410 ? 'Job expired or was removed' : 'Job not found',
-          id,
-          reason,
-          likely: [
-            'Polling the wrong jobId',
-            'Job removed after completion (raise removeOnComplete.age while debugging)',
-            'Worker/route mismatch: different REDIS_URL or queue name',
-          ],
-          queue: stats,
-          workers: { activeWorkers: workers },
-          redis: ping,
-        },
-        status
-      );
+      const payload: Record<string, unknown> = { error: status === 410 ? 'Job expired or was removed' : 'Job not found', id, reason };
+      if (DEBUG) {
+        const [ping, stats, workers] = await Promise.all([redisPing(), queueStats(), getWorkersCount()]);
+        payload.queue = stats;
+        payload.workers = { activeWorkers: workers };
+        payload.redis = ping;
+      }
+
+      const res = okJson(payload, status);
       if (status === 410) res.headers.set('Retry-After', '30');
       return withJobHeaders(res, id, status === 410 ? 'gone' : 'missing');
     }
@@ -327,22 +402,20 @@ export async function GET(req: NextRequest) {
     if (state === 'completed') {
       const result = job.returnvalue;
 
-      // ===== THE FIX IS HERE =====
-      // Validate the job's return value before sending it to the client.
-      // If the data is malformed, treat the job as if it failed.
+      // Validate result before returning
       if (!isValidLlmJobResult(result)) {
         console.error(`[llm/enqueue][GET] Job ${id} completed with malformed result.`, { result });
         const payload = {
-          state: 'failed',
-          progress: 100, // It finished, but incorrectly.
+          state: 'failed' as const,
+          progress: 100,
           error: 'Job completed but worker returned malformed or incomplete data. Check worker logs.',
-          debug: debug ? { rawReturnValue: result } : undefined,
+          debug: debug ? { rawReturnValue: result } as Record<string, unknown> : undefined,
         };
         return withJobHeaders(okJson(payload, 500), id, 'failed');
       }
-      // ===========================
 
       setCached(id, result);
+
       const payload = debug
         ? {
             state,
@@ -369,6 +442,7 @@ export async function GET(req: NextRequest) {
             },
           }
         : { state, progress, result };
+
       return withJobHeaders(okJson(payload, 200), id, state);
     }
 
@@ -379,15 +453,32 @@ export async function GET(req: NextRequest) {
       return withJobHeaders(okJson(payload, 500), id, state);
     }
 
+    // Non-terminal states
+    if (lite) {
+      const resp = okJson({ state, progress }, 200);
+      resp.headers.set('Retry-After', '2');
+      resp.headers.set('X-Poll-After-Ms', '2000');
+      return withJobHeaders(resp, id, state);
+    }
+
     const [workers, counts] = await Promise.all([
       getWorkersCount(),
-      (await getQueue()).getJobCounts('waiting', 'active'),
+      q.getJobCounts('waiting', 'active'),
     ]);
-    return withJobHeaders(
-      okJson({ state, progress, workerStatus: { activeWorkers: workers, ...counts } }, 200),
-      id,
-      state
+
+    const pollAfterMs = computePollAfterMs(state, {
+      workers,
+      waiting: counts.waiting,
+      active: counts.active,
+    });
+
+    const resp = okJson(
+      { state, progress, workerStatus: { activeWorkers: workers, ...counts } },
+      200
     );
+    resp.headers.set('Retry-After', String(Math.ceil(pollAfterMs / 1000)));
+    resp.headers.set('X-Poll-After-Ms', String(pollAfterMs));
+    return withJobHeaders(resp, id, state);
   } catch (err) {
     const msg = (err as Error)?.message || String(err);
     console.error('[llm/enqueue][GET] Unhandled error', { id: req.nextUrl.searchParams.get('id'), error: msg });
