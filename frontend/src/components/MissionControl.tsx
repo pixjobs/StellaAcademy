@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState, useCallback, ComponentType, Dispatch, SetStateAction } from 'react';
-// ===== CHANGE #1: Import next/image =====
 import Image from 'next/image';
 import { useGame } from '@/lib/store';
 import { NotesProvider, useNotes } from '@/lib/notes/NotesContext';
@@ -42,6 +41,7 @@ function MissionControlInternal({
   const { notes, addNote, removeNote, isLoading: isNotesLoading } = useNotes();
   const { messages, loading: isChatLoading, sendMessage, stop, reset } = useMissionChat({ role, mission });
 
+  const hasImages = useMemo(() => images && images.length > 0, [images]);
   const [selImageIndex, setSelImageIndex] = useState(() => Math.max(0, initialImage ?? 0));
   const [chatInputValue, setChatInputValue] = useState('');
   const [mobileView, setMobileView] = useState<'chat' | 'notebook'>('chat');
@@ -50,22 +50,22 @@ function MissionControlInternal({
   useGSAP(() => { gsap.from(rootRef.current, { autoAlpha: 0, duration: 0.45, ease: 'power2.out' }); }, { scope: rootRef });
 
   const buildContext = useCallback(() => {
-    const currentPic = images[selImageIndex];
-    if (!currentPic) return `Student is learning about: ${mission}.`;
-    const lines = [
-      `Student is learning about: ${mission}.`,
-      context?.trim() || '',
-      `Current Image: #${selImageIndex + 1} ${currentPic.title.trim()} – ${currentPic.href.trim()}`,
-    ];
+    const lines = [`Student is learning about: ${mission}.`, context?.trim() || ''];
+    if (hasImages) {
+      const currentPic = images[selImageIndex];
+      if (currentPic) {
+        lines.push(`Current Image: #${selImageIndex + 1} ${currentPic.title.trim()} – ${currentPic.href.trim()}`);
+      }
+    }
     return lines.filter(Boolean).join('\n');
-  }, [images, mission, context, selImageIndex]);
+  }, [images, mission, context, selImageIndex, hasImages]);
 
   useEffect(() => {
-    if (images.length > 0 && messages.length === 0 && !initialMessage) {
+    if (hasImages && messages.length === 0 && !initialMessage) {
       sendMessage(`Give a ${role}-friendly 2-line summary of the current image.`, buildContext());
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [images.length]);
+  }, [hasImages]);
 
   const onSend = (text: string) => {
     sendMessage(text, buildContext());
@@ -74,7 +74,7 @@ function MissionControlInternal({
   };
 
   const handleImageChange = (newIndex: number) => {
-    if (isChatLoading) return;
+    if (!hasImages || isChatLoading) return;
     const totalImages = images.length;
     const nextIndex = (newIndex + totalImages) % totalImages;
     if (nextIndex === selImageIndex) return;
@@ -114,38 +114,48 @@ function MissionControlInternal({
     return initialMessage ? [initialMessage, ...dynamicMessages] : dynamicMessages;
   }, [messages, initialMessage]);
 
-  if (images.length === 0) {
-    return (
-      <div className="rounded-2xl bg-white/5 border border-white/10 backdrop-blur-lg p-4 text-center">
-        <h3 className="font-pixel text-lg text-gold mb-2 font-semibold">Mission Standby</h3>
-        <p className="text-sm">No visuals were retrieved for this objective.</p>
-      </div>
-    );
-  }
-
   return (
     <TooltipProvider>
       <div
         ref={rootRef}
-        className="flex flex-col xl:grid xl:grid-cols-[1.05fr_1.95fr] gap-5 items-start min-h-0"
+        className={clsx(
+          "flex flex-col gap-5 items-start min-h-0",
+          hasImages && "xl:grid xl:grid-cols-[1.05fr_1.95fr]"
+        )}
       >
-        <div className="flex flex-col gap-3 min-h-0">
-          <VisualPanel
-            currentImage={images[selImageIndex]}
-            imageIndex={selImageIndex}
-            imageCount={images.length}
-            onPrev={() => handleImageChange(selImageIndex - 1)}
-            onNext={() => handleImageChange(selImageIndex + 1)}
-            onQuickAction={(prompt) => sendMessage(prompt, buildContext())}
-            onSaveImage={() => addNote({ type: 'image', title: images[selImageIndex].title, imgHref: images[selImageIndex].href })}
-          />
+        {hasImages && (
+          <div className="w-full flex flex-col gap-3 min-h-0">
+            <VisualPanel
+              currentImage={images[selImageIndex]}
+              imageIndex={selImageIndex}
+              imageCount={images.length}
+              onPrev={() => handleImageChange(selImageIndex - 1)}
+              onNext={() => handleImageChange(selImageIndex + 1)}
+              onQuickAction={(prompt) => sendMessage(prompt, buildContext())}
+              onSaveImage={() => addNote({ type: 'image', title: images[selImageIndex].title, imgHref: images[selImageIndex].href })}
+            />
+          </div>
+        )}
 
+        <div className={clsx("w-full flex flex-col gap-3 min-h-0", !hasImages && "xl:grid xl:grid-cols-2")}>
           <div className="flex items-center justify-center rounded-lg bg-black/20 p-1 xl:hidden">
             <TabButton icon={MessageSquare} label="Chat" isActive={mobileView === 'chat'} onClick={() => setMobileView('chat')} />
             <TabButton icon={BookOpen} label="Notebook" isActive={mobileView === 'notebook'} onClick={() => setMobileView('notebook')} />
           </div>
 
-          <div className={clsx({ hidden: mobileView !== 'notebook' }, 'xl:hidden flex-1 min-h-0')}>
+          <div className={clsx("min-h-0", { "hidden xl:block": mobileView !== 'chat' })}>
+            <ChatPanel
+              messages={chatMessages}
+              isLoading={isChatLoading}
+              onSend={onSend}
+              onStop={stop}
+              onCaptureMessage={handleCaptureMessage}
+              inputValue={chatInputValue}
+              setInputValue={setChatInputValue}
+            />
+          </div>
+
+          <div className={clsx("min-h-0", { "hidden xl:block": mobileView !== 'notebook' })}>
             <NotebookPanel
               notes={notes}
               isLoading={isNotesLoading}
@@ -153,29 +163,6 @@ function MissionControlInternal({
               onNoteClick={handleNoteClick}
             />
           </div>
-
-          <div className="hidden xl:block min-h-0">
-            <div className="sticky top-4">
-              <NotebookPanel
-                notes={notes}
-                isLoading={isNotesLoading}
-                onRemoveNote={removeNote}
-                onNoteClick={handleNoteClick}
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className={clsx({ hidden: mobileView !== 'chat' }, 'xl:block flex-1 min-h-0')}>
-          <ChatPanel
-            messages={chatMessages}
-            isLoading={isChatLoading}
-            onSend={onSend}
-            onStop={stop}
-            onCaptureMessage={handleCaptureMessage}
-            inputValue={chatInputValue}
-            setInputValue={setChatInputValue}
-          />
         </div>
       </div>
     </TooltipProvider>
@@ -233,7 +220,6 @@ function VisualPanel({ currentImage, imageIndex, imageCount, onPrev, onNext, onQ
   return (
     <div className="w-full h-full flex flex-col gap-3 sticky top-4">
       <div ref={imageRef} className="relative w-full aspect-video rounded-xl overflow-hidden border border-white/10 bg-black/50 group">
-        {/* ===== CHANGE #2: Replaced <img> with next/image ===== */}
         <Image
           key={currentImage.href}
           src={currentImage.href}
@@ -248,7 +234,7 @@ function VisualPanel({ currentImage, imageIndex, imageCount, onPrev, onNext, onQ
         {imageCount > 1 && (
           <>
             <Button onClick={onPrev} size="icon" variant="secondary" className="absolute left-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity"><ChevronLeft className="h-4 w-4" /></Button>
-            <Button onClick={onNext} size="icon" variant="secondary" className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity"><ChevronRight className="w-4 w-4" /></Button>
+            <Button onClick={onNext} size="icon" variant="secondary" className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity"><ChevronRight className="h-4 w-4" /></Button>
           </>
         )}
       </div>
@@ -258,7 +244,7 @@ function VisualPanel({ currentImage, imageIndex, imageCount, onPrev, onNext, onQ
         <Button onClick={() => onQuickAction('Give me a one-sentence summary.')} variant="outline" size="sm">Summary</Button>
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button onClick={onSaveImage} size="sm" variant="default">
+            <Button onClick={onSaveImage} size="sm">
               <Bookmark className="w-4 h-4 mr-1.5" />
               Save Image
             </Button>

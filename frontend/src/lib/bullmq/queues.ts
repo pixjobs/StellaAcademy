@@ -1,13 +1,47 @@
-import crypto from 'node:crypto';
-import { Job, JobsOptions, Queue, JobState } from 'bullmq';
+import { Queue, JobsOptions, Job, JobState } from 'bullmq';
 import { NextResponse } from 'next/server';
-// --- Import the specific types for your application ---
+import crypto from 'node:crypto';
 import type { LlmJobData, LlmJobResult } from '@/types/llm';
-import { getQueues } from '@/lib/bullmq/queues'; // No longer need queue names here
 import { getConnection } from '@/lib/queue';
 
 /* ─────────────────────────────────────────────────────────
- * Utils
+ * QUEUE DEFINITIONS & SINGLETONS
+ * This is the single source of truth for queue names and instances.
+ * ────────────────────────────────────────────────────────── */
+
+// --- CORRECT QUEUE NAMES (from worker logs) ---
+export const INTERACTIVE_QUEUE_NAME = 'llm-interactive-queue';
+export const BACKGROUND_QUEUE_NAME = 'llm-background-queue';
+
+// Type-safe Queue instances (note the 3rd generic for job name type)
+let interactiveQueue: Queue<LlmJobData, LlmJobResult, string> | null = null;
+let backgroundQueue: Queue<LlmJobData, LlmJobResult, string> | null = null;
+
+/**
+ * A singleton provider for BullMQ Queue instances.
+ * This ensures we reuse the same queue objects and Redis connection
+ * across the application, which is critical for performance.
+ */
+export async function getQueues() {
+  if (interactiveQueue && backgroundQueue) {
+    return { interactiveQueue, backgroundQueue };
+  }
+
+  const connection = await getConnection();
+
+  if (!interactiveQueue) {
+    interactiveQueue = new Queue<LlmJobData, LlmJobResult, string>(INTERACTIVE_QUEUE_NAME, { connection });
+  }
+
+  if (!backgroundQueue) {
+    backgroundQueue = new Queue<LlmJobData, LlmJobResult, string>(BACKGROUND_QUEUE_NAME, { connection });
+  }
+
+  return { interactiveQueue, backgroundQueue };
+}
+
+/* ─────────────────────────────────────────────────────────
+ * UTILS
  * ────────────────────────────────────────────────────────── */
 
 export function hashId(o: unknown): string {
@@ -17,7 +51,7 @@ export function hashId(o: unknown): string {
 const ALREADY_EXISTS_RE = /already exists/i;
 
 /* ─────────────────────────────────────────────────────────
- * Queue stats & Redis health
+ * QUEUE OPERATIONS & HEALTH CHECKS
  * ────────────────────────────────────────────────────────── */
 
 export async function queueStats() {
@@ -28,8 +62,8 @@ export async function queueStats() {
       backgroundQueue.getJobCounts('wait', 'active', 'completed', 'failed', 'delayed'),
     ]);
     return {
-      [interactiveQueue.name]: iStats,
-      [backgroundQueue.name]: bStats,
+      [INTERACTIVE_QUEUE_NAME]: iStats,
+      [BACKGROUND_QUEUE_NAME]: bStats,
     };
   } catch (e) {
     return { error: String((e as Error)?.message || e) };
@@ -47,7 +81,7 @@ export async function redisPing() {
 }
 
 /* ─────────────────────────────────────────────────────────
- * Defaults for adding jobs
+ * JOB DEFAULTS & ENQUEUE LOGIC
  * ────────────────────────────────────────────────────────── */
 
 export const DEFAULT_ADD_OPTS: JobsOptions = {
@@ -57,44 +91,44 @@ export const DEFAULT_ADD_OPTS: JobsOptions = {
   removeOnFail: { age: 86400, count: 1000 },
 };
 
-/* ─────────────────────────────────────────────────────────
- * Idempotent enqueue
- * ────────────────────────────────────────────────────────── */
-
-// ===== THE FIX IS HERE: REPLACED GENERICS WITH SPECIFIC TYPES =====
-/**
- * A type-safe wrapper for adding jobs idempotently to a queue.
- * This function is now specific to LlmJobData and LlmJobResult.
- */
 export async function enqueueIdempotent(
-  name: string, // The name of the job (e.g., 'process-image')
-  data: LlmJobData, // The job data must match the LlmJobData union
+  name: string,
+  data: LlmJobData,
   jobId: string,
-  q: Queue<LlmJobData, LlmJobResult>, // The queue must be of the correct type
+  q: Queue<LlmJobData, LlmJobResult, string>,
   opts: JobsOptions = DEFAULT_ADD_OPTS,
-): Promise<{ job: Job<LlmJobData, LlmJobResult> | null; state: JobState | 'exists' | 'unknown' }> {
+): Promise<{ job: Job<LlmJobData, LlmJobResult, string> | null; state: JobState | 'exists' | 'unknown' }> {
   try {
-    // This call is now fully type-safe and will not error.
     await q.add(name, data, { ...opts, jobId });
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : String(e);
     if (!ALREADY_EXISTS_RE.test(msg)) throw e;
   }
 
-  const found = await Job.fromId<LlmJobData, LlmJobResult>(q, jobId);
+  const found = await Job.fromId<LlmJobData, LlmJobResult, string>(q, jobId);
   const state: JobState | 'exists' | 'unknown' = found ? await found.getState() : 'exists';
   return { job: found ?? null, state };
 }
 
 /* ─────────────────────────────────────────────────────────
- * HTTP helpers + adaptive polling
+ * HTTP HELPERS & ADAPTIVE POLLING
  * ────────────────────────────────────────────────────────── */
 
 export type QueueStateHeader = JobState | 'exists' | 'missing' | 'error' | 'unknown';
 
 const VALID_STATES: Set<string> = new Set([
-  'waiting', 'active', 'delayed', 'prioritized', 'waiting-children',
-  'completed', 'failed', 'paused', 'exists', 'missing', 'error', 'unknown',
+  'waiting',
+  'active',
+  'delayed',
+  'prioritized',
+  'waiting-children',
+  'completed',
+  'failed',
+  'paused',
+  'exists',
+  'missing',
+  'error',
+  'unknown',
 ]);
 
 function normalizeState(state: string): QueueStateHeader {
@@ -130,48 +164,37 @@ function withRetryAfter(res: NextResponse, seconds: number) {
   return res;
 }
 
-/* ─────────────────────────────────────────────────────────
- * Poll a job (UPGRADED for multi-queue)
- * ────────────────────────────────────────────────────────── */
-
 export async function pollJobResponse(id: string, debug = false) {
   const { interactiveQueue, backgroundQueue } = await getQueues();
-  
-  // Job.fromId is now strongly typed, so `job` is Job<LlmJobData, LlmJobResult> | null
-  const job = (await Job.fromId<LlmJobData, LlmJobResult>(interactiveQueue, id)) ?? 
-              (await Job.fromId<LlmJobData, LlmJobResult>(backgroundQueue, id));
+
+  const jobInteractive = await Job.fromId<LlmJobData, LlmJobResult, string>(interactiveQueue, id);
+  const jobBackground = await Job.fromId<LlmJobData, LlmJobResult, string>(backgroundQueue, id);
+  const job = jobInteractive ?? jobBackground;
 
   if (!job) {
     const res = NextResponse.json({ error: 'Job not found in any queue', id }, { status: 404 });
     return withRetryAfter(withJobHeaders(res, id, 'missing'), 10);
   }
 
-  const state = await job.getState();
-  const progress = job.progress ?? 0;
+  const state: JobState | 'unknown' = await job.getState();
+  const progress = (job as Job<LlmJobData, LlmJobResult, string>).progress ?? 0;
   const retryAfter = suggestRetryAfterSec(state);
 
   if (state === 'completed') {
-    // --- NO LONGER NEED `as LlmJobResult` CAST ---
-    // TypeScript knows job.returnvalue is of type LlmJobResult
-    const result = job.returnvalue; 
-    const res = NextResponse.json(
-      debug ? { state, progress, result, job } : { state, progress, result },
-      { status: 200 },
-    );
+    const body = debug
+      ? { state, progress, result: job.returnvalue, job }
+      : { state, progress, result: job.returnvalue };
+    const res = NextResponse.json(body, { status: 200 });
     return withRetryAfter(withJobHeaders(res, id, state), 0);
   }
 
   if (state === 'failed') {
-    const res = NextResponse.json(
-      debug ? { state, progress, error: job.failedReason, job } : { state, progress, error: job.failedReason },
-      { status: 500 },
-    );
+    const body = debug ? { state, progress, error: job.failedReason, job } : { state, progress, error: job.failedReason };
+    const res = NextResponse.json(body, { status: 500 });
     return withRetryAfter(withJobHeaders(res, id, state), 0);
   }
 
-  const res = NextResponse.json(
-    debug ? { state, progress, job } : { state, progress },
-    { status: 202 }, // Use 202 Accepted for pending states
-  );
+  const body = debug ? { state, progress, job } : { state, progress };
+  const res = NextResponse.json(body, { status: 202 }); // 202 Accepted for pending states
   return withRetryAfter(withJobHeaders(res, id, state), retryAfter);
 }

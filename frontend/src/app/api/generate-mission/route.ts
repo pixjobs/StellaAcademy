@@ -1,127 +1,123 @@
-// app/api/generate-mission/route.ts
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-
 import { NextRequest, NextResponse } from 'next/server';
-import type { Role, MissionType } from '@/types/llm';
-
-// Use the shared helpers that resolve queue/redis at runtime (no static llmQueue import)
+import { Job } from 'bullmq'; // Import the Job type for type safety
 import {
   hashId,
-  queueStats,
-  redisPing,
   enqueueIdempotent,
   withJobHeaders,
   pollJobResponse,
 } from '@/lib/api/queueHttp';
-import { getQueue } from '@/lib/queue';
+import { getQueues } from '@/lib/bullmq/queues';
+import { INTERACTIVE_QUEUE_NAME, BACKGROUND_QUEUE_NAME } from '@/lib/queue';
+import { isMissionType, isRole } from '@/workers/ollama/utils';
+import type { Role, MissionType } from '@/types/llm';
 
-type RequestPayload = { missionType: MissionType; role?: Role };
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
-/* ---------------------------- POST (enqueue) ---------------------------- */
-export async function POST(req: NextRequest) {
-  const started = Date.now();
+/* -------------------------------------------------------------------------- */
+/*                                Local Types                                 */
+/* -------------------------------------------------------------------------- */
+
+type RequestPayload = {
+  missionType: MissionType;
+  role?: Role;
+};
+
+/* -------------------------------------------------------------------------- */
+/*                               POST (Enqueue Job)                           */
+/* -------------------------------------------------------------------------- */
+export async function POST(req: NextRequest): Promise<NextResponse> {
   let jobId = 'unknown';
-
   try {
-    // Parse body safely
-    let body: Partial<RequestPayload> = {};
-    try {
-      body = await req.json();
-    } catch {
-      return NextResponse.json({ error: 'Malformed JSON body.' }, { status: 400 });
+    const body = await req.json() as RequestPayload;
+
+    const { missionType } = body;
+    const role: Role = body.role ?? 'explorer';
+
+    if (!isMissionType(missionType)) {
+      return NextResponse.json({ error: "Invalid or missing 'missionType'." }, { status: 400 });
+    }
+    if (!isRole(role)) {
+      return NextResponse.json({ error: "Invalid 'role'. Use explorer|cadet|scholar." }, { status: 400 });
     }
 
-    const missionType = String(body.missionType ?? '').trim();
-    const role: Role = (body.role as Role) ?? 'explorer';
+    const payloadForQueue = { missionType, role };
+    jobId = hashId({ type: 'mission', payload: payloadForQueue });
 
-    if (!missionType) {
-      return NextResponse.json({ error: "Missing 'missionType'." }, { status: 400 });
-    }
+    console.log('[generate-mission][POST] enqueuing', { jobId, missionType, role });
 
-    // Stable id for idempotency: same payload → same jobId
-    jobId = hashId({ type: 'mission', payload: { missionType, role } });
+    const { backgroundQueue } = await getQueues();
 
-    // Pre-flight observability that won't crash if queue/redis aren't ready yet
-    const [ping, statsBefore] = await Promise.all([redisPing(), queueStats()]);
-    console.log('[generate-mission][POST] enqueuing', {
-      jobId, missionType, role, redis: ping, statsBefore, pid: process.pid, time: new Date().toISOString(),
-    });
-
-    // Idempotent add (ignore "already exists" race)
     const { state } = await enqueueIdempotent(
-      'llm',
-      { type: 'mission', payload: { missionType, role }, cacheKey: jobId },
-      jobId
+      'mission-generation',
+      { type: 'mission', payload: payloadForQueue },
+      jobId,
+      backgroundQueue
     );
 
-    const statsAfter = await queueStats();
-
-    const res = NextResponse.json(
-      {
-        accepted: true,
-        jobId,
-        state,
-        queue: { before: statsBefore, after: statsAfter },
-        redis: await redisPing(),
-        message: 'Poll GET ?id=<jobId> (optionally &debug=1) for status/result.',
-        server: { pid: process.pid, now: new Date().toISOString(), durationMs: Date.now() - started },
-      },
-      { status: 202 }
-    );
+    const res = NextResponse.json({ accepted: true, jobId, state }, { status: 202 });
     return withJobHeaders(res, jobId, state);
-  } catch (err) {
-    const msg = (err as Error)?.message || String(err);
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
     console.error('[generate-mission][POST] error', { jobId, error: msg });
-
-    const res = NextResponse.json(
-      {
-        error: 'Failed to enqueue mission.',
-        details: msg,
-        queue: await queueStats().catch(() => ({ error: 'queue-stats-failed' })),
-        redis: await redisPing().catch(() => ({ ok: false, error: 'redis-ping-failed' })),
-      },
-      { status: 500 }
-    );
+    const res = NextResponse.json({ error: 'Failed to enqueue mission generation.', details: msg }, { status: 500 });
     return withJobHeaders(res, jobId, 'error');
   }
 }
 
-/* ---------------- GET (status / debug / list / stats) ---------------- */
-export async function GET(req: NextRequest) {
+/* -------------------------------------------------------------------------- */
+/*                      GET (Poll Status / Debug)                             */
+/* -------------------------------------------------------------------------- */
+export async function GET(req: NextRequest): Promise<NextResponse> {
   const id = req.nextUrl.searchParams.get('id');
   const debug = req.nextUrl.searchParams.get('debug') === '1';
   const statsOnly = req.nextUrl.searchParams.get('stats') === '1';
   const list = req.nextUrl.searchParams.get('list') === '1';
 
-  if (statsOnly) {
-    const [ping, stats] = await Promise.all([redisPing(), queueStats()]);
-    return NextResponse.json(
-      { queue: stats, redis: ping, server: { pid: process.pid, now: new Date().toISOString() } },
-      { status: 200 }
-    );
-  }
+  if (statsOnly || list) {
+    const { interactiveQueue, backgroundQueue } = await getQueues();
+    if (statsOnly) {
+      const [interactiveStats, backgroundStats] = await Promise.all([
+        interactiveQueue.getJobCounts('wait', 'active', 'completed', 'failed', 'delayed'),
+        backgroundQueue.getJobCounts('wait', 'active', 'completed', 'failed', 'delayed'),
+      ]);
+      return NextResponse.json({
+        queues: {
+          [INTERACTIVE_QUEUE_NAME]: interactiveStats,
+          [BACKGROUND_QUEUE_NAME]: backgroundStats,
+        },
+      });
+    }
 
-  if (list) {
-    // Resolve the queue at runtime; don’t use a static llmQueue
-    const q = await getQueue();
-    const [waiting, active, delayed] = await Promise.all([
-      q.getJobs(['waiting'], 0, 20),
-      q.getJobs(['active'], 0, 20),
-      q.getJobs(['delayed'], 0, 20),
+    // --- CORRECTED LOGIC for ?list=1 ---
+    const [iJobs, bJobs] = await Promise.all([
+      interactiveQueue.getJobs(['active', 'waiting', 'delayed'], 0, 20),
+      backgroundQueue.getJobs(['active', 'waiting', 'delayed'], 0, 20),
     ]);
-    return NextResponse.json(
-      {
-        waiting: waiting.map((j) => j.id),
-        active: active.map((j) => j.id),
-        delayed: delayed.map((j) => j.id),
-      },
-      { status: 200 }
-    );
+
+    // Helper function to asynchronously get the state for each job
+    const jobToJSON = async (j: Job) => ({
+        id: j.id,
+        name: j.name,
+        state: await j.getState(),
+    });
+
+    // Process all jobs in parallel to get their states
+    const [iJobsWithState, bJobsWithState] = await Promise.all([
+        Promise.all(iJobs.map(jobToJSON)),
+        Promise.all(bJobs.map(jobToJSON)),
+    ]);
+
+    return NextResponse.json({
+      [INTERACTIVE_QUEUE_NAME]: iJobsWithState,
+      [BACKGROUND_QUEUE_NAME]: bJobsWithState,
+    });
   }
 
-  if (!id) return NextResponse.json({ error: 'Missing ?id=' }, { status: 400 });
+  if (!id) {
+    return NextResponse.json({ error: 'Missing job ?id=' }, { status: 400 });
+  }
 
-  // ✅ Return the poller’s response directly (it handles 200/404/500 + debug meta)
+  // The pollJobResponse helper is queue-agnostic and works by job ID.
   return pollJobResponse(id, debug);
 }

@@ -1,17 +1,22 @@
 /**
  * =========================================================================
- * UTILITIES & TYPE GUARDS
+ * UTILITIES, TYPE GUARDS & HELPERS
  *
- * This module contains general-purpose helper functions and, critically,
- * type guards that validate data against the canonical types defined in
- * the central `types` directory.
+ * This module contains general-purpose helper functions, type guards,
+ * LLM interaction helpers, and content hashing logic for the worker.
  * =========================================================================
  */
 
+import { createHash } from 'crypto';
+
 // --- DYNAMIC IMPORTS FROM THE SINGLE SOURCE OF TRUTH ---
-// We import both the types and the runtime constants for validation.
 import { ALL_ROLES, ALL_MISSION_TYPES } from '@/types/llm';
 import type { Role, MissionType } from '@/types/llm';
+import type { EnrichedMissionPlan } from '@/types/mission';
+
+/* -------------------------------------------------------------------------- */
+/*                              General Helpers                               */
+/* -------------------------------------------------------------------------- */
 
 /**
  * Clamps a numeric value from a string within a given range.
@@ -48,17 +53,30 @@ export function maskRedisUrl(u?: string): string | undefined {
   }
 }
 
+/**
+ * Returns a new array with only unique values.
+ */
+export function uniq<T>(arr: (T | null | undefined)[]): T[] {
+  return Array.from(new Set(arr.filter((x): x is T => x != null)));
+}
+
 /* -------------------------------------------------------------------------- */
 /*                                 Type Guards                                */
 /* -------------------------------------------------------------------------- */
+
+/**
+ * A generic type guard to check if a value is a non-null object.
+ */
+export function isRecord(x: unknown): x is Record<string, unknown> {
+  return typeof x === 'object' && x !== null;
+}
 
 /**
  * A type guard that dynamically checks if a value is a valid Role.
  * It uses the imported ALL_ROLES constant as its single source of truth.
  */
 export function isRole(value: unknown): value is Role {
-  // The local `VALID_ROLES` array has been removed.
-  return typeof value === 'string' && (ALL_ROLES as string[]).includes(value);
+  return typeof value === 'string' && (ALL_ROLES as readonly string[]).includes(value);
 }
 
 /**
@@ -66,8 +84,7 @@ export function isRole(value: unknown): value is Role {
  * It uses the imported ALL_MISSION_TYPES constant as its single source of truth.
  */
 export function isMissionType(value: unknown): value is MissionType {
-  // The local `VALID_MISSION_TYPES` array has been removed.
-  return typeof value === 'string' && (ALL_MISSION_TYPES as string[]).includes(value);
+  return typeof value === 'string' && (ALL_MISSION_TYPES as readonly string[]).includes(value);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -76,7 +93,6 @@ export function isMissionType(value: unknown): value is MissionType {
 
 /**
  * Role-aware system prompt for the tutor preflight.
- * Keep this pure so it can be used from API routes, workers, or tests.
  */
 export function buildTutorSystem(role: Role, mission: string, topic: string, imageTitle?: string): string {
   return [
@@ -96,7 +112,6 @@ export function buildTutorSystem(role: Role, mission: string, topic: string, ima
 
 /**
  * User prompt that requests strict JSON for the tutor preflight.
- * The schema lives here to keep one source of truth.
  */
 export function buildTutorUser(topicSummary: string): string {
   return [
@@ -127,22 +142,57 @@ export function hardenAskPrompt(prompt: string, context?: string): string {
 }
 
 /**
- * Robustly extract JSON from LLM output.
- * - First try direct JSON.parse
- * - Fallback: grab the last {...} block
+ * Removes markdown code fences (e.g., ```json) from a string.
  */
-export function extractJson<T = unknown>(raw: string): T {
+export function stripFences(s: string): string {
+  return s ? s.replace(/```json\s*([\s\S]*?)```/gi, '$1').replace(/```\s*([\s\S]*?)```/gi, '$1').trim() : '';
+}
+
+/** Safe JSON extractor: returns parsed JSON object of type T or throws */
+export function extractJson<T = unknown>(raw: string, matcher: RegExp = /\{[\s\S]*\}$/m): T {
+  const match = raw.match(matcher);
+  if (!match || !match[0]) {
+    throw new Error('extractJson: no JSON match found');
+  }
+  return JSON.parse(match[0]) as T;
+}
+
+/** Variant that returns null instead of throwing */
+export function extractJsonOrNull<T = unknown>(raw: string, matcher: RegExp = /\{[\s\S]*\}$/m): T | null {
+  const match = raw.match(matcher);
+  if (!match || !match[0]) return null;
   try {
-    return JSON.parse(raw) as T;
+    const parsed = JSON.parse(match[0]) as T;
+    return parsed ?? null;
   } catch {
-    const m = raw.match(/\{[\s\S]*\}$/);
-    if (!m) throw new Error('extractJson: could not locate JSON object in model output');
-    return JSON.parse(m[0]) as T;
+    return null;
   }
 }
 
+/* -------------------------------------------------------------------------- */
+/*                              Content Hashing                               */
+/* -------------------------------------------------------------------------- */
+
 /**
- * Optional: stable cache key for tutor-preflight results.
+ * Creates a stable SHA-256 hash from the core text content of a mission plan.
+ * This is used to detect and prevent content-wise duplicates.
+ */
+export function hashMissionPlan(plan: EnrichedMissionPlan): string {
+  // Create a consistent string representation of the mission's core content.
+  const content = [
+    plan.missionTitle,
+    ...plan.topics.map(t => `${t.title}:${t.summary}`)
+  ].join('|').toLowerCase().trim();
+  
+  return createHash('sha256').update(content).digest('hex');
+}
+
+/* -------------------------------------------------------------------------- */
+/*                              Caching Helpers                               */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Creates a stable cache key for tutor-preflight results.
  */
 export function preflightCacheKey(params: {
   role: Role;
