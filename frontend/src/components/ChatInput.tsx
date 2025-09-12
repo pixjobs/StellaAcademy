@@ -3,7 +3,7 @@
 import { type Dispatch, type SetStateAction } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
 import { Send, Square } from 'lucide-react';
-import { cn } from '@/lib/utils'; // Assuming you have cn for class merging
+import { cn } from '@/lib/utils';
 
 type ChatInputProps = {
   onSend: (prompt: string) => void;
