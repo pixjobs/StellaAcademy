@@ -1,5 +1,4 @@
 // app/api/llm/preflight/route.ts
-/* eslint-disable no-console */
 import { NextRequest, NextResponse } from 'next/server';
 import { Job } from 'bullmq';
 import type { Role, LlmJobData, LlmJobResult } from '@/types/llm';

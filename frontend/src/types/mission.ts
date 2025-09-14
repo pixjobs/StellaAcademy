@@ -4,12 +4,7 @@ export type UID = string;
 export type Difficulty = 'starter' | 'core' | 'challenge';
 
 export type Img = {
-  href: string;            // required so <img src> is always valid
-  // --- THIS IS THE FIX ---
-  // The `title` is now a required string. This enforces data integrity
-  // and prevents runtime errors like `[object Object]` when a title is missing.
-  // The data normalization we did in the page component now correctly satisfies this type.
-  title: string;
+  href: string; 
   alt?: string;            // accessibility text
   credit?: string;         // photographer/source
   license?: string;        // e.g., "CC-BY-4.0", "All Rights Reserved"

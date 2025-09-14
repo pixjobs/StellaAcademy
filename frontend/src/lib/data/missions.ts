@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import type { EnrichedMissionPlan } from '@/types/mission';
 import type { MissionType, Role } from '@/types/llm';
 

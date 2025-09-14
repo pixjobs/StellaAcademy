@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 /**
  * =========================================================================
  * NASA API CLIENT (Production-grade, Redis-optional, resilient)

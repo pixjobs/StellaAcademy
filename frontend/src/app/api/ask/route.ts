@@ -1,5 +1,5 @@
 // app/api/llm/ask/route.ts
-/* eslint-disable no-console */
+
 import { NextRequest, NextResponse } from 'next/server';
 import { Job } from 'bullmq';
 import type { LlmJobData, LlmJobResult } from '@/types/llm';
