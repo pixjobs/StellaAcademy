@@ -1,22 +1,20 @@
-// src/lib/nasa.ts
+/* eslint-disable no-console */
 /**
  * =========================================================================
- * NASA API CLIENT (Hardened + L1/L2 Cached + Circuit Breaker for Redis)
+ * NASA API CLIENT (Production-grade, Redis-optional, resilient)
  *
- * L1 (in-process): JSON cache + image HEAD results (soft/hard TTL).
- * L2 (shared Redis): IMAGE-ONLY
- *   - HEAD reachability of image URLs → nasa:img:head:<sha1(url)>
- *   - Best NIVL asset URL per (nasaId, prefer) → nasa:nivl:best:<id>:<prefer>
- *
- * Request coalescing, retries with jitter, concurrency limiting for NIVL assets,
- * and Next.js revalidate hints are included. Type-safe, lint-safe.
+ * - No hard dependency on your Redis connection module.
+ * - L1 (in-process) caches + optional L2 (Redis) via pluggable provider.
+ * - Circuit breaker around Redis usage; per-command timeouts.
+ * - Request coalescing for identical in-flight requests.
+ * - Robust image reachability check: HEAD with 1-byte GET fallback.
+ * - APOD/Mars require NASA_API_KEY; EPIC auto-falls back to public endpoint.
  * =========================================================================
  */
 
 import crypto from 'node:crypto';
 import type { Redis } from 'ioredis';
 import { getNasaApiKey } from '@/lib/secrets';
-import { getConnection as getRedisConnection } from '@/lib/queue';
 import type { MarsPhoto } from '@/types/llm';
 
 /* -------------------------------------------------------------------------- */
@@ -75,24 +73,25 @@ type EpicApiResponseItem = { date: string; image: string };
 /*                                   Config                                   */
 /* -------------------------------------------------------------------------- */
 
-// Next.js revalidate hints (seconds)
 const REVALIDATE_DAY = 60 * 60 * 24;
 const REVALIDATE_HOUR = 60 * 60;
 
-// In-process cache TTLs (milliseconds)
+// L1 cache TTLs (ms)
 const JSON_SOFT_MS = intEnv('NASA_JSON_SOFT_MS', 10 * 60 * 1000);
 const JSON_HARD_MS = intEnv('NASA_JSON_HARD_MS', 60 * 60 * 1000);
 const HEAD_SOFT_MS = intEnv('NASA_HEAD_SOFT_MS', 30 * 60 * 1000);
 const HEAD_HARD_MS = intEnv('NASA_HEAD_HARD_MS', 6 * 60 * 60);
 
-// Shared Redis (L2) TTLs — IMAGE ONLY (seconds)
+// Optional L2 (Redis) TTLs (sec)
 const REDIS_HEAD_TTL_SEC = intEnv('NASA_REDIS_HEAD_TTL_SEC', 3 * 60 * 60); // 3h
 const REDIS_NIVL_BEST_TTL_SEC = intEnv('NASA_REDIS_NIVL_BEST_TTL_SEC', 24 * 60 * 60); // 24h
+const REDIS_ENABLED = boolEnv('NASA_USE_REDIS_CACHE', false);
+const REDIS_CMD_TIMEOUT_MS = intEnv('NASA_REDIS_CMD_TIMEOUT_MS', 1500);
+const GETREDIS_TIMEOUT_MS = intEnv('NASA_REDIS_GET_TIMEOUT_MS', 400); // short, non-blocking
 
-// Circuit breaker for Redis usage in this module
+// Circuit breaker for Redis
 const CB_BASE_MS = intEnv('NASA_REDIS_CB_BASE_MS', 5_000);
 const CB_MAX_MS = intEnv('NASA_REDIS_CB_MAX_MS', 60_000);
-const GETREDIS_TIMEOUT_MS = intEnv('NASA_REDIS_GET_TIMEOUT_MS', 120); // very short, avoid blocking on Redis
 
 // Networking & resilience
 const TIMEOUT_MS = intEnv('NASA_TIMEOUT_MS', 15_000);
@@ -122,7 +121,22 @@ function warn(...args: unknown[]): void {
 }
 
 /* -------------------------------------------------------------------------- */
-/*                                L1 Cache Maps                                */
+/*                          Optional Redis provider                           */
+/* -------------------------------------------------------------------------- */
+
+type RedisProvider = () => Promise<Redis | null> | Redis | null;
+let redisProvider: RedisProvider | null = null;
+
+/**
+ * Attach a provider to enable L2 caching. If you never call this, or
+ * set env NASA_USE_REDIS_CACHE=0, the client remains Redis-free.
+ */
+export function setRedisProvider(provider: RedisProvider): void {
+  redisProvider = provider;
+}
+
+/* -------------------------------------------------------------------------- */
+/*                                L1 Cache Maps                               */
 /* -------------------------------------------------------------------------- */
 
 type CacheVal<T> = { value: T; fetchedAt: number; soft: number; hard: number };
@@ -155,21 +169,17 @@ function resetCircuit(): void {
 }
 
 async function getRedisFast(): Promise<Redis | null> {
+  if (!REDIS_ENABLED || !redisProvider) return null;
   if (circuitOpen()) return null;
+
   try {
-    const p = getRedisConnection();
-    // FIX: wrap resolve for correct typings
-    const r = (await Promise.race<Redis | null>([
-      p,
-      new Promise<null>((resolve) => {
-        setTimeout(() => resolve(null), GETREDIS_TIMEOUT_MS);
-      }),
-    ]));
+    const p = Promise.resolve(redisProvider());
+    const r = (await raceWithTimeout<Redis | null>(p, GETREDIS_TIMEOUT_MS, 'redis.get')) ?? null;
     if (!r) {
       tripCircuit();
       return null;
     }
-    // ioredis exposes a status string; skip if not ready
+    // ioredis exposes status; skip until ready
     const status = (r as Redis & { status?: string }).status;
     if (status && status !== 'ready') {
       tripCircuit();
@@ -183,8 +193,24 @@ async function getRedisFast(): Promise<Redis | null> {
   }
 }
 
+async function redisGetWithTimeout(r: Redis, key: string): Promise<string | null> {
+  try {
+    return await raceWithTimeout(r.get(key), REDIS_CMD_TIMEOUT_MS, `redis.get(${key})`);
+  } catch {
+    tripCircuit();
+    return null;
+  }
+}
+async function redisSetexWithTimeout(r: Redis, key: string, ttlSec: number, val: string): Promise<void> {
+  try {
+    await raceWithTimeout(r.setex(key, ttlSec, val), REDIS_CMD_TIMEOUT_MS, `redis.setex(${key})`);
+  } catch {
+    tripCircuit();
+  }
+}
+
 /* -------------------------------------------------------------------------- */
-/*                                   Utils                                     */
+/*                                   Utils                                    */
 /* -------------------------------------------------------------------------- */
 
 function intEnv(name: string, fallback: number): number {
@@ -192,6 +218,12 @@ function intEnv(name: string, fallback: number): number {
   if (!raw) return fallback;
   const n = Number(raw);
   return Number.isFinite(n) ? n : fallback;
+}
+function boolEnv(name: string, def = false): boolean {
+  const v = process.env[name];
+  if (!v) return def;
+  const t = v.trim().toLowerCase();
+  return t === '1' || t === 'true' || t === 'yes';
 }
 function now(): number {
   return Date.now();
@@ -224,9 +256,22 @@ function isTransientError(err: unknown): boolean {
   const msg = err instanceof Error ? err.message : String(err);
   return /ECONNRESET|ECONNREFUSED|ETIMEDOUT|EAI_AGAIN|network\s*error|fetch failed|aborted/i.test(msg);
 }
+async function raceWithTimeout<T>(p: Promise<T>, ms: number, label: string): Promise<T> {
+  let t: NodeJS.Timeout | null = null;
+  try {
+    return await Promise.race<T>([
+      p,
+      new Promise<T>((_, rej) => {
+        t = setTimeout(() => rej(new Error(`${label} timed out in ${ms}ms`)), ms);
+      }),
+    ]);
+  } finally {
+    if (t) clearTimeout(t);
+  }
+}
 
 /* -------------------------------------------------------------------------- */
-/*                                Fetch layer                                  */
+/*                                Fetch layer                                 */
 /* -------------------------------------------------------------------------- */
 
 async function doFetch(url: string, revalidateSeconds: number, timeoutMs = TIMEOUT_MS): Promise<Response> {
@@ -245,8 +290,7 @@ async function doFetch(url: string, revalidateSeconds: number, timeoutMs = TIMEO
 
 async function fetchWithRetry(url: string, revalidateSeconds: number): Promise<Response> {
   let attempt = 0;
-
-  while (true) {
+  for (;;) {
     try {
       const res = await doFetch(url, revalidateSeconds);
       if (!res.ok && shouldRetry(res.status) && attempt < MAX_RETRIES) {
@@ -271,7 +315,7 @@ async function fetchWithRetry(url: string, revalidateSeconds: number): Promise<R
 }
 
 /* -------------------------------------------------------------------------- */
-/*                               URL utilities                                 */
+/*                               URL utilities                                */
 /* -------------------------------------------------------------------------- */
 
 function upgradeHttps(u: string | null | undefined): string | null {
@@ -332,52 +376,53 @@ function redisKeyBest(nasaId: string, prefer: 'orig' | 'large' | 'any'): string 
   return `nasa:nivl:best:${nasaId}:${prefer}`;
 }
 
-/** HEAD reachability with L1 + Redis L2 + circuit breaker */
+/** Robust reachability: HEAD first, fallback to GET Range: 0-0, with one retry */
+async function headOrRangeCheck(url: string, attempt = 1): Promise<boolean> {
+  const timeout = 7_000;
+  try {
+    const res = await fetch(url, { method: 'HEAD', signal: AbortSignal.timeout(timeout) });
+    if (res.ok) return true;
+    // Some CDNs reject HEAD—probe with a 1-byte range GET:
+    const res2 = await fetch(url, { method: 'GET', headers: { Range: 'bytes=0-0' }, signal: AbortSignal.timeout(timeout) });
+    return res2.ok || res2.status === 206;
+  } catch (e) {
+    if (attempt < 2 && isTransientError(e)) {
+      await new Promise((r) => setTimeout(r, expBackoffWithJitter(attempt, 1200)));
+      return headOrRangeCheck(url, attempt + 1);
+    }
+    return false;
+  }
+}
+
+/** HEAD reachability with L1 + optional Redis L2 + circuit breaker */
 async function headReachable(url: string): Promise<boolean> {
   const keyL1 = `HEAD ${url}`;
   const l1 = getCached(headCache, keyL1);
   if (l1 && now() < l1.soft) return l1.value;
 
-  // Coalesce in L1
   const inFlight = inflight.get(keyL1);
   if (inFlight) return (await inFlight) as boolean;
 
   const p = (async () => {
-    // Try Redis L2
-    const redis1 = await getRedisFast();
-    if (redis1) {
-      try {
-        const v = await redis1.get(redisKeyHead(url));
-        if (v != null) {
-          const ok = v === '1';
-          setCached(headCache, keyL1, ok, HEAD_SOFT_MS, HEAD_HARD_MS);
-          return ok;
-        }
-      } catch {
-        tripCircuit();
+    // Try Redis L2 read
+    const r1 = await getRedisFast();
+    if (r1) {
+      const v = await redisGetWithTimeout(r1, redisKeyHead(url));
+      if (v != null) {
+        const ok = v === '1';
+        setCached(headCache, keyL1, ok, HEAD_SOFT_MS, HEAD_HARD_MS);
+        return ok;
       }
     }
 
-    // Compute via HEAD if not in L2 (or Redis skipped)
-    let ok = false;
-    try {
-      const res = await fetch(url, { method: 'HEAD', signal: AbortSignal.timeout(7_000) });
-      ok = res.ok;
-    } catch {
-      ok = false;
-    }
-
-    // Write-through to L1
+    // Compute via network
+    const ok = await headOrRangeCheck(url);
     setCached(headCache, keyL1, ok, HEAD_SOFT_MS, HEAD_HARD_MS);
 
-    // Write-through to L2 (if available)
-    const redis2 = await getRedisFast();
-    if (redis2) {
-      try {
-        await redis2.setex(redisKeyHead(url), REDIS_HEAD_TTL_SEC, ok ? '1' : '0');
-      } catch {
-        tripCircuit();
-      }
+    // Best-effort L2 write
+    const r2 = await getRedisFast();
+    if (r2 && ok != null) {
+      await redisSetexWithTimeout(r2, redisKeyHead(url), REDIS_HEAD_TTL_SEC, ok ? '1' : '0');
     }
     return ok;
   })();
@@ -393,26 +438,16 @@ async function headReachable(url: string): Promise<boolean> {
 /** Shared cache helpers for NIVL best asset */
 async function cacheGetBestAsset(nasaId: string, prefer: 'orig' | 'large' | 'any'): Promise<string | null> {
   const key = redisKeyBest(nasaId, prefer);
-  const redis = await getRedisFast();
-  if (!redis) return null;
-  try {
-    const v = await redis.get(key);
-    return v ?? null;
-  } catch {
-    tripCircuit();
-    return null;
-  }
+  const r = await getRedisFast();
+  if (!r) return null;
+  return await redisGetWithTimeout(r, key);
 }
 async function cacheSetBestAsset(nasaId: string, prefer: 'orig' | 'large' | 'any', href: string | null): Promise<void> {
   if (!href) return;
   const key = redisKeyBest(nasaId, prefer);
-  const redis = await getRedisFast();
-  if (!redis) return;
-  try {
-    await redis.setex(key, REDIS_NIVL_BEST_TTL_SEC, href);
-  } catch {
-    tripCircuit();
-  }
+  const r = await getRedisFast();
+  if (!r) return;
+  await redisSetexWithTimeout(r, key, REDIS_NIVL_BEST_TTL_SEC, href);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -446,18 +481,13 @@ async function mapWithConcurrency<T, R>(
         const i = idx++;
         active++;
         void fn(arr[i])
-          .then((val) => {
-            ret[i] = val;
-          })
+          .then((val) => { ret[i] = val; })
           .catch((e: unknown) => {
             const msg = e instanceof Error ? e.message : String(e);
             warn('NIVL asset expansion failed:', msg);
             (ret as (R | undefined)[])[i] = undefined as unknown as R;
           })
-          .finally(() => {
-            active--;
-            next();
-          });
+          .finally(() => { active--; next(); });
       }
     };
     next();
@@ -575,7 +605,7 @@ async function pickBestNivlAsset(
     let pick: string | null = prefer === 'orig' ? jpgs.find((h) => /_orig\.jpe?g/i.test(h)) ?? null : null;
     pick = pick || largestByNameGuess(jpgs) || hrefs[0] || null;
 
-    // 3) Validate with shared HEAD cache
+    // 3) Validate with reachability
     if (pick && (await headReachable(pick))) {
       await cacheSetBestAsset(nasaId, prefer, pick);
       return pick;
@@ -601,7 +631,10 @@ async function pickBestNivlAsset(
 
 export async function fetchLatestMarsPhotos(rover = 'curiosity'): Promise<MarsPhoto[]> {
   const apiKey = await getNasaApiKey();
-  if (!apiKey) throw new Error('NASA API Key is not configured for Mars Rover Photos.');
+  if (!apiKey) {
+    warn('Mars Rover Photos skipped: NASA_API_KEY missing.');
+    return [];
+  }
 
   const url = `https://api.nasa.gov/mars-photos/api/v1/rovers/${rover}/latest_photos?api_key=${apiKey}`;
   log('Mars Latest GET', { rover, url });
@@ -623,41 +656,216 @@ export async function fetchLatestMarsPhotos(rover = 'curiosity'): Promise<MarsPh
   }));
 }
 
-/* -------------------------------------------------------------------------- */
-/*                 EPIC (Earth Polychromatic Imaging Camera)                  */
-/* -------------------------------------------------------------------------- */
+// ---------------------------------------------------------------------------
+// EPIC (Earth Polychromatic Imaging Camera)
+// Spec: https://epic.gsfc.nasa.gov/about/api
+// Primary: GSFC (no key)      -> https://epic.gsfc.nasa.gov/api/...
+// Mirror:  api.nasa.gov (key) -> https://api.nasa.gov/EPIC/api/...
+// ---------------------------------------------------------------------------
 
-export async function fetchEPICImages({ count = 12 } = {}): Promise<{ date: string; href: string }[]> {
-  const apiKey = await getNasaApiKey();
-  if (!apiKey) throw new Error('NASA API Key is not configured for EPIC.');
+type EpicKind = 'natural' | 'enhanced' | 'aerosol' | 'cloud';
+type EpicImageType = 'png' | 'jpg' | 'thumbs';
 
-  const primaryUrl = `https://api.nasa.gov/EPIC/api/natural/images?api_key=${apiKey}`;
-  const fallbackUrl = `https://epic.gsfc.nasa.gov/api/natural`;
+type EpicMeta = {
+  image: string;                   // e.g. epic_1b_20161031074844
+  date: string;                    // ISO
+  caption?: string;
+  centroid_coordinates?: { lat: number; lon: number };
+  dscovr_j2000_position?: unknown;
+  lunar_j2000_position?: unknown;
+  sun_j2000_position?: unknown;
+  attitude_quaternions?: unknown;
+  coords?: unknown;
+};
 
-  let data: EpicApiResponseItem[];
-  try {
-    log('EPIC GET (Primary)', { url: primaryUrl });
-    data = await cachedJson<EpicApiResponseItem[]>(primaryUrl, REVALIDATE_HOUR);
-  } catch (primaryError) {
-    const msg = primaryError instanceof Error ? primaryError.message : String(primaryError);
-    warn('Primary EPIC API failed, trying direct fallback...', { error: msg });
-    data = await cachedJson<EpicApiResponseItem[]>(fallbackUrl, REVALIDATE_HOUR);
-  }
+// --- URL builders -----------------------------------------------------------
 
-  if (!Array.isArray(data) || data.length === 0) {
-    warn('EPIC API returned an empty or invalid array.');
-    return [];
-  }
-
-  return data.slice(0, count).map((img: EpicApiResponseItem) => {
-    const date = new Date(img.date);
-    const year = date.getUTCFullYear();
-    const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-    const day = String(date.getUTCDate()).padStart(2, '0');
-    const href = `https://epic.gsfc.nasa.gov/archive/natural/${year}/${month}/${day}/png/${img.image}.png`;
-    return { date: img.date, href: upgradeHttps(href)! };
-  });
+function gsfcApiUrl(kind: EpicKind, path: 'latest' | 'available' | { date: string }): string {
+  if (path === 'latest') return `https://epic.gsfc.nasa.gov/api/${kind}`;
+  if (path === 'available') return `https://epic.gsfc.nasa.gov/api/${kind}/available`;
+  return `https://epic.gsfc.nasa.gov/api/${kind}/date/${path.date}`;
 }
+
+function nasaMirrorApiUrl(kind: EpicKind, path: 'latest' | 'available' | { date: string }, apiKey: string): string {
+  const base = `https://api.nasa.gov/EPIC/api/${kind}`;
+  const q = `?api_key=${encodeURIComponent(apiKey)}`;
+  if (path === 'latest') return `${base}${q}`;
+  if (path === 'available') return `${base}/available${q}`;
+  return `${base}/date/${path.date}${q}`;
+}
+
+function pad2(n: number): string { return String(n).padStart(2, '0'); }
+
+function epicArchiveUrl(
+  kind: EpicKind,
+  isoDate: string,
+  imageBase: string,
+  imageType: EpicImageType = 'png',
+): string {
+  const d = new Date(isoDate);
+  const yyyy = d.getUTCFullYear();
+  const mm = pad2(d.getUTCMonth() + 1);
+  const dd = pad2(d.getUTCDate());
+  const ext = imageType === 'png' ? 'png' : 'jpg';
+  // thumbs are always jpg per spec
+  const folder = imageType === 'thumbs' ? 'thumbs' : ext;
+  return `https://epic.gsfc.nasa.gov/archive/${kind}/${yyyy}/${mm}/${dd}/${folder}/${imageBase}.${ext}`;
+}
+
+// --- Fetch helpers (reuse your retry/timeout layer if present) --------------
+
+async function fetchJsonSafe<T>(url: string, revalidateSeconds: number): Promise<T | null> {
+  try {
+    // If you already have fetchWithRetry, prefer it; else fallback to simple fetch with timeout.
+
+    const res: Response = typeof fetchWithRetry === 'function'
+      ? await fetchWithRetry(url, revalidateSeconds)
+      : await (async () => {
+          const ctrl = new AbortController();
+          const t = setTimeout(() => ctrl.abort(), 15000);
+          try { return await fetch(url, { signal: ctrl.signal }); }
+          finally { clearTimeout(t); }
+        })();
+
+    if (!res.ok) return null;
+    const j = (await res.json()) as T;
+    return j;
+  } catch {
+    return null;
+  }
+}
+
+// Try GSFC first (no key), then NASA mirror (if key available)
+async function epicGet<T>(kind: EpicKind, path: 'latest' | 'available' | { date: string }): Promise<T | null> {
+  // Prefer GSFC (doesn't require key, historically more stable)
+  const primary = gsfcApiUrl(kind, path);
+
+  const REVALIDATE_HOUR_SAFE: number = typeof REVALIDATE_HOUR === 'number' ? REVALIDATE_HOUR : 3600;
+  const j1 = await fetchJsonSafe<T>(primary, REVALIDATE_HOUR_SAFE);
+  if (j1) return j1;
+
+  // Mirror (needs key)
+  try {
+
+    const apiKey: string = await getNasaApiKey();
+    if (apiKey && apiKey.trim()) {
+      const mirror = nasaMirrorApiUrl(kind, path, apiKey);
+      const j2 = await fetchJsonSafe<T>(mirror, REVALIDATE_HOUR_SAFE);
+      if (j2) return j2;
+    }
+  } catch {
+    // ignore; we fail soft below
+  }
+  return null;
+}
+
+// --- Public, low-level EPIC calls -------------------------------------------
+
+export async function epicAvailableDates(kind: EpicKind): Promise<string[]> {
+  const dates = await epicGet<string[]>(kind, 'available');
+  if (!Array.isArray(dates)) return [];
+  // Normalize YYYY-MM-DD (the API already returns that, but be safe)
+  return dates.map((d) => String(d).slice(0, 10)).filter((d) => /^\d{4}-\d{2}-\d{2}$/.test(d));
+}
+
+export async function epicLatest(kind: EpicKind): Promise<EpicMeta[]> {
+  const items = await epicGet<EpicMeta[]>(kind, 'latest');
+  return Array.isArray(items) ? items : [];
+}
+
+export async function epicByDate(kind: EpicKind, date: string): Promise<EpicMeta[]> {
+  const norm = String(date).slice(0, 10);
+  const items = await epicGet<EpicMeta[]>(kind, { date: norm });
+  return Array.isArray(items) ? items : [];
+}
+
+// --- Higher-level: variance-oriented image sampler --------------------------
+
+function seededRng(seed: number) {
+  // Mulberry32; deterministic per seed
+  let t = seed >>> 0;
+  return () => {
+    t += 0x6D2B79F5;
+    let r = Math.imul(t ^ (t >>> 15), 1 | t);
+    r ^= r + Math.imul(r ^ (r >>> 7), 61 | r);
+    return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function pickSome<T>(arr: readonly T[], count: number, rnd: () => number): T[] {
+  if (count >= arr.length) return [...arr];
+  const copy = [...arr];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(rnd() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy.slice(0, count);
+}
+
+export type EpicSmartOptions = {
+  kinds?: EpicKind[];           // which collections to include
+  imageType?: EpicImageType;    // 'png' | 'jpg' | 'thumbs'
+  sampleDatesPerKind?: number;  // how many dates to sample per kind
+  itemsPerDate?: number;        // how many images per sampled date
+  preferRecent?: boolean;       // bias towards most recent available dates
+  seed?: number;                // stable randomness for dedupe resilience
+};
+
+export type EpicSmartItem = {
+  kind: EpicKind;
+  date: string;                 // YYYY-MM-DD
+  href: string;                 // direct image url
+  image: string;                // base name
+  caption?: string;
+};
+
+export async function fetchEPICSmart(opts: EpicSmartOptions = {}): Promise<EpicSmartItem[]> {
+  const {
+    kinds = ['natural', 'enhanced'],
+    imageType = 'jpg',
+    sampleDatesPerKind = 2,
+    itemsPerDate = 4,
+    preferRecent = true,
+    seed = Date.now(),
+  } = opts;
+
+  const rng = seededRng(seed);
+  const out: EpicSmartItem[] = [];
+  const seen = new Set<string>(); // dedupe by href
+
+  for (const kind of kinds) {
+    const dates = await epicAvailableDates(kind);
+    if (dates.length === 0) continue;
+
+    // Choose date set
+    const chosenDates = (() => {
+      if (preferRecent) {
+        const recent = dates.slice(-Math.min(20, dates.length)); // cap search window
+        return pickSome(recent, Math.min(sampleDatesPerKind, recent.length), rng);
+      }
+      return pickSome(dates, Math.min(sampleDatesPerKind, dates.length), rng);
+    })();
+
+    // Fetch per-date items
+    for (const date of chosenDates) {
+      const metas = await epicByDate(kind, date);
+      if (!Array.isArray(metas) || metas.length === 0) continue;
+
+      const chosen = pickSome(metas, Math.min(itemsPerDate, metas.length), rng);
+      for (const m of chosen) {
+        if (!m?.image || !m?.date) continue;
+        const href = epicArchiveUrl(kind, m.date, m.image, imageType);
+        if (seen.has(href)) continue;
+        seen.add(href);
+        out.push({ kind, date: date.slice(0, 10), href, image: m.image, caption: m.caption });
+      }
+    }
+  }
+
+  // Shuffle final result slightly for inter-kind variety
+  return pickSome(out, out.length, rng);
+}
+
 
 /* -------------------------------------------------------------------------- */
 /*               Context Builders (for feeding info to the LLM)               */

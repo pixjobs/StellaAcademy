@@ -1,42 +1,80 @@
+// src/lib/api/queueHttp.ts
 import crypto from 'node:crypto';
-import { Job, JobsOptions, Queue, JobState } from 'bullmq';
+import { Job, JobsOptions, Queue } from 'bullmq';
 import { NextResponse } from 'next/server';
-// --- Import the specific types for your application ---
 import type { LlmJobData, LlmJobResult } from '@/types/llm';
-import { getQueues } from '@/lib/bullmq/queues'; // No longer need queue names here
-import { getConnection } from '@/lib/queue';
+import {
+  getQueue,
+  getConnection,
+  INTERACTIVE_QUEUE_NAME,
+  BACKGROUND_QUEUE_NAME,
+} from '@/lib/queue';
 
 /* ─────────────────────────────────────────────────────────
- * Utils
- * ────────────────────────────────────────────────────────── */
+   Types & small utils
+────────────────────────────────────────────────────────── */
+
+type JobG = Job<LlmJobData, unknown, string>;
+type QueueG = Queue<LlmJobData, unknown, string>;
 
 export function hashId(o: unknown): string {
   return crypto.createHash('sha256').update(JSON.stringify(o)).digest('hex');
 }
 
-const ALREADY_EXISTS_RE = /already exists/i;
+function hasResultField(x: unknown): x is { result: unknown } {
+  return !!x && typeof x === 'object' && 'result' in (x as Record<string, unknown>);
+}
 
 /* ─────────────────────────────────────────────────────────
- * Queue stats & Redis health
- * ────────────────────────────────────────────────────────── */
+   Queue stats / Redis ping
+────────────────────────────────────────────────────────── */
 
-export async function queueStats() {
+export async function queueStats(q?: Queue | string) {
   try {
-    const { interactiveQueue, backgroundQueue } = await getQueues();
-    const [iStats, bStats] = await Promise.all([
-      interactiveQueue.getJobCounts('wait', 'active', 'completed', 'failed', 'delayed'),
-      backgroundQueue.getJobCounts('wait', 'active', 'completed', 'failed', 'delayed'),
+    const statsOf = async (queue: Queue): Promise<{
+      waiting: number;
+      active: number;
+      delayed: number;
+      failed: number;
+      completed: number;
+      isPaused: boolean;
+    }> => {
+      const [waiting, active, delayed, failed, completed, isPaused] = await Promise.all([
+        queue.getWaitingCount(),
+        queue.getActiveCount(),
+        queue.getDelayedCount(),
+        queue.getFailedCount(),
+        queue.getCompletedCount(),
+        queue.isPaused(),
+      ]);
+      return { waiting, active, delayed, failed, completed, isPaused };
+    };
+
+    if (q instanceof Queue) return statsOf(q);
+    if (typeof q === 'string' && q.trim().length > 0) return statsOf(await getQueue(q));
+
+    // Aggregate over both queues by default
+    const [iq, bq] = await Promise.all([
+      getQueue(INTERACTIVE_QUEUE_NAME),
+      getQueue(BACKGROUND_QUEUE_NAME),
     ]);
+    const [is, bs] = await Promise.all([statsOf(iq), statsOf(bq)]);
     return {
-      [interactiveQueue.name]: iStats,
-      [backgroundQueue.name]: bStats,
+      waiting: is.waiting + bs.waiting,
+      active: is.active + bs.active,
+      delayed: is.delayed + bs.delayed,
+      failed: is.failed + bs.failed,
+      completed: is.completed + bs.completed,
+      isPaused: Boolean(is.isPaused || bs.isPaused),
+      interactive: is,
+      background: bs,
     };
   } catch (e) {
     return { error: String((e as Error)?.message || e) };
   }
 }
 
-export async function redisPing() {
+export async function redisPing(): Promise<{ ok: boolean; pong?: string; error?: string }> {
   try {
     const conn = await getConnection();
     const pong = await conn.ping();
@@ -47,131 +85,138 @@ export async function redisPing() {
 }
 
 /* ─────────────────────────────────────────────────────────
- * Defaults for adding jobs
- * ────────────────────────────────────────────────────────── */
+   Enqueue (idempotent)
+────────────────────────────────────────────────────────── */
 
 export const DEFAULT_ADD_OPTS: JobsOptions = {
   attempts: 2,
   backoff: { type: 'exponential', delay: 1500 },
-  removeOnComplete: { age: 3600, count: 5000 },
-  removeOnFail: { age: 86400, count: 1000 },
+  removeOnComplete: { age: 3600, count: 5000 }, // 1h
+  removeOnFail: { age: 86400, count: 1000 },    // 1d
 };
 
-/* ─────────────────────────────────────────────────────────
- * Idempotent enqueue
- * ────────────────────────────────────────────────────────── */
-
-// ===== THE FIX IS HERE: REPLACED GENERICS WITH SPECIFIC TYPES =====
-/**
- * A type-safe wrapper for adding jobs idempotently to a queue.
- * This function is now specific to LlmJobData and LlmJobResult.
- */
 export async function enqueueIdempotent(
-  name: string, // The name of the job (e.g., 'process-image')
-  data: LlmJobData, // The job data must match the LlmJobData union
+  name: string,
+  data: unknown,
   jobId: string,
-  q: Queue<LlmJobData, LlmJobResult>, // The queue must be of the correct type
+  q?: Queue | string,
   opts: JobsOptions = DEFAULT_ADD_OPTS,
-): Promise<{ job: Job<LlmJobData, LlmJobResult> | null; state: JobState | 'exists' | 'unknown' }> {
+): Promise<{ job: JobG | null; state: string }> {
+  const queue: Queue =
+    q instanceof Queue
+      ? q
+      : await getQueue(typeof q === 'string' && q.length > 0 ? q : INTERACTIVE_QUEUE_NAME);
+
   try {
-    // This call is now fully type-safe and will not error.
-    await q.add(name, data, { ...opts, jobId });
+    await queue.add(name, data, { ...opts, jobId });
   } catch (e: unknown) {
-    const msg = e instanceof Error ? e.message : String(e);
-    if (!ALREADY_EXISTS_RE.test(msg)) throw e;
+    const msg = String((e as Error)?.message || e);
+    if (!/already exists/i.test(msg)) throw e;
   }
 
-  const found = await Job.fromId<LlmJobData, LlmJobResult>(q, jobId);
-  const state: JobState | 'exists' | 'unknown' = found ? await found.getState() : 'exists';
-  return { job: found ?? null, state };
+  // Cast to typed Job to avoid `any` generics
+  const job = (await Job.fromId(queue as unknown as QueueG, jobId)) as JobG | null;
+  const state = job ? await job.getState() : 'missing';
+  return { job: job ?? null, state };
 }
 
 /* ─────────────────────────────────────────────────────────
- * HTTP helpers + adaptive polling
- * ────────────────────────────────────────────────────────── */
+   Headers helper
+────────────────────────────────────────────────────────── */
 
-export type QueueStateHeader = JobState | 'exists' | 'missing' | 'error' | 'unknown';
-
-const VALID_STATES: Set<string> = new Set([
-  'waiting', 'active', 'delayed', 'prioritized', 'waiting-children',
-  'completed', 'failed', 'paused', 'exists', 'missing', 'error', 'unknown',
-]);
-
-function normalizeState(state: string): QueueStateHeader {
-  return VALID_STATES.has(state) ? (state as QueueStateHeader) : 'missing';
-}
-
-export function withJobHeaders(res: NextResponse, jobId: string, state: QueueStateHeader | string) {
+export function withJobHeaders(res: NextResponse, jobId: string, state: string): NextResponse {
   res.headers.set('x-job-id', jobId);
-  res.headers.set('x-queue-state', normalizeState(String(state)));
-  return res;
-}
-
-function suggestRetryAfterSec(state: JobState | 'missing' | 'unknown'): number {
-  switch (state) {
-    case 'completed':
-    case 'failed':
-      return 0; // stop polling
-    case 'active':
-      return 1;
-    case 'waiting':
-      return 3;
-    case 'delayed':
-      return 5;
-    default:
-      return 8;
-  }
-}
-
-function withRetryAfter(res: NextResponse, seconds: number) {
-  if (seconds > 0) {
-    res.headers.set('Retry-After', String(seconds));
-  }
+  res.headers.set('x-queue-state', state);
   return res;
 }
 
 /* ─────────────────────────────────────────────────────────
- * Poll a job (UPGRADED for multi-queue)
- * ────────────────────────────────────────────────────────── */
+   Poll a job by ID (searches both queues).
+   Returns inner `result` (unwrapped) when present.
+────────────────────────────────────────────────────────── */
 
-export async function pollJobResponse(id: string, debug = false) {
-  const { interactiveQueue, backgroundQueue } = await getQueues();
-  
-  // Job.fromId is now strongly typed, so `job` is Job<LlmJobData, LlmJobResult> | null
-  const job = (await Job.fromId<LlmJobData, LlmJobResult>(interactiveQueue, id)) ?? 
-              (await Job.fromId<LlmJobData, LlmJobResult>(backgroundQueue, id));
+export async function pollJobResponse(id: string, debug = false): Promise<NextResponse> {
+  const [iq, bq] = await Promise.all([
+    getQueue(INTERACTIVE_QUEUE_NAME),
+    getQueue(BACKGROUND_QUEUE_NAME),
+  ]);
+
+  const jobA = (await Job.fromId(iq as unknown as QueueG, id)) as JobG | null;
+  const jobB = jobA ? null : ((await Job.fromId(bq as unknown as QueueG, id)) as JobG | null);
+  const job = jobA ?? jobB;
+  const queueUsed = jobA ? INTERACTIVE_QUEUE_NAME : jobB ? BACKGROUND_QUEUE_NAME : 'unknown';
 
   if (!job) {
-    const res = NextResponse.json({ error: 'Job not found in any queue', id }, { status: 404 });
-    return withRetryAfter(withJobHeaders(res, id, 'missing'), 10);
+    return NextResponse.json(
+      {
+        error: 'Job not found',
+        id,
+        likely: [
+          'Polled wrong jobId',
+          'Job expired / removed',
+          'Queue/worker mismatch (different REDIS_URL or names)',
+        ],
+        queue: await queueStats(), // aggregate view
+        redis: await redisPing(),
+      },
+      { status: 404 },
+    );
   }
 
   const state = await job.getState();
-  const progress = job.progress ?? 0;
-  const retryAfter = suggestRetryAfterSec(state);
+  const progress = (typeof job.progress === 'number' ? job.progress : 0) ?? 0;
+
+  const meta = debug
+    ? {
+        id: job.id,
+        name: job.name,
+        state,
+        progress,
+        attemptsMade: job.attemptsMade,
+        opts: job.opts,
+        dataPreviewBytes: (() => {
+          try {
+            return JSON.stringify(job.data).length;
+          } catch {
+            return -1;
+          }
+        })(),
+        timestamps: {
+          timestamp: job.timestamp,
+          processedOn: job.processedOn,
+          finishedOn: job.finishedOn,
+        },
+        queueUsed,
+        queues: await queueStats(),
+        redis: await redisPing(),
+        server: { pid: process.pid, now: new Date().toISOString() },
+      }
+    : undefined;
 
   if (state === 'completed') {
-    // --- NO LONGER NEED `as LlmJobResult` CAST ---
-    // TypeScript knows job.returnvalue is of type LlmJobResult
-    const result = job.returnvalue; 
+    const full: unknown = job.returnvalue as LlmJobResult | unknown;
+    const inner = hasResultField(full) ? full.result : full;
+
     const res = NextResponse.json(
-      debug ? { state, progress, result, job } : { state, progress, result },
+      debug ? { state, progress, result: inner, debug: meta } : { state, progress, result: inner },
       { status: 200 },
     );
-    return withRetryAfter(withJobHeaders(res, id, state), 0);
+    return withJobHeaders(res, id, state);
   }
 
   if (state === 'failed') {
     const res = NextResponse.json(
-      debug ? { state, progress, error: job.failedReason, job } : { state, progress, error: job.failedReason },
+      debug
+        ? { state, progress, error: job.failedReason, debug: meta }
+        : { state, progress, error: job.failedReason },
       { status: 500 },
     );
-    return withRetryAfter(withJobHeaders(res, id, state), 0);
+    return withJobHeaders(res, id, state);
   }
 
   const res = NextResponse.json(
-    debug ? { state, progress, job } : { state, progress },
-    { status: 202 }, // Use 202 Accepted for pending states
+    debug ? { state, progress, debug: meta } : { state, progress },
+    { status: 200 },
   );
-  return withRetryAfter(withJobHeaders(res, id, state), retryAfter);
+  return withJobHeaders(res, id, state);
 }

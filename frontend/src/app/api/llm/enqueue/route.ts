@@ -1,43 +1,52 @@
+/* eslint-disable no-console */
+// src/app/api/llm/enqueue/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'node:crypto';
 import { Job, JobsOptions, JobState } from 'bullmq';
 import type { LlmJobData, LlmJobResult, TutorPreflightOutput } from '@/types/llm';
 import { enqueueIdempotent, withJobHeaders } from '@/lib/api/queueHttp';
-import { getQueues } from '@/lib/bullmq/queues';
+import { getQueue, INTERACTIVE_QUEUE_NAME, BACKGROUND_QUEUE_NAME } from '@/lib/queue';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
-
-/* ─────────────────────────────────────────────────────────
-  TYPES & VALIDATION
-────────────────────────────────────────────────────────── */
 
 type EnqueueResult = { state: JobState | 'exists' | 'unknown' };
 type CacheVal<T> = { value: T; fetchedAt: number; soft: number; hard: number };
 interface ErrorLike { name?: string; message?: string; stack?: string; code?: string | number; }
 
+const isDev = process.env.NODE_ENV !== 'production';
+
+/* ─────────────────────────────────────────────────────────
+  Validators
+────────────────────────────────────────────────────────── */
 function isValidLlmJobResult(value: unknown): value is LlmJobResult {
   if (typeof value !== 'object' || value === null) return false;
   if (!('type' in value) || !('result' in value)) return false;
-  const data = value as { type: unknown; result: unknown };
-  const t = data.type;
+
+  const v = value as { type: unknown; result: unknown };
+  const t = v.type;
+
   if (t === 'tutor-preflight') {
-    const r = data.result as TutorPreflightOutput;
-    return typeof r?.systemPrompt === 'string' && Array.isArray(r.starterMessages) && typeof r.warmupQuestion === 'string';
+    const r = v.result as TutorPreflightOutput | undefined;
+    return !!r
+      && typeof r.systemPrompt === 'string'
+      && Array.isArray(r.starterMessages)
+      && typeof r.warmupQuestion === 'string'
+      && typeof r.difficultyHints === 'object'
+      && r.difficultyHints !== null;
   }
   if (t === 'mission' || t === 'ask') {
-    return typeof data.result === 'object' && data.result !== null;
+    return typeof v.result === 'object' && v.result !== null;
   }
   return false;
 }
 
 /* ─────────────────────────────────────────────────────────
-  DEBUG, CACHES, CONSTANTS
+  Debug / cache
 ────────────────────────────────────────────────────────── */
-
-const DEBUG = process.env.DEBUG_LLM_ENQUEUE === '1';
 const log = (reqId: string, msg: string, ctx: Record<string, unknown> = {}) => {
-  if (DEBUG) console.log(`[llm/enqueue][${reqId}] ${msg}`, ctx);
+  try { console.log(`[llm/enqueue][${reqId}] ${msg}`, JSON.stringify(ctx)); }
+  catch { console.log(`[llm/enqueue][${reqId}] ${msg}`, ctx); }
 };
 
 const CACHE = new Map<string, CacheVal<LlmJobResult>>();
@@ -45,11 +54,41 @@ const SOFT_MS = Number(process.env.LLM_CACHE_SOFT_MS ?? 5 * 60 * 1000);
 const HARD_MS = Number(process.env.LLM_CACHE_HARD_MS ?? 30 * 60 * 1000);
 
 /* ─────────────────────────────────────────────────────────
-  SMALL UTILS
+  Small utils
 ────────────────────────────────────────────────────────── */
-
 function newReqId(): string { return crypto.randomUUID(); }
 function hashId(o: unknown): string { return crypto.createHash('sha256').update(JSON.stringify(o)).digest('hex'); }
+function okJson(data: object, init?: number | ResponseInit) {
+  return NextResponse.json(data, typeof init === 'number' ? { status: init } : init);
+}
+function toErrInfo(e: unknown): ErrorLike {
+  const ee = (e ?? {}) as ErrorLike;
+  return { name: ee.name ?? 'Error', message: ee.message ?? String(e), stack: ee.stack, code: ee.code };
+}
+function getClientIp(req: NextRequest): string {
+  const h = req.headers;
+  const candidates = [
+    h.get('x-forwarded-for'),
+    h.get('x-real-ip'),
+    h.get('cf-connecting-ip'),
+    h.get('fastly-client-ip'),
+    h.get('true-client-ip'),
+    h.get('x-client-ip'),
+    h.get('x-cluster-client-ip'),
+    h.get('forwarded'),
+  ].filter(Boolean) as string[];
+
+  if (candidates.length > 0) {
+    const fwd = candidates[0];
+    if (fwd.includes(',')) return fwd.split(',')[0].trim();
+    if (fwd.startsWith('for=')) {
+      const m = /for="?([\[\]A-Fa-f0-9\.:]+)"?/i.exec(fwd);
+      if (m?.[1]) return m[1];
+    }
+    return fwd;
+  }
+  return 'unknown';
+}
 function getCached(id: string): CacheVal<LlmJobResult> | null {
   const v = CACHE.get(id);
   if (!v || Date.now() > v.hard) {
@@ -62,13 +101,6 @@ function setCached(id: string, value: LlmJobResult): void {
   const now = Date.now();
   CACHE.set(id, { value, fetchedAt: now, soft: now + SOFT_MS, hard: now + HARD_MS });
 }
-function okJson(data: object, init?: number | ResponseInit) {
-  return NextResponse.json(data, typeof init === 'number' ? { status: init } : init);
-}
-function toErrInfo(e: unknown): ErrorLike {
-  const ee = (e ?? {}) as ErrorLike;
-  return { name: ee.name ?? 'Error', message: ee.message ?? String(e), stack: ee.stack, code: ee.code };
-}
 
 /* ─────────────────────────────────────────────────────────
   POST (enqueue)
@@ -77,65 +109,119 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   const reqId = newReqId();
   let jobId = 'unknown';
 
+  console.log(`[llm/enqueue][${reqId}] Received POST request`);
   try {
     const raw = await req.text();
-    log(reqId, 'POST start', { contentLength: raw.length });
+    log(reqId, 'POST start', {
+      contentLength: raw.length,
+      remoteAddress: getClientIp(req),
+      path: req.nextUrl.pathname,
+      search: req.nextUrl.search,
+    });
 
-    if (!raw) return withJobHeaders(okJson({ error: 'Empty body; expected JSON.' }, 400), jobId, 'error');
+    if (!raw) {
+      log(reqId, 'Request body is empty');
+      return withJobHeaders(okJson({ error: 'Empty body; expected JSON.' }, 400), jobId, 'error');
+    }
 
     let body: LlmJobData;
     try {
       body = JSON.parse(raw) as LlmJobData;
-    } catch {
-      return withJobHeaders(okJson({ error: 'Malformed JSON.' }, 400), jobId, 'error');
+      log(reqId, 'Successfully parsed JSON body', { type: (body as { type?: unknown })?.type });
+    } catch (e) {
+      const errInfo = toErrInfo(e);
+      log(reqId, 'Malformed JSON body', { error: errInfo.message });
+      return withJobHeaders(okJson({ error: 'Malformed JSON.', details: errInfo.message }, 400), jobId, 'error');
     }
 
     if (body?.type !== 'mission' && body?.type !== 'ask' && body?.type !== 'tutor-preflight') {
-      return withJobHeaders(okJson({ error: "Invalid 'type' (use 'mission', 'ask', or 'tutor-preflight')." }, 400), jobId, 'error');
+      log(reqId, 'Validation Error: Invalid type', { type: (body as { type?: unknown })?.type });
+      return withJobHeaders(
+        okJson({ error: "Invalid 'type' (use 'mission', 'ask', or 'tutor-preflight')." }, 400),
+        jobId,
+        'error',
+      );
     }
     if (!body?.payload || typeof body.payload !== 'object') {
+      log(reqId, 'Validation Error: Invalid payload');
       return withJobHeaders(okJson({ error: "Invalid 'payload'." }, 400), jobId, 'error');
     }
+    log(reqId, 'Body validation passed');
 
     jobId = body.cacheKey || hashId({ type: body.type, payload: body.payload });
     log(reqId, 'Computed jobId', { jobId, type: body.type });
 
     const cached = getCached(jobId);
     if (cached && Date.now() < cached.soft) {
-      log(reqId, 'Cache HIT (fresh)', { ageMs: Date.now() - cached.fetchedAt });
-      const res = okJson({ accepted: true, jobId, state: 'completed', result: cached.value, cache: { status: 'fresh' } }, 200);
+      const ageMs = Date.now() - cached.fetchedAt;
+      log(reqId, 'Cache HIT (fresh)', { ageMs, jobId });
+      const res = okJson(
+        { accepted: true, jobId, state: 'completed', result: cached.value, cache: { status: 'fresh' } },
+        200,
+      );
+      res.headers.set('X-Req-Id', reqId);
+      res.headers.set('X-Cache', 'fresh');
       return withJobHeaders(res, jobId, 'completed');
     }
+    if (cached) {
+      log(reqId, 'Cache HIT (stale)', { ageMs: Date.now() - cached.fetchedAt, jobId });
+    } else {
+      log(reqId, 'Cache MISS', { jobId });
+    }
 
-    const { interactiveQueue, backgroundQueue } = await getQueues();
-    const targetQueue = (body.type === 'mission') ? backgroundQueue : interactiveQueue;
-    log(reqId, 'Queue selected', { queueName: targetQueue.name });
+    // Queues
+    log(reqId, 'Fetching queues...');
+    const [interactiveQueue, backgroundQueue] = await Promise.all([
+      getQueue(INTERACTIVE_QUEUE_NAME),
+      getQueue(BACKGROUND_QUEUE_NAME),
+    ]);
+    log(reqId, 'Queues ready', { interactiveQueue: interactiveQueue.name, backgroundQueue: backgroundQueue.name });
+
+    const targetQueue = body.type === 'mission' ? backgroundQueue : interactiveQueue;
+
+    const priority =
+      body.type === 'mission'
+        ? (isDev ? 1 : 5) // HIGH priority for mission in dev (quick local testing)
+        : 1;              // Interactive always high priority
 
     const addOpts: JobsOptions = {
       jobId,
       attempts: 2,
+      priority,
       backoff: { type: 'exponential', delay: 1500 },
-      removeOnComplete: { age: 300, count: 1000 },
-      removeOnFail: { age: 1800, count: 1000 },
+      removeOnComplete: isDev ? false as any : { age: 300, count: 1000 },
+      removeOnFail:     { age: 1800, count: 1000 },
     };
+    log(reqId, 'Job options configured', { priority });
 
-    const { state } = await enqueueIdempotent(
+    // enqueue
+    log(reqId, 'Calling enqueueIdempotent', { jobId });
+    const { state } = (await enqueueIdempotent(
       body.type,
       { ...body, cacheKey: jobId },
       jobId,
       targetQueue,
-      addOpts
-    ) as EnqueueResult;
+      addOpts,
+    )) as EnqueueResult;
 
-    log(reqId, 'enqueueIdempotent ok', { state });
+    log(reqId, 'enqueueIdempotent finished', { state, jobId });
 
     const res = okJson({ accepted: true, jobId, state }, 202);
     res.headers.set('X-Req-Id', reqId);
+    res.headers.set('X-Queue', targetQueue.name);
+    res.headers.set('X-Job-Priority', String(priority));
+    log(reqId, 'Returning 202 Accepted', { jobId, state });
     return withJobHeaders(res, jobId, state === 'exists' || state === 'unknown' ? 'waiting' : state);
-
   } catch (err) {
     const info = toErrInfo(err);
-    console.error('[llm/enqueue][POST] Unhandled error', { reqId, jobId, ...info });
+    console.error(`[llm/enqueue][${reqId}][FATAL] Unhandled error in POST`, {
+      reqId,
+      jobId,
+      errorName: info.name,
+      errorMessage: info.message,
+      errorCode: info.code,
+      stack: info.stack,
+    });
     const res = okJson({ error: 'Failed to enqueue job.', details: info.message, code: info.code }, 500);
     res.headers.set('X-Req-Id', reqId);
     return withJobHeaders(res, jobId, 'error');
@@ -150,83 +236,154 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
   const id = req.nextUrl.searchParams.get('id');
   const debug = req.nextUrl.searchParams.get('debug') === '1';
 
-  if (!id) return okJson({ error: 'Missing ?id=' }, 400);
+  log(reqId, 'GET request received', { id, debug });
 
-  const { interactiveQueue, backgroundQueue } = await getQueues();
-  const job = (await Job.fromId(interactiveQueue, id)) ?? (await Job.fromId(backgroundQueue, id));
-
-  if (!job) {
-    log(reqId, 'Job not found', { id });
-    return withJobHeaders(okJson({ error: 'Job not found in any active queue.', id }, 404), id, 'missing');
+  if (!id) {
+    log(reqId, 'Missing job ID in query params');
+    return okJson({ error: 'Missing ?id=' }, 400);
   }
 
-  const state = await job.getState();
-  const progress = job.progress ?? 0;
+  try {
+    // Load queues
+    log(reqId, 'Loading queues for GET...', { id });
+    const [interactiveQueue, backgroundQueue] = await Promise.all([
+      getQueue(INTERACTIVE_QUEUE_NAME),
+      getQueue(BACKGROUND_QUEUE_NAME),
+    ]);
+    log(reqId, 'Queues loaded', { id, interactiveQueue: interactiveQueue.name, backgroundQueue: backgroundQueue.name });
 
-  if (state === 'completed') {
-    const result = job.returnvalue as LlmJobResult;
-    if (!isValidLlmJobResult(result)) {
-      log(reqId, 'Job completed with malformed data', { id });
-      const payload = { state: 'failed' as const, progress: 100, error: 'Worker returned malformed data.' };
-      return withJobHeaders(okJson(payload, 500), id, 'failed');
+    // Find job
+    log(reqId, 'Searching for job', { id });
+    const candidateA = await Job.fromId<LlmJobData, LlmJobResult>(interactiveQueue, id);
+    let job: Job<LlmJobData, LlmJobResult, string> | undefined = candidateA ?? undefined;
+    let queueName = interactiveQueue.name;
+
+    if (!job) {
+      const candidateB = await Job.fromId<LlmJobData, LlmJobResult>(backgroundQueue, id);
+      job = candidateB ?? undefined;
+      if (job) queueName = backgroundQueue.name;
     }
-    setCached(id, result);
-    const payload = debug ? { state, progress, result, debug: { ...job } } : { state, progress, result };
-    return withJobHeaders(okJson(payload, 200), id, state);
+
+    if (!job) {
+      log(reqId, 'Job not found', { id });
+      return withJobHeaders(okJson({ error: 'Job not found in any active queue.', id }, 404), id, 'missing');
+    }
+
+    log(reqId, 'Job found', { id, queueName });
+
+    const state = await job.getState();
+    const progress = typeof job.progress === 'number' ? job.progress : 0;
+
+    log(reqId, 'State/progress retrieved', { id, state, progress });
+
+    if (state === 'completed') {
+      const resultUnknown = job.returnvalue as unknown;
+      if (!isValidLlmJobResult(resultUnknown)) {
+        log(reqId, 'Completed job has malformed data', { id });
+        const payload = { state: 'failed' as const, progress: 100, error: 'Worker returned malformed data.' };
+        return withJobHeaders(okJson(payload, 500), id, 'failed');
+      }
+
+      const result = resultUnknown as LlmJobResult;
+      setCached(id, result);
+
+      const dbg = debug
+        ? {
+            id: job.id,
+            name: job.name,
+            queue: queueName,
+            attemptsMade: job.attemptsMade,
+            timestamp: job.timestamp,
+            processedOn: job.processedOn,
+            finishedOn: job.finishedOn,
+          }
+        : undefined;
+
+      const payload = dbg ? { state, progress, result, debug: dbg } : { state, progress, result };
+      return withJobHeaders(okJson(payload, 200), id, state);
+    }
+
+    if (state === 'failed') {
+      const dbg = debug
+        ? {
+            id: job.id,
+            name: job.name,
+            queue: queueName,
+            attemptsMade: job.attemptsMade,
+            timestamp: job.timestamp,
+            failedReason: job.failedReason,
+            stacktrace: job.stacktrace,
+          }
+        : undefined;
+      const payload = dbg
+        ? { state, progress, error: job.failedReason, debug: dbg }
+        : { state, progress, error: job.failedReason };
+      return withJobHeaders(okJson(payload, 500), id, state);
+    }
+
+    // pending-ish states
+    const { interactiveStats, backgroundStats } = await getQueuesAndStats();
+    const totalWaiting = (interactiveStats.waiting ?? 0) + (backgroundStats.waiting ?? 0);
+    const totalActive = (interactiveStats.active ?? 0) + (backgroundStats.active ?? 0);
+
+    const pollAfterMs = computePollAfterMs(state, totalWaiting, totalActive);
+    const resp = okJson({ state, progress, queue: { waiting: totalWaiting, active: totalActive } }, 200);
+    resp.headers.set('Retry-After', String(Math.ceil(pollAfterMs / 1000)));
+    resp.headers.set('X-Poll-After-Ms', String(pollAfterMs));
+    return withJobHeaders(resp, id, state);
+  } catch (err) {
+    const info = toErrInfo(err);
+    console.error(`[llm/enqueue][${reqId}][FATAL] Unhandled error in GET`, {
+      reqId,
+      jobId: id,
+      errorName: info.name,
+      errorMessage: info.message,
+      errorCode: info.code,
+      stack: info.stack,
+    });
+    const res = okJson({ error: 'Failed to retrieve job status.', details: info.message, code: info.code }, 500);
+    res.headers.set('X-Req-Id', reqId);
+    return withJobHeaders(res, id, 'error');
   }
-
-  if (state === 'failed') {
-    const payload = debug ? { state, progress, error: job.failedReason, stacktrace: job.stacktrace } : { state, progress, error: job.failedReason };
-    return withJobHeaders(okJson(payload, 500), id, state);
-  }
-
-  const { interactiveStats, backgroundStats } = await getQueuesAndStats();
-  const totalWaiting = (interactiveStats.waiting ?? 0) + (backgroundStats.waiting ?? 0);
-  const totalActive = (interactiveStats.active ?? 0) + (backgroundStats.active ?? 0);
-  
-  // The state is passed to the corrected helper function below
-  const pollAfterMs = computePollAfterMs(state, totalWaiting, totalActive);
-
-  const resp = okJson({ state, progress, queue: { waiting: totalWaiting, active: totalActive } }, 200);
-  resp.headers.set('Retry-After', String(Math.ceil(pollAfterMs / 1000)));
-  resp.headers.set('X-Poll-After-Ms', String(pollAfterMs));
-  return withJobHeaders(resp, id, state);
 }
 
-// Helper for GET endpoint to fetch stats for both queues
-async function getQueuesAndStats() {
-  const { interactiveQueue, backgroundQueue } = await getQueues();
-  const [interactiveStats, backgroundStats] = await Promise.all([
+/* ─────────────────────────────────────────────────────────
+  Helpers
+────────────────────────────────────────────────────────── */
+async function getQueuesAndStats(): Promise<{
+  interactiveStats: Record<'waiting' | 'active', number>;
+  backgroundStats: Record<'waiting' | 'active', number>;
+}> {
+  const [interactiveQueue, backgroundQueue] = await Promise.all([
+    getQueue(INTERACTIVE_QUEUE_NAME),
+    getQueue(BACKGROUND_QUEUE_NAME),
+  ]);
+
+  const [interactiveCounts, backgroundCounts] = await Promise.all([
     interactiveQueue.getJobCounts('wait', 'active'),
     backgroundQueue.getJobCounts('wait', 'active'),
   ]);
-  return { interactiveStats, backgroundStats };
+
+  return {
+    interactiveStats: { waiting: interactiveCounts.wait, active: interactiveCounts.active },
+    backgroundStats: { waiting: backgroundCounts.wait, active: backgroundCounts.active },
+  };
 }
 
-// --- CORRECTED HELPER FUNCTION ---
-// The function signature is widened to accept the 'unknown' state.
 function computePollAfterMs(state: JobState | 'unknown', waiting: number, active: number): number {
   let base: number;
   switch (state) {
-    case 'active':
-      base = 1200;
-      break;
-    case 'delayed':
-      base = 2000;
-      break;
+    case 'active': base = 1200; break;
+    case 'delayed': base = 2000; break;
     case 'waiting':
     case 'waiting-children':
     case 'prioritized':
-    case 'unknown': // Handle 'unknown' gracefully
-    default:
-      base = 1500; // Default to a safe polling interval
-      break;
+    case 'unknown':
+    default: base = 1500; break;
   }
-  
   const ratio = active > 0 ? waiting / active : waiting;
   if (ratio > 10) base = Math.max(base, 4000);
   else if (ratio > 3) base = Math.max(base, 2500);
-  
   const jitter = base * (0.6 + Math.random() * 0.8);
   return Math.max(800, Math.min(8000, Math.round(jitter)));
 }
