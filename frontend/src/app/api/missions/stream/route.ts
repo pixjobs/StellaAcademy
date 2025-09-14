@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'node:crypto';
 
@@ -12,9 +11,21 @@ import { getQueue, BACKGROUND_QUEUE_NAME } from '@/lib/queue';
    Types
 ────────────────────────────────────────────────────────── */
 type FastStatus = 'ready' | 'stale' | 'queued' | 'missing' | 'error';
-type FastReady  = { status: Extract<FastStatus, 'ready' | 'stale'>; plan: EnrichedMissionPlan; jobId?: string };
-type FastQueued = { status: 'queued'; jobId: string; plan?: EnrichedMissionPlan };
-type FastMissing = { status: 'missing' } | { status: 'error'; error?: string };
+
+type FastReady = {
+  status: Extract<FastStatus, 'ready' | 'stale'>;
+  plan: EnrichedMissionPlan;
+  jobId?: string;
+};
+type FastQueued = {
+  status: 'queued';
+  jobId: string;
+  plan?: EnrichedMissionPlan;
+};
+type FastMissing = { status: 'missing' };
+type FastError = { status: 'error'; error?: string };
+
+type ResponseBody = FastReady | FastQueued | FastMissing | FastError;
 
 type DocShape = {
   plan: EnrichedMissionPlan;
@@ -27,8 +38,8 @@ type DocShape = {
 /* ─────────────────────────────────────────────────────────
    Small utils
 ────────────────────────────────────────────────────────── */
-const json = (data: FastReady | FastQueued | FastMissing, status = 200) =>
-  NextResponse.json(data as any, {
+const json = (data: ResponseBody, status = 200): NextResponse =>
+  NextResponse.json(data, {
     status,
     headers: { 'Cache-Control': 'no-store' },
   });
@@ -40,7 +51,9 @@ const isRecord = (x: unknown): x is Record<string, unknown> =>
   typeof x === 'object' && x !== null;
 
 const isMissionPlan = (x: unknown): x is EnrichedMissionPlan =>
-  isRecord(x) && typeof x.missionTitle === 'string' && Array.isArray((x as { topics?: unknown }).topics);
+  isRecord(x) &&
+  typeof x.missionTitle === 'string' &&
+  Array.isArray(x.topics);
 
 /* ─────────────────────────────────────────────────────────
    Firebase Admin
@@ -49,7 +62,10 @@ if (getApps().length === 0) {
   try {
     initializeApp({ credential: applicationDefault() });
   } catch {
-    if (getApps().length === 0) initializeApp();
+    // Fallback for environments where default credentials might not be set up initially.
+    if (getApps().length === 0) {
+      initializeApp();
+    }
   }
 }
 const db = getFirestore();
@@ -57,15 +73,22 @@ const db = getFirestore();
 /* ─────────────────────────────────────────────────────────
    Firestore helpers
 ────────────────────────────────────────────────────────── */
-const docId = (mission: string, role: string) => `${mission}:${role}`;
+const docId = (mission: string, role: string): string => `${mission}:${role}`;
 
-async function readDocExact(mission: string, role: string): Promise<DocShape | null> {
+async function readDocExact(
+  mission: string,
+  role: string
+): Promise<DocShape | null> {
   const ref = db.collection('mission_plans').doc(docId(mission, role));
   const snap = await ref.get();
-  if (!snap.exists) return null;
-  const data = snap.data() as DocShape;
-  if (!data || !isMissionPlan(data.plan)) return null;
-  return data;
+  if (!snap.exists) {
+    return null;
+  }
+  const data = snap.data();
+  if (!data || !isMissionPlan(data.plan)) {
+    return null;
+  }
+  return data as DocShape;
 }
 
 // Fallback: pick newest doc for same mission from ANY role
@@ -78,25 +101,44 @@ async function readNewestForMission(mission: string): Promise<DocShape | null> {
       .limit(1)
       .get();
 
-    if (qs.empty) return null;
-    const data = qs.docs[0].data() as DocShape;
-    if (!data || !isMissionPlan(data.plan)) return null;
-    return data;
+    if (qs.empty) {
+      return null;
+    }
+    const data = qs.docs[0].data();
+    if (!data || !isMissionPlan(data.plan)) {
+      return null;
+    }
+    return data as DocShape;
   } catch (e) {
-    // If an index is missing, fall back to client-side sort
-    const all = await db.collection('mission_plans').where('mission', '==', mission).get();
-    if (all.empty) return null;
+    // If an index is missing, Firestore throws. Fall back to client-side sort.
+    const all = await db
+      .collection('mission_plans')
+      .where('mission', '==', mission)
+      .get();
+    if (all.empty) {
+      return null;
+    }
     let latest: DocShape | null = null;
     all.forEach((doc) => {
-      const d = doc.data() as DocShape;
-      if (!d || !isMissionPlan(d.plan) || !d.updatedAt) return;
-      if (!latest || d.updatedAt.toMillis() > latest.updatedAt.toMillis()) latest = d;
+      const d = doc.data();
+      if (
+        d &&
+        isMissionPlan(d.plan) &&
+        d.updatedAt instanceof Timestamp &&
+        (!latest || d.updatedAt.toMillis() > latest.updatedAt.toMillis())
+      ) {
+        latest = d as DocShape;
+      }
     });
     return latest;
   }
 }
 
-async function writeDoc(mission: string, role: string, plan: EnrichedMissionPlan): Promise<DocShape> {
+async function writeDoc(
+  mission: string,
+  role: string,
+  plan: EnrichedMissionPlan
+): Promise<DocShape> {
   const ref = db.collection('mission_plans').doc(docId(mission, role));
   const now = Timestamp.now();
   const body: DocShape = { mission, role, plan, updatedAt: now };
@@ -107,7 +149,10 @@ async function writeDoc(mission: string, role: string, plan: EnrichedMissionPlan
 /* ─────────────────────────────────────────────────────────
    Queue helper (direct; no delegation loops)
 ────────────────────────────────────────────────────────── */
-async function enqueueMissionDirectly(mission: string, role: string): Promise<{ jobId: string }> {
+async function enqueueMissionDirectly(
+  mission: string,
+  role: string
+): Promise<{ jobId: string }> {
   const payload = { missionType: mission, role };
   const jobData = { type: 'mission', payload };
   const jobId = hashId(jobData);
@@ -127,13 +172,17 @@ async function enqueueMissionDirectly(mission: string, role: string): Promise<{ 
 /* ─────────────────────────────────────────────────────────
    Handler
 ────────────────────────────────────────────────────────── */
-export async function GET(req: NextRequest) {
+export async function GET(req: NextRequest): Promise<NextResponse> {
   try {
     const sp = req.nextUrl.searchParams;
 
     const mission = (sp.get('mission') || '').trim();
     const requestedRole = (sp.get('role') || 'explorer').trim();
-    const maxAgeMs = Math.max(60_000, Number(sp.get('maxAgeMs')) || 6 * 60 * 60 * 1000); // default 6h
+    // default 6h
+    const maxAgeMs = Math.max(
+      60 * 1000,
+      Number(sp.get('maxAgeMs')) || 6 * 60 * 60 * 1000
+    );
     const force = sp.get('force') === '1';
 
     // NEVER enqueue when these flags are present
@@ -150,17 +199,15 @@ export async function GET(req: NextRequest) {
 
     // 2) If exact role missing, fall back to ANY role for this mission (freshest)
     if (!doc) {
-      const fallback = await readNewestForMission(mission);
-      if (fallback) {
-        doc = fallback;
-      }
+      doc = await readNewestForMission(mission);
     }
 
     const now = Date.now();
-    const isFresh = !!doc?.updatedAt && now - doc.updatedAt.toMillis() <= maxAgeMs;
+    const isFresh =
+      !!doc?.updatedAt && now - doc.updatedAt.toMillis() <= maxAgeMs;
 
     // A) Found a doc
-    if (doc && isMissionPlan(doc.plan)) {
+    if (doc) {
       // i) Fresh and not forced → "ready"
       if (isFresh && !force) {
         return json({ status: 'ready', plan: doc.plan }, 200);
@@ -172,9 +219,9 @@ export async function GET(req: NextRequest) {
         return json({ status: 'stale', plan: doc.plan }, 200);
       }
 
-      // Enqueue a background refresh for the *requested* role (keeps role coverage complete)
+      // Enqueue a background refresh for the *requested* role
       const { jobId } = await enqueueMissionDirectly(mission, requestedRole);
-      // Return stale plan immediately (good UX), mark that a refresh is queued
+      // Return stale plan immediately, mark that a refresh is queued
       return json({ status: 'stale', plan: doc.plan, jobId }, 202);
     }
 
@@ -188,6 +235,7 @@ export async function GET(req: NextRequest) {
     return json({ status: 'queued', jobId }, 202);
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
+    // The console.error call is kept for debugging purposes.
     console.error('[missions/stream] error', msg);
     return json({ status: 'error', error: msg }, 500);
   }

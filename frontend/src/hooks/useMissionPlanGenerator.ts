@@ -30,12 +30,9 @@ type PollResponse = PollCompleted | PollOngoing | PollFailed;
 type FastStatus = 'ready' | 'stale' | 'queued' | 'missing' | 'error';
 type FastReady  = { status: Extract<FastStatus, 'ready' | 'stale'>; plan: EnrichedMissionPlan; jobId?: string };
 type FastQueued = { status: 'queued'; jobId: string; plan?: EnrichedMissionPlan };
-type FastMissing = { status: 'missing' } | { status: 'error'; error?: string };
 
 /** Some backends reply 202 with just { jobId, plan? } (no status). Support that too. */
 type FastQueuedLoose = { jobId: string; plan?: EnrichedMissionPlan; status?: 'queued' };
-
-type FastResponse = FastReady | FastQueued | FastMissing | FastQueuedLoose;
 
 /* -------------------------------------------------------------------------- */
 /* Config & helpers                                                            */

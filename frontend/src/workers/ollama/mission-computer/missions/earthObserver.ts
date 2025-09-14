@@ -2,7 +2,12 @@
 import type { WorkerContext } from '../../context';
 import type { Role } from '@/types/llm';
 import type { EnrichedMissionPlan, EnrichedTopic } from '@/types/mission';
-import { fetchEpicRich, type EpicKind } from '../../apis/epic';
+import {
+  fetchEpicRich,
+  epicLatest,
+  buildArchiveHref,
+  type EpicKind,
+} from '../../apis/epic';
 import { ensureMissionPlan, ensureTopic } from '../shared/core';
 import type { GenerationOpts } from '../shared/types';
 
@@ -11,45 +16,132 @@ import type { GenerationOpts } from '../shared/types';
  * Role is intentionally ignored to prioritize EPIC product modes.
  */
 export async function missionEarthObserver(
-  _role: Role,             // role intentionally ignored
-  _context: WorkerContext, // (reserved for future caching/telemetry)
-  options?: GenerationOpts, // <-- seedIndex/attempt supported to diversify
+  _role: Role,
+  _context: WorkerContext,
+  options?: GenerationOpts,
 ): Promise<EnrichedMissionPlan> {
   const logPrefix = '[mission][earth-observer]';
 
-  // Mix seedIndex + attempt for deterministic variety across retries
+  // Deterministic variety across retries
   const baseSeed = (options?.seedIndex ?? Date.now()) >>> 0;
   const attempt  = Math.max(1, options?.attempt ?? 1);
   const seed     = ((baseSeed ^ (attempt * 0x9E3779B1)) >>> 0);
 
-  // Vary sampling a little based on the seed (within safe bounds)
-  const sampleDatesPerKind = clamp(2 + (seed & 1), 2, 3);   // 2–3 dates/kind
-  const itemsPerDate       = clamp(5 + ((seed >>> 1) % 3), 5, 7); // 5–7 items/date
+  // Tunables (env-overridable)
+  const SAMPLE_DATES_BASE = clamp(intFromEnv('EO_SAMPLE_DATES', 2), 1, 4);   // default 2
+  const ITEMS_PER_DATE_BASE = clamp(intFromEnv('EO_ITEMS_PER_DATE', 6), 3, 10); // default 6
+  const MAX_TOPIC_IMAGES = clamp(intFromEnv('EO_MAX_TOPIC_IMAGES', 10), 4, 16);
+  const MAX_TOPICS = clamp(intFromEnv('EO_MAX_TOPICS', 4), 1, 4);
+  const REACH_CONCURRENCY = clamp(intFromEnv('EO_REACH_CONCURRENCY', 4), 1, 8);
+  const REACH_TIMEOUT_MS = clamp(intFromEnv('EO_REACH_TIMEOUT_MS', 7000), 1500, 15000);
 
-  let rich: Awaited<ReturnType<typeof fetchEpicRich>> = [];
-  try {
-    rich = await fetchEpicRich({
+  // Slight deterministic wiggle
+  const sampleDatesPerKind = clamp(SAMPLE_DATES_BASE + (seed & 1), 1, 4);          // 1–4 dates/kind
+  const itemsPerDate       = clamp(ITEMS_PER_DATE_BASE + ((seed >>> 1) % 2), 3, 10); // 3–10 items/date
+
+  // Prefer JPGs (smaller, reliably present). Pass the key if you have it.
+  const apiKey = process.env.NASA_API_KEY ?? '';
+
+  // ------- Stage 1: normal path (recent) -------
+  let rich = await safeFetchEpicRich(
+    {
       kinds: ['natural', 'enhanced', 'cloud', 'aerosol'],
       preferRecent: true,
       sampleDatesPerKind,
       itemsPerDate,
       seed,
       imageType: 'jpg',
-    });
-  } catch (e) {
-    console.warn(`${logPrefix} EPIC call failed; using educational fallback.`, e);
+    },
+    apiKey,
+    `${logPrefix} stage1`
+  );
+
+  // ------- Stage 2: retry with tighter variance if still empty -------
+  if (rich.length === 0) {
+    rich = await safeFetchEpicRich(
+      {
+        kinds: ['natural', 'enhanced', 'cloud', 'aerosol'],
+        preferRecent: true,
+        sampleDatesPerKind: Math.max(1, sampleDatesPerKind - 1),
+        itemsPerDate,
+        seed: seed ^ 0xA5A5A5A5,
+        imageType: 'jpg',
+      },
+      apiKey,
+      `${logPrefix} stage2`
+    );
   }
 
+  // ------- Stage 3: hard fallback to latest per kind -------
+  if (rich.length === 0) {
+    console.warn(`${logPrefix} falling back to epicLatest per kind`);
+    const kinds: EpicKind[] = ['natural', 'enhanced', 'cloud', 'aerosol'];
+    const hard: Array<{ kind: EpicKind; date: string; href: string; caption?: string; lat?: number; lon?: number }> = [];
+    const seen = new Set<string>();
+
+    for (const k of kinds) {
+      try {
+        const metas = await epicLatest(k, apiKey);
+        for (const m of metas.slice(0, itemsPerDate)) {
+          const ymd = String(m.date ?? '').slice(0, 10);
+          if (!m.image || !/^\d{4}-\d{2}-\d{2}$/.test(ymd)) continue;
+          const href = buildArchiveHref(k, ymd, m.image, 'jpg');
+          if (!href || seen.has(href)) continue;
+          seen.add(href);
+          hard.push({
+            kind: k,
+            date: ymd,
+            href,
+            caption: m.caption,
+            lat: m.centroid_coordinates?.lat,
+            lon: m.centroid_coordinates?.lon,
+          });
+        }
+      } catch (e) {
+        console.warn(`${logPrefix} epicLatest failed for kind=${k}`, e);
+      }
+    }
+    rich = hard;
+  }
+
+  // Group by kind and dedupe by href
   const byKind = groupEpicByKind(rich);
 
-  const total =
-    (byKind.natural?.length ?? 0) +
-    (byKind.enhanced?.length ?? 0) +
-    (byKind.cloud?.length ?? 0) +
-    (byKind.aerosol?.length ?? 0);
+  // Reachability filter (HEAD w/ 1-byte GET fallback), capped concurrency
+  for (const k of ['natural', 'enhanced', 'cloud', 'aerosol'] as const) {
+    const items = byKind[k];
+    if (!items?.length) continue;
 
-  // If NASA/EPIC is unavailable or empty, return a deterministic, educational plan.
-  if (total === 0) {
+    const reachable = await mapWithConcurrency(items, REACH_CONCURRENCY, async (it) => {
+      const ok = await headOrRangeCheck(it.href, REACH_TIMEOUT_MS);
+      return ok ? it : null;
+    });
+
+    // compact, dedupe again, and cap per-topic images
+    byKind[k] = dedupeByHref(reachable.filter(Boolean) as typeof items).slice(0, MAX_TOPIC_IMAGES);
+  }
+
+  // Build topics (keep only non-empty, cap total topics)
+  const topics: EnrichedTopic[] = [];
+  for (const kind of ['natural', 'enhanced', 'cloud', 'aerosol'] as const) {
+    const items = byKind[kind] ?? [];
+    if (items.length === 0) continue;
+
+    const picked = pickDeterministic(items, Math.min(items.length, MAX_TOPIC_IMAGES), seed ^ kind.length);
+    const title = titleFor(kind);
+    const summary = summaryFor(kind, picked);
+    const images = picked.map((i) => ({
+      title: imgTitle(kind, i.date, i.caption, i.lat, i.lon),
+      href: i.href,
+    }));
+
+    topics.push(ensureTopic({ title, summary, images }));
+    if (topics.length >= MAX_TOPICS) break;
+  }
+
+  // Final fallback if we still somehow have no images/topics
+  if (topics.length === 0 || topics.every(t => (t.images?.length ?? 0) === 0)) {
+    console.warn(`${logPrefix} no live images after reachability; returning educational fallback`);
     const topic = ensureTopic({
       title: 'Reading Earth from L1',
       summary:
@@ -64,35 +156,6 @@ export async function missionEarthObserver(
     });
   }
 
-  // Build topics in a consistent order; slice deterministically with seed
-  const topics: EnrichedTopic[] = [];
-  (['natural', 'enhanced', 'cloud', 'aerosol'] as const).forEach((kind) => {
-    const items = byKind[kind] ?? [];
-    if (items.length === 0) return;
-
-    // Deterministic shuffle/slice to reduce duplicate hashes across attempts
-    const picked = pickDeterministic(items, 10, seed ^ kind.length);
-    const title = titleFor(kind);
-    const summary = summaryFor(kind, picked);
-    const images = picked.map((i) => ({
-      title: imgTitle(kind, i.date, i.caption, i.lat, i.lon),
-      href: i.href,
-    }));
-
-    topics.push(ensureTopic({ title, summary, images }));
-  });
-
-  // Defensive: if filtering produced nothing (shouldn’t happen), keep it educational.
-  if (topics.length === 0) {
-    const topic = ensureTopic({
-      title: 'Interpreting EPIC Products',
-      summary:
-        'Use full-disk imagery to compare natural and enhanced color products, locate cloud systems with cloud fraction, and identify particle plumes via aerosol index.',
-      images: [],
-    });
-    topics.push(topic);
-  }
-
   return ensureMissionPlan({
     missionTitle: 'Earth Observer',
     introduction:
@@ -102,26 +165,48 @@ export async function missionEarthObserver(
 }
 
 /* ─────────────────────────────────────────────────────────
-   Helpers (exhaustive returns)
+   Hardened fetch wrapper + helpers
 ────────────────────────────────────────────────────────── */
+
+async function safeFetchEpicRich(
+  base: Parameters<typeof fetchEpicRich>[0],
+  apiKey: string,
+  tag: string,
+) {
+  try {
+    return await fetchEpicRich(base, apiKey);
+  } catch (e) {
+    console.warn(`${tag} fetchEpicRich failed`, e);
+    return [];
+  }
+}
 
 type Grouped = Record<
   'natural' | 'enhanced' | 'cloud' | 'aerosol',
   Array<{ date: string; href: string; caption?: string; lat?: number; lon?: number }>
 >;
 
-function groupEpicByKind(items: Awaited<ReturnType<typeof fetchEpicRich>>): Grouped {
+function groupEpicByKind(
+  items: Array<{ kind: EpicKind; date: string; href: string; caption?: string; lat?: number; lon?: number }>
+): Grouped {
   const out: Grouped = { natural: [], enhanced: [], cloud: [], aerosol: [] };
   for (const it of items) {
-    if (it.kind === 'natural' || it.kind === 'enhanced' || it.kind === 'cloud' || it.kind === 'aerosol') {
-      out[it.kind].push({
-        date: it.date,
-        href: it.href,
-        caption: it.caption,
-        lat: it.lat,
-        lon: it.lon,
-      });
+    const k = it.kind;
+    if (k === 'natural' || k === 'enhanced' || k === 'cloud' || k === 'aerosol') {
+      if (!it.href) continue;
+      out[k].push({ date: it.date, href: it.href, caption: it.caption, lat: it.lat, lon: it.lon });
     }
+  }
+  return out;
+}
+
+function dedupeByHref<T extends { href: string }>(arr: T[]): T[] {
+  const seen = new Set<string>();
+  const out: T[] = [];
+  for (const it of arr) {
+    if (!it.href || seen.has(it.href)) continue;
+    seen.add(it.href);
+    out.push(it);
   }
   return out;
 }
@@ -229,4 +314,57 @@ function pickDeterministic<T>(arr: readonly T[], count: number, seed: number): T
 
 function clamp(n: number, lo: number, hi: number): number {
   return Math.max(lo, Math.min(hi, n));
+}
+
+function intFromEnv(name: string, def: number): number {
+  const v = Number(process.env[name]);
+  return Number.isFinite(v) ? v : def;
+}
+
+/* ─────────────────────────────────────────────────────────
+   Reachability (HEAD with GET range fallback)
+────────────────────────────────────────────────────────── */
+
+async function headOrRangeCheck(url: string, timeoutMs: number, attempt = 1): Promise<boolean> {
+  const to = AbortSignal.timeout ? AbortSignal.timeout(timeoutMs) : undefined;
+  try {
+    const res = await fetch(url, { method: 'HEAD', signal: to });
+    if (res.ok) return true;
+    // Some CDNs reject HEAD — probe with a 1-byte range GET
+    const res2 = await fetch(url, { method: 'GET', headers: { Range: 'bytes=0-0' }, signal: to });
+    return res2.ok || res2.status === 206;
+  } catch (e) {
+    if (attempt < 2 && /ECONN|ETIMEDOUT|network|fetch failed|aborted/i.test(String(e))) {
+      await new Promise(r => setTimeout(r, 200 + Math.random() * 600));
+      return headOrRangeCheck(url, timeoutMs, attempt + 1);
+    }
+    return false;
+  }
+}
+
+async function mapWithConcurrency<T, R>(
+  arr: readonly T[],
+  concurrency: number,
+  fn: (item: T, index: number) => Promise<R>,
+): Promise<R[]> {
+  const ret: R[] = new Array(arr.length);
+  let i = 0;
+  let running = 0;
+  return await new Promise<R[]>((resolve) => {
+    const next = () => {
+      while (running < concurrency && i < arr.length) {
+        const idx = i++;
+        running++;
+        void fn(arr[idx], idx)
+          .then((v) => { ret[idx] = v; })
+          .catch(() => { (ret as (R | undefined)[])[idx] = undefined as unknown as R; })
+          .finally(() => {
+            running--;
+            if (i >= arr.length && running === 0) resolve(ret);
+            else next();
+          });
+      }
+    };
+    next();
+  });
 }

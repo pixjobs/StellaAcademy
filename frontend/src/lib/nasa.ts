@@ -66,7 +66,7 @@ type NivlSearchItem = { data?: NivlDataItem[]; links?: NivlLink[] };
 type NivlSearchResponse = { collection: { items: NivlSearchItem[] } };
 type NivlAssetResponse = { collection: { items: { href: string }[] } };
 type MarsRoverApiResponse = { latest_photos: MarsPhoto[] };
-type EpicApiResponseItem = { date: string; image: string };
+
 
 /* -------------------------------------------------------------------------- */
 /*                                   Config                                   */

@@ -1,11 +1,11 @@
 /* eslint-disable no-console */
+
 import {
   Timestamp,
   type Firestore,
   type FirestoreDataConverter,
   type QueryDocumentSnapshot,
   type CollectionReference,
-  type Query,
 } from '@google-cloud/firestore';
 
 import type { WorkerContext } from './context';
@@ -19,41 +19,35 @@ import {
   type MissionType,
 } from '@/types/llm';
 import type { EnrichedMissionPlan } from '@/types/mission';
+import { logger } from './utils/logger';
 
 /* ─────────────────────────────────────────────────────────
    Tunables
 ────────────────────────────────────────────────────────── */
 
+const FRESHNESS_BUDGET_MS = 25_000;
 const DEV = process.env.NODE_ENV !== 'production';
 
-// Pool sizing (can be per-mission tuned if you want)
 const MIN_PER_ROLE: Record<MissionType, number> = {
   'rocket-lab': 2,
+  'space-poster': 2,
+  'rover-cam': 2,
+  'earth-observer': 2,
+  'celestial-investigator': 2,
+};
+const MAX_PER_ROLE: Record<MissionType, number> = {
+  'rocket-lab': 3,
   'space-poster': 3,
   'rover-cam': 3,
   'earth-observer': 3,
   'celestial-investigator': 3,
 };
-const MAX_PER_ROLE: Record<MissionType, number> = {
-  'rocket-lab': 12,
-  'space-poster': 10,
-  'rover-cam': 10,
-  'earth-observer': 12,
-  'celestial-investigator': 10,
-};
 
-// Freshness (ms)
-const FRESH_MAX_AGE_MS = 14 * 24 * 60 * 60 * 1000; // 14d = “fresh”
-const TARGET_FRESH_PER_ROLE = 2; // keep at least N fresh per role
-const USER_SEEN_TTL_SECONDS = 30 * 24 * 60 * 60; // 30d
+const FRESH_MAX_AGE_MS = 14 * 24 * 60 * 60 * 1000; // 14d
+const TARGET_FRESH_PER_ROLE = 2;
 
-// Proactive maintenance
 const MAINTENANCE_INTERVAL_MS = DEV ? 60_000 : 5 * 60_000;
-
-// Generation attempts
-const MAX_GENERATION_ATTEMPTS = 7;
-
-// How many docs to sample when picking a variant
+const MAX_GENERATION_ATTEMPTS = 2;
 const SAMPLE_LIMIT = 30;
 
 /* ─────────────────────────────────────────────────────────
@@ -62,9 +56,9 @@ const SAMPLE_LIMIT = 30;
 
 type MissionVariantData = {
   generatedAt: Timestamp;
-  role: Role;                 // 'explorer' is the generic pool
+  role: Role;
   plan: EnrichedMissionPlan;
-  contentHash: string;        // dedupe across the whole mission type
+  contentHash: string;
 };
 type MissionVariant = MissionVariantData & { id: string };
 
@@ -88,23 +82,77 @@ function randPick<T>(arr: T[]): T | undefined {
 }
 function roleIntro(plan: EnrichedMissionPlan, role: Role): EnrichedMissionPlan {
   const intro =
-    plan.introduction?.replace(/welcome.*?\./i, `Welcome, ${role}.`) ?? `Welcome, ${role}.`;
+    plan.introduction?.replace(/welcome.*?\./i, `Welcome, ${role}.`) ??
+    `Welcome, ${role}.`;
   return { ...plan, introduction: intro };
 }
 
-async function safeCount(q: Query<MissionVariantData>): Promise<number> {
-  // New SDKs support aggregate count(); older ones don’t.
-  try {
-    const snap = await q.count().get();
-    return snap?.data?.().count ?? 0;
-  } catch {
-    const s = await q.limit(1000).get();
-    return s.size;
-  }
+function baseCollection(
+  db: Firestore,
+  missionType: MissionType
+): CollectionReference<MissionVariantData> {
+  return db
+    .collection('mission_plans')
+    .doc(missionType)
+    .collection('variants')
+    .withConverter(missionVariantConverter);
 }
 
-function baseCollection(db: Firestore, missionType: MissionType): CollectionReference<MissionVariantData> {
-  return db.collection('mission_plans').doc(missionType).collection('variants').withConverter(missionVariantConverter);
+/* ─────────────────────────────────────────────────────────
+   Near-duplicate detection helpers
+────────────────────────────────────────────────────────── */
+
+function norm(s: string): string {
+  return s.toLowerCase().replace(/\s+/g, ' ').trim();
+}
+
+function jaccard(a: Set<string>, b: Set<string>): number {
+  const inter = new Set([...a].filter((x) => b.has(x))).size;
+  const uni = new Set([...a, ...b]).size || 1;
+  return inter / uni;
+}
+
+function isNearDuplicate(a: EnrichedMissionPlan, b: EnrichedMissionPlan): boolean {
+  const titleA = norm(a.missionTitle || '');
+  const titleB = norm(b.missionTitle || '');
+  if (titleA && titleA === titleB) return true;
+
+  const topicsA = new Set(
+    (a.topics ?? []).map((t) => norm(t.title || '')).filter(Boolean)
+  );
+  const topicsB = new Set(
+    (b.topics ?? []).map((t) => norm(t.title || '')).filter(Boolean)
+  );
+  if (topicsA.size === 0 || topicsB.size === 0) return false;
+
+  const overlap = jaccard(topicsA, topicsB);
+  return overlap >= 0.6;
+}
+
+function logPlanPreview(
+  prefix: string,
+  missionType: MissionType,
+  role: Role,
+  attempt: number,
+  seedIndex: number,
+  plan: EnrichedMissionPlan,
+  contentHash: string,
+  dupe?: string
+) {
+  const topics = (plan.topics ?? []).slice(0, 3).map((t) => t.title || 'Untitled');
+  const message =
+    `${prefix} ${missionType}/${role} (attempt=${attempt}, seed=${seedIndex})\n` +
+    `  title: ${plan.missionTitle}\n` +
+    `  topics: ${topics.join(' | ')}` +
+    (plan.topics && plan.topics.length > 3 ? ` (+${plan.topics.length - 3} more)` : '') +
+    `\n  hash: ${contentHash}` +
+    (dupe ? `  [DUPLICATE: ${dupe}]` : '');
+
+  if (dupe) {
+    logger.warn(message);
+  } else {
+    logger.info(message);
+  }
 }
 
 /* ─────────────────────────────────────────────────────────
@@ -115,63 +163,42 @@ export async function retrieveMissionFromLibraryFast(
   missionType: MissionType,
   role: Role,
   context: WorkerContext,
-  opts?: {
-    preferUnseen?: boolean;
-    maxAgeMs?: number;     // use Infinity to allow any age
-    sampleLimit?: number;
-  }
+  opts?: { maxAgeMs?: number; sampleLimit?: number }
 ): Promise<EnrichedMissionPlan | null> {
   assertDb(context.db);
   const db = context.db;
-  const redis = context.redis;
-  const preferUnseen = opts?.preferUnseen !== false;
   const maxAgeMs = opts?.maxAgeMs ?? FRESH_MAX_AGE_MS;
   const sampleLimit = Math.max(8, Math.min(60, opts?.sampleLimit ?? SAMPLE_LIMIT));
 
   const col = baseCollection(db, missionType);
-  const userSeenKey = `user:${role}:seen-missions:${missionType}`;
 
-  const [roleDocs, genericDocs, seenIds] = await Promise.all([
+  const [roleDocs, genericDocs] = await Promise.all([
     col.where('role', '==', role).orderBy('generatedAt', 'desc').limit(sampleLimit).get(),
     col.where('role', '==', 'explorer').orderBy('generatedAt', 'desc').limit(sampleLimit).get(),
-    preferUnseen ? redis.smembers(userSeenKey) : Promise.resolve<string[]>([]),
   ]);
 
   const now = Date.now();
-  const withinAge = (ts?: Timestamp) => !ts || (now - ts.toMillis() <= maxAgeMs);
+  const withinAge = (ts?: Timestamp) => !ts || now - ts.toMillis() <= maxAgeMs;
 
   const mapDocs = (docs: typeof roleDocs.docs): MissionVariant[] =>
     docs
-      .map((doc: QueryDocumentSnapshot<MissionVariantData>) => ({ id: doc.id, ...doc.data() }))
+      .map((doc: QueryDocumentSnapshot<MissionVariantData>) => ({
+        id: doc.id,
+        ...doc.data(),
+      }))
       .filter((v) => withinAge(v.generatedAt));
 
   const rolePool = mapDocs(roleDocs.docs);
   const genericPool = mapDocs(genericDocs.docs);
+  const combinedPool = [...rolePool, ...genericPool];
 
-  if (rolePool.length + genericPool.length === 0) return null;
+  if (combinedPool.length === 0) return null;
 
-  const choose = (pool: MissionVariant[]): MissionVariant | undefined => {
-    if (pool.length === 0) return undefined;
-    if (preferUnseen && seenIds.length > 0) {
-      const unseen = pool.filter((v) => !seenIds.includes(v.id));
-      if (unseen.length > 0) return randPick(unseen);
-    }
-    return randPick(pool);
-  };
-
-  let chosen = choose(rolePool) || choose(genericPool) || randPick([...rolePool, ...genericPool]);
+  const chosen = randPick(combinedPool);
   if (!chosen) return null;
 
-  if (preferUnseen) {
-    void redis
-      .sadd(userSeenKey, chosen.id)
-      .then(() => redis.expire(userSeenKey, USER_SEEN_TTL_SECONDS))
-      .catch(() => {});
-  }
-
-  // Kick a best-effort freshness check (doesn’t block the response)
   void ensureFreshness(missionType, role, context).catch((e) =>
-    console.warn('[library] ensureFreshness background failed:', e?.message || e)
+    logger.warn('[library] ensureFreshness background failed:', e instanceof Error ? e.message : e)
   );
 
   return roleIntro(chosen.plan, role);
@@ -183,12 +210,10 @@ export async function retrieveMissionFromLibraryFast(
 
 type PoolMetrics = {
   totalRole: number;
-  totalGeneric: number;
   freshRole: number;
-  freshGeneric: number;
-  oldestMsRole: number | null;
-  oldestMsGeneric: number | null;
 };
+
+// --- RESTORED FUNCTION ---
 async function getPoolMetrics(
   missionType: MissionType,
   role: Role,
@@ -198,10 +223,7 @@ async function getPoolMetrics(
   const db = context.db;
   const col = baseCollection(db, missionType);
 
-  const [roleSnap, explSnap] = await Promise.all([
-    col.where('role', '==', role).orderBy('generatedAt', 'desc').limit(100).get(),
-    col.where('role', '==', 'explorer').orderBy('generatedAt', 'desc').limit(100).get(),
-  ]);
+  const roleSnap = await col.where('role', '==', role).orderBy('generatedAt', 'desc').limit(100).get();
 
   const now = Date.now();
   const age = (ts?: Timestamp) => (ts ? now - ts.toMillis() : Infinity);
@@ -209,19 +231,13 @@ async function getPoolMetrics(
   const fresh = (docs: typeof roleSnap.docs) =>
     docs.filter((d) => age(d.data().generatedAt) <= FRESH_MAX_AGE_MS).length;
 
-  const oldestMs = (docs: typeof roleSnap.docs) =>
-    docs.length === 0 ? null : age(docs[docs.length - 1].data().generatedAt);
-
   return {
     totalRole: roleSnap.size,
-    totalGeneric: explSnap.size,
     freshRole: fresh(roleSnap.docs),
-    freshGeneric: fresh(explSnap.docs),
-    oldestMsRole: oldestMs(roleSnap.docs),
-    oldestMsGeneric: oldestMs(explSnap.docs),
   };
 }
 
+// --- RESTORED FUNCTION ---
 async function deleteOverflow(
   missionType: MissionType,
   role: Role,
@@ -236,13 +252,14 @@ async function deleteOverflow(
   const toDelete = Math.max(0, snap.size - keep);
   if (toDelete <= 0) return 0;
 
-  const victims = snap.docs.slice(-toDelete); // oldest first
+  const victims = snap.docs.slice(-toDelete);
   const batch = db.batch();
   victims.forEach((d) => batch.delete(d.ref));
   await batch.commit();
   return victims.length;
 }
 
+// --- RESTORED FUNCTION ---
 async function generateUniqueMission(
   missionType: MissionType,
   role: Role,
@@ -257,16 +274,26 @@ async function generateUniqueMission(
   assertDb(context.db);
   const col = baseCollection(context.db, missionType);
   const newHash = hashMissionPlan(newPlan);
-  const dup = await col.where('contentHash', '==', newHash).limit(1).get();
-  if (!dup.empty) {
-    console.warn(
-      `[library] duplicate content for ${missionType}/${role} (attempt ${attempt}); retrying`
-    );
+
+  const exactDup = await col.where('contentHash', '==', newHash).limit(1).get();
+  if (!exactDup.empty) {
+    logPlanPreview('DUP (hash)', missionType, role, attempt, seedIndex, newPlan, newHash, 'hash');
     return generateUniqueMission(missionType, role, context, attempt + 1);
   }
+
+  const recent = await col.orderBy('generatedAt', 'desc').limit(50).get();
+  for (const d of recent.docs) {
+    if (isNearDuplicate(newPlan, d.data().plan)) {
+      logPlanPreview('DUP (near)', missionType, role, attempt, seedIndex, newPlan, newHash, 'near');
+      return generateUniqueMission(missionType, role, context, attempt + 1);
+    }
+  }
+
+  logPlanPreview('OK', missionType, role, attempt, seedIndex, newPlan, newHash);
   return newPlan;
 }
 
+// --- RESTORED FUNCTION ---
 async function backfillRole(
   missionType: MissionType,
   role: Role,
@@ -277,156 +304,148 @@ async function backfillRole(
   const db = context.db;
   const col = baseCollection(db, missionType);
 
-  const plans = (
-    await Promise.all(
-      Array.from({ length: need }, () => generateUniqueMission(missionType, role, context))
-    )
-  ).filter((p): p is EnrichedMissionPlan => p != null);
+  const accepted: EnrichedMissionPlan[] = [];
+  for (let i = 0; i < need; i++) {
+    const plan = await generateUniqueMission(missionType, role, context);
+    if (!plan) break;
+    accepted.push(plan);
+  }
 
-  if (plans.length === 0) return 0;
+  if (accepted.length === 0) return 0;
 
   const batch = db.batch();
-  plans.forEach((plan) => {
+  accepted.forEach((plan) => {
     const docRef = col.doc();
-    const payload: MissionVariantData = {
+    batch.set(docRef, {
       generatedAt: Timestamp.now(),
       role,
       plan,
       contentHash: hashMissionPlan(plan),
-    };
-    batch.set(docRef, payload);
+    });
   });
   await batch.commit();
-  return plans.length;
+
+  logger.info(`[library][gen] committed ${accepted.length} new variant(s) for ${missionType}/${role}`);
+  return accepted.length;
 }
 
-/** Ensure pool has enough *total* and *fresh* variants; rotate overflow. */
 async function ensureFreshness(
   missionType: MissionType,
   role: Role,
-  context: WorkerContext
+  context: WorkerContext,
+  isFirstBoot = false,
 ): Promise<void> {
   const logPrefix = `[library][freshness][${missionType}/${role}]`;
-
-  const min = MIN_PER_ROLE[missionType] ?? 3;
-  const max = MAX_PER_ROLE[missionType] ?? (min + 6);
+  const min = MIN_PER_ROLE[missionType] ?? 2;
+  const max = MAX_PER_ROLE[missionType] ?? 3;
+  const start = Date.now();
+  const outOfBudget = () => Date.now() - start >= FRESHNESS_BUDGET_MS;
 
   try {
     const m = await getPoolMetrics(missionType, role, context);
-    console.log(logPrefix, 'metrics', m);
 
-    // 1) Floor on total (role + explorer for retrieval; but we keep per-role)
-    const total = m.totalRole;
-    if (total < min) {
-      const added = await backfillRole(missionType, role, context, min - total);
-      console.log(logPrefix, `added ${added} to reach min=${min}`);
+    if (!outOfBudget() && m.totalRole < min) {
+      const need = Math.min(min - m.totalRole, 2);
+      await backfillRole(missionType, role, context, need);
     }
 
-    // 2) Freshness target per role
-    const fresh = m.freshRole;
-    if (fresh < TARGET_FRESH_PER_ROLE) {
-      const add = TARGET_FRESH_PER_ROLE - fresh;
-      const added = await backfillRole(missionType, role, context, add);
-      console.log(logPrefix, `added ${added} fresh to reach target=${TARGET_FRESH_PER_ROLE}`);
+    if (outOfBudget()) return;
+    const m2 = await getPoolMetrics(missionType, role, context);
+
+    if (!outOfBudget() && m2.freshRole < TARGET_FRESH_PER_ROLE) {
+      const need = Math.min(TARGET_FRESH_PER_ROLE - m2.freshRole, 2);
+      await backfillRole(missionType, role, context, need);
     }
 
-    // 3) Rotate overflow
-    const deleted = await deleteOverflow(missionType, role, context, max);
-    if (deleted > 0) console.log(logPrefix, `rotated ${deleted} old variants (kept <= ${max})`);
+    if (!outOfBudget()) {
+      await deleteOverflow(missionType, role, context, max);
+    }
   } catch (e) {
-    console.warn(logPrefix, 'ensureFreshness failed:', (e as Error)?.message || e);
+    if (DEV && isFirstBoot) {
+      logger.error(`${logPrefix} ensureFreshness failed during initial boot:`, e);
+    } else {
+      logger.warn(`${logPrefix} ensureFreshness failed:`, e instanceof Error ? e.message : e);
+    }
   }
 }
 
 /* ─────────────────────────────────────────────────────────
-   Proactive maintenance (kept, but smarter logging)
+   Proactive maintenance
 ────────────────────────────────────────────────────────── */
 
-async function checkAndEnrichEntireLibrary(context: WorkerContext): Promise<void> {
-  console.log('[library] maintenance start…');
-  const tasks: Array<Promise<void>> = [];
-  for (const missionType of ALL_MISSION_TYPES) {
-    for (const role of ALL_ROLES) {
-      tasks.push(ensureFreshness(missionType, role, context));
-    }
-  }
+async function checkAndEnrichEntireLibrary(
+  context: WorkerContext,
+  isFirstBoot = false,
+): Promise<void> {
+  logger.info('[library] maintenance start…');
+  const tasks = ALL_MISSION_TYPES.flatMap(missionType =>
+    ALL_ROLES.map(role => ensureFreshness(missionType, role, context, isFirstBoot))
+  );
   await Promise.allSettled(tasks);
-  console.log('[library] maintenance end.');
+  logger.info('[library] maintenance end.');
 }
 
-export function startLibraryMaintenance(context: WorkerContext): NodeJS.Timeout {
-  console.log(`[library] maintenance loop every ${MAINTENANCE_INTERVAL_MS / 1000}s.`);
-  // run immediately (fire-and-forget)
-  void checkAndEnrichEntireLibrary(context);
-  return setInterval(() => void checkAndEnrichEntireLibrary(context), MAINTENANCE_INTERVAL_MS);
+export function startLibraryMaintenance(
+  context: WorkerContext
+): NodeJS.Timeout {
+  logger.info(`[library] maintenance loop every ${MAINTENANCE_INTERVAL_MS / 1000}s.`);
+  void checkAndEnrichEntireLibrary(context, true);
+  return setInterval(
+    () => void checkAndEnrichEntireLibrary(context, false),
+    MAINTENANCE_INTERVAL_MS
+  );
 }
 
 /* ─────────────────────────────────────────────────────────
-   Public API used by the worker handler
-   (tries fast path first; generates as last resort)
+   Public API
 ────────────────────────────────────────────────────────── */
 
 export async function retrieveMissionForUser(
   missionType: MissionType,
   role: Role,
-  context: WorkerContext,
+  context: WorkerContext
 ): Promise<EnrichedMissionPlan> {
-  // 1) Try fresh first
   const fresh = await retrieveMissionFromLibraryFast(missionType, role, context, {
-    preferUnseen: true,
     maxAgeMs: FRESH_MAX_AGE_MS,
-    sampleLimit: SAMPLE_LIMIT,
   });
   if (fresh) return fresh;
 
-  // 2) Try any-age
   const anyAge = await retrieveMissionFromLibraryFast(missionType, role, context, {
-    preferUnseen: false,
     maxAgeMs: Number.POSITIVE_INFINITY,
-    sampleLimit: SAMPLE_LIMIT,
   });
   if (anyAge) {
-    // nudge freshness in background
     void ensureFreshness(missionType, role, context).catch(() => {});
     return anyAge;
   }
 
-  // 3) Library empty → emergency generation (and store it)
   const plan = await generateUniqueMission(missionType, role, context);
   if (!plan) {
-    // As a last, last resort, write a small deterministic seed so the pool is never empty again.
-    console.warn('[library] emergency seed insert for', missionType, role);
+    logger.warn('[library] emergency seed insert for', missionType, role);
     const seedPlan: EnrichedMissionPlan = {
       missionTitle: 'Mission Seed',
-      introduction: `Welcome, ${role}. This is a seeded plan used to recover an empty library.`,
+      introduction: `Welcome, ${role}. This is a seeded plan to recover an empty library.`,
       topics: [],
     };
-
     assertDb(context.db);
     const col = baseCollection(context.db, missionType);
-    const docRef = col.doc();
-    const payload: MissionVariantData = {
+    await col.add({
       generatedAt: Timestamp.now(),
       role,
       plan: seedPlan,
       contentHash: hashMissionPlan(seedPlan),
-    };
-    await docRef.set(payload);
+    });
     return roleIntro(seedPlan, role);
   }
 
-  // store it so subsequent requests are fast
   assertDb(context.db);
   const col = baseCollection(context.db, missionType);
-  const docRef = col.doc();
-  await docRef.set({
+  await col.add({
     generatedAt: Timestamp.now(),
     role,
     plan,
     contentHash: hashMissionPlan(plan),
   });
 
-  // refresh in background (fill up to min/fresh targets)
   void ensureFreshness(missionType, role, context).catch(() => {});
   return roleIntro(plan, role);
 }

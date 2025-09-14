@@ -2,9 +2,13 @@ import type { Role } from '@/types/llm';
 import { audienceSpec } from './audience';
 import { templates } from './templates';
 
-export function buildRocketLabTopicPrompt(role: Role): string {
+export function buildRocketLabTopicPrompt(
+  role: Role,
+  variety: { lens: string; output: string; challenge: string },
+  contextLines: string[],
+): string {
   const aud = audienceSpec(role);
-  return templates.rocketLabTopics(aud);
+  return templates.rocketLabTopics(aud, variety, contextLines);
 }
 
 export function hardenAskPrompt(question: string, extra?: string): string {

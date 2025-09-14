@@ -43,6 +43,8 @@ function MissionControlInternal({
 
   const hasImages = useMemo(() => images && images.length > 0, [images]);
   const [selImageIndex, setSelImageIndex] = useState(() => Math.max(0, initialImage ?? 0));
+  const currentPic = useMemo(() => (hasImages ? images[selImageIndex] : undefined), [hasImages, images, selImageIndex]);
+
   const [chatInputValue, setChatInputValue] = useState('');
   const [mobileView, setMobileView] = useState<'chat' | 'notebook'>('chat');
 
@@ -51,14 +53,12 @@ function MissionControlInternal({
 
   const buildContext = useCallback(() => {
     const lines = [`Student is learning about: ${mission}.`, context?.trim() || ''];
-    if (hasImages) {
-      const currentPic = images[selImageIndex];
-      if (currentPic) {
-        lines.push(`Current Image: #${selImageIndex + 1} ${currentPic.title.trim()} – ${currentPic.href.trim()}`);
-      }
+    if (currentPic) {
+      const title = currentPic.title?.trim() ?? 'Untitled Image';
+      lines.push(`Current Image: #${selImageIndex + 1} ${title} – ${currentPic.href.trim()}`);
     }
     return lines.filter(Boolean).join('\n');
-  }, [images, mission, context, selImageIndex, hasImages]);
+  }, [mission, context, currentPic, selImageIndex]);
 
   useEffect(() => {
     if (hasImages && messages.length === 0 && !initialMessage) {
@@ -83,9 +83,12 @@ function MissionControlInternal({
     reset();
 
     const nextPic = images[nextIndex];
+    if (!nextPic) return;
+
+    const title = nextPic.title?.trim() ?? 'Untitled Image';
     const newContext = [
       `Student is learning about: ${mission}.`, context?.trim() || '',
-      `Current Image: #${nextIndex + 1} ${nextPic.title.trim()} – ${nextPic.href.trim()}`,
+      `Current Image: #${nextIndex + 1} ${title} – ${nextPic.href.trim()}`,
     ].filter(Boolean).join('\n');
     sendMessage(`Give a ${role}-friendly 2-line summary of the new image.`, newContext);
   };
@@ -123,16 +126,16 @@ function MissionControlInternal({
           hasImages && "xl:grid xl:grid-cols-[1.05fr_1.95fr]"
         )}
       >
-        {hasImages && (
+        {hasImages && currentPic && (
           <div className="w-full flex flex-col gap-3 min-h-0">
             <VisualPanel
-              currentImage={images[selImageIndex]}
+              currentImage={currentPic}
               imageIndex={selImageIndex}
               imageCount={images.length}
               onPrev={() => handleImageChange(selImageIndex - 1)}
               onNext={() => handleImageChange(selImageIndex + 1)}
               onQuickAction={(prompt) => sendMessage(prompt, buildContext())}
-              onSaveImage={() => addNote({ type: 'image', title: images[selImageIndex].title, imgHref: images[selImageIndex].href })}
+              onSaveImage={() => addNote({ type: 'image', title: currentPic.title ?? 'Untitled Image', imgHref: currentPic.href })}
             />
           </div>
         )}
@@ -217,19 +220,21 @@ function VisualPanel({ currentImage, imageIndex, imageCount, onPrev, onNext, onQ
     gsap.fromTo(imageRef.current, { autoAlpha: 0, scale: 0.95 }, { autoAlpha: 1, scale: 1, duration: 0.35, ease: 'power2.out' });
   }, { dependencies: [currentImage] });
 
+  const title = currentImage.title ?? 'Untitled Image';
+
   return (
     <div className="w-full h-full flex flex-col gap-3 sticky top-4">
       <div ref={imageRef} className="relative w-full aspect-video rounded-xl overflow-hidden border border-white/10 bg-black/50 group">
         <Image
           key={currentImage.href}
           src={currentImage.href}
-          alt={currentImage.title}
+          alt={title}
           fill
           className="object-contain"
           sizes="(max-width: 1279px) 90vw, 33vw"
         />
         <div className="absolute bottom-0 left-0 right-0 px-3 py-2 text-xs bg-gradient-to-t from-black/80 to-transparent text-slate-200">
-          {currentImage.title} • #{imageIndex + 1}/{imageCount}
+          {title} • #{imageIndex + 1}/{imageCount}
         </div>
         {imageCount > 1 && (
           <>

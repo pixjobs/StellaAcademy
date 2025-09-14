@@ -70,7 +70,7 @@ function normalizeImages(raw: unknown[]): MissionImage[] {
       let highResHref: string | undefined = it.hdurl ?? undefined;
 
       if (!highResHref && Array.isArray(it.links)) {
-        highResHref = it.links.find(link => link.rel === 'orig')?.href ?? undefined;
+        highResHref = it.links.find(link => link?.rel === 'orig')?.href ?? undefined;
       }
 
       out.push({ href, title: String(title), highResHref });
@@ -116,6 +116,8 @@ export default function TopicSelector({ plan, onSelect, maxThumbs = 4 }: TopicSe
     onSelect(topic, imageIndex);
   };
 
+  const activeLightboxTopic = topics[lightboxState.topicIdx];
+
   return (
     <div ref={root} className="rounded-2xl bg-slate-900/60 p-4 shadow-pixel border border-white/10 backdrop-blur-md">
       <h2 className="font-pixel text-lg text-gold mb-2">{plan.missionTitle}</h2>
@@ -133,12 +135,12 @@ export default function TopicSelector({ plan, onSelect, maxThumbs = 4 }: TopicSe
         ))}
       </div>
 
-      {lightboxState.open && (
+      {lightboxState.open && activeLightboxTopic && (
         <Lightbox
-          topic={topics[lightboxState.topicIdx]}
+          topic={activeLightboxTopic}
           activeImageIndex={lightboxState.imageIdx}
           onClose={closeLightbox}
-          onSelectImage={(imageIndex) => handleSelect(topics[lightboxState.topicIdx], imageIndex)}
+          onSelectImage={(imageIndex) => handleSelect(activeLightboxTopic, imageIndex)}
           onSetActiveImage={(imageIndex) => setLightboxState(prev => ({ ...prev, imageIdx: imageIndex }))}
         />
       )}
@@ -174,7 +176,7 @@ function TopicCard({ topic, onSelect, onViewSlideshow, maxThumbs }: TopicCardPro
             >
               <Image
                 src={im.href}
-                alt={im.title}
+                alt={im.title ?? 'Untitled image'}
                 fill
                 className="object-cover group-hover:scale-[1.03] transition-transform duration-200"
                 sizes="(max-width: 640px) 25vw, (max-width: 1024px) 15vw, 10vw"
@@ -191,13 +193,11 @@ function TopicCard({ topic, onSelect, onViewSlideshow, maxThumbs }: TopicCardPro
             <Button onClick={onViewSlideshow} variant="secondary" size="sm" className="flex-1">
               Slideshow
             </Button>
-            {/* --- FIX IS HERE --- */}
             <Button onClick={() => onSelect(0)} size="sm" className="flex-1">
               Learn Topic
             </Button>
           </>
         ) : (
-          // --- AND HERE ---
           <Button onClick={() => onSelect(0)} size="sm" className="w-full">
             Learn Topic
           </Button>
@@ -256,7 +256,7 @@ function Lightbox({ topic, activeImageIndex, onClose, onSelectImage, onSetActive
               <Image
                 key={currentImage.href}
                 src={currentImage.href}
-                alt={currentImage.title}
+                alt={currentImage.title ?? 'Untitled image'}
                 fill
                 className="object-contain"
                 sizes="(max-width: 1280px) 90vw, 896px"
@@ -284,7 +284,6 @@ function Lightbox({ topic, activeImageIndex, onClose, onSelectImage, onSetActive
         <div className="mt-2 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <div className="text-xs text-slate-300 truncate pr-4">{currentImage?.title} • {activeImageIndex + 1}/{count}</div>
           <div className="flex gap-2 flex-shrink-0">
-            {/* --- AND HERE --- */}
             <Button onClick={() => onSelectImage(activeImageIndex)} size="sm">
               Learn from this Image
             </Button>

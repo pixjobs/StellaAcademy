@@ -1,7 +1,11 @@
 /* eslint-disable no-console */
-// workers/ollama/mission-computer.ts
-// Thin router that delegates to modular mission implementations.
-// Keep this file name to satisfy existing imports in your app.
+
+/**
+ * @file mission-computer.ts
+ * @description
+ * A thin router that delegates mission generation requests to modular mission
+ * implementations. It includes centralized error handling and logging.
+ */
 
 import type { WorkerContext } from './context';
 import type { Role, MissionType } from '@/types/llm';
@@ -13,7 +17,14 @@ import { missionSpacePoster } from './mission-computer/missions/spacePoster';
 import { missionRoverCam } from './mission-computer/missions/roverCam';
 import { missionCelestialInvestigator } from './mission-computer/missions/celestialInvestigator';
 import type { GenerationOpts } from './mission-computer/shared/types';
+// --- FIX APPLIED HERE: Corrected the relative path ---
+import { logger } from './utils/logger';
 
+/**
+ * Creates a standard fallback mission plan when generation fails.
+ * @param reason A brief description of the failure.
+ * @returns An EnrichedMissionPlan object for the aborted mission.
+ */
 function fallback(reason?: string): EnrichedMissionPlan {
   const r = reason ?? 'An unexpected error occurred.';
   return {
@@ -24,8 +35,8 @@ function fallback(reason?: string): EnrichedMissionPlan {
 }
 
 /**
- * Main entry used by the worker / library code.
- * Delegates to mission modules; always returns a plan.
+ * Main entry point for the mission generation worker.
+ * Delegates to specific mission modules based on missionType and always returns a valid plan.
  */
 export async function computeMission(
   role: Role,
@@ -36,29 +47,27 @@ export async function computeMission(
   try {
     switch (missionType) {
       case 'earth-observer':
-        // Role is intentionally ignored for this mission (it’s product/camera–driven).
-        return missionEarthObserver(role, context);
+        return missionEarthObserver(role, context, options);
 
       case 'rocket-lab':
-        return missionRocketLab(role, context);
+        return missionRocketLab(role, context, options);
 
       case 'space-poster':
-        return missionSpacePoster(role, context);
+        return missionSpacePoster(role, context, options);
 
       case 'rover-cam':
-        // Current rover mission does not need context.
         return missionRoverCam(role);
 
       case 'celestial-investigator':
         return missionCelestialInvestigator(role, context, options);
 
       default:
-        console.warn(`[mission] Unknown missionType '${missionType}'. Falling back to Rocket Lab.`);
-        return missionRocketLab(role, context);
+        logger.warn(`[mission] Unknown missionType '${missionType}'. Falling back to Rocket Lab.`);
+        return missionRocketLab(role, context, options);
     }
   } catch (err) {
     const e = err instanceof Error ? err : new Error(String(err));
-    console.error(`[mission] FATAL computeMission for type='${missionType}' role='${role}':`, e);
+    logger.error(`[mission] FATAL computeMission for type='${missionType}' role='${role}':`, e);
     return fallback(e.message);
   }
 }

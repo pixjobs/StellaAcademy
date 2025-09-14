@@ -44,8 +44,60 @@ export type MarsCamera = { id: number; name: string; rover_id: number; full_name
 export type MarsRover = { id: number; name: string; landing_date: string; launch_date: string; status: string; };
 export type MarsPhoto = { id: number; sol: number; camera: MarsCamera; img_src: string; earth_date: string; rover: MarsRover; };
 
-// --- NASA Image and Video Library (NIVL) API ---
-export type NivlItem = { href: string; data: { nasa_id: string; title: string; keywords?: string[]; description?: string; date_created?: string; }[]; links?: { href: string; rel: 'preview' | 'orig'; }[]; };
+// --- NASA Image and Video Library (NIVL) API (Harmonized) ---
+export type NivlMediaType = 'image' | 'video' | 'audio';
+export interface NivlData {
+  title?: string;
+  description?: string;
+  nasa_id?: string;
+  center?: string;
+  keywords?: string[];
+  date_created?: string;
+  media_type?: NivlMediaType;
+}
+export interface NivlLink {
+  href: string;
+  rel?: string;
+  render?: string;
+  prompt?: string;
+}
+export interface NivlItem {
+  href?: string;
+  data?: NivlData[];
+  links?: NivlLink[];
+}
+
+// --- NASA Astronomy Picture of the Day (APOD) API ---
+export interface ApodItem {
+  date?: string;
+  title?: string;
+  explanation?: string;
+  url?: string;
+  hdurl?: string;
+  bgUrl?: string;
+  copyright?: string;
+  media_type?: string;
+}
+
+// --- NASA Earth Polychromatic Imaging Camera (EPIC) API (Added) ---
+export type EpicImageType = 'natural' | 'enhanced';
+export interface EpicImage {
+  identifier: string;
+  caption: string;
+  image: string;
+  version: string;
+  centroid_coordinates: {
+    lat: number;
+    lon: number;
+  };
+  dscovr_j2000_position: {
+    x: number;
+    y: number;
+    z: number;
+  };
+  // ... and other complex coordinate objects
+}
+
 
 /* ─────────────────────────────────────────────────────────
  * Internal Data Structures (missions, content)
