@@ -1,10 +1,9 @@
 # cloudbuild.worker.yaml
-# Builds the worker Docker image, validates its TypeScript code,
-# and deploys the final image to Cloud Run.
+# Builds the worker Docker image and deploys it to Cloud Run.
+# This version uses the project's Default Compute Service Account.
 
 timeout: "1200s"
 
-# Defaults (can be overridden via --substitutions)
 substitutions:
   _REGION: europe-west1
   _AR_REPO: stella
@@ -13,12 +12,7 @@ substitutions:
 
 steps:
   # ------------------------------------------------------------------------------------
-  # STEP 1: Build the Docker image using the multi-stage Dockerfile.worker.
-  #
-  # This single command now implicitly performs the TypeScript validation because of the
-  # `RUN npx tsc -p tsconfig.worker.json --noEmit` command in the Dockerfile's
-  # "builder" stage. If there are any TypeScript errors, this entire step will fail,
-  # preventing a broken image from being built or deployed.
+  # STEP 1 & 2: Build and Push the Docker image. (No changes)
   # ------------------------------------------------------------------------------------
   - name: gcr.io/cloud-builders/docker
     id: Build
@@ -29,12 +23,6 @@ steps:
       - -f
       - Dockerfile.worker
       - .
-
-  # ------------------------------------------------------------------------------------
-  # STEP 2: Push the successfully built and validated image to Artifact Registry.
-  #
-  # This step only runs if Step 1 succeeds.
-  # ------------------------------------------------------------------------------------
   - name: gcr.io/cloud-builders/docker
     id: Push
     args:
@@ -42,10 +30,8 @@ steps:
       - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPO}/${_SERVICE}:${_IMAGE_TAG}
 
   # ------------------------------------------------------------------------------------
-  # STEP 3: Deploy the new image version to the specified Cloud Run service.
-  #
-  # This step uses the gcloud SDK to update the service with the newly pushed image.
-  # It correctly maps secrets from Secret Manager and sets environment variables.
+  # STEP 3: Deploy the new image to Cloud Run.
+  # This step is simplified to use the default service account.
   # ------------------------------------------------------------------------------------
   - name: gcr.io/google.com/cloudsdktool/cloud-sdk
     id: Deploy
@@ -57,15 +43,17 @@ steps:
       - --image=${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPO}/${_SERVICE}:${_IMAGE_TAG}
       - --region=${_REGION}
       - --no-allow-unauthenticated
-      - --set-secrets=REDIS_URL_ONLINE=REDIS_URL_ONLINE:latest,OLLAMA_BASE_URL=OLLAMA_BASE_URL:latest,NASA_API_KEY=NASA_API_KEY:latest,GOOGLE_CUSTOM_SEARCH_KEY=GOOGLE_CUSTOM_SEARCH_KEY:latest,GOOGLE_CUSTOM_SEARCH_CX=GOOGLE_CUSTOM_SEARCH_CX:latest
-      - --update-env-vars=LLM_QUEUE_NAME=llm-queue,FORCE_LOCAL_REDIS=0,NODE_ENV=production,OLLAMA_WORKER_CONCURRENCY=1
+      # --- REMOVED: Redis secret is no longer needed. ---
+      - --set-secrets=OLLAMA_BASE_URL=OLLAMA_BASE_URL:latest,NASA_API_KEY=NASA_API_KEY:latest,GOOGLE_CUSTOM_SEARCH_KEY=GOOGLE_CUSTOM_SEARCH_KEY:latest,GOOGLE_CUSTOM_SEARCH_CX=GOOGLE_CUSTOM_SEARCH_CX:latest
+      # --- REMOVED: Redis and BullMQ env vars are no longer needed. ---
+      - --update-env-vars=NODE_ENV=production
+      # --- REMOVED: The --service-account flag has been removed. ---
+      # By removing this flag, Cloud Run will automatically assign the project's
+      # Default Compute Service Account as the identity for this service.
+      - --concurrency=4
       - --cpu=1
       - --memory=512Mi
       - --max-instances=3
-      # (Optional) use a custom service account:
-      # - --service-account=YOUR-SA@${PROJECT_ID}.iam.gserviceaccount.com
 
-# This final section makes the built image available to other Cloud Build steps if needed,
-# and it's used by Cloud Build to show what images were created by this build.
 images:
   - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPO}/${_SERVICE}:${_IMAGE_TAG}

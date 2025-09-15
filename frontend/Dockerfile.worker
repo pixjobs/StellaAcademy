@@ -2,28 +2,31 @@
 ARG NODE_VERSION=20-alpine
 
 # ==================================
-# Stage 1: Builder & Type Validator
+# Stage 1: Builder
+# Compiles TypeScript to JavaScript
 # ==================================
 FROM node:20-alpine AS builder
 WORKDIR /app
 
-# Copy package files and tsconfigs for dependency installation and validation.
+# Copy manifests and configs
 COPY package.json package-lock.json* ./
 COPY tsconfig.json tsconfig.worker.json ./
 
-# Install ALL dependencies, including devDependencies for the build step.
+# Install all dependencies needed for the build
 RUN npm ci
 
-# Copy the application source code.
+# Copy the rest of the source code
 COPY src ./src
 
-# --- Type Validation Step ---
-# This command ensures your code is type-safe. If there are any TS errors,
-# the entire 'docker build' will stop here.
-RUN npx tsc -p tsconfig.worker.json --noEmit
+# --- CHANGED: Full Compilation Step ---
+# Instead of just type-checking, we now run the actual build script.
+# This compiles everything into the /app/dist folder and handles path aliases.
+# The build will fail if there are any TypeScript errors, so validation is included.
+RUN npm run build:worker
 
 # =========================
 # Stage 2: Final Runtime
+# Creates a lean image with only what's needed to run.
 # =========================
 FROM node:${NODE_VERSION}
 WORKDIR /app
@@ -34,27 +37,29 @@ RUN apk add --no-cache curl
 # Copy only production dependency manifests from the builder stage.
 COPY --from=builder /app/package.json /app/package-lock.json* ./
 
-# Install ONLY production dependencies. This includes tsx and tsconfig-paths.
+# Install ONLY production dependencies.
 RUN npm ci --omit=dev
 
-# Copy the validated source code and tsconfigs from the builder stage.
-COPY --from=builder /app/src ./src
-COPY --from=builder /app/tsconfig.json ./tsconfig.json
-COPY --from=builder /app/tsconfig.worker.json ./tsconfig.worker.json
+# --- CHANGED: Copy Compiled Code ---
+# Instead of copying the 'src' folder, we copy the compiled JavaScript
+# from the 'dist' folder in the builder stage. This makes the final image
+# smaller and more secure as it doesn't contain source code.
+COPY --from=builder /app/dist ./dist
 
 # Environment for Cloud Run.
 ENV NODE_ENV=production \
-    PORT=8080 \
-    ENABLE_WEB_ENRICH=1
+    PORT=8080
 
 # Cloud Run health check configuration.
 EXPOSE 8080
-HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
-  CMD curl -fsS "http://127.0.0.1:${PORT}/healthz" || exit 1
 
-# --- THIS IS THE FINAL FIX ---
-# This CMD is now simpler and more robust.
-# `npx tsx` automatically finds the correct `tsx` executable and runs it.
-# The `--require` flag is passed to the underlying `node` process by `tsx`.
-# We no longer need `dumb-init` as Cloud Run handles signals well for Node.js apps.
-CMD ["npx", "tsx", "--tsconfig", "tsconfig.worker.json", "src/workers/ollama/worker.ts"]
+# --- CHANGED: Updated Health Check Path ---
+# The new server.ts uses '/_health' for its health check endpoint.
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
+  CMD curl -f "http://127.0.0.1:${PORT}/_health" || exit 1
+
+# --- CHANGED: Final Production Command ---
+# This command now uses the 'start:worker' script from your package.json.
+# It directly runs the compiled JavaScript file with Node.js, which is
+# faster and more efficient than using tsx in production.
+CMD ["npm", "run", "start:worker"]

@@ -2,8 +2,12 @@
  * =========================================================================
  * LLM & JOB TYPE DEFINITIONS (extended)
  *
- * This file is the single source of truth for all data structures related to
- * BullMQ jobs, LLM interactions, API responses, and internal state.
+ * Single source of truth for:
+ * - Personas/roles & mission types
+ * - External API types used in missions
+ * - Enriched mission content shapes
+ * - Job payloads/results for ask / mission / tutor-preflight / backfill
+ * - Worker metadata (timing, queue info)
  * =========================================================================
  */
 
@@ -11,16 +15,14 @@
  * Core Enumerations (Single Source of Truth Pattern)
  * ────────────────────────────────────────────────────────── */
 
-/** A readonly array of all possible AI personas. The 'Role' type is derived from this. */
+/** All personas. */
 export const ALL_ROLES = ['explorer', 'cadet', 'scholar'] as const;
-/** Represents the AI's persona, influencing its tone and response style. */
 export type Role = typeof ALL_ROLES[number];
-
 export function isRole(v: unknown): v is Role {
   return typeof v === 'string' && (ALL_ROLES as readonly string[]).includes(v);
 }
 
-/** A readonly array of all possible mission types. */
+/** All mission types. */
 export const ALL_MISSION_TYPES = [
   'rocket-lab',
   'rover-cam',
@@ -28,23 +30,21 @@ export const ALL_MISSION_TYPES = [
   'earth-observer',
   'celestial-investigator',
 ] as const;
-/** Defines the specific type of mission the user can embark on. */
 export type MissionType = typeof ALL_MISSION_TYPES[number];
-
 export function isMissionType(v: unknown): v is MissionType {
   return typeof v === 'string' && (ALL_MISSION_TYPES as readonly string[]).includes(v);
 }
 
 /* ─────────────────────────────────────────────────────────
- * External API Response Types
+ * External API Response Types (NASA etc.)
  * ────────────────────────────────────────────────────────── */
 
-// --- NASA Mars Rover Photos API ---
-export type MarsCamera = { id: number; name: string; rover_id: number; full_name: string; };
-export type MarsRover = { id: number; name: string; landing_date: string; launch_date: string; status: string; };
-export type MarsPhoto = { id: number; sol: number; camera: MarsCamera; img_src: string; earth_date: string; rover: MarsRover; };
+// Mars Rover Photos API
+export type MarsCamera = { id: number; name: string; rover_id: number; full_name: string };
+export type MarsRover = { id: number; name: string; landing_date: string; launch_date: string; status: string };
+export type MarsPhoto = { id: number; sol: number; camera: MarsCamera; img_src: string; earth_date: string; rover: MarsRover };
 
-// --- NASA Image and Video Library (NIVL) API (Harmonized) ---
+// NASA Image and Video Library (NIVL)
 export type NivlMediaType = 'image' | 'video' | 'audio';
 export interface NivlData {
   title?: string;
@@ -67,7 +67,7 @@ export interface NivlItem {
   links?: NivlLink[];
 }
 
-// --- NASA Astronomy Picture of the Day (APOD) API ---
+// APOD (Astronomy Picture of the Day)
 export interface ApodItem {
   date?: string;
   title?: string;
@@ -79,66 +79,83 @@ export interface ApodItem {
   media_type?: string;
 }
 
-// --- NASA Earth Polychromatic Imaging Camera (EPIC) API (Added) ---
+// EPIC (Earth Polychromatic Imaging Camera)
 export type EpicImageType = 'natural' | 'enhanced';
 export interface EpicImage {
   identifier: string;
   caption: string;
   image: string;
   version: string;
-  centroid_coordinates: {
-    lat: number;
-    lon: number;
-  };
-  dscovr_j2000_position: {
-    x: number;
-    y: number;
-    z: number;
-  };
-  // ... and other complex coordinate objects
+  centroid_coordinates: { lat: number; lon: number };
+  dscovr_j2000_position: { x: number; y: number; z: number };
+  // (other fields omitted)
 }
-
 
 /* ─────────────────────────────────────────────────────────
  * Internal Data Structures (missions, content)
  * ────────────────────────────────────────────────────────── */
 
-export type MissionImage = { title: string; href: string; };
-export type EnrichedTopic = { title: string; summary: string; images: MissionImage[]; keywords?: string[]; };
-export type EnrichedMissionPlan = { missionTitle: string; introduction: string; topics: EnrichedTopic[]; };
+export type MissionImage = { title: string; href: string };
+export type EnrichedTopic = {
+  title: string;
+  summary: string;
+  images: MissionImage[];
+  keywords?: string[];
+};
+export type EnrichedMissionPlan = {
+  missionTitle: string;
+  introduction: string;
+  topics: EnrichedTopic[];
+};
 
-/** A reusable “template” for missions that can be cached/seeded. */
-export type MissionTemplate = { missionType: MissionType; role: Role; title: string; synopsis: string; defaultTopics?: Pick<EnrichedTopic, 'title' | 'summary'>[]; version?: string; };
-export type MissionLibraryEntry = { key: string; template: MissionTemplate; updatedAt: string; };
+export type MissionTemplate = {
+  missionType: MissionType;
+  role: Role;
+  title: string;
+  synopsis: string;
+  defaultTopics?: Pick<EnrichedTopic, 'title' | 'summary'>[];
+  version?: string;
+};
+export type MissionLibraryEntry = {
+  key: string;
+  template: MissionTemplate;
+  updatedAt: string;
+};
 
 /* ─────────────────────────────────────────────────────────
  * Chat & Retrieval Primitives
  * ────────────────────────────────────────────────────────── */
 
-export type LinkPreview = { url: string; title?: string; faviconUrl?: string; snippet?: string; meta?: string; };
+export type LinkPreview = { url: string; title?: string; faviconUrl?: string; snippet?: string; meta?: string };
 export type GoogleSearchFn = (q: string, n?: number) => Promise<LinkPreview[]>;
-export type InlineCitation = { index: number; url: string; title?: string; };
-export type ChatMessage = { id: string; role: 'stella' | 'user'; text: string; links?: LinkPreview[]; citations?: InlineCitation[]; };
+export type InlineCitation = { index: number; url: string; title?: string };
+export type ChatMessage = { id: string; role: 'stella' | 'user'; text: string; links?: LinkPreview[]; citations?: InlineCitation[] };
 
 /* ─────────────────────────────────────────────────────────
- * Telemetry, Health & Metadata (Stricter Typing)
+ * Telemetry, Health & Metadata
  * ────────────────────────────────────────────────────────── */
 
-export type RetrievalOptions = { enable?: boolean; qOverride?: string; num?: number; timeoutMs?: number; minScore?: number; provider?: string; };
+export type RetrievalOptions = {
+  enable?: boolean;
+  qOverride?: string;
+  num?: number;
+  timeoutMs?: number;
+  minScore?: number;
+  provider?: string;
+};
 
-/** Performance timing data for a worker job. All values are in milliseconds. */
 export type WorkerTiming = {
-  totalMs: number; // Guaranteed to be set at the end of a job.
-  queueWaitMs: number; // Guaranteed to be set at the start of a job.
+  totalMs: number;
+  queueWaitMs: number;
   retrievalMs?: number;
   llmMs?: number;
 };
 
-/** Debugging and performance metadata attached to a job result. */
 export interface WorkerMeta {
-  jobId: string; // A job always has an ID.
-  queueName: string; // A job always belongs to a queue.
-  timing: WorkerTiming; // The timing object is guaranteed to be initialized.
+  jobId: string;
+  /** optional in local/dev paths */
+  queueName?: string | null;
+  timing: WorkerTiming;
   model?: string;
   role?: Role;
   mission?: string;
@@ -147,41 +164,57 @@ export interface WorkerMeta {
   notes?: Record<string, unknown>;
 }
 
-export type WorkerHealth = { ok: boolean; details?: Record<string, unknown>; };
+export type WorkerHealth = { ok: boolean; details?: Record<string, unknown> };
 
 /* ─────────────────────────────────────────────────────────
- * BullMQ: Names, Headers & Progress
+ * Queue / Progress (legacy-friendly)
  * ────────────────────────────────────────────────────────── */
 
-/** Narrow job names to the ones your workers use; ideal for BullMQ’s 3rd generic. */
-export type JobName = 'ask' | 'tutor-preflight' | 'mission';
-
-/** If you want to type queue names across the app, you can re-export from your queue module. */
+export type JobName = 'ask' | 'tutor-preflight' | 'mission' | 'library-backfill';
 export type QueueName = 'llm-interactive-queue' | 'llm-background-queue';
+export type QueueStateHeader =
+  | 'waiting'
+  | 'active'
+  | 'delayed'
+  | 'prioritized'
+  | 'waiting-children'
+  | 'completed'
+  | 'failed'
+  | 'paused'
+  | 'exists'
+  | 'missing'
+  | 'error'
+  | 'unknown';
 
-/** Mirrors your HTTP header enum used by pollers */
-export type QueueStateHeader = 'waiting' | 'active' | 'delayed' | 'prioritized' | 'waiting-children' | 'completed' | 'failed' | 'paused' | 'exists' | 'missing' | 'error' | 'unknown';
-
-/** Typed progress payloads you might emit via job.updateProgress(...) */
-export type JobProgress = { kind: 'started' } | { kind: 'llm'; pct?: number } | { kind: 'retrieval'; pct?: number; count?: number } | { kind: 'postprocess'; pct?: number } | { kind: 'completed' };
+export type JobProgress =
+  | { kind: 'started' }
+  | { kind: 'llm'; pct?: number }
+  | { kind: 'retrieval'; pct?: number; count?: number }
+  | { kind: 'postprocess'; pct?: number }
+  | { kind: 'completed' };
 
 /* ─────────────────────────────────────────────────────────
- * Caching / Idempotency Hooks
+ * Cache / Idempotency
  * ────────────────────────────────────────────────────────── */
 
-export type CachePolicy = { maxAgeSec?: number; bypass?: boolean; };
-export type MissionCacheKey = string; // e.g. `${missionType}:${role}`
-export type MissionCacheEntry = { key: MissionCacheKey; plan: EnrichedMissionPlan; createdAt: string; ttlSec?: number; version?: string; };
+export type CachePolicy = { maxAgeSec?: number; bypass?: boolean };
+export type MissionCacheKey = string;
+export type MissionCacheEntry = {
+  key: MissionCacheKey;
+  plan: EnrichedMissionPlan;
+  createdAt: string;
+  ttlSec?: number;
+  version?: string;
+};
 
 /* ─────────────────────────────────────────────────────────
- * BullMQ Job Payloads (Input)
+ * Job Payloads (input)
  * ────────────────────────────────────────────────────────── */
 
 export interface LlmMissionPayload {
   missionType: MissionType;
   role: Role;
   cache?: CachePolicy;
-  /** For internal testing: if true, the worker will force a failure. */
   _test_should_fail?: boolean;
 }
 
@@ -192,7 +225,6 @@ export interface LlmAskPayload {
   mission?: string;
   retrieval?: RetrievalOptions;
   cache?: CachePolicy;
-  /** For internal testing: if true, the worker will force a failure. */
   _test_should_fail?: boolean;
 }
 
@@ -203,12 +235,11 @@ export interface TutorPreflightPayload {
   imageTitle?: string;
   role: Role;
   cache?: CachePolicy;
-  /** For internal testing: if true, the worker will force a failure. */
   _test_should_fail?: boolean;
 }
 
 /* ─────────────────────────────────────────────────────────
- * BullMQ Job Data (Full Job Definition)
+ * Job Data (discriminated union)
  * ────────────────────────────────────────────────────────── */
 
 export interface MissionJobData {
@@ -232,10 +263,23 @@ export interface TutorPreflightJobData {
   name?: Extract<JobName, 'tutor-preflight'>;
 }
 
-/** Discriminated union of all possible job data shapes. */
-export type LlmJobData = MissionJobData | AskJobData | TutorPreflightJobData;
+/** NEW: library backfill (maintenance / scheduled) */
+export interface LibraryBackfillJobData {
+  type: 'library-backfill';
+  payload: {
+    missionType: MissionType;
+    role: Role;
+    reason: 'miss' | 'stale' | 'scheduled';
+  };
+  name?: Extract<JobName, 'library-backfill'>;
+}
 
-/** Type guard to safely discriminate between job data types in worker code. */
+export type LlmJobData =
+  | MissionJobData
+  | AskJobData
+  | TutorPreflightJobData
+  | LibraryBackfillJobData;
+
 export function isLlmJobData<T extends LlmJobData['type']>(
   data: LlmJobData,
   type: T,
@@ -244,7 +288,7 @@ export function isLlmJobData<T extends LlmJobData['type']>(
 }
 
 /* ─────────────────────────────────────────────────────────
- * BullMQ Job Results (Output)
+ * Job Results (output)
  * ────────────────────────────────────────────────────────── */
 
 export interface AskResult {
@@ -259,36 +303,41 @@ export interface TutorPreflightOutput {
   starterMessages: ChatMessage[];
   warmupQuestion: string;
   goalSuggestions: string[];
-  difficultyHints: { easy: string; standard: string; challenge: string; };
+  difficultyHints: { easy: string; standard: string; challenge: string };
 }
 
-/** The standard shape for a job that failed during execution. */
+/** NEW: result for library backfill */
+export interface LibraryBackfillResult {
+  ok: boolean;
+  reason: 'miss' | 'stale' | 'scheduled';
+  missionType: MissionType;
+  role: Role;
+}
+
+/** Standard failure & ignored variants */
 export interface JobFailureResult {
   type: 'failure';
-  error: { message: string; stack?: string; };
-  meta: WorkerMeta; // Metadata is mandatory for failures to aid debugging.
+  result: { error: string };
+  meta: WorkerMeta;
 }
-
-/** The standard shape for a job that was intentionally ignored by the worker. */
 export interface JobIgnoredResult {
   type: 'ignored';
-  reason?: string;
-  meta: WorkerMeta; // Metadata is mandatory.
+  result: {};
+  meta: WorkerMeta;
 }
 
-/** Discriminated union of all possible job results from a worker. */
+/** Discriminated union of all worker results. */
 export type LlmJobResult =
-  | { type: 'mission'; result: EnrichedMissionPlan; meta: WorkerMeta }
-  | { type: 'ask'; result: AskResult; meta: WorkerMeta }
-  | { type: 'tutor-preflight'; result: TutorPreflightOutput; meta: WorkerMeta }
+  | { type: 'mission';          result: EnrichedMissionPlan;   meta: WorkerMeta }
+  | { type: 'ask';              result: AskResult;             meta: WorkerMeta }
+  | { type: 'tutor-preflight';  result: TutorPreflightOutput;  meta: WorkerMeta }
+  | { type: 'library-backfill'; result: LibraryBackfillResult; meta: WorkerMeta }
   | JobFailureResult
   | JobIgnoredResult;
 
-/** Result type guard to check for failures. */
 export function isFailureResult(r: LlmJobResult): r is JobFailureResult {
   return r.type === 'failure';
 }
-/** Result type guard to check if a job was ignored. */
 export function isIgnoredResult(r: LlmJobResult): r is JobIgnoredResult {
   return r.type === 'ignored';
 }

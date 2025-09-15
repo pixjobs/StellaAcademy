@@ -7,6 +7,9 @@ import { hardenAskPrompt, buildTutorSystem, buildTutorUser, extractJson } from '
 import { callOllama } from './ollama-client';
 import { postProcessLlmResponse } from './llm-post-processing';
 import { markdownifyBareUrls, extractLinksFromText } from '@/lib/llm/links';
+import type { LibraryBackfillJobData } from '@/types/llm';
+import { backfillOne } from './mission-library'; 
+
 import type {
   LlmJobData,
   MissionJobData,
@@ -75,6 +78,23 @@ async function resolveGoogleSearch(): Promise<GoogleSearchFn | null> {
 /* -------------------------------------------------------------------------- */
 /* Handlers                                                                   */
 /* -------------------------------------------------------------------------- */
+
+//** backfill */
+export async function handleLibraryBackfillJob(
+  job: Job<LlmJobData>,
+  context: WorkerContext
+): Promise<HandlerOutput> {
+  if (job.data.type !== 'library-backfill') {
+    throw new Error(`handleLibraryBackfillJob received wrong type: ${job.data.type}`);
+  }
+  const { missionType, role, reason } = (job.data as LibraryBackfillJobData).payload;
+
+  await job.updateProgress(5);
+  const ok = await backfillOne(missionType, role, context);
+  await job.updateProgress(100);
+
+  return { type: 'library-backfill', result: { ok, reason, missionType, role } };
+}
 
 /** 'mission' */
 export async function handleMissionJob(job: Job<LlmJobData>, context: WorkerContext): Promise<HandlerOutput> {

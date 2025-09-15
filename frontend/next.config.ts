@@ -38,6 +38,14 @@ const nextConfig: NextConfig = {
      * Replace with the packages you actually use.
      */
     optimizePackageImports: ["lodash", "date-fns"],
+
+    /**
+     * --- ADD THIS ---
+     * Exclude specific server-side packages from the Next.js bundle.
+     * This is required for libraries like @google-cloud/* that dynamically
+     * load their own config files at runtime.
+     */
+    serverComponentsExternalPackages: ['@google-cloud/tasks', '@google-cloud/firestore'],
   },
 };
 
