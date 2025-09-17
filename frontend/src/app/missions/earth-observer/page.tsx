@@ -1,9 +1,13 @@
 'use client';
 
-import { useCallback, useMemo, useState, useEffect, useRef } from 'react';
-import { useMissionPlanGenerator } from '@/hooks/useMissionPlanGenerator';
+import { useCallback, useMemo, useState, useEffect } from 'react';
 import { useGame } from '@/lib/store';
-import type { EnrichedMissionPlan, Img } from '@/types/mission';
+import type { EnrichedTopic, Img } from '@/types/mission';
+import type { Role } from '@/types/llm';
+
+// --- Import BOTH hooks ---
+import { useMissionPlanGenerator } from '@/hooks/useMissionPlanGenerator';
+import { useTutorPreflightGenerator } from '@/hooks/useTutorPreflightGenerator';
 
 import MissionControl from '@/components/MissionControl';
 import MissionStandby from '@/components/MissionStandby';
@@ -14,23 +18,10 @@ import { Button } from '@/components/ui/button';
 /*                                    Types                                   */
 /* -------------------------------------------------------------------------- */
 
-type TopicFromHook = EnrichedMissionPlan['topics'][number];
-type CleanTopic = Omit<TopicFromHook, 'images'> & { images: Img[] };
-
-type TutorPreflightResult = {
-  systemPrompt: string;
-  starterMessages: Array<{ id: string; role: 'stella' | 'user'; text: string }>;
-  warmupQuestion: string;
-  goalSuggestions: string[];
-  difficultyHints: {
-    easy: string;
-    standard: string;
-    challenge: string;
-  };
-};
+type CleanTopic = Omit<EnrichedTopic, 'images'> & { images: Img[] };
 
 /* -------------------------------------------------------------------------- */
-/*                             Mission copy & helpers                         */
+/*                             Component Helpers                              */
 /* -------------------------------------------------------------------------- */
 
 const DEFAULT_BRIEFING = `Welcome, Observer.
@@ -46,7 +37,6 @@ function reorderImages(images: Img[], focusIndex: number): Img[] {
   return [images[i], ...images.slice(0, i), ...images.slice(i + 1)];
 }
 
-// ===== UPGRADED: Handle topics with no images =====
 function buildContext(topic: CleanTopic, pickedIndex = 0): string {
   const chosen = topic.images?.[pickedIndex];
   const chosenLine = chosen
@@ -55,64 +45,30 @@ function buildContext(topic: CleanTopic, pickedIndex = 0): string {
   return `Mission: ${topic.title}. ${topic.summary}${chosenLine}`.trim();
 }
 
-/* ----------------------------- Preflight helpers ------------------------- */
-
-async function startPreflight(payload: {
-  mission: string;
-  topicTitle: string;
-  topicSummary: string;
-  imageTitle?: string;
-  role: 'explorer' | 'cadet' | 'scholar';
-}): Promise<TutorPreflightResult | string> {
-  const res = await fetch('/api/llm/enqueue', {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ type: 'tutor-preflight', payload }),
-  });
-
-  const data = await res.json();
-  if (res.ok && data.state === 'completed') {
-    return data.result.result as TutorPreflightResult;
-  }
-  if (res.status === 202 && data.jobId) {
-    return data.jobId as string;
-  }
-  throw new Error(data?.error || 'Failed to enqueue preflight.');
-}
-
-async function waitForPreflight(jobId: string, { timeoutMs = 45_000, intervalMs = 1500 } = {}) {
-  const started = Date.now();
-  while (Date.now() - started < timeoutMs) {
-    const res = await fetch(`/api/llm/enqueue?id=${encodeURIComponent(jobId)}`);
-    const data = await res.json();
-    if (!res.ok) throw new Error(data?.error || 'Preflight status error.');
-    if (data.state === 'completed') {
-      return data.result.result as TutorPreflightResult;
-    }
-    if (data.state === 'failed') throw new Error(data?.error || 'Preflight job failed.');
-    await new Promise((r) => setTimeout(r, intervalMs));
-  }
-  throw new Error('Preflight timed out.');
-}
-
-function isValidPreflightResult(data: unknown): data is TutorPreflightResult {
-  if (typeof data !== 'object' || data === null) return false;
-  const result = data as TutorPreflightResult;
-  return (
-    typeof result.systemPrompt === 'string' &&
-    Array.isArray(result.starterMessages) &&
-    typeof result.warmupQuestion === 'string'
-  );
-}
-
 /* -------------------------------------------------------------------------- */
 /*                               Page Component                               */
 /* -------------------------------------------------------------------------- */
 
 export default function EarthObserverPage() {
   const { role = 'explorer' } = useGame();
-  const { missionPlan, isLoading, error, generateNewPlan } = useMissionPlanGenerator('earth-observer');
 
+  // HOOK 1: Manages fetching the overall mission plan (the list of topics).
+  const {
+    missionPlan,
+    isLoading: isMissionLoading,
+    error: missionError,
+    generateNewPlan,
+  } = useMissionPlanGenerator('earth-observer');
+
+  // HOOK 2: Manages fetching the pre-flight data for a SINGLE selected topic.
+  const {
+    preflight,
+    isLoading: isPreflightLoading,
+    error: preflightError,
+    generateNewPreflight,
+  } = useTutorPreflightGenerator();
+
+  // Memoize the sanitized mission plan to prevent unnecessary re-renders.
   const cleanMissionPlan = useMemo(() => {
     if (!missionPlan) return null;
     return {
@@ -128,10 +84,22 @@ export default function EarthObserverPage() {
 
   const [selectedTopic, setSelectedTopic] = useState<CleanTopic | null>(null);
   const [selectedImageIdx, setSelectedImageIdx] = useState<number>(0);
-  const [preflightLoading, setPreflightLoading] = useState(false);
-  const [preflightError, setPreflightError] = useState<string | null>(null);
-  const [preflightBriefing, setPreflightBriefing] = useState<string | null>(null);
-  const lastRequestedRef = useRef<string | null>(null);
+
+  // This effect is the "glue" that connects the two hooks.
+  // When a user selects a topic, it triggers the pre-flight generation for that topic.
+  useEffect(() => {
+    if (selectedTopic && cleanMissionPlan) {
+      const imageTitle = selectedTopic.images?.[selectedImageIdx]?.title;
+      
+      generateNewPreflight({
+        role: role as Role,
+        mission: cleanMissionPlan, // Pass the full mission plan object
+        topicTitle: selectedTopic.title,
+        topicSummary: selectedTopic.summary,
+        imageTitle,
+      });
+    }
+  }, [selectedTopic, selectedImageIdx, role, cleanMissionPlan, generateNewPreflight]);
 
   const handleSelectTopic = useCallback((topic: CleanTopic, imageIndex: number) => {
     setSelectedTopic(topic);
@@ -140,73 +108,26 @@ export default function EarthObserverPage() {
 
   const handleReturnToTopics = useCallback(() => {
     setSelectedTopic(null);
-    setPreflightLoading(false);
-    setPreflightError(null);
-    setPreflightBriefing(null);
-    lastRequestedRef.current = null;
   }, []);
 
-  useEffect(() => {
-    if (!selectedTopic) return;
-
-    const imageTitle = selectedTopic.images?.[selectedImageIdx]?.title;
-    const reqKey = `${selectedTopic.title}::${imageTitle ?? 'no-image'}::${role}`;
-    lastRequestedRef.current = reqKey;
-
-    setPreflightLoading(true);
-    setPreflightError(null);
-    setPreflightBriefing(null);
-
-    const runPreflight = async () => {
-      try {
-        const resultOrJobId = await startPreflight({
-          mission: 'earth-observer',
-          topicTitle: selectedTopic.title,
-          topicSummary: selectedTopic.summary,
-          imageTitle,
-          role,
-        });
-
-        let finalResult: TutorPreflightResult;
-        if (typeof resultOrJobId === 'string') {
-          finalResult = await waitForPreflight(resultOrJobId);
-        } else {
-          finalResult = resultOrJobId;
-        }
-
-        if (!isValidPreflightResult(finalResult)) {
-          console.error("Invalid preflight data received from worker:", finalResult);
-          throw new Error("Worker returned incomplete or malformed preflight data.");
-        }
-
-        const assistantFirst = finalResult.starterMessages.find((m) => m.role === 'stella') || finalResult.starterMessages[0];
-        const briefingText = assistantFirst?.text?.trim() || DEFAULT_BRIEFING;
-
-        if (lastRequestedRef.current === reqKey) {
-          setPreflightBriefing(briefingText);
-          setPreflightLoading(false);
-        }
-      } catch (e: unknown) {
-        if (lastRequestedRef.current === reqKey) {
-          setPreflightError(String((e as Error)?.message || e));
-          setPreflightLoading(false);
-        }
-      }
-    };
-    
-    runPreflight();
-  }, [selectedTopic, selectedImageIdx, role]);
+  // Derive the initial briefing message from the pre-flight result.
+  const briefingMessage = useMemo(() => {
+    if (!preflight) return DEFAULT_BRIEFING;
+    const assistantFirst = preflight.starterMessages.find((m) => m.role === 'stella');
+    return assistantFirst?.text?.trim() || DEFAULT_BRIEFING;
+  }, [preflight]);
 
   /* ---------------------------- Render states ---------------------------- */
 
-  if (isLoading || error) {
+  // State 1: Handle the initial loading and error state for the MISSION PLAN.
+  if (isMissionLoading || missionError) {
     return (
       <section className="container mx-auto flex flex-col items-center justify-center p-4 text-center min-h-[60vh]">
         <h1 className="font-pixel text-xl text-gold mb-4">🌍 Earth Observer</h1>
-        {error ? (
+        {missionError ? (
           <div className="rounded-xl border border-red-600/50 bg-red-900/30 p-4 text-red-200 max-w-md">
             <p className="font-semibold mb-1">Mission Plan Failed</p>
-            <p className="text-sm opacity-90 mb-4">{String(error)}</p>
+            <p className="text-sm opacity-90 mb-4">{String(missionError)}</p>
             <Button onClick={generateNewPlan} variant="destructive">Try Again</Button>
           </div>
         ) : (
@@ -216,6 +137,7 @@ export default function EarthObserverPage() {
     );
   }
 
+  // State 2: The main page content, which branches based on whether a topic is selected.
   return (
     <section className="container mx-auto px-4 py-8 max-w-6xl">
       <div className="flex justify-between items-start mb-6">
@@ -230,13 +152,15 @@ export default function EarthObserverPage() {
       </div>
 
       {selectedTopic ? (
-        preflightLoading ? (
+        // State 2a: A topic IS selected. Now we render based on the PRE-FLIGHT hook's state.
+        isPreflightLoading ? (
           <MissionStandby missionName="Preparing Mission Briefing..." />
         ) : preflightError ? (
           <div className="rounded-xl border border-red-600/50 bg-red-900/30 p-4 text-red-200 max-w-xl">
             <p className="font-semibold mb-1">Preflight Failed</p>
             <p className="text-sm opacity-90 mb-3">{preflightError}</p>
             <div className="flex gap-2">
+              {/* Retry by re-triggering the useEffect */}
               <Button onClick={() => setSelectedTopic((t) => (t ? { ...t } : t))} variant="secondary">Retry</Button>
               <Button onClick={handleReturnToTopics} variant="outline">Back to Targets</Button>
             </div>
@@ -250,11 +174,12 @@ export default function EarthObserverPage() {
             initialMessage={{
               id: 'stella-earth-briefing',
               role: 'stella',
-              text: preflightBriefing ?? DEFAULT_BRIEFING,
+              text: briefingMessage,
             }}
           />
         )
       ) : (
+        // State 2b: No topic selected yet. Show the list of topics.
         cleanMissionPlan && <TopicSelector plan={cleanMissionPlan} onSelect={handleSelectTopic} />
       )}
     </section>

@@ -1,9 +1,9 @@
 'use client';
 
 import Image from 'next/image'; // Step 1: Import the next/image component
-import { Note } from '@/types/mission';
 import { Button } from './ui/button';
 import { X, FileText, Link, Sigma, Image as ImageIcon, Loader2 } from 'lucide-react';
+import type { Note } from '@/types/mission';
 
 type NotebookPanelProps = {
   notes: Note[];

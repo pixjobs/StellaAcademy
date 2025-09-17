@@ -30,7 +30,7 @@ gcloud/
 .yarn/cache/
 .yarn/unplugged/
 .yarn/build-state.yml
-.pnp.*
+.pnp.*  
 .pnp.js
 
 # Logs
@@ -154,14 +154,14 @@ temp/
 stylelintcache
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Cloud Build & infra configs — keep tracked
+# Cloud Build & infra configs — MUST be tracked
 # ─────────────────────────────────────────────────────────────────────────────
-cloudbuild.yaml
-cloudbuild.worker.yaml
-cloudbuild.web.yaml
-cloudbuild*.yaml
+!cloudbuild.yaml
+!cloudbuild.web.yaml
+!cloudbuild.worker.yaml
+!cloudbuild*.yaml
 !infra/**
-# (If you store IaC files under infra/, unignore above)
+# (Infra folder always tracked)
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Project-specific generated assets

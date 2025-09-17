@@ -1,21 +1,26 @@
-// This file is SAFE to use in browser components ('use client').
+'use client';
 
 import type { LlmJobData, LlmJobResult } from '@/types/llm';
 
-// This defines the shape of the job document we get from our API
-export type JobStatus<T = LlmJobResult> = {
+// This utility type creates a union of all possible "raw" result payloads.
+type RawJobResultPayload = LlmJobResult['result'];
+
+/**
+ * Defines the shape of the job document returned by the API, both before
+ * and after normalization.
+ */
+export type JobStatus = {
   jobId: string;
   status: 'pending' | 'completed' | 'failed';
   type: LlmJobData['type'];
   createdAt: Date;
-  result?: T;
+  // The result can be the raw payload, a nested object, or the full LlmJobResult.
+  result?: RawJobResultPayload | { result: RawJobResultPayload } | LlmJobResult;
   error?: string | null;
 };
 
 /**
  * Starts a new job by calling our Next.js API route.
- * @param jobData The job payload to enqueue.
- * @returns The unique ID of the created job.
  */
 export async function startJob(jobData: LlmJobData): Promise<string> {
   const res = await fetch('/api/llm/enqueue', {
@@ -24,10 +29,7 @@ export async function startJob(jobData: LlmJobData): Promise<string> {
     body: JSON.stringify(jobData),
   });
 
-  const data = (await res.json()) as {
-    jobId?: string;
-    error?: string;
-  };
+  const data = (await res.json()) as { jobId?: string; error?: string };
 
   if (!res.ok || !data.jobId) {
     throw new Error(data?.error || 'Failed to start job.');
@@ -36,10 +38,9 @@ export async function startJob(jobData: LlmJobData): Promise<string> {
 }
 
 /**
- * Polls our Next.js API route to get the status of a job.
- * This function also NORMALIZES the result shape before returning it.
- * @param jobId The ID of the job to check.
- * @returns The full, normalized job status document.
+ * Polls the API for job status and NORMALIZES the result shape.
+ * This function is the single source of truth for cleaning up the API response
+ * before it reaches any React component or hook.
  */
 export async function checkJobStatus(jobId: string): Promise<JobStatus> {
   const res = await fetch(`/api/llm/enqueue?id=${encodeURIComponent(jobId)}`);
@@ -51,26 +52,25 @@ export async function checkJobStatus(jobId: string): Promise<JobStatus> {
 
   const jobStatus = data as JobStatus;
 
-  // ========================================================================
-  // --- NORMALIZATION LOGIC ---
-  // This is where we fix the nested 'result' object for 'mission' jobs.
-  // ========================================================================
+  // --- UNIVERSAL NORMALIZATION LOGIC ---
+  // This block handles the nested result structure for ALL completed job types.
   if (
     jobStatus.status === 'completed' &&
-    jobStatus.type === 'mission' &&
     jobStatus.result &&
     typeof jobStatus.result === 'object' &&
-    'result' in jobStatus.result
+    'result' in jobStatus.result && // Check if the outer result has a nested result
+    'type' in jobStatus.result &&   // Check if it looks like our LlmJobResult shape
+    'meta' in jobStatus.result
   ) {
-    console.log('[task-client] Normalizing nested mission result...');
-    // "Unwrap" the nested result and return a clean object.
+    console.log(`[task-client] Normalizing nested result for job type: '${jobStatus.result.type}'`);
+    
+    // "Unwind" the structure, replacing the complex result with the clean, inner payload.
     return {
       ...jobStatus,
-      result: (jobStatus.result as any).result,
+      result: (jobStatus.result as LlmJobResult).result,
     };
   }
-  // ========================================================================
 
-  // For all other cases (ask jobs, failed jobs, pending jobs), return the data as-is.
+  // For pending, failed, or already-flat results, return as-is.
   return jobStatus;
 }

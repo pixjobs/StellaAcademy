@@ -1,6 +1,5 @@
 # cloudbuild.worker.yaml
-# Builds the worker Docker image and deploys it to Cloud Run.
-# This version uses the project's Default Compute Service Account.
+# Build & deploy the stella-worker container to Cloud Run (Service).
 
 timeout: "1200s"
 
@@ -9,11 +8,13 @@ substitutions:
   _AR_REPO: stella
   _SERVICE: stella-worker
   _IMAGE_TAG: latest
+  # Optional: pin a runtime service account (leave blank to keep existing)
+  _RUNTIME_SA: ""
 
 steps:
-  # ------------------------------------------------------------------------------------
-  # STEP 1 & 2: Build and Push the Docker image. (No changes)
-  # ------------------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
+  # Build
+  # ---------------------------------------------------------------------------
   - name: gcr.io/cloud-builders/docker
     id: Build
     args:
@@ -23,37 +24,48 @@ steps:
       - -f
       - Dockerfile.worker
       - .
+
+  # ---------------------------------------------------------------------------
+  # Push
+  # ---------------------------------------------------------------------------
   - name: gcr.io/cloud-builders/docker
     id: Push
     args:
       - push
       - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPO}/${_SERVICE}:${_IMAGE_TAG}
 
-  # ------------------------------------------------------------------------------------
-  # STEP 3: Deploy the new image to Cloud Run.
-  # This step is simplified to use the default service account.
-  # ------------------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
+  # Deploy
+  # ---------------------------------------------------------------------------
   - name: gcr.io/google.com/cloudsdktool/cloud-sdk
     id: Deploy
-    entrypoint: gcloud
+    entrypoint: bash
     args:
-      - run
-      - deploy
-      - ${_SERVICE}
-      - --image=${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPO}/${_SERVICE}:${_IMAGE_TAG}
-      - --region=${_REGION}
-      - --no-allow-unauthenticated
-      # --- REMOVED: Redis secret is no longer needed. ---
-      - --set-secrets=OLLAMA_BASE_URL=OLLAMA_BASE_URL:latest,NASA_API_KEY=NASA_API_KEY:latest,GOOGLE_CUSTOM_SEARCH_KEY=GOOGLE_CUSTOM_SEARCH_KEY:latest,GOOGLE_CUSTOM_SEARCH_CX=GOOGLE_CUSTOM_SEARCH_CX:latest
-      # --- REMOVED: Redis and BullMQ env vars are no longer needed. ---
-      - --update-env-vars=NODE_ENV=production
-      # --- REMOVED: The --service-account flag has been removed. ---
-      # By removing this flag, Cloud Run will automatically assign the project's
-      # Default Compute Service Account as the identity for this service.
-      - --concurrency=4
-      - --cpu=1
-      - --memory=512Mi
-      - --max-instances=3
+      - -ceu
+      - |
+        set -euo pipefail
+
+        BASE_ARGS=(
+          run deploy ${_SERVICE}
+          --image=${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPO}/${_SERVICE}:${_IMAGE_TAG}
+          --region=${_REGION}
+          --no-allow-unauthenticated
+          --set-secrets=CLOUD_RUN_WORKER_URL=CLOUD_RUN_WORKER_URL:latest,OLLAMA_BASE_URL=OLLAMA_BASE_URL:latest,NASA_API_KEY=NASA_API_KEY:latest,GOOGLE_CUSTOM_SEARCH_KEY=GOOGLE_CUSTOM_SEARCH_KEY:latest,GOOGLE_CUSTOM_SEARCH_CX=GOOGLE_CUSTOM_SEARCH_CX:latest,INTERACTIVE_TASKS_QUEUE_ID=INTERACTIVE_TASKS_QUEUE_ID:latest,BACKGROUND_TASKS_QUEUE_ID=BACKGROUND_TASKS_QUEUE_ID:latest
+          --update-env-vars=NODE_ENV=production
+          --concurrency=4
+          --cpu=1
+          --memory=512Mi
+          --max-instances=3
+          --timeout=600
+          --cpu-boost
+          --execution-environment=gen2
+        )
+
+        if [ -n "${_RUNTIME_SA}" ]; then
+          gcloud "${BASE_ARGS[@]}" --service-account="${_RUNTIME_SA}"
+        else
+          gcloud "${BASE_ARGS[@]}"
+        fi
 
 images:
   - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPO}/${_SERVICE}:${_IMAGE_TAG}

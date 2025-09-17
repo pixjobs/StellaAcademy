@@ -7,12 +7,15 @@ import {
   useState,
   useEffect,
   useCallback,
-  ReactNode,
   useMemo
 } from 'react';
+
+import type { ReactNode } from 'react';
+
 // Import the UID type alongside the Note type
-import { Note, UID } from '@/types/mission';
-import { INoteStorage, LocalStorageNoteStorage } from './storage';
+import type { Note, UID } from '@/types/mission';
+import { LocalStorageNoteStorage } from './storage';
+import type { INoteStorage } from './storage';
 
 // Update the UID generator to return the branded UID type
 const uid = (): UID => (Math.random().toString(36).slice(2, 9) as UID);

@@ -1,13 +1,13 @@
 // lib/cloudTasks.ts
 import { CloudTasksClient } from '@google-cloud/tasks';
-import type { LlmJobData } from '@/types/llm';
+import type { LlmJobData, LlmJobResult } from '@/types/llm';
 import {
   getGcpLocation,
+  getProjectId,               // ⬅️ use this instead of a secret
   getCloudRunWorkerUrl,
-  getCloudTasksInvokerSa,
+  getCloudTasksInvokerSa,     // ⬅️ already auto-computes from env/metadata if not set
   getInteractiveTasksQueueId,
   getBackgroundTasksQueueId,
-  getRequiredSecret,
 } from './secrets';
 
 const tasksClient = new CloudTasksClient();
@@ -23,10 +23,9 @@ async function postToLocalWorkerViaJobs(jobId: string, jobData: LlmJobData) {
   const url = `${DEV_WORKER_URL}/jobs`;
   const headers = {
     'Content-Type': 'application/json',
-    'X-Local-Auth': 'dev', // required by your server.ts in dev
+    'X-Local-Auth': 'dev',
   };
-  const bodyObj = { jobId, jobData };
-  const bodyStr = JSON.stringify(bodyObj);
+  const bodyStr = JSON.stringify({ jobId, jobData });
 
   if (VERBOSE) {
     console.log('\n[DEV enqueue] -> REQUEST');
@@ -60,7 +59,7 @@ async function postToLocalWorkerViaJobs(jobId: string, jobData: LlmJobData) {
   }
 
   try {
-    return JSON.parse(text); // should be: { jobId, type, result, meta }
+    return JSON.parse(text);
   } catch {
     return { type: 'failure', result: { error: text }, meta: { jobId, timing: { totalMs: 0, queueWaitMs: 0 } } };
   }
@@ -68,30 +67,29 @@ async function postToLocalWorkerViaJobs(jobId: string, jobData: LlmJobData) {
 
 /**
  * Enqueue a task.
- * - DEV: call local worker /jobs and RETURN result (so your API can write Firestore immediately)
+ * - DEV: call local worker /jobs and RETURN result
  * - PROD: create Cloud Task (returns null)
  */
 export async function enqueueTask(
   jobId: string,
   jobData: LlmJobData,
   queueType: QueueType
-): Promise<any | null> {
+): Promise<LlmJobResult | null> {
   if (process.env.NODE_ENV === 'development') {
     console.log(`[DEV] Posting job ${jobId} to ${DEV_WORKER_URL}/jobs (${queueType})`);
     const out = await postToLocalWorkerViaJobs(jobId, jobData);
     return out ?? null;
   }
 
-  // ---- PRODUCTION (unchanged) ----
   const [
-    project,
+    project,                 // ⬅️ auto from env/metadata
     location,
     workerUrl,
-    serviceAccountEmail,
+    serviceAccountEmail,     // ⬅️ auto from secret OR derived default (your helper)
     interactiveQueue,
     backgroundQueue,
   ] = await Promise.all([
-    getRequiredSecret('GOOGLE_CLOUD_PROJECT'),
+    getProjectId(),
     getGcpLocation(),
     getCloudRunWorkerUrl(),
     getCloudTasksInvokerSa(),

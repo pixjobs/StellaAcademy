@@ -15,6 +15,8 @@
  * Core Enumerations (Single Source of Truth Pattern)
  * ────────────────────────────────────────────────────────── */
 
+import type { EnrichedMissionPlan } from './mission'; 
+
 /** All personas. */
 export const ALL_ROLES = ['explorer', 'cadet', 'scholar'] as const;
 export type Role = typeof ALL_ROLES[number];
@@ -101,11 +103,6 @@ export type EnrichedTopic = {
   summary: string;
   images: MissionImage[];
   keywords?: string[];
-};
-export type EnrichedMissionPlan = {
-  missionTitle: string;
-  introduction: string;
-  topics: EnrichedTopic[];
 };
 
 export type MissionTemplate = {
@@ -200,7 +197,7 @@ export type JobProgress =
 export type CachePolicy = { maxAgeSec?: number; bypass?: boolean };
 export type MissionCacheKey = string;
 export type MissionCacheEntry = {
-  key: MissionCacheKey;
+  key: string;
   plan: EnrichedMissionPlan;
   createdAt: string;
   ttlSec?: number;
@@ -229,7 +226,7 @@ export interface LlmAskPayload {
 }
 
 export interface TutorPreflightPayload {
-  mission: string;
+  mission: string | EnrichedMissionPlan;
   topicTitle: string;
   topicSummary: string;
   imageTitle?: string;
@@ -263,7 +260,6 @@ export interface TutorPreflightJobData {
   name?: Extract<JobName, 'tutor-preflight'>;
 }
 
-/** NEW: library backfill (maintenance / scheduled) */
 export interface LibraryBackfillJobData {
   type: 'library-backfill';
   payload: {
@@ -306,7 +302,6 @@ export interface TutorPreflightOutput {
   difficultyHints: { easy: string; standard: string; challenge: string };
 }
 
-/** NEW: result for library backfill */
 export interface LibraryBackfillResult {
   ok: boolean;
   reason: 'miss' | 'stale' | 'scheduled';
@@ -322,11 +317,14 @@ export interface JobFailureResult {
 }
 export interface JobIgnoredResult {
   type: 'ignored';
-  result: {};
+  result: Record<string, never>;
   meta: WorkerMeta;
 }
 
-/** Discriminated union of all worker results. */
+/**
+ * Discriminated union of all FINAL worker results.
+ * This is the source of truth for the shape of a completed job.
+ */
 export type LlmJobResult =
   | { type: 'mission';          result: EnrichedMissionPlan;   meta: WorkerMeta }
   | { type: 'ask';              result: AskResult;             meta: WorkerMeta }
@@ -341,3 +339,14 @@ export function isFailureResult(r: LlmJobResult): r is JobFailureResult {
 export function isIgnoredResult(r: LlmJobResult): r is JobIgnoredResult {
   return r.type === 'ignored';
 }
+
+/**
+ * Defines the raw output of a job handler, BEFORE metadata is attached.
+ * This is a separate type used internally by the worker to pass
+ * data from a handler function to the main server logic.
+ */
+export type HandlerOutput =
+  | { type: 'mission';          result: EnrichedMissionPlan }
+  | { type: 'ask';              result: AskResult }
+  | { type: 'tutor-preflight';  result: TutorPreflightOutput }
+  | { type: 'library-backfill'; result: LibraryBackfillResult };

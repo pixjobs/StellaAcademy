@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "@clerk/nextjs": "^6.31.9",
+    "@clerk/themes": "^2.4.19",
     "@google-cloud/firestore": "^7.11.3",
     "@google-cloud/secret-manager": "^6.1.0",
     "@google-cloud/tasks": "^6.2.0",
@@ -39,7 +40,6 @@
     "gsap": "^3.13.0",
     "hast-util-to-string": "^3.0.1",
     "immer": "^10.1.1",
-    "ioredis": "^5.7.0",
     "katex": "^0.16.22",
     "lucide-react": "^0.542.0",
     "nanoid": "^5.1.5",

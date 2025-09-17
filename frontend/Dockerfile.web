@@ -1,5 +1,5 @@
 # ====================================================================================
-# 1. Base Dependencies Stage
+# 1) Base Dependencies Stage
 # ====================================================================================
 FROM node:20-alpine AS deps
 WORKDIR /app
@@ -7,45 +7,62 @@ COPY package.json package-lock.json* ./
 RUN npm ci
 
 # ====================================================================================
-# 2. Build Stage
+# 2) Build Stage
 # ====================================================================================
 FROM node:20-alpine AS builder
 WORKDIR /app
 
+# Build-time args provided via --build-arg from Cloud Build
+ARG NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+
+# Make it an actual environment variable so next build can read it
+ENV NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=${NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
+
+# Bring in node_modules for build
 COPY --from=deps /app/node_modules ./node_modules
+# Copy source
 COPY . .
 
-# Build arg for Clerk publishable key (injected from Cloud Build)
-ARG NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
-ENV NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=$NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
-
-# Build Next.js (standalone output is enabled in next.config)
+# Build Next.js (ensure next.config.js has `output: 'standalone'`)
 RUN npm run build
 
+# Sanity check: fail the image build if standalone server is missing
+RUN test -f .next/standalone/server.js || (echo >&2 "❌ Missing .next/standalone/server.js" && ls -R .next && exit 1)
+
 # ====================================================================================
-# 3. Production Runner
+# 3) Production Runner Stage
 # ====================================================================================
 FROM node:20-alpine AS runner
 WORKDIR /app
 
-# Create non-root user
+# Add libs commonly needed by Next image optimization
+RUN apk add --no-cache libc6-compat curl
+
+# Create non-root user for security
 RUN addgroup --system --gid 1001 nextjs \
- && adduser --system --uid 1001 nextjs
+ && adduser  --system --uid 1001 nextjs
 
-# Production env
-ENV NODE_ENV=production
-ENV PORT=8080
-ENV HOSTNAME=0.0.0.0
+# Set production runtime environment
+ENV NODE_ENV=production \
+    PORT=8080 \
+    HOSTNAME=0.0.0.0 \
+    NEXT_TELEMETRY_DISABLED=1
 
-# Copy build artifacts
-# includes server.js
-COPY --from=builder --chown=nextjs:nextjs /app/.next/standalone .
+# 🔧 Bring FULL node_modules (ensures google-cloud JSON files exist)
+COPY --from=deps --chown=nextjs:nextjs /app/node_modules ./node_modules
+
+# Copy only the necessary artifacts from the builder stage
+COPY --from=builder --chown=nextjs:nextjs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nextjs /app/.next/static ./.next/static
-# required for standalone
 COPY --from=builder --chown=nextjs:nextjs /app/public ./public
-COPY --from=builder --chown=nextjs:nextjs /app/package.json ./
+COPY --from=builder --chown=nextjs:nextjs /app/package.json ./package.json
 
 USER nextjs
 EXPOSE 8080
 
+# Healthcheck
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
+  CMD curl -fsS "http://127.0.0.1:${PORT}/" >/dev/null || exit 1
+
+# Start the optimized Next.js server
 CMD ["node", "server.js"]

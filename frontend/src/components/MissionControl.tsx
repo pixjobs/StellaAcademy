@@ -1,6 +1,8 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState, useCallback, ComponentType, Dispatch, SetStateAction, memo } from 'react';
+import { useEffect, useMemo, useRef, useState, useCallback, memo } from 'react';
+import type { ComponentType, Dispatch, SetStateAction } from 'react';
+
 import Image from 'next/image';
 import { useGame } from '@/lib/store';
 import { NotesProvider, useNotes } from '@/lib/notes/NotesContext';
@@ -14,7 +16,7 @@ import ChatInput from './ChatInput';
 import { Button } from './ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 import NotebookPanel from './NotebookPanel';
-import { Img, Note } from '@/types/mission';
+import type { Img, Note } from '@/types/mission';
 
 export type MissionControlProps = {
   mission?: string;

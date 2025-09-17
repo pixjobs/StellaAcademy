@@ -1,0 +1,64 @@
+# cloudbuild.web.yaml
+timeout: "1200s"
+
+substitutions:
+  _REGION: europe-west1
+  _AR_REPO: stella
+  _SERVICE: stella-web
+  _IMAGE_TAG: latest
+  _NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_live_Y2xlcmsuc3RlbGxhLWFjYWRlbXkub3JnJA
+
+steps:
+  # ----------------------------------------------------------------------------
+  # STEP 1: Build the Docker image
+  # ----------------------------------------------------------------------------
+  - name: gcr.io/cloud-builders/docker
+    id: Build
+    args:
+      - build
+      - -t
+      - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_AR_REPO}/${_SERVICE}:${_IMAGE_TAG}
+      - -f
+      - Dockerfile.web
+      - --build-arg
+      - GOOGLE_CLOUD_PROJECT=${PROJECT_ID}
+      - --build-arg
+      - NEXT_PUBLIC_GOOGLE_CLOUD_PROJECT=${PROJECT_ID}
+      - --build-arg
+      - NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=${_NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
+      - .
+
+  # ----------------------------------------------------------------------------
+  # STEP 2: Push the image to Artifact Registry
+  # ----------------------------------------------------------------------------
+  - name: gcr.io/cloud-builders/docker
+    id: Push
+    args:
+      - push
+      - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_AR_REPO}/${_SERVICE}:${_IMAGE_TAG}
+
+  # ----------------------------------------------------------------------------
+  # STEP 3: Deploy to Cloud Run (mount runtime secrets by NAME, not value)
+  # ----------------------------------------------------------------------------
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+    id: Deploy
+    entrypoint: gcloud
+    args:
+      - run
+      - deploy
+      - ${_SERVICE}
+      - --image=${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_AR_REPO}/${_SERVICE}:${_IMAGE_TAG}
+      - --project=${PROJECT_ID}
+      - --region=${_REGION}
+      - --allow-unauthenticated
+      - --set-env-vars=USE_APOD_BG=true,NODE_ENV=production, NEXT_PUBLIC_GOOGLE_CLOUD_PROJECT=${PROJECT_ID},GOOGLE_CLOUD_PROJECT=${PROJECT_ID}
+      - --set-secrets=CLERK_SECRET_KEY=CLERK_SECRET_KEY:latest,CLOUD_RUN_WORKER_URL=CLOUD_RUN_WORKER_URL:latest,INTERACTIVE_TASKS_QUEUE_ID=INTERACTIVE_TASKS_QUEUE_ID:latest,BACKGROUND_TASKS_QUEUE_ID=BACKGROUND_TASKS_QUEUE_ID:latest
+      - --cpu=1
+      - --memory=512Mi
+      - --concurrency=40
+      - --max-instances=3
+      - --timeout=600
+      - --cpu-boost
+      - --execution-environment=gen2
+images:
+  - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_AR_REPO}/${_SERVICE}:${_IMAGE_TAG}

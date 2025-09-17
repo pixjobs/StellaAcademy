@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect, useRef, useMemo, Suspense, ReactNode } from 'react';
+import { useState, useEffect, useRef, useMemo, Suspense } from 'react';
+import type { ReactNode } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Stars, Line, Preload, useTexture, Loader } from '@react-three/drei';
 import * as THREE from 'three';

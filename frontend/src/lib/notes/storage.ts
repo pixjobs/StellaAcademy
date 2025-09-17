@@ -2,7 +2,7 @@
 
 // --- THIS IS THE CHANGE ---
 // Import the official Note type from the centralized types file.
-import { Note } from '@/types/mission';
+import type { Note } from '@/types/mission';
 
 /**
  * Defines the contract for any note storage mechanism.

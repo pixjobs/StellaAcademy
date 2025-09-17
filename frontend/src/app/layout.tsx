@@ -14,12 +14,11 @@ import Providers from './providers';
 export const metadata: Metadata = { title: 'Stella Academy' };
 
 /**
- * Important: prevent static prerender so Clerk doesn't need the
- * NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY at build time.
- * You'll still provide the key at runtime via env/secrets.
+ * Keep this dynamic so Clerk reads env at runtime (no build-time key needed).
  */
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 type RootLayoutProps = { children: ReactNode };
 
@@ -29,7 +28,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
   let bgUrl: string | undefined;
   if (useApod) {
     try {
-      // Server-only import; runs at request time (not at build) thanks to force-dynamic
+      // Server-only import; executes per-request thanks to force-dynamic
       const { getApod } = await import('@/lib/apod');
       const apod = await getApod();
       bgUrl = apod?.bgUrl ?? undefined;
@@ -48,10 +47,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
           'selection:bg-accent selection:text-accent-foreground',
         ].join(' ')}
       >
-        {/**
-         * Providers typically wraps ClerkProvider.
-         * Because this layout is force-dynamic, Clerk reads keys at runtime only.
-         */}
+        {/* Wrap the whole app in ClerkProvider via your Providers */}
         <Providers>
           <GSAPProvider>
             <ConditionalBackgrounds url={bgUrl} />
