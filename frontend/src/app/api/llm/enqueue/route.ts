@@ -95,19 +95,23 @@ export async function POST(request: Request) {
     const immediateResult = await enqueueTask(jobId, jobData, 'interactive');
 
     if (isLlmJobResult(immediateResult)) {
+      // TypeScript's inference gets confused by the type guard's logic, resulting in `never`.
+      // We cast `immediateResult` because the guard has already validated its structure.
+      const successfulResult = immediateResult as LlmJobResult;
+
       console.log('[API ENQUEUE][DEV] Immediate worker result — writing to Firestore', {
-        jobId: immediateResult.meta.jobId,
-        type: immediateResult.type,
-        hasResult: !!immediateResult.result,
+        jobId: successfulResult.meta.jobId,
+        type: successfulResult.type,
+        hasResult: !!successfulResult.result,
       });
 
       // Persist the complete, validated result from the worker.
       await jobsCollection.doc(jobId).set(
         {
           status: 'completed',
-          type: immediateResult.type,
-          result: immediateResult.result,
-          meta: immediateResult.meta,
+          type: successfulResult.type,
+          result: successfulResult.result,
+          meta: successfulResult.meta,
           completedAt: new Date(),
           error: null,
         },

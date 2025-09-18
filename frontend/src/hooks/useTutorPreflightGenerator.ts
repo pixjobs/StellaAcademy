@@ -50,27 +50,24 @@ export function useTutorPreflightGenerator() {
 
         const jobId = await startJob(jobPayload);
 
-        const POLLING_INTERVAL_MS = 2000;
-        const JOB_TIMEOUT_MS = 45_000;
-        const started = Date.now();
+        // --- CHANGE: Updated polling interval and switched to a retry-based timeout ---
+        const POLLING_INTERVAL_MS = 5000; // Poll every 5 seconds
+        const MAX_POLLING_ATTEMPTS = 30; // Try a maximum of 30 times (30 * 5s = 150s total timeout)
 
-        while (Date.now() - started < JOB_TIMEOUT_MS) {
+        for (let attempt = 0; attempt < MAX_POLLING_ATTEMPTS; attempt++) {
           if (controller.signal.aborted) {
             console.log('Tutor pre-flight polling was cancelled.');
             return;
           }
 
-          // `checkJobStatus` now returns a clean, unwound data structure.
           const jobStatus = await checkJobStatus(jobId);
 
           if (jobStatus.status === 'completed') {
-            // --- SIMPLIFIED & TYPE-SAFE LOGIC ---
-            // The ugly nested checks are gone. We can now directly check the result.
             if (jobStatus.result && 'systemPrompt' in jobStatus.result) {
               const preflightData = jobStatus.result as TutorPreflightOutput;
               setPreflight(preflightData);
               setStatus('success');
-              return; // Success!
+              return; // Success! Exit the loop.
             }
             throw new Error('Completed job returned an invalid pre-flight result shape.');
           }
@@ -79,10 +76,14 @@ export function useTutorPreflightGenerator() {
             throw new Error(jobStatus.error || 'Pre-flight generation failed in the worker.');
           }
 
+          // Wait for the next interval before the next attempt.
           await new Promise((r) => setTimeout(r, POLLING_INTERVAL_MS));
         }
 
-        throw new Error('Pre-flight generation timed out. The server may be busy.');
+        // --- CHANGE: Updated timeout error message ---
+        // If the loop finishes without returning or throwing, it means we've timed out.
+        throw new Error(`Pre-flight generation did not complete after ${MAX_POLLING_ATTEMPTS} attempts.`);
+
       } catch (err: unknown) {
         if (err instanceof Error && err.name === 'AbortError') return;
         const message = err instanceof Error ? err.message : 'An unknown error occurred.';

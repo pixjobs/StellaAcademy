@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 import type { Job } from 'bullmq';
+import type { Firestore } from '@google-cloud/firestore';
 import type { WorkerContext } from './context';
 import { retrieveMissionForUser, backfillOne } from './mission-library';
 import { hardenAskPrompt, buildTutorSystem, buildTutorUser, extractJson } from './utils';
@@ -9,7 +10,6 @@ import { markdownifyBareUrls, extractLinksFromText } from '@/lib/llm/links';
 import { logger } from './utils/logger';
 import { retrievePreflightFromLibrary, savePreflightToLibrary } from './preflight-library';
 
-import type { EnrichedMissionPlan } from '@/types/mission';
 import type {
   LlmJobData,
   MissionJobData,
@@ -23,12 +23,13 @@ import type {
   HandlerOutput,
 } from '@/types/llm';
 
+import type { EnrichedMissionPlan } from '@/types/mission';
+
 /* -------------------------------------------------------------------------- */
-/* Config & tiny utils                                                        */
+/* Config & Utilities                                                         */
 /* -------------------------------------------------------------------------- */
 
 const LLM_TIMEOUT_MS = 12_000;
-const DEBUG_WORKER = process.env.DEBUG_WORKER === '1';
 
 function isRole(x: unknown): x is Role {
   return x === 'explorer' || x === 'cadet' || x === 'scholar';
@@ -38,43 +39,52 @@ function clampStr(s: string, max = 8000): string {
   return s.length > max ? s.slice(0, max) : s;
 }
 
-function requireBottleneck(ctx: WorkerContext) {
-  const b = (ctx as any).llmBottleneck;
-  if (!b || typeof b.submit !== 'function') {
-    throw new Error('[worker] llmBottleneck missing from WorkerContext.');
-  }
-  return b as { submit: <T>(fn: () => Promise<T>) => Promise<T> };
-}
+/* -------------------------------------------------------------------------- */
+/* Centralized Firestore Update Helpers                                       */
+/* -------------------------------------------------------------------------- */
 
-function withTimeout<T>(p: Promise<T>, ms = LLM_TIMEOUT_MS, tag = 'llm'): Promise<T> {
-  return new Promise<T>((resolve, reject) => {
-    const t = setTimeout(() => reject(new Error(`${tag} timed out after ${ms}ms`)), ms);
-    p.then(
-      (v) => { clearTimeout(t); resolve(v); },
-      (e) => { clearTimeout(t); reject(e); }
-    );
-  });
-}
-
-type GoogleSearchFn = (query: string, limit: number) => Promise<LinkPreview[]>;
-
-async function resolveGoogleSearch(): Promise<GoogleSearchFn | null> {
+async function updateJobAsCompleted(db: Firestore, jobId: string, result: unknown): Promise<void> {
+  const jobDocRef = db.collection('jobs').doc(jobId);
+  logger.info(`[worker][firestore][${jobId}] Attempting to write 'completed' status...`);
   try {
-    const mod = (await import('@/lib/search')) as any;
-    if (typeof mod.googleCustomSearch === 'function') return mod.googleCustomSearch;
-    const def = mod.default;
-    if (typeof def === 'function') return def as GoogleSearchFn;
-    if (def && typeof def.googleCustomSearch === 'function') {
-      return def.googleCustomSearch;
-    }
-    return null;
-  } catch {
-    return null;
+    await jobDocRef.set(
+      {
+        status: 'completed',
+        result,
+        completedAt: new Date(),
+        error: null,
+      },
+      { merge: true }
+    );
+    logger.info(`[worker][firestore][${jobId}] Successfully wrote 'completed' status.`);
+  } catch (error) {
+    logger.error(`[worker][firestore][${jobId}] FAILED to write 'completed' status to Firestore:`, error);
+    throw error;
+  }
+}
+
+async function updateJobAsFailed(db: Firestore, jobId: string, error: Error): Promise<void> {
+  const jobDocRef = db.collection('jobs').doc(jobId);
+  logger.info(`[worker][firestore][${jobId}] Attempting to write 'failed' status...`);
+  try {
+    await jobDocRef.set(
+      {
+        status: 'failed',
+        error: error.message || 'An unknown worker error occurred.',
+        completedAt: new Date(),
+      },
+      { merge: true }
+    );
+    logger.info(`[worker][firestore][${jobId}] Successfully wrote 'failed' status.`);
+  } catch (dbError) {
+    logger.error(`[worker][firestore][${jobId}] FAILED to write 'failed' status to Firestore:`, dbError);
+    logger.error(`[worker][firestore][${jobId}] Original error was:`, error);
+    throw dbError;
   }
 }
 
 /* -------------------------------------------------------------------------- */
-/* Handlers                                                                   */
+/* Job Handlers                                                               */
 /* -------------------------------------------------------------------------- */
 
 export async function handleLibraryBackfillJob(job: Job<LlmJobData>, context: WorkerContext): Promise<HandlerOutput> {
@@ -89,135 +99,126 @@ export async function handleLibraryBackfillJob(job: Job<LlmJobData>, context: Wo
 }
 
 export async function handleMissionJob(job: Job<LlmJobData>, context: WorkerContext): Promise<HandlerOutput> {
+  const jobId = job.id;
+  if (!jobId) throw new Error('Job is missing an ID.');
+
   if (job.data.type !== 'mission') {
     throw new Error(`handleMissionJob received wrong job type: ${job.data.type}`);
   }
-  const { missionType, role } = (job.data as MissionJobData).payload;
-  const safeRole: Role = isRole(role) ? role : 'explorer';
-  await job.updateProgress(10);
-  const missionPlan: EnrichedMissionPlan = await retrieveMissionForUser(missionType, safeRole, context);
-  await job.updateProgress(100);
-  return { type: 'mission', result: missionPlan };
+
+  try {
+    const { missionType, role } = (job.data as MissionJobData).payload;
+    const safeRole: Role = isRole(role) ? role : 'explorer';
+    await job.updateProgress(10);
+
+    const missionPlan: EnrichedMissionPlan = await retrieveMissionForUser(missionType, safeRole, context);
+    await job.updateProgress(90);
+
+    await updateJobAsCompleted(context.db, jobId, missionPlan);
+
+    await job.updateProgress(100);
+    return { type: 'mission', result: missionPlan };
+  } catch (error) {
+    const err = error instanceof Error ? error : new Error(String(error));
+    logger.error(`[worker][handler][mission][${jobId}] Failed:`, err);
+    await updateJobAsFailed(context.db, jobId, err);
+    throw err;
+  }
 }
 
 export async function handleAskJob(job: Job<LlmJobData>, context: WorkerContext): Promise<HandlerOutput> {
+  const jobId = job.id;
+  if (!jobId) throw new Error('Job is missing an ID.');
+
   if (job.data.type !== 'ask') {
     throw new Error(`handleAskJob received wrong job type: ${job.data.type}`);
   }
-  const { prompt, context: jobContext } = (job.data as AskJobData).payload;
-  if (!prompt || typeof prompt !== 'string') {
-    throw new Error('ASK job missing "prompt" string.');
-  }
-  const logPrefix = `[worker][handler][ask][${job.id}]`;
-  await job.updateProgress(5);
-  const bottleneck = requireBottleneck(context);
-  const rawAnswer = await withTimeout(
-    bottleneck.submit(() => callOllama(hardenAskPrompt(clampStr(prompt), clampStr(String(jobContext ?? ''))), { temperature: 0.6 })),
-    LLM_TIMEOUT_MS,
-    'ask-llm',
-  );
-  const cleanedAnswer = postProcessLlmResponse(rawAnswer, {});
-  const answerWithLinks = markdownifyBareUrls(cleanedAnswer);
-  let links: LinkPreview[] = [];
+
   try {
-    const inline = extractLinksFromText(answerWithLinks, 8);
-    const baseQuery = [String(jobContext ?? '').slice(0, 240), String(prompt ?? '').slice(0, 280)].filter(Boolean).join(' ').trim().slice(0, 360);
-    const googleSearchFn = await resolveGoogleSearch();
-    if (googleSearchFn && baseQuery) {
-      const web = await googleSearchFn(baseQuery, 5);
-      const seen = new Set<string>(inline.map((l) => l.url));
-      links = [...inline, ...web.filter((w) => !seen.has(w.url))].slice(0, 8);
-    } else {
-      links = inline;
-    }
-  } catch (e: unknown) {
-    const msg = e instanceof Error ? e.message : String(e);
-    logger.warn(`${logPrefix} Link enrichment failed (continuing): ${msg}`);
+    const { prompt, context: jobContext } = (job.data as AskJobData).payload;
+    if (!prompt) throw new Error('ASK job is missing a prompt.');
+
+    await job.updateProgress(10);
+
+    const hardenedPrompt = hardenAskPrompt(clampStr(prompt), clampStr(String(jobContext ?? '')));
+    const rawAnswer = await callOllama(hardenedPrompt, { temperature: 0.6 });
+    const cleanedAnswer = postProcessLlmResponse(rawAnswer, {});
+    const answerWithLinks = markdownifyBareUrls(cleanedAnswer);
+    const links: LinkPreview[] = extractLinksFromText(answerWithLinks, 8);
+
+    const result: AskResult = { answer: answerWithLinks, links };
+    await job.updateProgress(90);
+
+    await updateJobAsCompleted(context.db, jobId, result);
+
+    await job.updateProgress(100);
+    return { type: 'ask', result };
+  } catch (error) {
+    const err = error instanceof Error ? error : new Error(String(error));
+    logger.error(`[worker][handler][ask][${jobId}] Failed:`, err);
+    await updateJobAsFailed(context.db, jobId, err);
+    throw err;
   }
-  const result: AskResult = { answer: answerWithLinks, links };
-  await job.updateProgress(100);
-  return { type: 'ask', result };
 }
 
 export async function handleTutorPreflightJob(job: Job<LlmJobData>, context: WorkerContext): Promise<HandlerOutput> {
+  const jobId = job.id;
+  if (!jobId) throw new Error('Job is missing an ID.');
+
   if (job.data.type !== 'tutor-preflight') {
     throw new Error(`handleTutorPreflightJob received wrong job type: ${job.data.type}`);
   }
-  
+
   const jobPayload = (job.data as TutorPreflightJobData).payload;
-  const { role } = jobPayload;
-  const safeRole: Role = isRole(role) ? role : 'explorer';
-  const logPrefix = `[worker][handler][preflight][${job.id}]`;
-  await job.updateProgress(5);
-
-  const cachedPreflight = await retrievePreflightFromLibrary(jobPayload, context);
-  if (cachedPreflight) {
-    await job.updateProgress(100);
-    return { type: 'tutor-preflight', result: cachedPreflight };
-  }
-
-  const bottleneck = requireBottleneck(context);
-
-  const createPreflight = async (currentRole: Role): Promise<TutorPreflightOutput> => {
-    logger.info(`${logPrefix} Generating new pre-flight for role: ${currentRole}`);
-    const { mission, topicTitle, topicSummary, imageTitle } = jobPayload;
-
-    if (!mission || !topicTitle || !topicSummary) {
-      throw new Error('Tutor-preflight job missing mission/topicTitle/topicSummary.');
-    }
-
-    // --- FIX: Safely extract the mission title string for the prompt builder ---
-    const missionTitle = typeof mission === 'string' ? mission : mission.missionTitle;
-
-    const system = buildTutorSystem(currentRole, missionTitle, topicTitle, imageTitle);
-    const user = buildTutorUser(topicSummary);
-
-    const raw = await withTimeout(
-      bottleneck.submit(() =>
-        callOllama(`${system}\n\nUSER:\n${user}\n\nReturn JSON only.`, { temperature: 0.6 }),
-      ),
-      LLM_TIMEOUT_MS,
-      'tutor-preflight-llm',
-    );
-
-    if (DEBUG_WORKER || currentRole !== safeRole) {
-      logger.debug(`${logPrefix} RAW LLM OUTPUT (Role: ${currentRole}):\n---\n${raw}\n---`);
-    }
-
-    const parsed = extractJson<TutorPreflightOutput>(raw);
-    if (
-      !parsed || typeof parsed.systemPrompt !== 'string' || !Array.isArray(parsed.starterMessages) ||
-      typeof parsed.warmupQuestion !== 'string' || !parsed.difficultyHints ||
-      typeof parsed.difficultyHints.easy !== 'string' || typeof parsed.difficultyHints.standard !== 'string' ||
-      typeof parsed.difficultyHints.challenge !== 'string'
-    ) {
-      throw new Error(`Tutor-preflight (role: ${currentRole}): LLM returned malformed JSON.`);
-    }
-
-    parsed.systemPrompt = clampStr(parsed.systemPrompt, 4000);
-    parsed.starterMessages = parsed.starterMessages.slice(0, 6).map((m) => ({
-      id: String(m.id || '').slice(0, 64) || 'stella-hello',
-      role: m.role === 'user' ? 'user' : 'stella',
-      text: clampStr(String(m.text || ''), 1200),
-    }));
-    parsed.goalSuggestions = Array.isArray(parsed.goalSuggestions)
-      ? parsed.goalSuggestions.slice(0, 6).map((s) => clampStr(String(s), 200))
-      : [];
-
-    return parsed;
-  };
 
   try {
-    const result = await createPreflight(safeRole);
-    await savePreflightToLibrary(jobPayload, result, context);
+    await job.updateProgress(5);
+    let finalResult: TutorPreflightOutput;
+
+    const cachedPreflight = await retrievePreflightFromLibrary(jobPayload, context);
+
+    if (cachedPreflight) {
+      logger.info(`[worker][handler][preflight][${jobId}] Cache hit.`);
+      finalResult = cachedPreflight;
+    } else {
+      logger.info(`[worker][handler][preflight][${jobId}] Cache miss, generating new preflight.`);
+      const { role } = jobPayload;
+      const safeRole: Role = isRole(role) ? role : 'explorer';
+
+      const createPreflight = async (currentRole: Role): Promise<TutorPreflightOutput> => {
+        const { mission, topicTitle, topicSummary, imageTitle } = jobPayload;
+        const missionTitle = typeof mission === 'string' ? mission : mission.missionTitle;
+        const system = buildTutorSystem(currentRole, missionTitle, topicTitle, imageTitle);
+        const user = buildTutorUser(topicSummary);
+
+        const raw = await callOllama(`${system}\n\nUSER:\n${user}\n\nReturn JSON only.`, { temperature: 0.6 });
+        const parsed = extractJson<TutorPreflightOutput>(raw);
+
+        if (!parsed?.systemPrompt || !parsed.starterMessages) {
+          throw new Error(`Tutor-preflight (role: ${currentRole}): LLM returned malformed JSON.`);
+        }
+        return parsed;
+      };
+
+      try {
+        finalResult = await createPreflight(safeRole);
+      } catch (generationError) {
+        logger.warn(`[worker][preflight][${jobId}] Generation for role '${safeRole}' failed. Retrying with 'explorer'.`, generationError);
+        finalResult = await createPreflight('explorer');
+      }
+
+      await savePreflightToLibrary(jobPayload, finalResult, context);
+    }
+
+    await job.updateProgress(90);
+    await updateJobAsCompleted(context.db, jobId, finalResult);
+
     await job.updateProgress(100);
-    return { type: 'tutor-preflight', result };
-  } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : String(err);
-    logger.warn(`${logPrefix} Tailored preflight for '${safeRole}' failed. Retrying with 'explorer'.`, { error: msg });
-    const fallbackResult = await createPreflight('explorer');
-    await savePreflightToLibrary(jobPayload, fallbackResult, context);
-    await job.updateProgress(100);
-    return { type: 'tutor-preflight', result: fallbackResult };
+    return { type: 'tutor-preflight', result: finalResult };
+  } catch (error) {
+    const err = error instanceof Error ? error : new Error(String(error));
+    logger.error(`[worker][handler][preflight][${jobId}] Failed catastrophically:`, err);
+    await updateJobAsFailed(context.db, jobId, err);
+    throw err;
   }
 }

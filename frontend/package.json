@@ -37,6 +37,8 @@
     "dotenv": "^17.2.2",
     "express": "^5.1.0",
     "firebase-admin": "^13.5.0",
+    "gcp-metadata": "^7.0.1",
+    "google-auth-library": "^10.3.0",
     "gsap": "^3.13.0",
     "hast-util-to-string": "^3.0.1",
     "immer": "^10.1.1",
