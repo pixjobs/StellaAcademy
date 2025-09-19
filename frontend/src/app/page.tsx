@@ -1,9 +1,10 @@
 'use client';
 
 import { useEffect } from 'react';
-import gsap from 'gsap';
-import Link from 'next/link';
-import { useGame, Role } from '@/lib/store';
+import gsap from 'gsap';         
+import Link from 'next/link';        
+import { useGame } from '@/lib/store';
+import type { Role } from '@/lib/store'; 
 import IntroOverlay from '@/components/IntroOverlay';
 
 const roles: { id: Role; label: string; blurb: string; persona: string }[] = [

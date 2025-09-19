@@ -1,232 +1,199 @@
-import { NextRequest, NextResponse } from 'next/server';
-import crypto from 'node:crypto';
-import { Job, JobsOptions, JobState } from 'bullmq';
-import type { LlmJobData, LlmJobResult, TutorPreflightOutput } from '@/types/llm';
-import { enqueueIdempotent, withJobHeaders } from '@/lib/api/queueHttp';
-import { getQueues } from '@/lib/bullmq/queues';
+import { NextResponse } from 'next/server';
+import { Firestore } from '@google-cloud/firestore';
+import { auth } from '@clerk/nextjs/server';
+import { enqueueTask } from '@/lib/cloudTasks';
+import { nanoid } from 'nanoid';
+import type { LlmJobData, AskResult, LlmJobResult, WorkerMeta } from '@/types/llm';
 
+// --- Import implemented link utilities ---
+import { markdownifyBareUrls, extractLinksFromText } from '@/lib/llm/links';
+import { dedupeLinks, tryGoogleCse } from '@/lib/llmUtils';
+
+// Ensure this route runs on the Node.js runtime for Firestore Admin SDK compatibility.
 export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
 
-/* ─────────────────────────────────────────────────────────
-  TYPES & VALIDATION
-────────────────────────────────────────────────────────── */
+// --- Initialization ---
+const db = new Firestore();
+const jobsCollection = db.collection('jobs');
 
-type EnqueueResult = { state: JobState | 'exists' | 'unknown' };
-type CacheVal<T> = { value: T; fetchedAt: number; soft: number; hard: number };
-interface ErrorLike { name?: string; message?: string; stack?: string; code?: string | number; }
+// ========================================================================
+// --- MODULE-LEVEL HELPERS & TYPE GUARDS ---
+// ========================================================================
 
-function isValidLlmJobResult(value: unknown): value is LlmJobResult {
-  if (typeof value !== 'object' || value === null) return false;
-  if (!('type' in value) || !('result' in value)) return false;
-  const data = value as { type: unknown; result: unknown };
-  const t = data.type;
-  if (t === 'tutor-preflight') {
-    const r = data.result as TutorPreflightOutput;
-    return typeof r?.systemPrompt === 'string' && Array.isArray(r.starterMessages) && typeof r.warmupQuestion === 'string';
+/**
+ * Type guard to safely check if an object is a valid, successful LlmJobResult.
+ */
+function isLlmJobResult(obj: unknown): obj is LlmJobResult {
+  if (!obj || typeof obj !== 'object') return false;
+  if (!('type' in obj && 'result' in obj && 'meta' in obj)) return false;
+  const meta = (obj as LlmJobResult).meta as WorkerMeta;
+  if (!meta || typeof meta !== 'object' || !('jobId' in meta)) return false;
+  return (obj as LlmJobResult).type !== 'failure';
+}
+
+/**
+ * Type guard to check for a nested result structure from 'mission' jobs.
+ */
+function isNestedMissionResult(obj: unknown): obj is { result: unknown } {
+  return !!obj && typeof obj === 'object' && 'result' in obj;
+}
+
+/**
+ * Type guard to check for a valid 'ask' job result.
+ */
+function isAskResult(obj: unknown): obj is AskResult {
+  return !!obj && typeof obj === 'object' && 'answer' in obj && typeof (obj as AskResult).answer === 'string';
+}
+
+/**
+ * Gets the current user's ID.
+ * In development, allows for a non-secure bypass for easy API testing.
+ */
+async function getUserId() {
+  if (process.env.NODE_ENV === 'development') {
+    const { userId } = await auth();
+    if (userId) return userId;
+    
+    console.warn('\n⚠️  [AUTH BYPASS] No user session found. Using development user ID. This should NOT appear in production.\n');
+    return 'dev-user-id-for-testing';
   }
-  if (t === 'mission' || t === 'ask') {
-    return typeof data.result === 'object' && data.result !== null;
+
+  const { userId } = await auth();
+  return userId;
+}
+
+// --- POST Handler (Enqueue any job type) ---
+export async function POST(request: Request) {
+  const userId = await getUserId();
+  if (!userId) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
-  return false;
-}
 
-/* ─────────────────────────────────────────────────────────
-  DEBUG, CACHES, CONSTANTS
-────────────────────────────────────────────────────────── */
-
-const DEBUG = process.env.DEBUG_LLM_ENQUEUE === '1';
-const log = (reqId: string, msg: string, ctx: Record<string, unknown> = {}) => {
-  if (DEBUG) console.log(`[llm/enqueue][${reqId}] ${msg}`, ctx);
-};
-
-const CACHE = new Map<string, CacheVal<LlmJobResult>>();
-const SOFT_MS = Number(process.env.LLM_CACHE_SOFT_MS ?? 5 * 60 * 1000);
-const HARD_MS = Number(process.env.LLM_CACHE_HARD_MS ?? 30 * 60 * 1000);
-
-/* ─────────────────────────────────────────────────────────
-  SMALL UTILS
-────────────────────────────────────────────────────────── */
-
-function newReqId(): string { return crypto.randomUUID(); }
-function hashId(o: unknown): string { return crypto.createHash('sha256').update(JSON.stringify(o)).digest('hex'); }
-function getCached(id: string): CacheVal<LlmJobResult> | null {
-  const v = CACHE.get(id);
-  if (!v || Date.now() > v.hard) {
-    if (v) CACHE.delete(id);
-    return null;
-  }
-  return v;
-}
-function setCached(id: string, value: LlmJobResult): void {
-  const now = Date.now();
-  CACHE.set(id, { value, fetchedAt: now, soft: now + SOFT_MS, hard: now + HARD_MS });
-}
-function okJson(data: object, init?: number | ResponseInit) {
-  return NextResponse.json(data, typeof init === 'number' ? { status: init } : init);
-}
-function toErrInfo(e: unknown): ErrorLike {
-  const ee = (e ?? {}) as ErrorLike;
-  return { name: ee.name ?? 'Error', message: ee.message ?? String(e), stack: ee.stack, code: ee.code };
-}
-
-/* ─────────────────────────────────────────────────────────
-  POST (enqueue)
-────────────────────────────────────────────────────────── */
-export async function POST(req: NextRequest): Promise<NextResponse> {
-  const reqId = newReqId();
-  let jobId = 'unknown';
+  let jobId = ''; // Initialize here for use in the catch block
 
   try {
-    const raw = await req.text();
-    log(reqId, 'POST start', { contentLength: raw.length });
-
-    if (!raw) return withJobHeaders(okJson({ error: 'Empty body; expected JSON.' }, 400), jobId, 'error');
-
-    let body: LlmJobData;
-    try {
-      body = JSON.parse(raw) as LlmJobData;
-    } catch {
-      return withJobHeaders(okJson({ error: 'Malformed JSON.' }, 400), jobId, 'error');
+    const jobData = (await request.json()) as LlmJobData;
+    if (!jobData || !jobData.type) {
+      return NextResponse.json({ error: 'Invalid job data provided.' }, { status: 400 });
     }
 
-    if (body?.type !== 'mission' && body?.type !== 'ask' && body?.type !== 'tutor-preflight') {
-      return withJobHeaders(okJson({ error: "Invalid 'type' (use 'mission', 'ask', or 'tutor-preflight')." }, 400), jobId, 'error');
-    }
-    if (!body?.payload || typeof body.payload !== 'object') {
-      return withJobHeaders(okJson({ error: "Invalid 'payload'." }, 400), jobId, 'error');
-    }
+    jobId = nanoid();
+    const createdAt = new Date();
 
-    jobId = body.cacheKey || hashId({ type: body.type, payload: body.payload });
-    log(reqId, 'Computed jobId', { jobId, type: body.type });
-
-    const cached = getCached(jobId);
-    if (cached && Date.now() < cached.soft) {
-      log(reqId, 'Cache HIT (fresh)', { ageMs: Date.now() - cached.fetchedAt });
-      const res = okJson({ accepted: true, jobId, state: 'completed', result: cached.value, cache: { status: 'fresh' } }, 200);
-      return withJobHeaders(res, jobId, 'completed');
-    }
-
-    const { interactiveQueue, backgroundQueue } = await getQueues();
-    const targetQueue = (body.type === 'mission') ? backgroundQueue : interactiveQueue;
-    log(reqId, 'Queue selected', { queueName: targetQueue.name });
-
-    const addOpts: JobsOptions = {
+    // Create the job doc in "pending" first.
+    await jobsCollection.doc(jobId).set({
       jobId,
-      attempts: 2,
-      backoff: { type: 'exponential', delay: 1500 },
-      removeOnComplete: { age: 300, count: 1000 },
-      removeOnFail: { age: 1800, count: 1000 },
-    };
+      status: 'pending',
+      type: jobData.type,
+      userId,
+      createdAt,
+      result: null,
+      error: null,
+    });
 
-    const { state } = await enqueueIdempotent(
-      body.type,
-      { ...body, cacheKey: jobId },
-      jobId,
-      targetQueue,
-      addOpts
-    ) as EnqueueResult;
+    // In DEV, this returns the full LlmJobResult. In PROD, it returns null.
+    const immediateResult = await enqueueTask(jobId, jobData, 'interactive');
 
-    log(reqId, 'enqueueIdempotent ok', { state });
+    if (isLlmJobResult(immediateResult)) {
+      // TypeScript's inference gets confused by the type guard's logic, resulting in `never`.
+      // We cast `immediateResult` because the guard has already validated its structure.
+      const successfulResult = immediateResult as LlmJobResult;
 
-    const res = okJson({ accepted: true, jobId, state }, 202);
-    res.headers.set('X-Req-Id', reqId);
-    return withJobHeaders(res, jobId, state === 'exists' || state === 'unknown' ? 'waiting' : state);
+      console.log('[API ENQUEUE][DEV] Immediate worker result — writing to Firestore', {
+        jobId: successfulResult.meta.jobId,
+        type: successfulResult.type,
+        hasResult: !!successfulResult.result,
+      });
 
-  } catch (err) {
-    const info = toErrInfo(err);
-    console.error('[llm/enqueue][POST] Unhandled error', { reqId, jobId, ...info });
-    const res = okJson({ error: 'Failed to enqueue job.', details: info.message, code: info.code }, 500);
-    res.headers.set('X-Req-Id', reqId);
-    return withJobHeaders(res, jobId, 'error');
-  }
-}
-
-/* ─────────────────────────────────────────────────────────
-  GET (status / debug / list / stats)
-────────────────────────────────────────────────────────── */
-export async function GET(req: NextRequest): Promise<NextResponse> {
-  const reqId = newReqId();
-  const id = req.nextUrl.searchParams.get('id');
-  const debug = req.nextUrl.searchParams.get('debug') === '1';
-
-  if (!id) return okJson({ error: 'Missing ?id=' }, 400);
-
-  const { interactiveQueue, backgroundQueue } = await getQueues();
-  const job = (await Job.fromId(interactiveQueue, id)) ?? (await Job.fromId(backgroundQueue, id));
-
-  if (!job) {
-    log(reqId, 'Job not found', { id });
-    return withJobHeaders(okJson({ error: 'Job not found in any active queue.', id }, 404), id, 'missing');
-  }
-
-  const state = await job.getState();
-  const progress = job.progress ?? 0;
-
-  if (state === 'completed') {
-    const result = job.returnvalue as LlmJobResult;
-    if (!isValidLlmJobResult(result)) {
-      log(reqId, 'Job completed with malformed data', { id });
-      const payload = { state: 'failed' as const, progress: 100, error: 'Worker returned malformed data.' };
-      return withJobHeaders(okJson(payload, 500), id, 'failed');
+      // Persist the complete, validated result from the worker.
+      await jobsCollection.doc(jobId).set(
+        {
+          status: 'completed',
+          type: successfulResult.type,
+          result: successfulResult.result,
+          meta: successfulResult.meta,
+          completedAt: new Date(),
+          error: null,
+        },
+        { merge: true }, // Use merge to safely update the 'pending' doc.
+      );
+    } else {
+      // This is the production path, or the dev path if the worker returned null/an error.
+      console.log('[API ENQUEUE] Enqueued job (async processing)', { jobId, type: jobData.type });
     }
-    setCached(id, result);
-    const payload = debug ? { state, progress, result, debug: { ...job } } : { state, progress, result };
-    return withJobHeaders(okJson(payload, 200), id, state);
+
+    return NextResponse.json({ jobId });
+  } catch (error) {
+    console.error(`[API ENQUEUE] Failed to enqueue job ${jobId}:`, error);
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    if (jobId) {
+      await jobsCollection.doc(jobId).set({ status: 'failed', error: message }, { merge: true });
+    }
+    return NextResponse.json({ error: `Enqueue failed: ${message}` }, { status: 500 });
   }
-
-  if (state === 'failed') {
-    const payload = debug ? { state, progress, error: job.failedReason, stacktrace: job.stacktrace } : { state, progress, error: job.failedReason };
-    return withJobHeaders(okJson(payload, 500), id, state);
-  }
-
-  const { interactiveStats, backgroundStats } = await getQueuesAndStats();
-  const totalWaiting = (interactiveStats.waiting ?? 0) + (backgroundStats.waiting ?? 0);
-  const totalActive = (interactiveStats.active ?? 0) + (backgroundStats.active ?? 0);
-  
-  // The state is passed to the corrected helper function below
-  const pollAfterMs = computePollAfterMs(state, totalWaiting, totalActive);
-
-  const resp = okJson({ state, progress, queue: { waiting: totalWaiting, active: totalActive } }, 200);
-  resp.headers.set('Retry-After', String(Math.ceil(pollAfterMs / 1000)));
-  resp.headers.set('X-Poll-After-Ms', String(pollAfterMs));
-  return withJobHeaders(resp, id, state);
 }
 
-// Helper for GET endpoint to fetch stats for both queues
-async function getQueuesAndStats() {
-  const { interactiveQueue, backgroundQueue } = await getQueues();
-  const [interactiveStats, backgroundStats] = await Promise.all([
-    interactiveQueue.getJobCounts('wait', 'active'),
-    backgroundQueue.getJobCounts('wait', 'active'),
-  ]);
-  return { interactiveStats, backgroundStats };
-}
-
-// --- CORRECTED HELPER FUNCTION ---
-// The function signature is widened to accept the 'unknown' state.
-function computePollAfterMs(state: JobState | 'unknown', waiting: number, active: number): number {
-  let base: number;
-  switch (state) {
-    case 'active':
-      base = 1200;
-      break;
-    case 'delayed':
-      base = 2000;
-      break;
-    case 'waiting':
-    case 'waiting-children':
-    case 'prioritized':
-    case 'unknown': // Handle 'unknown' gracefully
-    default:
-      base = 1500; // Default to a safe polling interval
-      break;
+// --- GET Handler (Poll for any job status, with special 'ask' logic) ---
+export async function GET(request: Request) {
+  const userId = await getUserId();
+  if (!userId) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
-  
-  const ratio = active > 0 ? waiting / active : waiting;
-  if (ratio > 10) base = Math.max(base, 4000);
-  else if (ratio > 3) base = Math.max(base, 2500);
-  
-  const jitter = base * (0.6 + Math.random() * 0.8);
-  return Math.max(800, Math.min(8000, Math.round(jitter)));
+
+  try {
+    const { searchParams } = new URL(request.url);
+    const jobId = searchParams.get('id');
+
+    if (!jobId) {
+      return NextResponse.json({ error: 'Job ID is required.' }, { status: 400 });
+    }
+
+    const jobDoc = await jobsCollection.doc(jobId).get();
+
+    if (!jobDoc.exists) {
+      return NextResponse.json({ error: 'Job not found.' }, { status: 404 });
+    }
+
+    const jobData = jobDoc.data()!;
+
+    if (jobData.userId !== userId) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
+    // --- TYPE-SAFE NORMALIZATION & POST-PROCESSING LOGIC ---
+
+    // 1. Normalize the shape for 'mission' jobs to unwrap the nested result.
+    if (
+      jobData.status === 'completed' &&
+      jobData.type === 'mission' &&
+      isNestedMissionResult(jobData.result) // Use the type guard (now defined at module level)
+    ) {
+      console.log(`[API POLL][${jobId}] Normalizing nested mission result.`);
+      jobData.result = jobData.result.result;
+    }
+
+    // 2. Post-process the result for 'ask' jobs to enrich with links.
+    if (
+      jobData.status === 'completed' &&
+      jobData.type === 'ask' &&
+      isAskResult(jobData.result) // Use the type guard (now defined at module level)
+    ) {
+      console.log(`[API POLL][${jobId}] Post-processing 'ask' result with link enrichment.`);
+      
+      const rawAnswer = jobData.result.answer;
+      const answerWithLinks = markdownifyBareUrls(rawAnswer);
+      const textLinks = extractLinksFromText(answerWithLinks);
+      const firstSentence = String(rawAnswer).split(/[.!?]\s/)[0]?.slice(0, 120) ?? '';
+      const cseLinks = firstSentence ? await tryGoogleCse(firstSentence) : [];
+      const links = dedupeLinks(textLinks, cseLinks);
+
+      jobData.result = { ...jobData.result, answer: answerWithLinks, links };
+    }
+
+    return NextResponse.json(jobData);
+  } catch (error) {
+    console.error(`[API POLL] Failed to get job status for user ${userId}:`, error);
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    return NextResponse.json({ error: `Status check failed: ${message}` }, { status: 500 });
+  }
 }

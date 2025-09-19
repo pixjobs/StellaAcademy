@@ -7,14 +7,18 @@ import {
   useState,
   useEffect,
   useCallback,
-  ReactNode,
   useMemo
 } from 'react';
-import { Note } from '@/types/mission'; // Import the single source of truth
-import { INoteStorage, LocalStorageNoteStorage } from './storage';
 
-// Simple UID generator for new notes
-const uid = () => Math.random().toString(36).slice(2, 9);
+import type { ReactNode } from 'react';
+
+// Import the UID type alongside the Note type
+import type { Note, UID } from '@/types/mission';
+import { LocalStorageNoteStorage } from './storage';
+import type { INoteStorage } from './storage';
+
+// Update the UID generator to return the branded UID type
+const uid = (): UID => (Math.random().toString(36).slice(2, 9) as UID);
 
 /**
  * Defines the shape of the data provided by our NotesContext.
@@ -95,6 +99,7 @@ export function NotesProvider({ children, missionKey }: NotesProviderProps) {
    */
   const addNote = useCallback((partialNote: Partial<Note>) => {
     const newNote: Note = {
+      // With the updated uid(), this line no longer causes a type error.
       id: partialNote.id || uid(),
       type: partialNote.type ?? 'concept',
       title: partialNote.title ?? 'Untitled Note',

@@ -1,9 +1,13 @@
 'use client';
 
-import { useCallback, useMemo, useRef, useState, useEffect } from 'react';
-import { useMissionPlanGenerator } from '@/hooks/useMissionPlanGenerator';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useGame } from '@/lib/store';
-import type { EnrichedMissionPlan, Img } from '@/types/mission';
+import type { EnrichedTopic, Img } from '@/types/mission';
+import type { Role } from '@/types/llm';
+
+// --- Import BOTH hooks ---
+import { useMissionPlanGenerator } from '@/hooks/useMissionPlanGenerator';
+import { useTutorPreflightGenerator } from '@/hooks/useTutorPreflightGenerator';
 
 import MissionControl from '@/components/MissionControl';
 import MissionStandby from '@/components/MissionStandby';
@@ -14,20 +18,7 @@ import { Button } from '@/components/ui/button';
 /*                                    Types                                   */
 /* -------------------------------------------------------------------------- */
 
-type TopicFromHook = EnrichedMissionPlan['topics'][number];
-type CleanTopic = Omit<TopicFromHook, 'images'> & { images: Img[] };
-
-type TutorPreflightResult = {
-  systemPrompt: string;
-  starterMessages: Array<{ id: string; role: 'stella' | 'user'; text: string }>;
-  warmupQuestion: string;
-  goalSuggestions: string[];
-  difficultyHints: {
-    easy: string;
-    standard: string;
-    challenge: string;
-  };
-};
+type CleanTopic = Omit<EnrichedTopic, 'images'> & { images: Img[] };
 
 /* -------------------------------------------------------------------------- */
 /*                                   Helpers                                  */
@@ -47,66 +38,12 @@ function reorderImages(images: Img[], focusIndex: number): Img[] {
   return [images[i], ...images.slice(0, i), ...images.slice(i + 1)];
 }
 
-// ===== CORRECTION 1: Handle topics with no images =====
 function buildContext(topic: CleanTopic, pickedIndex = 0): string {
   const chosen = topic.images?.[pickedIndex];
-  // Only add the "Selected poster base" line if an image was actually chosen.
   const chosenLine = chosen
     ? `\nSelected poster base: #${pickedIndex + 1} ${chosen.title}`
     : '';
   return `Poster Theme: ${topic.title}. ${topic.summary}${chosenLine}`.trim();
-}
-
-async function startPreflight(payload: {
-  mission: string;
-  topicTitle: string;
-  topicSummary: string;
-  imageTitle?: string;
-  role: 'explorer' | 'cadet' | 'scholar';
-}): Promise<TutorPreflightResult | string> {
-  const res = await fetch('/api/llm/enqueue', {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ type: 'tutor-preflight', payload }),
-  });
-
-  const data = await res.json();
-
-  if (res.ok && data.state === 'completed') {
-    return data.result.result as TutorPreflightResult;
-  }
-  if (res.status === 202 && data.jobId) {
-    return data.jobId as string;
-  }
-  
-  throw new Error(data?.error || 'Failed to enqueue preflight.');
-}
-
-async function waitForPreflight(jobId: string, { timeoutMs = 45_000, intervalMs = 1500 } = {}) {
-  const started = Date.now();
-  while (Date.now() - started < timeoutMs) {
-    const res = await fetch(`/api/llm/enqueue?id=${encodeURIComponent(jobId)}`);
-    const data = await res.json();
-    if (!res.ok) throw new Error(data?.error || 'Preflight status error.');
-
-    if (data.state === 'completed') {
-      return data.result.result as TutorPreflightResult;
-    }
-    if (data.state === 'failed') throw new Error(data?.error || 'Preflight job failed.');
-    
-    await new Promise((r) => setTimeout(r, intervalMs));
-  }
-  throw new Error('Preflight timed out.');
-}
-
-function isValidPreflightResult(data: unknown): data is TutorPreflightResult {
-  if (typeof data !== 'object' || data === null) return false;
-  const result = data as TutorPreflightResult;
-  return (
-    typeof result.systemPrompt === 'string' &&
-    Array.isArray(result.starterMessages) &&
-    typeof result.warmupQuestion === 'string'
-  );
 }
 
 /* -------------------------------------------------------------------------- */
@@ -114,21 +51,33 @@ function isValidPreflightResult(data: unknown): data is TutorPreflightResult {
 /* -------------------------------------------------------------------------- */
 
 export default function SpacePosterPage() {
-  const { missionPlan, isLoading, error, generateNewPlan } = useMissionPlanGenerator('space-poster');
   const { role = 'explorer' } = useGame();
 
+  // HOOK 1: Manages fetching the overall mission plan.
+  const {
+    missionPlan,
+    isLoading: isMissionLoading,
+    error: missionError,
+    generateNewPlan,
+  } = useMissionPlanGenerator('space-poster');
+
+  // HOOK 2: Manages fetching the pre-flight data for a selected topic.
+  const {
+    preflight,
+    isLoading: isPreflightLoading,
+    error: preflightError,
+    generateNewPreflight,
+  } = useTutorPreflightGenerator();
+
+  // Memoize the sanitized mission plan to prevent unnecessary re-renders.
   const cleanMissionPlan = useMemo(() => {
     if (!missionPlan) return null;
     return {
       ...missionPlan,
       topics: missionPlan.topics.map((topic): CleanTopic => ({
         ...topic,
-        // Ensure images is always a valid array, even if it's empty.
         images: (topic.images || [])
-          .map((img) => ({
-            title: img.title ?? 'Untitled Image',
-            href: img.href ?? '',
-          }))
+          .map((img) => ({ title: img.title ?? 'Untitled Image', href: img.href ?? '' }))
           .filter((img) => img.href),
       })),
     };
@@ -136,89 +85,49 @@ export default function SpacePosterPage() {
 
   const [selectedTopic, setSelectedTopic] = useState<CleanTopic | null>(null);
   const [selectedImageIdx, setSelectedImageIdx] = useState<number>(0);
-  const [preflightLoading, setPreflightLoading] = useState(false);
-  const [preflightError, setPreflightError] = useState<string | null>(null);
-  const [preflightBriefing, setPreflightBriefing] = useState<string | null>(null);
-  const lastRequestedRef = useRef<string | null>(null);
+
+  // This effect connects the two hooks. When a topic is selected, it
+  // triggers the pre-flight generation for that topic.
+  useEffect(() => {
+    if (selectedTopic && cleanMissionPlan) {
+      const imageTitle = selectedTopic.images?.[selectedImageIdx]?.title;
+      
+      generateNewPreflight({
+        role: role as Role,
+        mission: cleanMissionPlan,
+        topicTitle: selectedTopic.title,
+        topicSummary: selectedTopic.summary,
+        imageTitle,
+      });
+    }
+  }, [selectedTopic, selectedImageIdx, role, cleanMissionPlan, generateNewPreflight]);
 
   const handleSelectTopic = useCallback((topic: CleanTopic, imageIndex: number) => {
     setSelectedTopic(topic);
-    // If imageIndex is invalid (e.g., -1 for no image), default to 0.
     setSelectedImageIdx(Math.max(0, imageIndex));
   }, []);
 
   const handleReturnToTopics = useCallback(() => {
     setSelectedTopic(null);
-    setPreflightLoading(false);
-    setPreflightError(null);
-    setPreflightBriefing(null);
-    lastRequestedRef.current = null;
   }, []);
 
-  useEffect(() => {
-    if (!selectedTopic) return;
+  // Derive the initial briefing message from the pre-flight result.
+  const briefingMessage = useMemo(() => {
+    if (!preflight) return DEFAULT_BRIEFING;
+    const assistantFirst = preflight.starterMessages.find((m) => m.role === 'stella');
+    return assistantFirst?.text?.trim() || DEFAULT_BRIEFING;
+  }, [preflight]);
 
-    // ===== CORRECTION 2: Gracefully handle topics with no images =====
-    const imageTitle = selectedTopic.images?.[selectedImageIdx]?.title;
-    const reqKey = `${selectedTopic.title}::${imageTitle ?? 'no-image'}::${role}`;
-    lastRequestedRef.current = reqKey;
+  /* ---------------------------- Render states ---------------------------- */
 
-    setPreflightLoading(true);
-    setPreflightError(null);
-    setPreflightBriefing(null);
-
-    const runPreflight = async () => {
-      try {
-        const resultOrJobId = await startPreflight({
-          mission: 'space-poster',
-          topicTitle: selectedTopic.title,
-          topicSummary: selectedTopic.summary,
-          imageTitle, // This is now safely `undefined` if there are no images.
-          role,
-        });
-
-        let finalResult: TutorPreflightResult;
-
-        if (typeof resultOrJobId === 'string') {
-          finalResult = await waitForPreflight(resultOrJobId);
-        } else {
-          finalResult = resultOrJobId;
-        }
-
-        if (!isValidPreflightResult(finalResult)) {
-          console.error("Invalid preflight data received from worker:", finalResult);
-          throw new Error("Worker returned incomplete or malformed preflight data.");
-        }
-
-        const assistantFirst =
-          finalResult.starterMessages.find((m) => m.role === 'stella') ||
-          finalResult.starterMessages[0];
-
-        const briefingText = assistantFirst?.text?.trim() || DEFAULT_BRIEFING;
-
-        if (lastRequestedRef.current === reqKey) {
-          setPreflightBriefing(briefingText);
-          setPreflightLoading(false);
-        }
-      } catch (e: unknown) {
-        if (lastRequestedRef.current === reqKey) {
-          setPreflightError(String((e as Error)?.message || e));
-          setPreflightLoading(false);
-        }
-      }
-    };
-
-    runPreflight();
-  }, [selectedTopic, selectedImageIdx, role]);
-
-  if (isLoading || error) {
+  if (isMissionLoading || missionError) {
     return (
       <section className="container mx-auto flex flex-col items-center justify-center p-4 text-center min-h-[60vh]">
         <h1 className="font-pixel text-xl text-gold mb-4">🌌 Space Poster Studio</h1>
-        {error ? (
+        {missionError ? (
           <div className="rounded-xl border border-red-600/50 bg-red-900/30 p-4 text-red-200 max-w-md">
             <p className="font-semibold mb-1">Poster Plan Failed</p>
-            <p className="text-sm opacity-90 mb-4">{String(error)}</p>
+            <p className="text-sm opacity-90 mb-4">{String(missionError)}</p>
             <Button onClick={generateNewPlan} variant="destructive">Try Again</Button>
           </div>
         ) : (
@@ -242,7 +151,7 @@ export default function SpacePosterPage() {
       </div>
 
       {selectedTopic ? (
-        preflightLoading ? (
+        isPreflightLoading ? (
           <MissionStandby missionName="Preparing Poster Briefing..." />
         ) : preflightError ? (
           <div className="rounded-xl border border-red-600/50 bg-red-900/30 p-4 text-red-200 max-w-xl">
@@ -255,7 +164,6 @@ export default function SpacePosterPage() {
           </div>
         ) : (
           <MissionControl
-            // ===== CORRECTION 3: More robust key =====
             key={`${selectedTopic.title}-${selectedTopic.images?.[selectedImageIdx]?.href ?? 'no-image'}`}
             mission={selectedTopic.title}
             images={reorderImages(selectedTopic.images, selectedImageIdx)}
@@ -263,13 +171,13 @@ export default function SpacePosterPage() {
             initialMessage={{
               id: 'stella-poster-briefing',
               role: 'stella',
-              text: preflightBriefing ?? DEFAULT_BRIEFING,
+              text: briefingMessage,
             }}
           />
         )
       ) : (
         cleanMissionPlan && <TopicSelector plan={cleanMissionPlan} onSelect={handleSelectTopic} />
       )}
-    </section>
+    </section>  
   );
 }

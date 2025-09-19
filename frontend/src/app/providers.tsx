@@ -1,9 +1,24 @@
 'use client';
 
-import { ClerkProvider } from '@clerk/nextjs';
+import { ClerkProvider, ClerkLoaded, ClerkLoading } from '@clerk/nextjs';
 
 export default function Providers({ children }: { children: React.ReactNode }) {
-  // If you want, you can pass publishableKey explicitly:
-  // return <ClerkProvider publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY!}>{children}</ClerkProvider>;
-  return <ClerkProvider>{children}</ClerkProvider>;
+  return (
+    <ClerkProvider
+      // Local sign-in page
+      signInUrl="/sign-in"
+      appearance={{
+        variables: { colorPrimary: '#0f766e', borderRadius: '0.75rem' },
+        elements: {
+          card: 'shadow-xl rounded-2xl border border-slate-200',
+          formButtonPrimary: 'bg-teal-600 hover:bg-teal-700 text-white',
+        },
+      }}
+    >
+      <ClerkLoading>
+        <div className="opacity-0">{children}</div>
+      </ClerkLoading>
+      <ClerkLoaded>{children}</ClerkLoaded>
+    </ClerkProvider>
+  );
 }

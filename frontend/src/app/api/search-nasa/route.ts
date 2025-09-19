@@ -1,11 +1,18 @@
 // /app/api/search-nasa/route.ts
 
 import { NextRequest, NextResponse } from 'next/server';
-// We can safely import from nasa.ts here because this route ONLY runs on the server.
-import { searchNIVL, NivlItem } from '@/lib/nasa';
+
+// Values (runtime):
+import { searchNIVL } from '@/lib/nasa';
+
+// Types only:
+import type { NivlItem } from '@/lib/nasa';
 
 type RequestPayload = {
   query: string;
+  page?: number;
+  limit?: number;
+  expandAssets?: boolean;
 };
 
 /**

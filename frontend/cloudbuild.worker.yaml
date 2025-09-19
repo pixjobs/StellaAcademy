@@ -1,25 +1,20 @@
 # cloudbuild.worker.yaml
-# Builds the worker Docker image, validates its TypeScript code,
-# and deploys the final image to Cloud Run.
+# Build & deploy the stella-worker container to Cloud Run (Service).
 
 timeout: "1200s"
 
-# Defaults (can be overridden via --substitutions)
 substitutions:
   _REGION: europe-west1
   _AR_REPO: stella
   _SERVICE: stella-worker
   _IMAGE_TAG: latest
+  # Optional: pin a runtime service account (leave blank to keep existing)
+  _RUNTIME_SA: ""
 
 steps:
-  # ------------------------------------------------------------------------------------
-  # STEP 1: Build the Docker image using the multi-stage Dockerfile.worker.
-  #
-  # This single command now implicitly performs the TypeScript validation because of the
-  # `RUN npx tsc -p tsconfig.worker.json --noEmit` command in the Dockerfile's
-  # "builder" stage. If there are any TypeScript errors, this entire step will fail,
-  # preventing a broken image from being built or deployed.
-  # ------------------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
+  # Build
+  # ---------------------------------------------------------------------------
   - name: gcr.io/cloud-builders/docker
     id: Build
     args:
@@ -30,42 +25,47 @@ steps:
       - Dockerfile.worker
       - .
 
-  # ------------------------------------------------------------------------------------
-  # STEP 2: Push the successfully built and validated image to Artifact Registry.
-  #
-  # This step only runs if Step 1 succeeds.
-  # ------------------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
+  # Push
+  # ---------------------------------------------------------------------------
   - name: gcr.io/cloud-builders/docker
     id: Push
     args:
       - push
       - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPO}/${_SERVICE}:${_IMAGE_TAG}
 
-  # ------------------------------------------------------------------------------------
-  # STEP 3: Deploy the new image version to the specified Cloud Run service.
-  #
-  # This step uses the gcloud SDK to update the service with the newly pushed image.
-  # It correctly maps secrets from Secret Manager and sets environment variables.
-  # ------------------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
+  # Deploy
+  # ---------------------------------------------------------------------------
   - name: gcr.io/google.com/cloudsdktool/cloud-sdk
     id: Deploy
-    entrypoint: gcloud
+    entrypoint: bash
     args:
-      - run
-      - deploy
-      - ${_SERVICE}
-      - --image=${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPO}/${_SERVICE}:${_IMAGE_TAG}
-      - --region=${_REGION}
-      - --no-allow-unauthenticated
-      - --set-secrets=REDIS_URL_ONLINE=REDIS_URL_ONLINE:latest,OLLAMA_BASE_URL=OLLAMA_BASE_URL:latest,NASA_API_KEY=NASA_API_KEY:latest,GOOGLE_CUSTOM_SEARCH_KEY=GOOGLE_CUSTOM_SEARCH_KEY:latest,GOOGLE_CUSTOM_SEARCH_CX=GOOGLE_CUSTOM_SEARCH_CX:latest
-      - --update-env-vars=LLM_QUEUE_NAME=llm-queue,FORCE_LOCAL_REDIS=0,NODE_ENV=production,OLLAMA_WORKER_CONCURRENCY=1
-      - --cpu=1
-      - --memory=512Mi
-      - --max-instances=3
-      # (Optional) use a custom service account:
-      # - --service-account=YOUR-SA@${PROJECT_ID}.iam.gserviceaccount.com
+      - -ceu
+      - |
+        set -euo pipefail
 
-# This final section makes the built image available to other Cloud Build steps if needed,
-# and it's used by Cloud Build to show what images were created by this build.
+        BASE_ARGS=(
+          run deploy ${_SERVICE}
+          --image=${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPO}/${_SERVICE}:${_IMAGE_TAG}
+          --region=${_REGION}
+          --no-allow-unauthenticated
+          --set-secrets=CLOUD_RUN_WORKER_URL=CLOUD_RUN_WORKER_URL:latest,OLLAMA_BASE_URL=OLLAMA_BASE_URL:latest,NASA_API_KEY=NASA_API_KEY:latest,GOOGLE_CUSTOM_SEARCH_KEY=GOOGLE_CUSTOM_SEARCH_KEY:latest,GOOGLE_CUSTOM_SEARCH_CX=GOOGLE_CUSTOM_SEARCH_CX:latest,INTERACTIVE_TASKS_QUEUE_ID=INTERACTIVE_TASKS_QUEUE_ID:latest,BACKGROUND_TASKS_QUEUE_ID=BACKGROUND_TASKS_QUEUE_ID:latest
+          --update-env-vars=NODE_ENV=production
+          --concurrency=4
+          --cpu=1
+          --memory=512Mi
+          --max-instances=3
+          --timeout=600
+          --cpu-boost
+          --execution-environment=gen2
+        )
+
+        if [ -n "${_RUNTIME_SA}" ]; then
+          gcloud "${BASE_ARGS[@]}" --service-account="${_RUNTIME_SA}"
+        else
+          gcloud "${BASE_ARGS[@]}"
+        fi
+
 images:
   - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_AR_REPO}/${_SERVICE}:${_IMAGE_TAG}
