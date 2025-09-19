@@ -9,7 +9,6 @@
  * =========================================================================
  */
 
-import crypto from "node:crypto";
 import { getNasaApiKey } from "@/lib/secrets";
 import type { MarsPhoto } from "@/types/llm";
 
@@ -59,6 +58,7 @@ type NivlDataItem = {
   date_created?: string;
   keywords?: string[];
 };
+
 type NivlSearchItem = { data?: NivlDataItem[]; links?: NivlLink[] };
 type NivlSearchResponse = { collection: { items: NivlSearchItem[] } };
 type NivlAssetResponse = { collection: { items: { href: string }[] } };
@@ -126,9 +126,7 @@ function intEnv(name: string, fallback: number): number {
 function now(): number {
   return Date.now();
 }
-function sha1(s: string): string {
-  return crypto.createHash("sha1").update(s).digest("hex");
-}
+
 function getCached<T>(map: Map<string, CacheVal<T>>, key: string): CacheVal<T> | null {
   const v = map.get(key);
   if (!v) return null;
@@ -153,19 +151,6 @@ function shouldRetry(status: number): boolean {
 function isTransientError(err: unknown): boolean {
   const msg = err instanceof Error ? err.message : String(err);
   return /ECONNRESET|ECONNREFUSED|ETIMEDOUT|EAI_AGAIN|network\s*error|fetch failed|aborted/i.test(msg);
-}
-async function raceWithTimeout<T>(p: Promise<T>, ms: number, label: string): Promise<T> {
-  let t: NodeJS.Timeout | null = null;
-  try {
-    return await Promise.race<T>([
-      p,
-      new Promise<T>((_, rej) => {
-        t = setTimeout(() => rej(new Error(`${label} timed out in ${ms}ms`)), ms);
-      }),
-    ]);
-  } finally {
-    if (t) clearTimeout(t);
-  }
 }
 
 /* -------------------------------------------------------------------------- */
