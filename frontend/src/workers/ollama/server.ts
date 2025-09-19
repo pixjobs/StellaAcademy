@@ -144,7 +144,7 @@ async function verifyCloudTask(req: Request, res: Response, next: NextFunction) 
 
   const authHeader = req.header('Authorization');
   if (!authHeader?.startsWith('Bearer ')) {
-    console.warn({ ...logContext, message: 'Unauthorized: Missing/invalid Authorization header.' });
+
     return res.status(401).send('Unauthorized');
   }
   const idToken = authHeader.slice('Bearer '.length);
@@ -153,12 +153,7 @@ async function verifyCloudTask(req: Request, res: Response, next: NextFunction) 
   for (const aud of allowedAudiences) {
     try {
       await authClient.verifyIdToken({ idToken, audience: aud });
-      console.info({
-        ...logContext,
-        message: 'OIDC token verified successfully.',
-        matchedAudience: aud,
-        incomingAud,
-      });
+   
       return next();
     } catch {
       // try the next audience
@@ -208,21 +203,13 @@ function readTaskHeaders(req: express.Request) {
 // ---------- Server bootstrap ----------
 export async function startServer() {
   const bootLogContext = { component: 'Bootstrap' };
-  console.info({ ...bootLogContext, message: 'Worker server starting…' });
 
   await loadConfigFromSecrets();
-  console.info({ ...bootLogContext, message: 'Configuration and secrets loaded.' });
 
   // Log normalised audiences once at boot
   const bootAudiences = getAllowedAudiences();
-  console.info({
-    ...bootLogContext,
-    message: 'Audience configuration (normalised)',
-    audiences: bootAudiences,
-  });
 
   const context: WorkerContext = await initializeContext();
-  console.info({ ...bootLogContext, message: 'Shared context initialized.' });
 
   const app = express();
   app.use(express.json({ limit: '6mb' }));
@@ -281,8 +268,6 @@ export async function startServer() {
         retryCount: hdrs.retryCount,
         taskName: hdrs.taskName,
       });
-
-      console.info({ ...jobLogContext, message: `Dispatching to handler: ${jobType}` });
 
       // NOTE: HandlerOutput is not generic in your codebase, so we treat result as unknown
       // and narrow via the LlmJobResult discriminant using ResultFor<...>.
@@ -361,11 +346,6 @@ export async function startServer() {
         meta: { jobId, queueName: readTaskHeaders(req).queue, timing: { totalMs, queueWaitMs: 0 } },
       };
 
-      console.info({
-        ...jobLogContext,
-        message: 'Returning 200 OK with failure payload to prevent Cloud Tasks retry.',
-        payload: finalErrorResult,
-      });
       return ok(res, finalErrorResult);
     }
   });
