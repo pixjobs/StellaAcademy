@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 
 // Constant parameters
@@ -80,9 +80,9 @@ export default function RocketLabPage() {
   const deltaV = Math.round(isp * GRAVITY * Math.log(massRatio));
   const isOrbitAchieved = deltaV >= TARGET_DELTAV;
 
-  const appendLog = (msg: string) => {
-    setLog(prev => [...prev, `[T+${(launchProgress / 10).toFixed(1)}s] ${msg}`]);
-  };
+  const appendLog = useCallback((msg: string, time: number) => {
+    setLog(prev => [...prev, `[T+${(time / 10).toFixed(1)}s] ${msg}`]);
+  }, []);
 
   const startLaunch = () => {
     setIsLaunching(true);
@@ -98,8 +98,8 @@ export default function RocketLabPage() {
     if (!isLaunching) return;
 
     if (launchProgress === 0) {
-      appendLog("Ignition command received. Cryogenic valves open.");
-      appendLog(`Wet Mass: ${totalWetMass.toLocaleString()} kg | Target Delta-V: ${TARGET_DELTAV} m/s`);
+      appendLog("Ignition command received. Cryogenic valves open.", 0);
+      appendLog(`Wet Mass: ${totalWetMass.toLocaleString()} kg | Target Delta-V: ${TARGET_DELTAV} m/s`, 0);
     }
 
     const timer = setTimeout(() => {
@@ -118,32 +118,32 @@ export default function RocketLabPage() {
 
       if (nextProgress === 10) {
         setStatusText('Liftoff!');
-        appendLog("Tower cleared. Pitch and roll program initiated.");
+        appendLog("Tower cleared. Pitch and roll program initiated.", nextProgress);
       } else if (nextProgress === 30) {
         setStatusText('Passing Max-Q');
-        appendLog("Maximum Aerodynamic Pressure (Max-Q) reached. Telemetry nominal.");
+        appendLog("Maximum Aerodynamic Pressure (Max-Q) reached. Telemetry nominal.", nextProgress);
       } else if (nextProgress === 60) {
         setStatusText('Main Engine Cutoff (MECO)');
-        appendLog("Main Engine Cutoff (MECO). Stage separation confirmed.");
+        appendLog("Main Engine Cutoff (MECO). Stage separation confirmed.", nextProgress);
       } else if (nextProgress === 80) {
         setStatusText('Orbit Insertion Burn');
-        appendLog("Upper stage engine ignited. Circularizing orbit...");
+        appendLog("Upper stage engine ignited. Circularizing orbit...", nextProgress);
       } else if (nextProgress >= 100) {
         setIsLaunching(false);
         if (isOrbitAchieved) {
           setStatusText('Orbit Achieved');
           setSimulationSuccess(true);
-          appendLog(`✅ Success! Satellite deployed at ${currentAlt}km orbit. Final Velocity: ${currentVel} m/s.`);
+          appendLog(`✅ Success! Satellite deployed at ${currentAlt}km orbit. Final Velocity: ${currentVel} m/s.`, nextProgress);
         } else {
           setStatusText('Sub-orbital / Burn Up');
           setSimulationSuccess(false);
-          appendLog(`❌ Failure: Insufficient Delta-V (${deltaV} m/s). Rocket fell back into the atmosphere.`);
+          appendLog(`❌ Failure: Insufficient Delta-V (${deltaV} m/s). Rocket fell back into the atmosphere.`, nextProgress);
         }
       }
     }, 100);
 
     return () => clearTimeout(timer);
-  }, [isLaunching, launchProgress]);
+  }, [isLaunching, launchProgress, appendLog, deltaV, isOrbitAchieved, totalWetMass]);
 
   const handleAnswerSubmit = (index: number) => {
     setSelectedAnswer(index);
