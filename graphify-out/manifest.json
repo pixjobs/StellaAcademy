@@ -1,0 +1,622 @@
+{
+  "frontend/components.json": {
+    "mtime": 1778840533.0889013,
+    "ast_hash": "77fbe2892215d7cd4b4316beba577a8d",
+    "semantic_hash": ""
+  },
+  "frontend/dotenv-config.js": {
+    "mtime": 1778840533.0889013,
+    "ast_hash": "713fa29665f9e52b949e5138c85ba7df",
+    "semantic_hash": ""
+  },
+  "frontend/eslint.config.mjs": {
+    "mtime": 1778840533.0889013,
+    "ast_hash": "a2b4486e82e11e640fa5b6b59023d5c4",
+    "semantic_hash": ""
+  },
+  "frontend/next-env.d.ts": {
+    "mtime": 1778840533.0889013,
+    "ast_hash": "ba64ff7d54714a8f64db89b1003207d8",
+    "semantic_hash": ""
+  },
+  "frontend/next.config.ts": {
+    "mtime": 1778840533.0889013,
+    "ast_hash": "97fe7d616b13b53206dc3245eb297ccd",
+    "semantic_hash": ""
+  },
+  "frontend/package.json": {
+    "mtime": 1778840533.090192,
+    "ast_hash": "1375570b774a4c08e4faf6f96702ba11",
+    "semantic_hash": ""
+  },
+  "frontend/postcss.config.js": {
+    "mtime": 1778840533.090192,
+    "ast_hash": "854b38759e7a8b4b82306ae2d9a3a833",
+    "semantic_hash": ""
+  },
+  "frontend/postcss.config.mjs": {
+    "mtime": 1778840533.090192,
+    "ast_hash": "675899342e765a4d16acd75a53389101",
+    "semantic_hash": ""
+  },
+  "frontend/src/app/about/page.tsx": {
+    "mtime": 1778840533.1061296,
+    "ast_hash": "53dbe3d8bcd954fec34f58709c9e47b1",
+    "semantic_hash": ""
+  },
+  "frontend/src/app/api/apod/route.ts": {
+    "mtime": 1778840533.1062138,
+    "ast_hash": "392cf074078c2ab0d398d8c7a231a28c",
+    "semantic_hash": ""
+  },
+  "frontend/src/app/api/llm/enqueue/route.ts": {
+    "mtime": 1778840533.1062818,
+    "ast_hash": "403d9657cbb6fe7d262c8a9fc70e6f94",
+    "semantic_hash": ""
+  },
+  "frontend/src/app/api/nivl/route.ts": {
+    "mtime": 1778840533.1062818,
+    "ast_hash": "c89494380f994832e8a07fcbe60637bd",
+    "semantic_hash": ""
+  },
+  "frontend/src/app/api/search-nasa/route.ts": {
+    "mtime": 1778840533.1062818,
+    "ast_hash": "3916b442ed4dab1fce5a4c5195abdbb1",
+    "semantic_hash": ""
+  },
+  "frontend/src/app/layout.tsx": {
+    "mtime": 1778840533.1062818,
+    "ast_hash": "cd98f6e6d417537f27a1e9480e622e4b",
+    "semantic_hash": ""
+  },
+  "frontend/src/app/missions/earth-observer/page.tsx": {
+    "mtime": 1778840533.1067123,
+    "ast_hash": "18b6b28880465e3344d451816e234c2b",
+    "semantic_hash": ""
+  },
+  "frontend/src/app/missions/rocket-lab/page.tsx": {
+    "mtime": 1778840533.1067123,
+    "ast_hash": "26895304eb6e9f4cb9dec59d08eeebe4",
+    "semantic_hash": ""
+  },
+  "frontend/src/app/missions/space-poster/page.tsx": {
+    "mtime": 1778840533.1067123,
+    "ast_hash": "b85e5cd6cf4ba160b9256f3a0bbdef3e",
+    "semantic_hash": ""
+  },
+  "frontend/src/app/page.tsx": {
+    "mtime": 1778840533.1067123,
+    "ast_hash": "5f651152ae152bdeaafbbcd3175e0b75",
+    "semantic_hash": ""
+  },
+  "frontend/src/app/providers.tsx": {
+    "mtime": 1778840533.1067123,
+    "ast_hash": "15df18a437f4ae7ac253919159f79802",
+    "semantic_hash": ""
+  },
+  "frontend/src/app/sign-in/[[...rest]]/page.tsx": {
+    "mtime": 1778840533.1071384,
+    "ast_hash": "0e948928b038db6eb90d8a58502a5d85",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/AboutContent.tsx": {
+    "mtime": 1778840533.1071384,
+    "ast_hash": "55be5b98ee0a97c846cff77e48c8717d",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/AppBackground.tsx": {
+    "mtime": 1778840533.1073105,
+    "ast_hash": "4f848285a117da4196a4573a4bbde217",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/ChatDisplay.tsx": {
+    "mtime": 1778840533.1073105,
+    "ast_hash": "140b53615dc36afc651a4700213c8163",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/ChatInput.tsx": {
+    "mtime": 1778840533.1073105,
+    "ast_hash": "d166f9fa2d40e576e4dc4bca3132dcda",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/ConditionalBackgrounds.tsx": {
+    "mtime": 1778840533.1073105,
+    "ast_hash": "63be72fa3d682a03661ae2a19ab173d1",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/Footer.tsx": {
+    "mtime": 1778840533.1073105,
+    "ast_hash": "1df6a7b0b551b059e17d7da79ea14109",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/GSAPProvider.tsx": {
+    "mtime": 1778840533.1073105,
+    "ast_hash": "30020fd8e0f251e4ede4288000610450",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/Header.tsx": {
+    "mtime": 1778840533.1073105,
+    "ast_hash": "da23e70bff7ffef0e0bf479c449eaee4",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/ImageSelector.tsx": {
+    "mtime": 1778840533.1073105,
+    "ast_hash": "6890005a076a426e5d333ffb02874b8d",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/IntroOverlay.tsx": {
+    "mtime": 1778840533.1073105,
+    "ast_hash": "55073eff45332ca16b941c0fd13ba41b",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/KatexDemo.tsx": {
+    "mtime": 1778840533.1073105,
+    "ast_hash": "9c85e42353c6b94e5355b037bd116cfa",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/MarkdownRenderer.tsx": {
+    "mtime": 1778840533.1073105,
+    "ast_hash": "7c16dd3bd8fe7d6f6e5ec6ec8f529e6f",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/MissionControl.tsx": {
+    "mtime": 1778840533.1073105,
+    "ast_hash": "4368f3db8f40733f31a6d6b59f31b38f",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/MissionStandby.tsx": {
+    "mtime": 1778840533.1073105,
+    "ast_hash": "e2a06fe38b9d416886522427a3bb0a6e",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/NotebookPanel.tsx": {
+    "mtime": 1778840533.1073105,
+    "ast_hash": "9add61e3f566981a36d77d5f7be77d7a",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/TopicSelector.tsx": {
+    "mtime": 1778840533.1073105,
+    "ast_hash": "8b81a7bee77ec7b9f9f51ff25f6f4444",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/WarpDrive.tsx": {
+    "mtime": 1778840533.1073105,
+    "ast_hash": "68069e6f26cc35c973d0fce764563798",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/ui/button.tsx": {
+    "mtime": 1778840533.1073105,
+    "ast_hash": "daff78990827ab44b654e46280a67552",
+    "semantic_hash": ""
+  },
+  "frontend/src/components/ui/tooltip.tsx": {
+    "mtime": 1778840533.108213,
+    "ast_hash": "ea2ca29252e545300826266c86c88fe2",
+    "semantic_hash": ""
+  },
+  "frontend/src/hooks/useMissionChat.ts": {
+    "mtime": 1778840533.108213,
+    "ast_hash": "0f127ba5caf0f166fd2ff69579ec4b3f",
+    "semantic_hash": ""
+  },
+  "frontend/src/hooks/useMissionPlanGenerator.ts": {
+    "mtime": 1778840533.1083019,
+    "ast_hash": "4026df76bacb24080e9287cd049ec64e",
+    "semantic_hash": ""
+  },
+  "frontend/src/hooks/useTutorPreflightGenerator.ts": {
+    "mtime": 1778840533.1083019,
+    "ast_hash": "7982075ccb6b4c65d14f60d1bf740ac1",
+    "semantic_hash": ""
+  },
+  "frontend/src/lib/apod.shared.ts": {
+    "mtime": 1778840533.1083019,
+    "ast_hash": "61bfba35a30dded2bdb5910340eac663",
+    "semantic_hash": ""
+  },
+  "frontend/src/lib/apod.ts": {
+    "mtime": 1778840533.1084657,
+    "ast_hash": "e32ee3eb97ce1d6177c8a331d42712d0",
+    "semantic_hash": ""
+  },
+  "frontend/src/lib/cloudTasks.ts": {
+    "mtime": 1778840533.1084657,
+    "ast_hash": "0d19e56dbe8ce74dda5215045b9ebb3d",
+    "semantic_hash": ""
+  },
+  "frontend/src/lib/data/missions.ts": {
+    "mtime": 1778840533.1084657,
+    "ast_hash": "7318a93a1e4cb88127f06888a79fb7c3",
+    "semantic_hash": ""
+  },
+  "frontend/src/lib/firebase/admin.ts": {
+    "mtime": 1778840533.1084657,
+    "ast_hash": "842069667880a0e5a3d6b641d1344c87",
+    "semantic_hash": ""
+  },
+  "frontend/src/lib/llm-client.ts": {
+    "mtime": 1778840533.1084657,
+    "ast_hash": "3e56547df34031bcd7288f75047227cb",
+    "semantic_hash": ""
+  },
+  "frontend/src/lib/llm/links.ts": {
+    "mtime": 1778840533.1084657,
+    "ast_hash": "cc384c91099a8526e74ba538f8d4d176",
+    "semantic_hash": ""
+  },
+  "frontend/src/lib/llmUtils.ts": {
+    "mtime": 1778840533.1084657,
+    "ast_hash": "0fd2158ee0366e639930b4e1951ccd6b",
+    "semantic_hash": ""
+  },
+  "frontend/src/lib/nasa.ts": {
+    "mtime": 1778840533.1084657,
+    "ast_hash": "5a0a972a6c2197bd08f4993e641f7af4",
+    "semantic_hash": ""
+  },
+  "frontend/src/lib/notes/NotesContext.tsx": {
+    "mtime": 1778840533.1084657,
+    "ast_hash": "ae5f20af209839f13d246364e4017371",
+    "semantic_hash": ""
+  },
+  "frontend/src/lib/notes/storage.ts": {
+    "mtime": 1778840533.1090128,
+    "ast_hash": "8dfe4c9a25b40c38652148ad30c73d4c",
+    "semantic_hash": ""
+  },
+  "frontend/src/lib/search.ts": {
+    "mtime": 1778840533.1090128,
+    "ast_hash": "8c41bf240b839647dd6854e915cdf54a",
+    "semantic_hash": ""
+  },
+  "frontend/src/lib/store.ts": {
+    "mtime": 1778840533.1090128,
+    "ast_hash": "995cff8da72f692bf46fb5f5c08f3629",
+    "semantic_hash": ""
+  },
+  "frontend/src/lib/task-client.ts": {
+    "mtime": 1778840533.1090128,
+    "ast_hash": "462fa760d071adf061b18ce90bd157ed",
+    "semantic_hash": ""
+  },
+  "frontend/src/lib/utils.ts": {
+    "mtime": 1778840533.1090128,
+    "ast_hash": "5a6fd53fdcf2be529e9cc0b718fde352",
+    "semantic_hash": ""
+  },
+  "frontend/src/lib/warp.ts": {
+    "mtime": 1778840533.1090128,
+    "ast_hash": "7b2f86dc1d353dcdba216af5e104993d",
+    "semantic_hash": ""
+  },
+  "frontend/src/middleware.ts": {
+    "mtime": 1778840533.1090128,
+    "ast_hash": "56fa6b9f8d0916cc27d84a3bba7c80b2",
+    "semantic_hash": ""
+  },
+  "frontend/src/types/llm.ts": {
+    "mtime": 1778840533.1090128,
+    "ast_hash": "daa1ec5dfc8001e6b5e9d36e39c42c02",
+    "semantic_hash": ""
+  },
+  "frontend/src/types/mission.ts": {
+    "mtime": 1778840533.109493,
+    "ast_hash": "00fa306114d6e526bc8fa5a21be46e88",
+    "semantic_hash": ""
+  },
+  "frontend/src/utils/normalizeMath.ts": {
+    "mtime": 1778840533.109493,
+    "ast_hash": "194c483023a7b1a078137ab887cb4246",
+    "semantic_hash": ""
+  },
+  "frontend/src/workers/ollama/apis/apod.ts": {
+    "mtime": 1778840533.109632,
+    "ast_hash": "cdb0fef34fba11ed7afe1669fabebaaa",
+    "semantic_hash": ""
+  },
+  "frontend/src/workers/ollama/apis/epic.ts": {
+    "mtime": 1778840533.1096926,
+    "ast_hash": "8e3b48bb7279db8120ed271a10a23e10",
+    "semantic_hash": ""
+  },
+  "frontend/src/workers/ollama/apis/http.ts": {
+    "mtime": 1778840533.1096926,
+    "ast_hash": "fc41d1b87f4fb8d6e4095397fecdf75a",
+    "semantic_hash": ""
+  },
+  "frontend/src/workers/ollama/apis/index.ts": {
+    "mtime": 1778840533.1096926,
+    "ast_hash": "d5fea1faeb2d1d5491db80d607bcc79b",
+    "semantic_hash": ""
+  },
+  "frontend/src/workers/ollama/apis/mars.ts": {
+    "mtime": 1778840533.1096926,
+    "ast_hash": "0079b9cdfef7b1deaf6bfff0aa28af43",
+    "semantic_hash": ""
+  },
+  "frontend/src/workers/ollama/apis/nivl.ts": {
+    "mtime": 1778840533.1096926,
+    "ast_hash": "879e61d0924c1aaa87395f0d5124620c",
+    "semantic_hash": ""
+  },
+  "frontend/src/workers/ollama/boot.ts": {
+    "mtime": 1778840533.1096926,
+    "ast_hash": "627cdb8732909e9c263515bb2f20317a",
+    "semantic_hash": ""
+  },
+  "frontend/src/workers/ollama/context.ts": {
+    "mtime": 1778840533.1096926,
+    "ast_hash": "97d55284ec87e622d297e739f6df2489",
+    "semantic_hash": ""
+  },
+  "frontend/src/workers/ollama/job-handlers.ts": {
+    "mtime": 1778840533.1096926,
+    "ast_hash": "38e1ee1c14ef9f8fd50cd392a713a654",
+    "semantic_hash": ""
+  },
+  "frontend/src/workers/ollama/llm-bottleneck.ts": {
+    "mtime": 1778840533.1096926,
+    "ast_hash": "62b705b43788232fe6c3ad20678997de",
+    "semantic_hash": ""
+  },
+  "frontend/src/workers/ollama/llm-post-processing.ts": {
+    "mtime": 1778840533.1096926,
+    "ast_hash": "860976257ef58f59d49c5db19efe944f",
+    "semantic_hash": ""
+  },
+  "frontend/src/workers/ollama/locks.ts": {
+    "mtime": 1778840533.1096926,
+    "ast_hash": "a8062c4361e6e1cef7b299086ba89e30",
+    "semantic_hash": ""
+  },
+  "frontend/src/workers/ollama/mission-computer.ts": {
+    "mtime": 1778840533.1096926,
+    "ast_hash": "08c44c1fa41bba0ca60a6c92ef60a18c",
+    "semantic_hash": ""
+  },
+  "frontend/src/workers/ollama/mission-computer/missions/celestialInvestigator.ts": {
+    "mtime": 1778840533.1102862,
+    "ast_hash": "5202b0566f95c01f3a3078377b3897bd",
+    "semantic_hash": ""
+  },
+  "frontend/src/workers/ollama/mission-computer/missions/earthObserver.ts": {
+    "mtime": 1778840533.1103458,
+    "ast_hash": "57527594c9431cfd6c9331137e00e3a2",
+    "semantic_hash": ""
+  },
+  "frontend/src/workers/ollama/mission-computer/missions/rocketLab.ts": {
+    "mtime": 1778840533.1103458,
+    "ast_hash": "0bde05655f0b5e6a99996a990d60a95f",
+    "semantic_hash": ""
+  },
+  "frontend/src/workers/ollama/mission-computer/missions/roverCam.ts": {
+    "mtime": 1778840533.1103458,
+    "ast_hash": "c1a26f6d0fa09eb0066e839fee764966",
+    "semantic_hash": ""
+  },
+  "frontend/src/workers/ollama/mission-computer/missions/spacePoster.ts": {
+    "mtime": 1778840533.1103458,
+    "ast_hash": "9005bda6fc4d543d6afa2ed85a5019f6",
+    "semantic_hash": ""
+  },
+  "frontend/src/workers/ollama/mission-computer/shared/core.ts": {
+    "mtime": 1778840533.1103458,
+    "ast_hash": "1ce8e9d29fa24d65c700a14672070f85",
+    "semantic_hash": ""
+  },
+  "frontend/src/workers/ollama/mission-computer/shared/llm-call.ts": {
+    "mtime": 1778840533.1107528,
+    "ast_hash": "7d9e65aaf670c415c7ca2f34d44e980d",
+    "semantic_hash": ""
+  },
+  "frontend/src/workers/ollama/mission-computer/shared/prompts.ts": {
+    "mtime": 1778840533.1107528,
+    "ast_hash": "9a690d5b3dfd9de749d7f1ca80c999bb",
+    "semantic_hash": ""
+  },
+  "frontend/src/workers/ollama/mission-computer/shared/types.ts": {
+    "mtime": 1778840533.1107528,
+    "ast_hash": "d2d33cb9e11a3a9191df74008d95b8e8",
+    "semantic_hash": ""
+  },
+  "frontend/src/workers/ollama/mission-computer/shared/variety.ts": {
+    "mtime": 1778840533.1107528,
+    "ast_hash": "6d462571e4fc65add2adae86d450302c",
+    "semantic_hash": ""
+  },
+  "frontend/src/workers/ollama/mission-library.ts": {
+    "mtime": 1778840533.1107528,
+    "ast_hash": "a07d7d1f6017c1cf36bbb28de7f5977d",
+    "semantic_hash": ""
+  },
+  "frontend/src/workers/ollama/ollama-client.ts": {
+    "mtime": 1778840533.1107528,
+    "ast_hash": "12eeedcbd31eccf3d29ac9ef57b5d1c5",
+    "semantic_hash": ""
+  },
+  "frontend/src/workers/ollama/parsing/json.ts": {
+    "mtime": 1778840533.1107528,
+    "ast_hash": "8cbd13877c5fd918ed9de621972c27e9",
+    "semantic_hash": ""
+  },
+  "frontend/src/workers/ollama/preflight-library.ts": {
+    "mtime": 1778840533.1107528,
+    "ast_hash": "e8b5bde1ebeb8f14f20fd48597b3c2f4",
+    "semantic_hash": ""
+  },
+  "frontend/src/workers/ollama/prompts/audience.ts": {
+    "mtime": 1778840533.1107528,
+    "ast_hash": "b00710f1a97ed5fed48c2be3e9be7635",
+    "semantic_hash": ""
+  },
+  "frontend/src/workers/ollama/prompts/builders.ts": {
+    "mtime": 1778840533.111229,
+    "ast_hash": "a9958d57ca2dafd61d1e9c365ff6becb",
+    "semantic_hash": ""
+  },
+  "frontend/src/workers/ollama/prompts/index.ts": {
+    "mtime": 1778840533.111229,
+    "ast_hash": "a2f2f8115310ff6fa794b9cf09cf8217",
+    "semantic_hash": ""
+  },
+  "frontend/src/workers/ollama/prompts/templates.ts": {
+    "mtime": 1778840533.111229,
+    "ast_hash": "6247cf989fa6c074de16aae3d9ef73cb",
+    "semantic_hash": ""
+  },
+  "frontend/src/workers/ollama/seed.ts": {
+    "mtime": 1778840533.111229,
+    "ast_hash": "d6ca1cf8dd4981df7518e17d0af938ac",
+    "semantic_hash": ""
+  },
+  "frontend/src/workers/ollama/server.ts": {
+    "mtime": 1778840533.111229,
+    "ast_hash": "f9a3d5e8ce996d4a57b05f25eb0fd3c9",
+    "semantic_hash": ""
+  },
+  "frontend/src/workers/ollama/utils.ts": {
+    "mtime": 1778840533.111229,
+    "ast_hash": "2cc7cb75cd83c46c85407f5d9836c37d",
+    "semantic_hash": ""
+  },
+  "frontend/src/workers/ollama/utils/logger.ts": {
+    "mtime": 1778840533.111229,
+    "ast_hash": "38ae6613cbf35b3d4c72a05087448339",
+    "semantic_hash": ""
+  },
+  "frontend/src/workers/shims/search.d.ts": {
+    "mtime": 1778840533.111229,
+    "ast_hash": "9147eaabddfa191cc8217158e2fb501a",
+    "semantic_hash": ""
+  },
+  "frontend/tailwind.config.js": {
+    "mtime": 1778840533.111229,
+    "ast_hash": "9499f3c4f48ab8038af1cff34cee32fe",
+    "semantic_hash": ""
+  },
+  "frontend/tsconfig.json": {
+    "mtime": 1778840533.111229,
+    "ast_hash": "ec85845ca3825dde2d192dc1704f22ae",
+    "semantic_hash": ""
+  },
+  "frontend/tsconfig.worker.json": {
+    "mtime": 1778840533.111229,
+    "ast_hash": "fa8e41746d7a8dbb6f91738122d3d631",
+    "semantic_hash": ""
+  },
+  "DEPLOYMENT.md": {
+    "mtime": 1778840533.088047,
+    "ast_hash": "6b13f07c5f46af646fa7927fb414f1b7",
+    "semantic_hash": ""
+  },
+  "README.MD": {
+    "mtime": 1778840533.0881922,
+    "ast_hash": "9b0c78ecd456f7001485404c3f6f37ec",
+    "semantic_hash": ""
+  },
+  "frontend/cloudbuild.web.yaml": {
+    "mtime": 1778840533.0889013,
+    "ast_hash": "4ccae02462e17c90e2e4e7720430d914",
+    "semantic_hash": ""
+  },
+  "frontend/cloudbuild.worker.yaml": {
+    "mtime": 1778840533.0889013,
+    "ast_hash": "18142200a6102db37acf03678b3cf7ae",
+    "semantic_hash": ""
+  },
+  "frontend/public/file.svg": {
+    "mtime": 1778840533.090192,
+    "ast_hash": "d09f95206c3fa0bb9bd9fefabfd0ea71",
+    "semantic_hash": ""
+  },
+  "frontend/public/globe.svg": {
+    "mtime": 1778840533.0912862,
+    "ast_hash": "2aaafa6a49b6563925fe440891e32717",
+    "semantic_hash": ""
+  },
+  "frontend/public/next.svg": {
+    "mtime": 1778840533.0912862,
+    "ast_hash": "8e061864f388b47f33a1c3780831193e",
+    "semantic_hash": ""
+  },
+  "frontend/public/stella.png": {
+    "mtime": 1778840533.0912862,
+    "ast_hash": "49ae5fd6ec734c61eddb72452aad0e98",
+    "semantic_hash": ""
+  },
+  "frontend/public/textures/2k_earth_clouds.jpg": {
+    "mtime": 1778840533.0921922,
+    "ast_hash": "d5113e6270051ef18c43aea3fe324c3e",
+    "semantic_hash": ""
+  },
+  "frontend/public/textures/2k_earth_daymap.jpg": {
+    "mtime": 1778840533.0951922,
+    "ast_hash": "eec7a2f8c47c27b5c5904b484b717986",
+    "semantic_hash": ""
+  },
+  "frontend/public/textures/2k_jupiter.jpg": {
+    "mtime": 1778840533.0961921,
+    "ast_hash": "bac68e493761c440a887576dd39409c3",
+    "semantic_hash": ""
+  },
+  "frontend/public/textures/2k_mars.jpg": {
+    "mtime": 1778840533.0971923,
+    "ast_hash": "b30dc37a707e6b4fc18da6de15997b95",
+    "semantic_hash": ""
+  },
+  "frontend/public/textures/2k_mercury.jpg": {
+    "mtime": 1778840533.0971923,
+    "ast_hash": "6e2825332ce2838939ae17f230412466",
+    "semantic_hash": ""
+  },
+  "frontend/public/textures/2k_moon.jpg": {
+    "mtime": 1778840533.0991921,
+    "ast_hash": "833cdd47d60b5ada5141b5558f1b0f0f",
+    "semantic_hash": ""
+  },
+  "frontend/public/textures/2k_neptune.jpg": {
+    "mtime": 1778840533.1001923,
+    "ast_hash": "17c1bff0c64a6a511e7ae707b660bf0f",
+    "semantic_hash": ""
+  },
+  "frontend/public/textures/2k_saturn.jpg": {
+    "mtime": 1778840533.1011922,
+    "ast_hash": "e758b798d7d9622429374b804940e77f",
+    "semantic_hash": ""
+  },
+  "frontend/public/textures/2k_saturn_ring_alpha.png": {
+    "mtime": 1778840533.1011922,
+    "ast_hash": "deeecd9f9f03ecbff7e0ba4f0b91201a",
+    "semantic_hash": ""
+  },
+  "frontend/public/textures/2k_sun.jpg": {
+    "mtime": 1778840533.1021922,
+    "ast_hash": "7ce3a845bb3ca672ddd6660fd477de1f",
+    "semantic_hash": ""
+  },
+  "frontend/public/textures/2k_uranus.jpg": {
+    "mtime": 1778840533.1031923,
+    "ast_hash": "0465fbad731bbca3d6c88d36ee524a1c",
+    "semantic_hash": ""
+  },
+  "frontend/public/textures/2k_venus_atmosphere.jpg": {
+    "mtime": 1778840533.1041923,
+    "ast_hash": "cb5877bec89f723cec7d30742fcf105d",
+    "semantic_hash": ""
+  },
+  "frontend/public/textures/2k_venus_surface.jpg": {
+    "mtime": 1778840533.1051922,
+    "ast_hash": "f3fc899218b29c879af0976bbd78bd25",
+    "semantic_hash": ""
+  },
+  "frontend/public/vercel.svg": {
+    "mtime": 1778840533.1051922,
+    "ast_hash": "c0af2f507b369b085b35ef4bbe3bcf1e",
+    "semantic_hash": ""
+  },
+  "frontend/public/window.svg": {
+    "mtime": 1778840533.1051922,
+    "ast_hash": "a2760511c65806022ad20adf74370ff3",
+    "semantic_hash": ""
+  }
+}

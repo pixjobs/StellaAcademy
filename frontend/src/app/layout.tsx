@@ -3,12 +3,9 @@ import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 
 import './globals.css';
-import 'katex/dist/katex.min.css';
 
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import GSAPProvider from '@/components/GSAPProvider';
-import ConditionalBackgrounds from '@/components/ConditionalBackgrounds';
 import Providers from './providers';
 
 export const metadata: Metadata = { title: 'Stella Academy' };
@@ -27,14 +24,19 @@ export default async function RootLayout({ children }: RootLayoutProps) {
 
   let bgUrl: string | undefined;
   if (useApod) {
-    try {
-      // Server-only import; executes per-request thanks to force-dynamic
-      const { getApod } = await import('@/lib/apod');
-      const apod = await getApod();
-      bgUrl = apod?.bgUrl ?? undefined;
-    } catch (err) {
-      console.warn('[layout] Failed to load APOD background:', err);
-      bgUrl = undefined;
+    // Simple APOD fetch without secrets (educational use)
+    const apiKey = process.env.NASA_API_KEY || '';
+    if (apiKey) {
+      try {
+        const date = new Date().toISOString().slice(0, 10);
+        const response = await fetch(`https://api.nasa.gov/planetary/apod?date=${date}&api_key=${apiKey}`);
+        if (response.ok) {
+          const data = await response.json();
+          bgUrl = data.url || undefined;
+        }
+      } catch (err) {
+        console.warn('[layout] Failed to load APOD background:', err);
+      }
     }
   }
 
@@ -47,16 +49,13 @@ export default async function RootLayout({ children }: RootLayoutProps) {
           'selection:bg-accent selection:text-accent-foreground',
         ].join(' ')}
       >
-        {/* Wrap the whole app in ClerkProvider via your Providers */}
+        {/* Wrap the whole app in Providers if needed - currently just passes children */}
         <Providers>
-          <GSAPProvider>
-            <ConditionalBackgrounds url={bgUrl} />
-            <div className="relative z-20 flex min-h-screen flex-col">
-              <Header />
-              <main className="flex-1">{children}</main>
-              <Footer />
-            </div>
-          </GSAPProvider>
+          <div className="relative z-20 flex min-h-screen flex-col">
+            <Header />
+            <main className="flex-1">{children}</main>
+            <Footer />
+          </div>
         </Providers>
       </body>
     </html>

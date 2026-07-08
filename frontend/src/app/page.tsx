@@ -1,128 +1,140 @@
 'use client';
 
-import { useEffect } from 'react';
-import gsap from 'gsap';         
-import Link from 'next/link';        
-import { useGame } from '@/lib/store';
-import type { Role } from '@/lib/store'; 
-import IntroOverlay from '@/components/IntroOverlay';
+import { Suspense } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import './globals.css';
 
-const roles: { id: Role; label: string; blurb: string; persona: string }[] = [
-  { id: 'explorer', label: 'Explorer (Kid)', blurb: 'Explore amazing space pictures with a friendly guide.', persona: 'You are Stella, a cheerful...' },
-  { id: 'cadet', label: 'Cadet (Teen)', blurb: 'Analyze mission data and form hypotheses with a co-pilot.', persona: 'You are Stella, a sharp...' },
-  { id: 'scholar', label: 'Scholar (Uni)', blurb: 'Conduct deep analysis and collaborate with an AI research partner.', persona: 'You are Stella, a sophisticated...' },
-];
+interface SpaceFact {
+  id: string;
+  title: string;
+  description: string;
+  image?: string;
+}
 
-const missions = [
-  { id: 'rocket-lab', title: 'Rocket Lab', href: '/missions/rocket-lab', tasks: { explorer: 'Help Stella name 3 rocket parts for a pre-launch check!', cadet: 'Analyze launch conditions and decide if it’s a "Go" or "No Go".', scholar: 'Interpret simulated telemetry data to identify a launch anomaly.' } },
-  { id: 'earth-observer', title: 'Earth Observer', href: '/missions/earth-observer', tasks: { explorer: 'Find your home continent and ask Stella what the weather is like!', cadet: 'Identify a major storm system and ask Stella to explain its scientific name.', scholar: 'Analyze cloud patterns to deduce the season in a hemisphere and justify it.' } },
-  { id: 'space-poster', title: 'Space Poster', href: '/missions/space-poster', tasks: { explorer: 'Pick a space photo and ask Stella to write a cool poem about it.', cadet: 'Write a scientific caption for a NASA photo and have Stella edit it.', scholar: 'Co-write a research abstract about a cosmic event with Stella.' } },
+const spaceFacts: SpaceFact[] = [
+  { 
+    id: '1', 
+    title: 'The Moon is Drifting Away', 
+    description: 'The Moon is currently moving away from Earth at about 3.8 cm per year. It will continue to do so for billions of years.'
+  },
+  { 
+    id: '2', 
+    title: 'Mars is Half the Size of Earth', 
+    description: 'Mars has a diameter of about 6,779 km, about half that of Earth. This explains why it has such weak gravity.'
+  },
+  { 
+    id: '3', 
+    title: 'The Great Red Spot', 
+    description: 'Jupiter\'s Great Red Spot is a storm that has been raging for at least 400 years. It is large enough to contain two or three Earths.'
+  },
+  { 
+    id: '4', 
+    title: 'There\'s Water on the Moon', 
+    description: 'NASA discovered water ice in permanently shadowed craters on the Moon. This could be a valuable resource for future lunar missions.'
+  },
+  { 
+    id: '5', 
+    title: 'Stars are Born in Dust Clouds', 
+    description: 'Stars are born in dense clouds of gas and dust called nebulae. Over millions of years, gravity pulls these materials together.'
+  },
 ];
 
 export default function Home() {
-  const { role, setRole, started, setStarted } = useGame();
-
-  useEffect(() => {
-    if (!started) return;
-    gsap.fromTo(
-      '.mission-card',
-      { opacity: 0, y: 10 },
-      { opacity: 1, y: 0, duration: 0.45, ease: 'power2.out', stagger: 0.075 }
-    );
-  }, [started]);
-
   return (
-    <>
-      {!started && (
-        <IntroOverlay
-          onStart={() => {
-            window.dispatchEvent(new Event('stella:warp'));
-            setStarted(true);
-            window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior  });
-          }}
+    <main className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-900 to-slate-900 text-white">
+      {/* Hero Section */}
+      <section className="relative py-20 px-4">
+        <div className="max-w-6xl mx-auto text-center">
+          <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
+            Stella Academy
+          </h1>
+          <p className="text-xl text-slate-300 mb-8">
+            Exploring the cosmos through knowledge, imagination, and discovery.
+          </p>
+          <Link 
+            href="/about" 
+            className="inline-block bg-purple-600 hover:bg-purple-700 text-white px-8 py-3 rounded-lg transition-colors"
+          >
+            Start Exploring →
+          </Link>
+        </div>
+      </section>
 
-          title="Welcome to Stella Academy 🌟"
-          copy="You’re signed in — great! I’m Stella, your interactive space tutor. Choose a learning path and I’ll guide you with quick, friendly challenges."
-          badges={['Interactive Analysis', 'Creative Co-writing', 'Personalised Learning']}
-          ctaLabel="▶ Press Start"
-          imageSrc="/stella.png"
-        >
-
-          <div className="grid grid-cols-3 gap-2">
-            {roles.map((r) => (
-              <button
-                key={r.id}
-                onClick={() => setRole(r.id)}
-                className={`rounded border border-white/15 bg-white/5 px-3 py-2 text-left hover:bg-white/10 transition ${
-                  role === r.id ? 'outline outline-1 outline-mint' : ''
-                }`}
-              >
-                <div className="font-pixel text-xs text-white">{r.label}</div>
-                <div className="text-[11px] text-slate-300">{r.blurb}</div>
-              </button>
-            ))}
-          </div>
-        </IntroOverlay>
-      )}
-
-      {started && (
-        <section className="container mx-auto px-4 py-10 max-w-5xl">
-          <div className="rounded-2xl bg-slate-900/60 p-6 shadow-pixel mb-8 border border-white/10 backdrop-blur-md">
-            <h1 className="font-pixel text-2xl text-gold mb-2">Stella Academy 🌟</h1>
-            <p className="text-slate-300">
-              Welcome to <strong className="text-gold">Stella Academy</strong> — your interactive space tutor. Choose a role and a mission, and Stella will teach, quiz, and explore the cosmos with you — powered by <span className="text-mint">gpt-oss-20b</span>.
-            </p>
-          </div>
-
-          <div className="rounded-2xl bg-slate-900/60 p-6 shadow-pixel mb-8 border border-white/10 backdrop-blur-md">
-            <h2 className="font-pixel text-xl text-sky mb-4">Choose your learning path</h2>
-            <div className="grid sm:grid-cols-3 gap-3">
-              {roles.map((r) => (
-                <button
-                  key={r.id}
-                  onClick={() => setRole(r.id)}
-                  className={`rounded-xl border-2 px-4 py-3 text-left transition h-full
-                    ${role === r.id
-                      ? 'border-mint bg-slate-800/80 shadow-lg'
-                      : 'border-slate-700 hover:border-slate-500 hover:bg-slate-800/40'}`}
-                >
-                  <div className={`font-pixel text-sm ${role === r.id ? 'text-white' : 'text-slate-200'}`}>{r.label}</div>
-                  <div className="text-xs text-slate-400">{r.blurb}</div>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="rounded-2xl bg-slate-900/60 p-6 shadow-pixel mb-8 border border-white/10 backdrop-blur-md">
-            <h2 className="font-pixel text-xl text-sky mb-4">Select a Mission</h2>
-            <div className="grid md:grid-cols-3 gap-4">
-              {missions.map((m) => (
-                <div key={m.id} className="mission-card rounded-xl border border-slate-700 bg-slate-800/40 p-4 flex flex-col">
-                  <div className="flex-grow">
-                    <div className="font-pixel text-base text-gold mb-2">{m.title}</div>
-                    <p className="text-xs text-slate-300 mb-3">
-                      <span className="font-bold text-sky">Your Task: </span>
-                      {m.tasks[role || 'explorer']}
-                    </p>
-                  </div>
-                  <div className="flex items-center justify-between mt-2">
-                    <span className="text-xs text-slate-400">★ Interactive AI Challenge</span>
-                    <Link href={m.href} className="btn-pixel font-pixel text-xs" aria-label={`Open ${m.title}`}>
-                      Launch
-                    </Link>
-                  </div>
+      {/* Featured Section */}
+      <section className="max-w-6xl mx-auto px-4 -mt-10">
+        <div className="bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 p-8 shadow-xl">
+          <h2 className="text-3xl font-bold mb-6">Featured Discoveries</h2>
+          <div className="grid md:grid-cols-2 gap-8">
+            <div className="space-y-4">
+              {spaceFacts.map((fact) => (
+                <div key={fact.id} className="space-y-2">
+                  <h3 className="text-xl font-semibold text-cyan-400">{fact.title}</h3>
+                  <p className="text-slate-300">{fact.description}</p>
                 </div>
               ))}
             </div>
+            <div className="border-l-2 border-purple-500 pl-8">
+              <h3 className="text-2xl font-bold mb-4 text-purple-400">Why This Matters</h3>
+              <p className="text-slate-300 mb-4">
+                Space exploration drives technological advancement and inspires the next generation of scientists and engineers.
+              </p>
+              
+              {/* Mock NASA APOD */}
+              <div className="rounded-lg overflow-hidden">
+                <img 
+                  src="https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?w=600&h=400&fit=crop" 
+                  alt="Stunning cosmic landscape"
+                  className="w-full h-48 object-cover"
+                />
+                <div className="bg-black/50 p-4 text-sm text-slate-300">
+                  Sample NASA Astronomy Picture of the Day (APOD)
+                </div>
+              </div>
+            </div>
           </div>
+        </div>
+      </section>
 
-          <div className="rounded-2xl bg-slate-900/60 p-4 shadow-pixel border border-white/10 backdrop-blur-md">
-            <p className="text-[11px] text-slate-400">
-              <strong>How it works:</strong> Inside each mission, our AI guide, Stella, uses your chosen role to personalise challenges and help. This project shows how <span className="text-mint font-bold">gpt-oss</span> creates adaptive learning experiences.
-            </p>
-          </div>
-        </section>
-      )}
-    </>
+      {/* Quick Links */}
+      <section className="max-w-6xl mx-auto px-4 py-16">
+        <h2 className="text-2xl font-bold mb-6">Explore More</h2>
+        <div className="grid md:grid-cols-3 gap-4">
+          <Link 
+            href="/about" 
+            className="bg-slate-800/50 hover:bg-slate-700/50 border border-slate-600 rounded-xl p-6 transition-colors"
+          >
+            <div className="text-3xl mb-2">📚</div>
+            <h3 className="font-bold text-lg mb-1">Learn</h3>
+            <p className="text-sm text-slate-400">Browse our space knowledge</p>
+          </Link>
+          
+          <Link 
+            href="/missions" 
+            className="bg-slate-800/50 hover:bg-slate-700/50 border border-slate-600 rounded-xl p-6 transition-colors"
+          >
+            <div className="text-3xl mb-2">🚀</div>
+            <h3 className="font-bold text-lg mb-1">Missions</h3>
+            <p className="text-sm text-slate-400">Interactive learning challenges</p>
+          </Link>
+          
+          <Link 
+            href="/gallery" 
+            className="bg-slate-800/50 hover:bg-slate-700/50 border border-slate-600 rounded-xl p-6 transition-colors"
+          >
+            <div className="text-3xl mb-2">🖼️</div>
+            <h3 className="font-bold text-lg mb-1">Gallery</h3>
+            <p className="text-sm text-slate-400">Visual space discoveries</p>
+          </Link>
+        </div>
+      </section>
+
+      {/* Footer Simple */}
+      <footer className="border-t border-white/10 mt-16 py-12">
+        <div className="max-w-6xl mx-auto px-4 text-center text-slate-400 text-sm">
+          <p>&copy; 2026 Stella Academy. Powered by open-source exploration.</p>
+        </div>
+      </footer>
+    </main>
   );
 }
