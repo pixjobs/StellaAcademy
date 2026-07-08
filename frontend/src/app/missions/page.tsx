@@ -13,7 +13,7 @@ export default function MissionsPage() {
         
         <div className="bg-white/5 p-8 rounded-xl">
           <p className="text-xl text-slate-300 mb-6">
-            This feature is under development. We're currently building our interactive mission experience with 
+            This feature is under development. We&apos;re currently building our interactive mission experience with 
             space-themed challenges and educational content.
           </p>
           

@@ -6,8 +6,6 @@
  * have been removed for simplicity.
  */
 
-import type { MarsPhoto } from "@/types/llm";
-
 /* -------------------------------------------------------------------------- */
 /*                                    Types                                   */
 /* -------------------------------------------------------------------------- */
@@ -142,6 +140,7 @@ export async function searchNIVL(
   q: string,
   opts?: { page?: number; limit?: number; expandAssets?: boolean; prefer?: "orig" | "large" | "any" }
 ): Promise<NivlItem[]> {
+  const { page, limit } = opts || {};
   const apiKey = process.env.NASA_API_KEY || '';
   
   if (!apiKey) {
@@ -174,7 +173,7 @@ export async function searchNIVL(
         title: media.title || '',
         description: media.description,
         sourceUrl: item.href,
-        thumbnailUrl: item.links?.[0]?.href || null,
+        thumbnailUrl: item.links?.[0]?.href || undefined,
       } : [];
     });
 
@@ -226,7 +225,7 @@ async function cachedJson<T>(
   if (cached) {
     if (now >= cached.fetchedAt + cached.soft) {
       // Soft expired - make a background refresh
-      doFetch(url, revalidateSeconds, 15000).catch(() => {});
+      doFetch(url, revalidateSeconds).catch(() => {});
     }
     if (now >= cached.fetchedAt + cached.hard) {
       jsonCache.delete(key as string);

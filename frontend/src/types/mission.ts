@@ -8,6 +8,25 @@
 
 // ---------- Shared Primitives ----------
 
+export const ALL_ROLES = ['explorer', 'cadet', 'scholar'] as const;
+export type Role = typeof ALL_ROLES[number];
+
+export const ALL_MISSION_TYPES = [
+  'rocket-lab',
+  'rover-cam',
+  'space-poster',
+  'earth-observer',
+  'celestial-investigator',
+] as const;
+export type MissionType = typeof ALL_MISSION_TYPES[number];
+
+export type LinkPreview = {
+  url: string;
+  title: string;
+  snippet: string;
+  faviconUrl: string;
+};
+
 /**
  * A branded type for unique identifiers. This prevents regular strings from being
  * assigned to ID fields by mistake, increasing type safety.

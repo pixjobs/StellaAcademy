@@ -16,7 +16,7 @@ export default function Footer() {
       <div className="max-w-6xl mx-auto text-center text-slate-400">
         <p className="text-sm mb-4">Quote of the Day</p>
         <blockquote className="text-slate-300 italic mb-4 text-lg">
-          "{QUOTES[Math.floor(Math.random() * QUOTES.length)]}"
+          &ldquo;{QUOTES[Math.floor(Math.random() * QUOTES.length)]}&rdquo;
         </blockquote>
         <div className="mt-8">
           <p>&copy; {year} Stella Academy. All rights reserved.</p>

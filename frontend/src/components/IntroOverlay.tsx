@@ -22,6 +22,7 @@ export default function IntroOverlay(props: IntroOverlayProps) {
     copy = `Exploring the cosmos through knowledge and discovery. Learn about space, view stunning imagery, and ignite your curiosity.`,
     badges = ['Education First', 'Space Exploration', 'Free & Open'],
     imageSrc = '/stella.png',
+    ctaLabel = 'Get Started',
   } = props;
 
   return (
