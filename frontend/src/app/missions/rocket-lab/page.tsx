@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { useGame } from '@/lib/store';
 
 // Constant parameters
 const PAYLOAD_MASS = 500; // kg (CubeSat payload)
@@ -52,6 +53,8 @@ const QUIZ_QUESTIONS: QuizQuestion[] = [
 ];
 
 export default function RocketLabPage() {
+  const { addStars, stars, level } = useGame();
+
   // Rocket configuration state
   const [dryMass, setDryMass] = useState(12000); // kg
   const [fuelMass, setFuelMass] = useState(45000); // kg
@@ -134,6 +137,7 @@ export default function RocketLabPage() {
           setStatusText('Orbit Achieved');
           setSimulationSuccess(true);
           appendLog(`✅ Success! Satellite deployed at ${currentAlt}km orbit. Final Velocity: ${currentVel} m/s.`, nextProgress);
+          addStars(50);
         } else {
           setStatusText('Sub-orbital / Burn Up');
           setSimulationSuccess(false);
@@ -143,13 +147,14 @@ export default function RocketLabPage() {
     }, 100);
 
     return () => clearTimeout(timer);
-  }, [isLaunching, launchProgress, appendLog, deltaV, isOrbitAchieved, totalWetMass]);
+  }, [isLaunching, launchProgress, appendLog, deltaV, isOrbitAchieved, totalWetMass, addStars]);
 
   const handleAnswerSubmit = (index: number) => {
     setSelectedAnswer(index);
     setShowExplanation(true);
     if (index === QUIZ_QUESTIONS[currentQuizIndex].answerIndex) {
       setQuizScore(prev => prev + 1);
+      addStars(15);
     }
   };
 
@@ -182,9 +187,17 @@ export default function RocketLabPage() {
           <Link href="/" className="text-xl font-bold bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">
             ✨ Stella Academy
           </Link>
-          <Link href="/missions" className="text-sm text-slate-300 hover:text-white transition-colors">
-            ← Back to Missions
-          </Link>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-1.5 px-3 py-1 bg-purple-500/10 border border-purple-500/30 rounded-full text-xs font-semibold text-purple-300 shadow-[0_0_12px_rgba(168,85,247,0.1)]">
+              <span>⭐</span> {stars} Stars
+            </div>
+            <div className="flex items-center gap-1.5 px-3 py-1 bg-cyan-500/10 border border-cyan-500/30 rounded-full text-xs font-semibold text-cyan-300 shadow-[0_0_12px_rgba(6,182,212,0.1)]">
+              <span>🛡️</span> Level {level}
+            </div>
+            <Link href="/missions" className="text-sm text-slate-300 hover:text-white transition-colors ml-2">
+              ← Back to Missions
+            </Link>
+          </div>
         </div>
       </nav>
 

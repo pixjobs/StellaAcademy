@@ -26,7 +26,7 @@ export async function GET() {
   });
 
   return NextResponse.json(
-    { bgUrl: apod?.bgUrl ?? null },
+    apod || { bgUrl: null, title: 'Stella Cosmic Landscape', explanation: 'Beautiful cosmos view', date: '', mediaType: 'image', credit: 'NASA' },
     { headers }
   );
 }
