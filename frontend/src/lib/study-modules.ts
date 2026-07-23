@@ -1,6 +1,6 @@
 import { type FormulaElement } from '@/components/study/VariableHighlighter';
 
-export type ConceptId = 'gravity' | 'prism' | 'gears' | 'trajectory' | 'circuit' | 'waves' | 'fractions' | 'trigonometry' | 'calculus' | 'vectors' | 'matrices' | 'probability' | 'diffeq' | 'arithmetic' | 'basic-geometry' | 'proportions' | 'decimals-percentages' | 'angles' | 'binary' | 'multiplication' | 'fraction-ops' | 'negative-numbers' | 'exponents-roots';
+export type ConceptId = 'gravity' | 'prism' | 'gears' | 'trajectory' | 'circuit' | 'waves' | 'fractions' | 'trigonometry' | 'calculus' | 'vectors' | 'matrices' | 'probability' | 'diffeq' | 'arithmetic' | 'basic-geometry' | 'proportions' | 'decimals-percentages' | 'angles' | 'binary' | 'multiplication' | 'fraction-ops' | 'negative-numbers' | 'exponents-roots' | 'thermodynamics' | 'momentum' | 'statistics' | 'electromagnetism' | 'quantum';
 export type CategoryId = 'physics' | 'mechanics' | 'electronics' | 'mathematics' | 'elementary-math';
 
 export interface StudyModule {
@@ -2752,6 +2752,716 @@ $$93{,}000{,}000 = 9.3 \\times 10^7$$
 
 *   [Khan Academy: Exponents](https://www.khanacademy.org/math/pre-algebra/pre-algebra-exponents-radicals)
 *   [Art of Problem Solving: Exponents](https://artofproblemsolving.com/wiki/index.php/Exponent)
+    `
+  },
+
+  // ─── THERMODYNAMICS ───────────────────────────────────────────────────────────
+  {
+    id: 'thermodynamics',
+    category: 'physics',
+    title: 'Thermodynamics',
+    subtitle: 'Explore heat, entropy, and the ideal gas law.',
+    icon: 'Sparkles',
+    accentColor: 'rose',
+    difficulty: 3,
+    estimatedMinutes: 20,
+    formula: 'PV = nRT',
+    formulaLayout: [
+      { type: 'variable', symbol: 'P' },
+      { type: 'variable', symbol: 'V' },
+      { type: 'operator', content: '=' },
+      { type: 'variable', symbol: 'n' },
+      { type: 'variable', symbol: 'R' },
+      { type: 'variable', symbol: 'T' },
+    ] as any,
+    variables: [
+      {
+        symbol: 'P',
+        name: 'Pressure',
+        unit: 'Pascals (Pa)',
+        description: 'The force exerted per unit area by gas molecules colliding with the container walls.',
+        color: 'text-rose-400',
+        range: { min: 1, max: 10, default: 1 }
+      },
+      {
+        symbol: 'V',
+        name: 'Volume',
+        unit: 'Cubic metres (m³)',
+        description: 'The space occupied by the gas. As volume decreases, pressure rises if temperature stays constant.',
+        color: 'text-orange-400',
+        range: { min: 1, max: 10, default: 5 }
+      },
+      {
+        symbol: 'n',
+        name: 'Amount of Substance',
+        unit: 'Moles (mol)',
+        description: 'The number of moles of gas. One mole contains approximately 6.022 × 10²³ molecules.',
+        color: 'text-amber-400'
+      },
+      {
+        symbol: 'R',
+        name: 'Ideal Gas Constant',
+        unit: 'J/(mol·K)',
+        description: 'A universal constant: R ≈ 8.314 J/(mol·K). It relates energy to temperature for one mole of an ideal gas.',
+        color: 'text-yellow-400'
+      },
+      {
+        symbol: 'T',
+        name: 'Temperature',
+        unit: 'Kelvin (K)',
+        description: 'Absolute temperature. Always use Kelvin (K = °C + 273.15) — never Celsius in gas laws.',
+        color: 'text-red-400',
+        range: { min: 200, max: 600, default: 300 }
+      }
+    ],
+    conceptSteps: [
+      {
+        stepNumber: 1,
+        title: 'The Ideal Gas Model',
+        content: 'An ideal gas is a theoretical model where gas molecules are perfectly elastic point particles that do not interact with each other. Real gases approximate this model well under low pressure and high temperature conditions.',
+        keyInsight: 'Pressure is caused by gas molecules bouncing off container walls millions of times per second.',
+        relatedVariables: ['P', 'V']
+      },
+      {
+        stepNumber: 2,
+        title: 'The Four Laws Combined',
+        content: 'PV = nRT combines Boyle\'s Law (P ∝ 1/V at constant T), Charles\'s Law (V ∝ T at constant P), and Avogadro\'s Law (V ∝ n) into a single unified equation for predicting gas behaviour.',
+        keyInsight: 'If you know any four of the five quantities, you can solve for the fifth.',
+        relatedVariables: ['P', 'V', 'n', 'T']
+      },
+      {
+        stepNumber: 3,
+        title: 'Entropy & the Second Law',
+        content: 'The Second Law of Thermodynamics states that the total entropy of an isolated system always increases. Heat flows spontaneously from hot to cold — never the reverse — because the disordered state is statistically overwhelmingly more probable.',
+        keyInsight: 'Entropy always increases. Ordered systems naturally tend toward disorder.',
+        relatedVariables: ['T']
+      }
+    ],
+    solvedExample: {
+      problem: 'A sealed container holds $n = 2$ mol of gas at $T = 300$ K and $V = 0.05$ m³. Find the pressure $P$.',
+      steps: [
+        'Use the ideal gas law: $P = \\frac{nRT}{V}$.',
+        'Substitute: $P = \\frac{2 \\times 8.314 \\times 300}{0.05}$.',
+        'Numerator: $2 \\times 8.314 \\times 300 = 4988.4$ J.',
+        'Divide: $P = \\frac{4988.4}{0.05}$.'
+      ],
+      resultFormula: 'P \\approx 99{,}768 \\text{ Pa} \\approx 0.985 \\text{ atm}'
+    },
+    practiceProblems: [
+      {
+        question: 'If the temperature of a fixed-volume gas doubles (in Kelvin), what happens to the pressure?',
+        hint: 'At constant V and n, P is proportional to T.',
+        answer: 'The pressure doubles.'
+      },
+      {
+        question: 'A gas occupies 4 L at 2 atm. If pressure drops to 1 atm at constant temperature, what is the new volume?',
+        hint: 'Use Boyle\'s Law: P₁V₁ = P₂V₂.',
+        answer: '8 L'
+      },
+      {
+        question: 'Why must temperature be in Kelvin (not Celsius) for the ideal gas law?',
+        hint: 'Think about what happens if T = 0°C in the formula.',
+        answer: 'Celsius can be zero or negative, which would imply zero or negative pressure — physically impossible. Kelvin starts at absolute zero, ensuring T is always positive.'
+      }
+    ],
+    realWorldConnection: 'Spacecraft thermal control engineers apply thermodynamics daily — managing heat from the Sun, electronics, and the cold of deep space to keep instruments within safe operating temperatures.',
+    textbookContent: `
+## The Ideal Gas Law and Thermodynamics
+
+The **Ideal Gas Law** is the equation of state for a hypothetical ideal gas, a useful approximation for many real gases under standard conditions:
+
+$$PV = nRT$$
+
+### State Variables
+
+| Symbol | Quantity | SI Unit |
+|---|---|---|
+| $P$ | Pressure | Pascal (Pa) |
+| $V$ | Volume | Cubic metre (m³) |
+| $n$ | Amount of substance | Mole (mol) |
+| $R$ | Ideal gas constant | 8.314 J/(mol·K) |
+| $T$ | Temperature | Kelvin (K) |
+
+### The Four Laws it Unifies
+
+*   **Boyle's Law (1662):** At constant temperature and amount, $PV = \\text{const}$, so $P \\propto 1/V$.
+*   **Charles's Law (1787):** At constant pressure and amount, $V/T = \\text{const}$, so $V \\propto T$.
+*   **Gay-Lussac's Law (1809):** At constant volume and amount, $P/T = \\text{const}$, so $P \\propto T$.
+*   **Avogadro's Law (1811):** At constant pressure and temperature, $V/n = \\text{const}$, so $V \\propto n$.
+
+### The Laws of Thermodynamics
+
+1. **Zeroth Law:** If system A is in thermal equilibrium with B, and B with C, then A is in equilibrium with C. (This defines temperature.)
+2. **First Law (Conservation of Energy):** The change in internal energy equals heat added minus work done: $\\Delta U = Q - W$.
+3. **Second Law:** The total entropy of an isolated system never decreases. Heat flows spontaneously from high to low temperature.
+4. **Third Law:** As temperature approaches absolute zero, the entropy of a perfect crystal approaches a constant minimum.
+
+### Entropy
+
+Entropy $S$ is a measure of the number of microscopic configurations $\\Omega$ consistent with a macroscopic state:
+$$S = k_B \\ln \\Omega$$
+where $k_B = 1.38 \\times 10^{-23}$ J/K is the Boltzmann constant.
+
+### References
+
+*   [Thermal Physics](https://global.oup.com/academic/product/thermal-physics-9780198566434) (Blundell & Blundell, Oxford)
+*   [Feynman Lectures on Physics, Vol. I, Ch. 39–44](https://www.feynmanlectures.caltech.edu/I_39.html)
+*   [NIST: Thermophysical Properties](https://webbook.nist.gov/chemistry/fluid/)
+    `
+  },
+
+  // ─── MOMENTUM & COLLISIONS ────────────────────────────────────────────────────
+  {
+    id: 'momentum',
+    category: 'mechanics',
+    title: 'Momentum & Collisions',
+    subtitle: 'Apply conservation of momentum to impacts and launches.',
+    icon: 'Activity',
+    accentColor: 'violet',
+    difficulty: 2,
+    estimatedMinutes: 15,
+    formula: 'p = mv',
+    formulaLayout: [
+      { type: 'variable', symbol: 'p' },
+      { type: 'operator', content: '=' },
+      { type: 'variable', symbol: 'm' },
+      { type: 'variable', symbol: 'v' },
+    ] as any,
+    variables: [
+      {
+        symbol: 'p',
+        name: 'Momentum',
+        unit: 'kg·m/s',
+        description: 'A vector quantity describing the quantity of motion an object has. The product of its mass and velocity.',
+        color: 'text-violet-400'
+      },
+      {
+        symbol: 'm',
+        name: 'Mass',
+        unit: 'Kilograms (kg)',
+        description: 'The amount of matter in the object. More massive objects are harder to stop or start moving.',
+        color: 'text-purple-400',
+        range: { min: 1, max: 10, default: 3 }
+      },
+      {
+        symbol: 'v',
+        name: 'Velocity',
+        unit: 'm/s',
+        description: 'The speed and direction of the object. Momentum is a vector — direction matters.',
+        color: 'text-indigo-400',
+        range: { min: 1, max: 20, default: 5 }
+      }
+    ],
+    conceptSteps: [
+      {
+        stepNumber: 1,
+        title: 'Momentum: The Quantity of Motion',
+        content: 'Momentum $p = mv$ captures both how heavy an object is and how fast it moves. A slow-moving truck and a fast-moving bullet can have similar momenta despite very different masses and speeds.',
+        keyInsight: 'Momentum depends on both mass AND velocity equally.',
+        relatedVariables: ['p', 'm', 'v']
+      },
+      {
+        stepNumber: 2,
+        title: 'Conservation of Momentum',
+        content: 'In a closed system with no external forces, the total momentum is conserved. Before and after any collision: $m_1v_1 + m_2v_2 = m_1v_1\' + m_2v_2\'$. This is one of the most powerful laws in all of physics.',
+        keyInsight: 'Total momentum before a collision always equals total momentum after.',
+        relatedVariables: ['p', 'm', 'v']
+      },
+      {
+        stepNumber: 3,
+        title: 'Impulse and Force',
+        content: 'Impulse $J = F\\Delta t = \\Delta p$ links force and time to changes in momentum. This is why airbags work — they extend the collision time, reducing the peak force on passengers.',
+        keyInsight: 'Same change in momentum over longer time = smaller force.',
+        relatedVariables: ['p']
+      }
+    ],
+    solvedExample: {
+      problem: 'A $5$ kg ball moving at $10$ m/s collides with a stationary $3$ kg ball. After the collision, the 5 kg ball moves at $4$ m/s. Find the velocity of the 3 kg ball.',
+      steps: [
+        'Apply conservation of momentum: $p_{\\text{before}} = p_{\\text{after}}$.',
+        'Before: $p = 5 \\times 10 + 3 \\times 0 = 50$ kg·m/s.',
+        'After: $p = 5 \\times 4 + 3 \\times v_2 = 20 + 3v_2$.',
+        'Set equal: $50 = 20 + 3v_2$, so $3v_2 = 30$.'
+      ],
+      resultFormula: 'v_2 = 10 \\text{ m/s}'
+    },
+    practiceProblems: [
+      {
+        question: 'A 70 kg astronaut floating in space throws a 2 kg tool at 10 m/s. How fast do they recoil?',
+        hint: 'Initial total momentum is zero. Use conservation of momentum.',
+        answer: '≈ 0.286 m/s in the opposite direction'
+      },
+      {
+        question: 'Two ice skaters (60 kg and 80 kg) push off each other from rest. The 60 kg skater moves at 4 m/s. How fast does the 80 kg skater move?',
+        hint: 'Total initial momentum = 0. So 60×4 = 80×v.',
+        answer: '3 m/s'
+      }
+    ],
+    realWorldConnection: 'Spacecraft navigation uses momentum conservation. When a rocket expels propellant backward at high speed, the spacecraft is propelled forward — just like an astronaut throwing a wrench.',
+    textbookContent: `
+## Momentum, Impulse, and Conservation Laws
+
+Linear momentum is a fundamental conserved quantity in classical mechanics. For a particle of mass $m$ moving with velocity $\\vec{v}$:
+
+$$\\vec{p} = m\\vec{v}$$
+
+### Newton's Second Law (Momentum Form)
+
+Newton's original formulation of his second law:
+$$\\vec{F} = \\frac{d\\vec{p}}{dt}$$
+
+For constant mass, this reduces to $F = ma$. For variable mass systems (rockets burning fuel):
+$$F = m\\frac{dv}{dt} + v_e\\frac{dm}{dt}$$
+where $v_e$ is the exhaust velocity.
+
+### Conservation of Linear Momentum
+
+In an isolated system (no net external force):
+$$\\vec{p}_{\\text{total}} = \\sum_i m_i \\vec{v}_i = \\text{constant}$$
+
+### Types of Collisions
+
+| Type | Kinetic Energy | Momentum |
+|---|---|---|
+| Elastic | Conserved | Conserved |
+| Inelastic | Not conserved | Conserved |
+| Perfectly Inelastic | Max KE lost | Conserved |
+
+In a **perfectly inelastic** collision, objects stick together:
+$$m_1 v_1 + m_2 v_2 = (m_1 + m_2) v_f$$
+
+### Impulse–Momentum Theorem
+
+$$J = \\int_{t_1}^{t_2} F\\,dt = \\Delta p$$
+
+For constant force: $J = F \\Delta t$.
+
+### The Tsiolkovsky Rocket Equation
+
+From momentum conservation for variable mass systems:
+$$\\Delta v = v_e \\ln\\left(\\frac{m_0}{m_f}\\right)$$
+
+### References
+
+*   [Classical Mechanics](https://uscibooks.aip.org/books/classical-mechanics/) (John R. Taylor, University Science Books)
+*   [Feynman Lectures, Vol. I, Ch. 10: Conservation of Momentum](https://www.feynmanlectures.caltech.edu/I_10.html)
+*   [NASA: How Rockets Work](https://www.grc.nasa.gov/WWW/k-12/airplane/rktpow.html)
+    `
+  },
+
+  // ─── STATISTICS & DATA ────────────────────────────────────────────────────────
+  {
+    id: 'statistics',
+    category: 'mathematics',
+    title: 'Statistics & Data',
+    subtitle: 'Analyse distributions, averages, and standard deviation.',
+    icon: 'Activity',
+    accentColor: 'cyan',
+    difficulty: 2,
+    estimatedMinutes: 15,
+    formula: '\\sigma = \\sqrt{\\frac{\\sum(x_i - \\mu)^2}{N}}',
+    formulaLayout: [
+      { type: 'variable', symbol: '\\sigma' },
+      { type: 'operator', content: '=' },
+      {
+        type: 'fraction',
+        numerator: [{ type: 'static', latex: '\\sum (x_i - \\mu)^2' }],
+        denominator: [{ type: 'variable', symbol: 'N' }]
+      }
+    ] as any,
+    variables: [
+      {
+        symbol: '\\sigma',
+        name: 'Standard Deviation',
+        unit: 'Same unit as data',
+        description: 'A measure of how spread out data values are around the mean. Small σ means data is tightly clustered; large σ means widely spread.',
+        color: 'text-cyan-400'
+      },
+      {
+        symbol: '\\mu',
+        name: 'Mean (Average)',
+        unit: 'Same unit as data',
+        description: 'The arithmetic average of all data points: sum of all values divided by count.',
+        color: 'text-teal-400'
+      },
+      {
+        symbol: 'x_i',
+        name: 'Individual Data Point',
+        unit: 'Same unit as data',
+        description: 'Each single measurement or value in the dataset.',
+        color: 'text-sky-400'
+      },
+      {
+        symbol: 'N',
+        name: 'Number of Data Points',
+        unit: 'Count',
+        description: 'The total number of values in the dataset.',
+        color: 'text-blue-400'
+      }
+    ],
+    conceptSteps: [
+      {
+        stepNumber: 1,
+        title: 'Measures of Central Tendency',
+        content: 'The **mean** (average) $\\mu = \\frac{\\sum x_i}{N}$ finds the central value. The **median** is the middle value when sorted. The **mode** is the most frequent value. Each measure has different strengths depending on the data distribution.',
+        keyInsight: 'Use median instead of mean when data has extreme outliers.',
+        relatedVariables: ['\\mu', 'x_i', 'N']
+      },
+      {
+        stepNumber: 2,
+        title: 'Standard Deviation & Spread',
+        content: 'Standard deviation $\\sigma$ measures how far data points typically stray from the mean. A dataset of sensor readings {100, 101, 99, 100} is much tighter than {50, 150, 80, 120} even if both have the same mean.',
+        keyInsight: 'σ tells you the "typical distance" from the average.',
+        relatedVariables: ['\\sigma', '\\mu', 'x_i']
+      },
+      {
+        stepNumber: 3,
+        title: 'The Normal Distribution',
+        content: 'In a normal (bell curve) distribution, approximately 68% of data falls within ±1σ of the mean, 95% within ±2σ, and 99.7% within ±3σ. This is the famous empirical rule used in quality control, science, and AI model evaluation.',
+        keyInsight: '68-95-99.7 rule: most data lies within 3 standard deviations of the mean.',
+        relatedVariables: ['\\sigma', '\\mu']
+      }
+    ],
+    solvedExample: {
+      problem: 'Find the mean $\\mu$ and standard deviation $\\sigma$ for the dataset: $\\{2, 4, 4, 4, 5, 5, 7, 9\\}$.',
+      steps: [
+        'Calculate the mean: $\\mu = \\frac{2+4+4+4+5+5+7+9}{8} = \\frac{40}{8} = 5$.',
+        'Calculate each squared deviation: $(2-5)^2=9$, $(4-5)^2=1$ (×3), $(5-5)^2=0$ (×2), $(7-5)^2=4$, $(9-5)^2=16$.',
+        'Sum of squared deviations: $9 + 3 + 0 + 4 + 16 = 32$.',
+        'Variance: $\\sigma^2 = \\frac{32}{8} = 4$.'
+      ],
+      resultFormula: '\\sigma = \\sqrt{4} = 2'
+    },
+    practiceProblems: [
+      {
+        question: 'A satellite sensor records temperatures: {-20, -18, -22, -19, -21}°C. What is the mean?',
+        hint: 'Sum all values and divide by 5.',
+        answer: '-20°C'
+      },
+      {
+        question: 'Dataset A has σ = 0.1 and Dataset B has σ = 5. Which is more precise (consistent)?',
+        hint: 'Lower standard deviation means tighter clustering around the mean.',
+        answer: 'Dataset A — its values are much more consistent.'
+      },
+      {
+        question: 'If the mean of 5 test scores is 80, and four scores are 75, 85, 90, 70, what is the fifth score?',
+        hint: 'Total must be 5 × 80 = 400.',
+        answer: '80'
+      }
+    ],
+    realWorldConnection: 'Data scientists at space agencies use statistics to filter sensor noise from telemetry signals — a single anomalous reading beyond 3σ from the mean triggers an automatic spacecraft health alert.',
+    textbookContent: `
+## Descriptive Statistics and Distributions
+
+Statistics is the science of collecting, analysing, interpreting, and presenting data. In engineering and science, it is essential for understanding measurement uncertainty, signal processing, and model validation.
+
+### Measures of Central Tendency
+
+*   **Mean:** $\\mu = \\frac{1}{N} \\sum_{i=1}^{N} x_i$
+*   **Median:** The middle value when data is sorted in ascending order.
+*   **Mode:** The most frequently occurring value.
+
+### Measures of Spread
+
+*   **Variance:** $\\sigma^2 = \\frac{1}{N} \\sum_{i=1}^{N} (x_i - \\mu)^2$
+*   **Standard Deviation:** $\\sigma = \\sqrt{\\sigma^2}$
+*   **Range:** $x_{\\max} - x_{\\min}$
+
+> **Note:** Population variance uses $1/N$. Sample variance uses $1/(N-1)$ (Bessel's correction).
+
+### The Normal Distribution
+
+$$f(x) = \\frac{1}{\\sigma\\sqrt{2\\pi}} e^{-\\frac{1}{2}\\left(\\frac{x-\\mu}{\\sigma}\\right)^2}$$
+
+**The Empirical Rule (68-95-99.7):**
+
+| Interval | % of Data |
+|---|---|
+| $\\mu \\pm 1\\sigma$ | ≈ 68.27% |
+| $\\mu \\pm 2\\sigma$ | ≈ 95.45% |
+| $\\mu \\pm 3\\sigma$ | ≈ 99.73% |
+
+### Correlation vs. Causation
+
+Two variables may be statistically correlated without one causing the other. Establishing causation requires controlled experiments.
+
+### References
+
+*   [The Art of Statistics](https://www.pelicanbookgroup.co.uk/ec/9780241258767/the-art-of-statistics.html) (David Spiegelhalter, Pelican)
+*   [Statistics](https://www.amazon.co.uk/Statistics-4th-David-Freedman/dp/0393929728) (Freedman, Pisani & Purves, 4th ed.)
+*   [Khan Academy: Statistics and Probability](https://www.khanacademy.org/math/statistics-probability)
+    `
+  },
+
+  // ─── ELECTROMAGNETISM ─────────────────────────────────────────────────────────
+  {
+    id: 'electromagnetism',
+    category: 'electronics',
+    title: 'Electromagnetism',
+    subtitle: "Explore Faraday's law, magnetic flux, and induced voltage.",
+    icon: 'Cpu',
+    accentColor: 'cyan',
+    difficulty: 3,
+    estimatedMinutes: 20,
+    formula: '\\mathcal{E} = -N \\frac{d\\Phi_B}{dt}',
+    formulaLayout: [
+      { type: 'variable', symbol: '\\mathcal{E}' },
+      { type: 'operator', content: '=' },
+      { type: 'static', latex: '-' },
+      { type: 'variable', symbol: 'N' },
+      {
+        type: 'fraction',
+        numerator: [{ type: 'static', latex: 'd\\Phi_B' }],
+        denominator: [{ type: 'static', latex: 'dt' }]
+      }
+    ] as any,
+    variables: [
+      {
+        symbol: '\\mathcal{E}',
+        name: 'Electromotive Force (EMF)',
+        unit: 'Volts (V)',
+        description: 'The voltage induced in a coil by a changing magnetic flux. The driving force behind electric generators and transformers.',
+        color: 'text-cyan-400'
+      },
+      {
+        symbol: 'N',
+        name: 'Number of Turns',
+        unit: 'Count',
+        description: 'The number of loops in the coil. More turns amplify the induced EMF proportionally.',
+        color: 'text-teal-400',
+        range: { min: 1, max: 100, default: 10 }
+      },
+      {
+        symbol: '\\Phi_B',
+        name: 'Magnetic Flux',
+        unit: 'Webers (Wb)',
+        description: 'The total magnetic field passing through a surface: Φ_B = B·A·cos(θ).',
+        color: 'text-sky-400'
+      }
+    ],
+    conceptSteps: [
+      {
+        stepNumber: 1,
+        title: 'Magnetic Fields',
+        content: 'Moving electric charges create magnetic fields. A current-carrying wire produces a circular magnetic field around it. Bar magnets create dipole fields running from south to north pole internally, and north to south externally.',
+        keyInsight: 'Electricity and magnetism are two faces of the same underlying force.',
+        relatedVariables: ['\\Phi_B']
+      },
+      {
+        stepNumber: 2,
+        title: "Faraday's Law of Induction",
+        content: "A changing magnetic flux through a coil induces an electromotive force (voltage). The faster the flux changes, the greater the induced EMF. This is the operating principle of every electric generator on Earth — from bicycle dynamos to nuclear power stations.",
+        keyInsight: 'Change is key: a static field induces nothing; a changing field induces voltage.',
+        relatedVariables: ['\\mathcal{E}', '\\Phi_B', 'N']
+      },
+      {
+        stepNumber: 3,
+        title: "Lenz's Law and the Negative Sign",
+        content: "The negative sign in Faraday's law reflects Lenz's Law: the induced current flows in a direction that opposes the change in flux that created it. This is an expression of energy conservation — you must do work against the opposing force to move the magnet.",
+        keyInsight: 'Induced currents always resist the change that caused them.',
+        relatedVariables: ['\\mathcal{E}']
+      }
+    ],
+    solvedExample: {
+      problem: 'A coil with $N = 200$ turns experiences a change in magnetic flux from $\\Phi_B = 0.5$ Wb to $0.1$ Wb in $\\Delta t = 0.2$ s. Find the induced EMF.',
+      steps: [
+        'Rate of change: $\\frac{d\\Phi_B}{dt} = \\frac{0.1 - 0.5}{0.2} = \\frac{-0.4}{0.2} = -2$ Wb/s.',
+        "Apply Faraday's Law: $\\mathcal{E} = -N \\frac{d\\Phi_B}{dt}$.",
+        'Substitute: $\\mathcal{E} = -200 \\times (-2)$.'
+      ],
+      resultFormula: '\\mathcal{E} = 400 \\text{ V}'
+    },
+    practiceProblems: [
+      {
+        question: 'If the number of turns N doubles but dΦ/dt stays constant, how does the induced EMF change?',
+        hint: 'EMF is directly proportional to N.',
+        answer: 'The EMF doubles.'
+      },
+      {
+        question: 'A stationary magnet near a stationary coil: is any voltage induced?',
+        hint: "Think about what Faraday's law requires.",
+        answer: "No. Faraday's law requires a *changing* flux. Static fields produce no EMF."
+      }
+    ],
+    realWorldConnection: "Every solar panel on the International Space Station drives power through transformer circuits governed by Faraday's law. Induction is also used in spacecraft docking for wireless power transfer.",
+    textbookContent: `
+## Faraday's Law of Electromagnetic Induction
+
+Electromagnetic induction is the production of an electromotive force across an electrical conductor in a changing magnetic field. Independently discovered by Michael Faraday (1831) and Joseph Henry (1832).
+
+### Magnetic Flux
+
+$$\\Phi_B = \\iint_S \\vec{B} \\cdot d\\vec{A}$$
+
+For a uniform field $B$ through flat area $A$ at angle $\\theta$ to the surface normal:
+$$\\Phi_B = BA\\cos\\theta$$
+
+The SI unit is the **Weber (Wb)**: $1 \\text{ Wb} = 1 \\text{ V}\\cdot\\text{s} = 1 \\text{ T}\\cdot\\text{m}^2$.
+
+### Faraday's Law
+
+For a single loop:
+$$\\mathcal{E} = -\\frac{d\\Phi_B}{dt}$$
+
+For a coil of $N$ turns:
+$$\\mathcal{E} = -N \\frac{d\\Phi_B}{dt}$$
+
+### Lenz's Law
+
+The negative sign encodes **Lenz's Law**: the induced emf drives a current whose magnetic field opposes the change in flux. This is a direct consequence of energy conservation.
+
+### Maxwell's Equations
+
+Faraday's Law in differential form (one of Maxwell's four equations):
+$$\\nabla \\times \\vec{E} = -\\frac{\\partial \\vec{B}}{\\partial t}$$
+
+### Applications
+
+*   **Generators:** Rotating a coil in a magnetic field continuously changes flux, generating AC power.
+*   **Transformers:** Two coils share a core; changing flux in one induces emf in the other.
+*   **Induction Charging:** Wireless charging pads use alternating magnetic fields to induce current.
+
+### References
+
+*   [Introduction to Electrodynamics, 4th ed.](https://www.cambridge.org/gb/universitypress/subjects/physics/electromagnetism-and-electrodynamics/introduction-electrodynamics-4th-edition) (David J. Griffiths, Cambridge)
+*   [Feynman Lectures, Vol. II, Ch. 17: The Laws of Induction](https://www.feynmanlectures.caltech.edu/II_17.html)
+*   [MIT OCW 8.02: Physics II — Electricity and Magnetism](https://ocw.mit.edu/courses/8-02-physics-ii-electricity-and-magnetism-spring-2007/)
+    `
+  },
+
+  // ─── QUANTUM BASICS ───────────────────────────────────────────────────────────
+  {
+    id: 'quantum',
+    category: 'physics',
+    title: 'Quantum Mechanics',
+    subtitle: "Discover wave-particle duality, Planck's constant, and photon energy.",
+    icon: 'Sparkles',
+    accentColor: 'violet',
+    difficulty: 4,
+    estimatedMinutes: 25,
+    formula: 'E = hf',
+    formulaLayout: [
+      { type: 'variable', symbol: 'E' },
+      { type: 'operator', content: '=' },
+      { type: 'variable', symbol: 'h' },
+      { type: 'variable', symbol: 'f' },
+    ] as any,
+    variables: [
+      {
+        symbol: 'E',
+        name: 'Photon Energy',
+        unit: 'Joules (J) or eV',
+        description: 'The discrete packet of energy carried by a single photon. Unlike classical waves, energy comes in indivisible chunks called quanta.',
+        color: 'text-violet-400'
+      },
+      {
+        symbol: 'h',
+        name: "Planck's Constant",
+        unit: 'J·s',
+        description: 'A fundamental constant of nature: h ≈ 6.626 × 10⁻³⁴ J·s. It sets the scale of quantum effects — the minimum "grain size" of action in the universe.',
+        color: 'text-purple-400'
+      },
+      {
+        symbol: 'f',
+        name: 'Frequency',
+        unit: 'Hertz (Hz)',
+        description: 'The frequency of the electromagnetic wave associated with the photon. Higher frequency (e.g. UV, X-rays) means more energetic photons.',
+        color: 'text-indigo-400',
+        range: { min: 1, max: 10, default: 5 }
+      }
+    ],
+    conceptSteps: [
+      {
+        stepNumber: 1,
+        title: 'The Ultraviolet Catastrophe',
+        content: 'In 1900, Max Planck solved a crisis in physics. Classical theory predicted that hot objects should radiate infinite energy at high frequencies (the "ultraviolet catastrophe"). Planck proposed that energy comes in discrete packets, or **quanta**, of size $E = hf$.',
+        keyInsight: 'Energy is quantised — it exists in discrete chunks, not a continuous flow.',
+        relatedVariables: ['E', 'h', 'f']
+      },
+      {
+        stepNumber: 2,
+        title: 'Wave-Particle Duality',
+        content: "In 1905, Einstein used Planck's idea to explain the photoelectric effect: light behaves as particles (photons) when it hits a metal and ejects electrons. Yet light also exhibits wave interference. Matter itself — electrons, protons — also displays wave-like diffraction. This is wave-particle duality.",
+        keyInsight: 'Light and matter are both waves AND particles, depending on how you observe them.',
+        relatedVariables: ['E', 'f']
+      },
+      {
+        stepNumber: 3,
+        title: "Heisenberg's Uncertainty Principle",
+        content: 'Werner Heisenberg showed that it is fundamentally impossible to simultaneously know both the exact position $x$ and exact momentum $p$ of a particle: $\\Delta x \\cdot \\Delta p \\geq \\frac{\\hbar}{2}$. This is not a limitation of instruments — it is a fundamental property of the universe.',
+        keyInsight: 'The more precisely you know position, the less precisely you can know momentum — and vice versa.',
+        relatedVariables: ['h']
+      }
+    ],
+    solvedExample: {
+      problem: 'Calculate the energy of a photon of visible light with $f = 6.0 \\times 10^{14}$ Hz (green light).',
+      steps: [
+        'Use $E = hf$ with $h = 6.626 \\times 10^{-34}$ J·s.',
+        'Substitute: $E = 6.626 \\times 10^{-34} \\times 6.0 \\times 10^{14}$.',
+        'Multiply: $E = 6.626 \\times 6.0 \\times 10^{-20} = 39.756 \\times 10^{-20}$.'
+      ],
+      resultFormula: 'E \\approx 3.98 \\times 10^{-19} \\text{ J} \\approx 2.49 \\text{ eV}'
+    },
+    practiceProblems: [
+      {
+        question: 'A UV photon has twice the frequency of a green photon. How do their energies compare?',
+        hint: 'E = hf. If f doubles, what happens to E?',
+        answer: 'The UV photon has twice the energy.'
+      },
+      {
+        question: 'Radio waves have frequencies around 10⁸ Hz. X-rays have frequencies around 10¹⁸ Hz. Which photons are more energetic, and by what factor?',
+        hint: 'Compare the frequencies using E = hf.',
+        answer: 'X-ray photons are 10¹⁰ (10 billion) times more energetic.'
+      },
+      {
+        question: 'Why can UV light cause sunburn but visible light cannot, even at the same intensity?',
+        hint: 'Think about individual photon energies, not total beam power.',
+        answer: 'UV photons have higher individual energies (higher frequency) and can break chemical bonds in DNA molecules. Visible photons lack sufficient energy per quantum to do this, regardless of total beam intensity.'
+      }
+    ],
+    realWorldConnection: 'Quantum mechanics underpins every semiconductor in your phone, spacecraft solar cells, GPS atomic clocks, and MRI scanners. Understanding quantisation is essential to all modern technology.',
+    textbookContent: `
+## Quantum Mechanics: Foundations
+
+Quantum mechanics governs the behaviour of matter and energy at atomic and subatomic scales. It replaces deterministic classical mechanics with a probabilistic description.
+
+### Planck's Quantum Hypothesis (1900)
+
+Max Planck resolved the ultraviolet catastrophe by postulating that electromagnetic oscillators emit or absorb energy only in discrete amounts:
+$$E_n = nhf \\quad (n = 0, 1, 2, \\ldots)$$
+
+where $h \\approx 6.626 \\times 10^{-34}$ J·s is **Planck's constant**.
+
+### The Photoelectric Effect (Einstein, 1905)
+
+Einstein proposed that light consists of discrete quanta (photons), each carrying energy $E = hf$. Above a threshold frequency $f_0$, electron kinetic energy scales linearly with frequency:
+$$K_{\\max} = hf - \\phi$$
+where $\\phi$ is the work function. Einstein won the 1921 Nobel Prize for this work.
+
+### de Broglie Wavelength
+
+All matter has an associated wavelength (de Broglie, 1924):
+$$\\lambda = \\frac{h}{p} = \\frac{h}{mv}$$
+
+Confirmed by the Davisson-Germer electron diffraction experiment (1927).
+
+### The Heisenberg Uncertainty Principle
+
+$$\\Delta x \\cdot \\Delta p \\geq \\frac{\\hbar}{2}$$
+
+where $\\hbar = h / (2\\pi)$ is the reduced Planck constant. Similarly: $\\Delta E \\cdot \\Delta t \\geq \\hbar / 2$.
+
+### The Schrödinger Equation
+
+$$i\\hbar \\frac{\\partial \\Psi}{\\partial t} = \\hat{H} \\Psi$$
+
+The wavefunction $\\Psi$ gives the probability amplitude for finding the particle in a given state. The probability density is $|\\Psi|^2$.
+
+### References
+
+*   [Quantum Mechanics: The Theoretical Minimum](https://theoreticalminimum.com/courses/quantum-mechanics) (Leonard Susskind & Art Friedman)
+*   [Feynman Lectures, Vol. III: Quantum Mechanics](https://www.feynmanlectures.caltech.edu/III_toc.html)
+*   [Introduction to Quantum Mechanics, 3rd ed.](https://www.cambridge.org/core/books/introduction-to-quantum-mechanics/990799CA07A83FC5312402AF6860311E) (David J. Griffiths)
     `
   }
 ];
