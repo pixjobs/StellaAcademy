@@ -72,9 +72,12 @@ export interface AccessibilityState {
   fontSizeScale: number;
   fontFamily: 'sans' | 'serif' | 'mono' | 'dyslexic';
   reduceTransparency: boolean;
+  reduceMotion: boolean;
   setFontSizeScale: (scale: number) => void;
   setFontFamily: (font: AccessibilityState['fontFamily']) => void;
   setReduceTransparency: (reduce: boolean) => void;
+  setReduceMotion: (reduce: boolean) => void;
+  resetDefaults: () => void;
 }
 
 export const useAccessibility = create<AccessibilityState>()(
@@ -83,9 +86,12 @@ export const useAccessibility = create<AccessibilityState>()(
       fontSizeScale: 1.15,
       fontFamily: 'sans',
       reduceTransparency: false,
+      reduceMotion: false,
       setFontSizeScale: (fontSizeScale) => set({ fontSizeScale }),
       setFontFamily: (fontFamily) => set({ fontFamily }),
       setReduceTransparency: (reduceTransparency) => set({ reduceTransparency }),
+      setReduceMotion: (reduceMotion) => set({ reduceMotion }),
+      resetDefaults: () => set({ fontSizeScale: 1.15, fontFamily: 'sans', reduceTransparency: false, reduceMotion: false }),
     }),
     {
       name: 'stella-accessibility',

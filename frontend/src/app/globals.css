@@ -208,6 +208,16 @@
   }
 }
 
+.reduce-motion .animate-apod-slow,
+.reduce-motion .animate-pulse,
+.reduce-motion .animate-ping,
+.reduce-motion .animate-spin,
+.reduce-motion .animate-bounce {
+  animation: none !important;
+  transform: none !important;
+  transition: none !important;
+}
+
 @keyframes apodSlowPan {
   0% {
     transform: scale(1.05) translate3d(0%, 0%, 0) rotate(0deg);

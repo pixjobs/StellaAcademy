@@ -4,7 +4,7 @@ import { useAccessibility } from '@/lib/store';
 import type { ReactNode } from 'react';
 
 export default function AccessibilityWrapper({ children }: { children: ReactNode }) {
-  const { fontSizeScale, fontFamily, reduceTransparency } = useAccessibility();
+  const { fontSizeScale, fontFamily, reduceTransparency, reduceMotion } = useAccessibility();
 
   const getFontFamily = () => {
     switch (fontFamily) {
@@ -23,7 +23,7 @@ export default function AccessibilityWrapper({ children }: { children: ReactNode
         '--font-scale': Math.max(0.5, fontSizeScale),
         '--font-main': getFontFamily(),
       } as React.CSSProperties}
-      className={`contents ${reduceTransparency ? 'reduce-transparency' : ''}`}
+      className={`contents ${reduceTransparency ? 'reduce-transparency' : ''} ${reduceMotion ? 'reduce-motion' : ''}`}
     >
       {children}
     </div>
