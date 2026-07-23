@@ -88,7 +88,7 @@ export default function Header() {
 
         {/* Nav — desktop */}
         <div className="hidden md:flex items-center gap-4 text-xs font-mono shrink-0">
-          <nav className="flex items-center gap-1.5 bg-white/[0.03] p-1 rounded-full border border-white/[0.08]">
+          <nav className="flex items-center gap-1 bg-white/[0.03] p-1 rounded-full border border-white/[0.08]">
             {navLinks.map((link) => {
               const isActive = pathname === link.href || (link.href !== '/' && pathname?.startsWith(link.href));
               return (
@@ -105,10 +105,10 @@ export default function Header() {
                 </Link>
               );
             })}
+            <div className="border-l border-white/10 pl-1.5 ml-0.5">
+              <AccessibilityMenu />
+            </div>
           </nav>
-          <div className="border-l border-white/10 pl-3">
-            <AccessibilityMenu />
-          </div>
         </div>
 
         {/* Mobile hamburger */}
