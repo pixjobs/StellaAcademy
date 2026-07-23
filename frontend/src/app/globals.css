@@ -236,3 +236,44 @@
   }
 }
 
+/* Font Family Accessibility Overrides */
+body[data-font-family="serif"] *,
+body[data-font-family="serif"] h1,
+body[data-font-family="serif"] h2,
+body[data-font-family="serif"] h3,
+body[data-font-family="serif"] p,
+body[data-font-family="serif"] button,
+body[data-font-family="serif"] input,
+body[data-font-family="serif"] a,
+body[data-font-family="serif"] .font-fraunces,
+body[data-font-family="serif"] .font-hanken {
+  font-family: 'Fraunces', Georgia, Cambria, 'Times New Roman', serif !important;
+}
+
+body[data-font-family="mono"] *,
+body[data-font-family="mono"] h1,
+body[data-font-family="mono"] h2,
+body[data-font-family="mono"] h3,
+body[data-font-family="mono"] p,
+body[data-font-family="mono"] button,
+body[data-font-family="mono"] input,
+body[data-font-family="mono"] a,
+body[data-font-family="mono"] .font-fraunces,
+body[data-font-family="mono"] .font-hanken,
+body[data-font-family="mono"] .font-mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace !important;
+}
+
+body[data-font-family="dyslexic"] *,
+body[data-font-family="dyslexic"] h1,
+body[data-font-family="dyslexic"] h2,
+body[data-font-family="dyslexic"] h3,
+body[data-font-family="dyslexic"] p,
+body[data-font-family="dyslexic"] button,
+body[data-font-family="dyslexic"] input,
+body[data-font-family="dyslexic"] a,
+body[data-font-family="dyslexic"] .font-fraunces,
+body[data-font-family="dyslexic"] .font-hanken {
+  font-family: 'Comic Sans MS', 'OpenDyslexic', sans-serif !important;
+}
+
