@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import {
   Sparkles, Activity, Cpu, Calculator, ChevronRight,
@@ -96,6 +96,17 @@ function ModuleCard({ mod, cat }: { mod: (typeof studyModules)[0]; cat: typeof c
 
 /* ─── Page ───────────────────────────────────────────────────────────── */
 export default function HomePage() {
+  const [apodTitle, setApodTitle] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch('/api/apod')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.title) setApodTitle(data.title);
+      })
+      .catch(() => {});
+  }, []);
+
   const totalModules = studyModules.length;
   const totalFlashcards = studyModules.filter(m =>
     ['arithmetic','basic-geometry','proportions','decimals-percentages','binary','multiplication','fraction-ops','negative-numbers','exponents-roots'].includes(m.id)
@@ -112,9 +123,23 @@ export default function HomePage() {
 
         {/* ── HERO ── */}
         <section className="pt-10 sm:pt-16 pb-10 sm:pb-14 text-center max-w-4xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-[10px] sm:text-xs font-mono uppercase tracking-widest mb-6 sm:mb-8">
-            <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-            Interactive Learning Platform
+          <div className="flex flex-wrap items-center justify-center gap-3 mb-6 sm:mb-8">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-[10px] sm:text-xs font-mono uppercase tracking-widest">
+              <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+              Interactive Learning Platform
+            </div>
+
+            {apodTitle && (
+              <Link
+                href="/gallery"
+                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 text-[10px] sm:text-xs font-mono hover:bg-cyan-500/20 transition-all group"
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+                <span className="text-slate-400">APOD:</span>
+                <span className="font-medium truncate max-w-[200px] sm:max-w-xs">{apodTitle}</span>
+                <ChevronRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
+              </Link>
+            )}
           </div>
 
           <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold font-fraunces text-white mb-5 sm:mb-6 leading-[1.05] tracking-[-0.03em]">

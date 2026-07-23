@@ -46,10 +46,13 @@ export default async function RootLayout({ children }: RootLayoutProps) {
         ].join(' ')}
       >
         <AccessibilityWrapper>
-          <div 
-            className="fixed inset-0 z-0 opacity-20 bg-cover bg-center bg-no-repeat mix-blend-screen pointer-events-none"
-            style={{ backgroundImage: `url('${bgUrl}')` }}
-          />
+          <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+            <div 
+              className="absolute -inset-[10%] opacity-25 bg-cover bg-center bg-no-repeat mix-blend-screen animate-apod-slow"
+              style={{ backgroundImage: `url('${bgUrl}')` }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-slate-950/50 via-transparent to-slate-950/80 pointer-events-none" />
+          </div>
           {/* Wrap the whole app in Providers if needed - currently just passes children */}
           <Providers>
             <div className="relative z-20 flex min-h-screen flex-col">

@@ -26,16 +26,12 @@ interface NasaApodResponse {
  * No caching, no secrets, no complex setup
  */
 export async function getApod(): Promise<Apod | null> {
-  const apiKey = process.env.NASA_API_KEY || '';
-  
-  if (!apiKey) {
-    console.warn('[apod] No NASA_API_KEY configured, returning null');
-    return null;
-  }
+  const apiKey = process.env.NASA_API_KEY || 'DEMO_KEY';
 
   try {
-    const date = new Date().toISOString().slice(0, 10);
-    const response = await fetch(`https://api.nasa.gov/planetary/apod?date=${date}&api_key=${apiKey}`);
+    const response = await fetch(`https://api.nasa.gov/planetary/apod?api_key=${apiKey}`, {
+      next: { revalidate: 86400 }
+    });
     
     if (!response.ok) {
       throw new Error(`APOD API error: ${response.status}`);
@@ -49,10 +45,17 @@ export async function getApod(): Promise<Apod | null> {
       explanation: data.explanation,
       mediaType: data.media_type,
       bgUrl: data.url,
-      credit: data.copyright || 'Public',
+      credit: data.copyright || 'NASA / Public Domain',
     };
   } catch (error) {
-    console.warn('[apod] Failed to fetch APOD:', error instanceof Error ? error.message : error);
-    return null;
+    console.warn('[apod] Failed to fetch APOD, using fallback:', error instanceof Error ? error.message : error);
+    return {
+      date: new Date().toISOString().slice(0, 10),
+      title: 'Cosmic Deep Field',
+      explanation: 'Deep space stars and nebulosity background.',
+      mediaType: 'image',
+      bgUrl: '/bg.jpg',
+      credit: 'Stella Academy',
+    };
   }
 }

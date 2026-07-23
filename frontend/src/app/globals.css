@@ -200,4 +200,29 @@
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */
   }
+
+  /* Ultra-slow cosmic pan & zoom animation for APOD backgrounds */
+  .animate-apod-slow {
+    animation: apodSlowPan 90s ease-in-out infinite;
+    will-change: transform;
+  }
 }
+
+@keyframes apodSlowPan {
+  0% {
+    transform: scale(1.05) translate3d(0%, 0%, 0) rotate(0deg);
+  }
+  25% {
+    transform: scale(1.18) translate3d(-2%, 1.2%, 0) rotate(0.4deg);
+  }
+  50% {
+    transform: scale(1.12) translate3d(2%, -1.5%, 0) rotate(-0.3deg);
+  }
+  75% {
+    transform: scale(1.22) translate3d(-1%, -1%, 0) rotate(0.2deg);
+  }
+  100% {
+    transform: scale(1.05) translate3d(0%, 0%, 0) rotate(0deg);
+  }
+}
+
