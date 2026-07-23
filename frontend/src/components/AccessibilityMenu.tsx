@@ -1,19 +1,33 @@
 'use client';
 
-import { useAccessibility } from '@/lib/store';
-import { Settings, X, RotateCcw, Check, Sparkles, Type, Eye } from 'lucide-react';
+import { useAccessibility, type FontSizePreset, type FontPreset } from '@/lib/store';
+import { Settings, X, RotateCcw, Check, Sparkles, Eye } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
+
+const FONT_SIZE_OPTIONS: { id: FontSizePreset; label: string; rootPx: string }[] = [
+  { id: 'compact', label: 'Compact', rootPx: 'Root 14px' },
+  { id: 'default', label: 'Default', rootPx: 'Root 16px' },
+  { id: 'comfortable', label: 'Comfortable', rootPx: 'Root 18px' },
+  { id: 'large', label: 'Large', rootPx: 'Root 20px' },
+];
+
+const TYPEFACE_OPTIONS: { id: FontPreset; label: string; sample: string; fontFamilyStyle: string }[] = [
+  { id: 'inclusive', label: 'Inclusive Sans', sample: 'Aa Bb Cc 123', fontFamilyStyle: "'Inclusive Sans', sans-serif" },
+  { id: 'system', label: 'System', sample: 'Aa Bb Cc 123', fontFamilyStyle: 'ui-sans-serif, system-ui, sans-serif' },
+  { id: 'serif', label: 'Serif', sample: 'Aa Bb Cc 123', fontFamilyStyle: "'Fraunces', Georgia, serif" },
+  { id: 'mono', label: 'Mono', sample: 'Aa Bb Cc 123', fontFamilyStyle: 'ui-monospace, monospace' },
+];
 
 export default function AccessibilityMenu() {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   const { 
-    fontSizeScale, 
+    fontSizePreset, 
     fontFamily, 
     reduceTransparency,
     reduceMotion,
-    setFontSizeScale, 
+    setFontSizePreset, 
     setFontFamily, 
     setReduceTransparency,
     setReduceMotion,
@@ -61,133 +75,131 @@ export default function AccessibilityMenu() {
 
       {/* Popover Dropdown aligned to Menu Button */}
       {isOpen && (
-        <div className="absolute right-0 top-full mt-3 w-[330px] sm:w-[370px] z-50 animate-in fade-in zoom-in-95 duration-200 origin-top-right">
+        <div className="absolute right-0 top-full mt-3 w-[340px] sm:w-[380px] z-50 animate-in fade-in zoom-in-95 duration-200 origin-top-right">
           {/* Top Liquid Glass Pointer Arrow */}
           <div className="absolute -top-2 right-5 w-4 h-4 rotate-45 bg-slate-950 border-t border-l border-white/15" />
 
           {/* Liquid Glass Container Box */}
-          <div className="relative rounded-3xl bg-slate-950/90 border border-white/15 backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.8),inset_0_1px_1px_rgba(255,255,255,0.2)] overflow-hidden p-5 text-center">
+          <div className="relative rounded-3xl bg-slate-950/95 border border-white/15 backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.85),inset_0_1px_1px_rgba(255,255,255,0.2)] overflow-hidden p-5 text-left">
             {/* Top Shine Accent */}
             <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-indigo-400/50 to-transparent" />
 
             {/* Header */}
-            <div className="flex items-center justify-between pb-3 mb-4 border-b border-white/10">
-              <div className="flex items-center gap-2">
-                <div className="p-1.5 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400">
-                  <Settings className="w-4 h-4" />
-                </div>
-                <h3 className="text-sm font-bold font-fraunces text-white">Display Settings</h3>
+            <div className="flex items-start justify-between pb-3 mb-4 border-b border-white/10">
+              <div>
+                <h3 className="text-base font-bold font-fraunces text-white">Display Settings</h3>
+                <p className="text-xs text-slate-400 mt-0.5 leading-snug">
+                  Customise font size and typeface. Changes are saved automatically.
+                </p>
               </div>
 
               <button 
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-white/10 transition-colors"
+                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-white/10 transition-colors shrink-0 ml-2"
                 aria-label="Close"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            {/* Controls */}
-            <div className="space-y-4">
-              {/* Text Sizing */}
-              <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-3.5 space-y-2.5 text-left">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-200">
-                    <Type className="w-3.5 h-3.5 text-indigo-400" />
-                    <span>Text Scale</span>
-                  </div>
-                  <span className="text-[11px] font-mono text-cyan-300 bg-cyan-500/10 px-2 py-0.5 rounded-full border border-cyan-500/20 font-bold">
-                    {Math.round(fontSizeScale * 100)}%
-                  </span>
-                </div>
-                <input 
-                  type="range" 
-                  min="0.8" max="2.0" step="0.05"
-                  value={fontSizeScale}
-                  onChange={(e) => setFontSizeScale(parseFloat(e.target.value))}
-                  className="w-full accent-indigo-500 cursor-pointer h-1.5 bg-slate-900 rounded-lg border border-white/10"
-                />
-              </div>
-
-              {/* Font Style */}
-              <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-3.5 space-y-2 text-left">
-                <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-200 mb-1">
-                  <Sparkles className="w-3.5 h-3.5 text-violet-400" />
-                  <span>Typography</span>
-                </div>
-                <div className="grid grid-cols-2 gap-1.5">
-                  {[
-                    { id: 'sans', label: 'Sans' },
-                    { id: 'serif', label: 'Serif' },
-                    { id: 'mono', label: 'Mono' },
-                    { id: 'dyslexic', label: 'Dyslexic' },
-                  ].map((font) => (
-                    <button
-                      key={font.id}
-                      type="button"
-                      onClick={() => setFontFamily(font.id as any)}
-                      className={`py-1.5 px-2 text-xs rounded-xl border text-center font-medium transition-all ${
-                        fontFamily === font.id 
-                          ? 'bg-indigo-500/20 border-indigo-400/60 text-indigo-200 font-semibold shadow-sm' 
-                          : 'bg-slate-900/60 border-white/10 text-slate-400 hover:bg-white/10 hover:text-slate-200'
-                      }`}
-                    >
-                      {font.label}
-                    </button>
-                  ))}
+            {/* Options Body */}
+            <div className="space-y-5">
+              
+              {/* SECTION 1: Font Size */}
+              <div className="space-y-2">
+                <label className="text-xs font-bold uppercase tracking-wider font-mono text-slate-300">
+                  Font Size
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  {FONT_SIZE_OPTIONS.map((opt) => {
+                    const isSelected = fontSizePreset === opt.id;
+                    return (
+                      <button
+                        key={opt.id}
+                        type="button"
+                        onClick={() => setFontSizePreset(opt.id)}
+                        className={`p-2.5 rounded-2xl border text-left transition-all ${
+                          isSelected
+                            ? 'bg-indigo-500/20 border-indigo-400/60 text-white shadow-[0_0_15px_rgba(99,102,241,0.2)] ring-1 ring-indigo-400/30'
+                            : 'bg-white/[0.03] border-white/10 text-slate-300 hover:bg-white/[0.08] hover:border-white/20'
+                        }`}
+                      >
+                        <div className="text-xs font-semibold">{opt.label}</div>
+                        <div className="text-[10px] font-mono text-slate-400 mt-0.5">{opt.rootPx}</div>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
-              {/* Toggles */}
-              <div className="space-y-2 text-left">
-                {/* Pause Motion */}
+              {/* SECTION 2: Typeface */}
+              <div className="space-y-2">
+                <label className="text-xs font-bold uppercase tracking-wider font-mono text-slate-300">
+                  Typeface
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  {TYPEFACE_OPTIONS.map((tf) => {
+                    const isSelected = fontFamily === tf.id;
+                    return (
+                      <button
+                        key={tf.id}
+                        type="button"
+                        onClick={() => setFontFamily(tf.id)}
+                        className={`p-2.5 rounded-2xl border text-left transition-all ${
+                          isSelected
+                            ? 'bg-indigo-500/20 border-indigo-400/60 text-white shadow-[0_0_15px_rgba(99,102,241,0.2)] ring-1 ring-indigo-400/30'
+                            : 'bg-white/[0.03] border-white/10 text-slate-300 hover:bg-white/[0.08] hover:border-white/20'
+                        }`}
+                      >
+                        <div className="text-xs font-semibold">{tf.label}</div>
+                        <div 
+                          className="text-xs mt-1 text-slate-300"
+                          style={{ fontFamily: tf.fontFamilyStyle }}
+                        >
+                          {tf.sample}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* SECTION 3: Toggles */}
+              <div className="space-y-2 pt-2 border-t border-white/10">
                 <div 
                   onClick={() => setReduceMotion(!reduceMotion)}
-                  className="flex items-center justify-between p-3 rounded-2xl bg-white/[0.03] border border-white/10 hover:border-white/20 transition-all cursor-pointer"
+                  className="flex items-center justify-between p-2.5 rounded-xl bg-white/[0.02] border border-white/10 hover:border-white/20 transition-all cursor-pointer"
                 >
                   <div className="flex items-center gap-2">
                     <Eye className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
-                    <div>
-                      <div className="text-xs font-semibold text-slate-200">Pause Motion</div>
-                      <div className="text-[10px] text-slate-400">Stops APOD drift</div>
-                    </div>
+                    <span className="text-xs font-medium text-slate-200">Pause Background Motion</span>
                   </div>
-                  <div className="relative inline-flex items-center shrink-0">
-                    <input 
-                      type="checkbox" 
-                      className="sr-only peer" 
-                      checked={reduceMotion}
-                      onChange={(e) => setReduceMotion(e.target.checked)}
-                    />
-                    <div className="w-9 h-5 bg-slate-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-500 border border-white/10"></div>
-                  </div>
+                  <input 
+                    type="checkbox" 
+                    className="accent-indigo-500 cursor-pointer"
+                    checked={reduceMotion}
+                    onChange={(e) => setReduceMotion(e.target.checked)}
+                  />
                 </div>
 
-                {/* Solid Mode */}
                 <div 
                   onClick={() => setReduceTransparency(!reduceTransparency)}
-                  className="flex items-center justify-between p-3 rounded-2xl bg-white/[0.03] border border-white/10 hover:border-white/20 transition-all cursor-pointer"
+                  className="flex items-center justify-between p-2.5 rounded-xl bg-white/[0.02] border border-white/10 hover:border-white/20 transition-all cursor-pointer"
                 >
                   <div className="flex items-center gap-2">
                     <Sparkles className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-                    <div>
-                      <div className="text-xs font-semibold text-slate-200">Solid Mode</div>
-                      <div className="text-[10px] text-slate-400 font-mono">Disables backdrop blur</div>
-                    </div>
+                    <span className="text-xs font-medium text-slate-200">Solid Background Mode</span>
                   </div>
-                  <div className="relative inline-flex items-center shrink-0">
-                    <input 
-                      type="checkbox" 
-                      className="sr-only peer" 
-                      checked={reduceTransparency}
-                      onChange={(e) => setReduceTransparency(e.target.checked)}
-                    />
-                    <div className="w-9 h-5 bg-slate-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-cyan-500 border border-white/10"></div>
-                  </div>
+                  <input 
+                    type="checkbox" 
+                    className="accent-cyan-500 cursor-pointer"
+                    checked={reduceTransparency}
+                    onChange={(e) => setReduceTransparency(e.target.checked)}
+                  />
                 </div>
               </div>
+
             </div>
 
             {/* Footer */}

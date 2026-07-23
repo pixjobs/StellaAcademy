@@ -68,30 +68,44 @@ export const useGame = create<GameState>()(
 // in another `persist` call with a different name and storage target.
 // For now, keeping `started` in localStorage is fine, but this shows an alternative.
 
+export type FontPreset = 'inclusive' | 'system' | 'serif' | 'mono';
+export type FontSizePreset = 'compact' | 'default' | 'comfortable' | 'large';
+
 export interface AccessibilityState {
+  fontSizePreset: FontSizePreset;
   fontSizeScale: number;
-  fontFamily: 'sans' | 'serif' | 'mono' | 'dyslexic';
+  fontFamily: FontPreset;
   reduceTransparency: boolean;
   reduceMotion: boolean;
-  setFontSizeScale: (scale: number) => void;
-  setFontFamily: (font: AccessibilityState['fontFamily']) => void;
+  setFontSizePreset: (preset: FontSizePreset) => void;
+  setFontScale: (scale: number) => void;
+  setFontFamily: (font: FontPreset) => void;
   setReduceTransparency: (reduce: boolean) => void;
   setReduceMotion: (reduce: boolean) => void;
   resetDefaults: () => void;
 }
 
+const PRESET_SCALES: Record<FontSizePreset, number> = {
+  compact: 0.875,     // 14px
+  default: 1.0,       // 16px
+  comfortable: 1.125, // 18px
+  large: 1.25,        // 20px
+};
+
 export const useAccessibility = create<AccessibilityState>()(
   persist(
     (set) => ({
-      fontSizeScale: 1.15,
-      fontFamily: 'sans',
+      fontSizePreset: 'default',
+      fontSizeScale: 1.0,
+      fontFamily: 'inclusive',
       reduceTransparency: false,
       reduceMotion: false,
-      setFontSizeScale: (fontSizeScale) => set({ fontSizeScale }),
+      setFontSizePreset: (fontSizePreset) => set({ fontSizePreset, fontSizeScale: PRESET_SCALES[fontSizePreset] || 1.0 }),
+      setFontScale: (fontSizeScale) => set({ fontSizeScale }),
       setFontFamily: (fontFamily) => set({ fontFamily }),
       setReduceTransparency: (reduceTransparency) => set({ reduceTransparency }),
       setReduceMotion: (reduceMotion) => set({ reduceMotion }),
-      resetDefaults: () => set({ fontSizeScale: 1.15, fontFamily: 'sans', reduceTransparency: false, reduceMotion: false }),
+      resetDefaults: () => set({ fontSizePreset: 'default', fontSizeScale: 1.0, fontFamily: 'inclusive', reduceTransparency: false, reduceMotion: false }),
     }),
     {
       name: 'stella-accessibility',

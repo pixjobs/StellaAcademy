@@ -16,13 +16,13 @@ export default function AccessibilityWrapper({ children }: { children: ReactNode
     body.style.fontSize = `calc(1rem * ${scale})`;
 
     // Determine font family string
-    let fontValue = "'Hanken Grotesk', 'Inter', ui-sans-serif, system-ui, sans-serif";
-    if (fontFamily === 'serif') {
+    let fontValue = "'Inclusive Sans', 'Hanken Grotesk', ui-sans-serif, system-ui, sans-serif";
+    if (fontFamily === 'system') {
+      fontValue = "ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif";
+    } else if (fontFamily === 'serif') {
       fontValue = "'Fraunces', Georgia, Cambria, 'Times New Roman', serif";
     } else if (fontFamily === 'mono') {
       fontValue = "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace";
-    } else if (fontFamily === 'dyslexic') {
-      fontValue = "'Comic Sans MS', 'OpenDyslexic', sans-serif";
     }
 
     root.style.setProperty('--font-main', fontValue);
