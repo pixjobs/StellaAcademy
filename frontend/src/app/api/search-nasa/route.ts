@@ -22,7 +22,7 @@ type RequestPayload = {
  */
 export async function POST(req: NextRequest) {
   try {
-    const { query } = (await req.json()) as RequestPayload;
+    const { query, page = 1, limit = 16 } = (await req.json()) as RequestPayload;
 
     if (!query) {
       return NextResponse.json({ error: 'Search query is required' }, { status: 400 });
@@ -31,7 +31,8 @@ export async function POST(req: NextRequest) {
     // Call the server-only function from our server-side API route.
     const items: NivlItem[] = await searchNIVL(query, {
       expandAssets: true,
-      limit: 6 // We can set a consistent limit here
+      page,
+      limit
     });
 
     // Return the successful result to the client.

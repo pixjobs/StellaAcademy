@@ -1,6 +1,9 @@
 /* 1) GLOBAL IMPORTS — Must be at the very top */
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..600&family=Hanken+Grotesk:wght@300;400;500;600;700&display=swap');
+@import url('https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css');
 
 /* 2) TAILWIND DIRECTIVES */
 @tailwind base;
@@ -44,22 +47,40 @@
   }
 
   body {
-    @apply min-h-screen bg-background text-foreground text-[19px] sm:text-[18px] leading-relaxed;
-    font-family: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+    @apply min-h-screen bg-background text-foreground leading-relaxed;
+    font-size: calc(1rem * var(--font-scale, 1));
+    font-family: var(--font-main, 'Inter', 'Hanken Grotesk', ui-sans-serif, system-ui, sans-serif);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    letter-spacing: -0.01em;
+  }
+
+  .reduce-transparency .backdrop-blur-md,
+  .reduce-transparency .backdrop-blur-sm,
+  .reduce-transparency .bg-slate-950\/70,
+  .reduce-transparency .bg-slate-950\/75,
+  .reduce-transparency .bg-slate-950\/60,
+  .reduce-transparency .bg-slate-950\/50,
+  .reduce-transparency .bg-slate-900\/50,
+  .reduce-transparency .bg-slate-900\/60 {
+    backdrop-filter: none !important;
+    background-color: #020617 !important; /* solid slate-950 */
   }
 
   h1 {
-    @apply text-3xl sm:text-4xl font-bold tracking-tight leading-snug;
+    @apply text-3xl sm:text-4xl md:text-5xl font-bold leading-[1.08] tracking-[-0.03em];
+    font-family: 'Fraunces', serif;
   }
 
   h2 {
-    @apply text-2xl sm:text-3xl font-semibold tracking-tight leading-snug;
+    @apply text-2xl sm:text-3xl font-bold leading-tight tracking-[-0.02em];
+    font-family: 'Fraunces', serif;
   }
 
   h3 {
-    @apply text-xl sm:text-2xl font-semibold tracking-tight leading-snug;
+    @apply text-lg sm:text-xl font-semibold leading-snug tracking-[-0.01em];
+    font-family: 'Fraunces', serif;
   }
 
   ::selection {
@@ -147,10 +168,7 @@
     overflow-y: hidden;
     text-align: center;
   }
-  .prose .katex,
-  .prose .katex * {
-    all: revert;
-  }
+
   .prose .katex-display {
     @apply my-6 block overflow-x-auto overflow-y-hidden text-center;
   }
@@ -171,5 +189,15 @@
   }
   .prose a {
     color: hsl(var(--custom-gold));
+  }
+
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  /* Hide scrollbar for IE, Edge and Firefox */
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
   }
 }

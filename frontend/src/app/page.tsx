@@ -1,340 +1,217 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { useGame } from '@/lib/store';
-import type { Role } from '@/lib/store';
+import {
+  Sparkles, Activity, Cpu, Calculator, ChevronRight,
+  FlaskConical, BookOpen, Zap, Trophy, ArrowRight
+} from 'lucide-react';
+import { studyModules, type CategoryId } from '@/lib/study-modules';
 
-interface SpaceFact {
-  id: string;
+/* ─── Category metadata ─────────────────────────────────────────────── */
+const categories: {
+  id: CategoryId;
   title: string;
-  description: string;
-}
-
-interface ApodData {
-  bgUrl: string | null;
-  title?: string;
-  explanation?: string;
-  credit?: string;
-  mediaType?: 'image' | 'video';
-}
-
-const spaceFacts: SpaceFact[] = [
-  { 
-    id: '1', 
-    title: 'The Moon is Drifting Away', 
-    description: 'The Moon is currently moving away from Earth at about 3.8 cm per year. It will continue to do so for billions of years.'
-  },
-  { 
-    id: '2', 
-    title: 'Mars is Half the Size of Earth', 
-    description: 'Mars has a diameter of about 6,779 km, about half that of Earth. This explains why it has such weak gravity.'
-  },
-  { 
-    id: '3', 
-    title: 'The Great Red Spot', 
-    description: 'Jupiter\'s Great Red Spot is a storm that has been raging for at least 400 years. It is large enough to contain two or three Earths.'
-  },
-  { 
-    id: '4', 
-    title: 'There\'s Water on the Moon', 
-    description: 'NASA discovered water ice in permanently shadowed craters on the Moon. This could be a valuable resource for future lunar missions.'
-  },
+  icon: React.ElementType;
+  color: string;
+  glow: string;
+  badge: string;
+}[] = [
+  { id: 'physics',         title: 'Physics & Fields',          icon: FlaskConical, color: 'text-indigo-400',  glow: 'rgba(99,102,241,0.15)',  badge: 'bg-indigo-500/10 border-indigo-500/30 text-indigo-400' },
+  { id: 'mechanics',       title: 'Mechanics & Orbits',         icon: Activity,     color: 'text-amber-400',   glow: 'rgba(245,158,11,0.15)',  badge: 'bg-amber-500/10 border-amber-500/30 text-amber-400' },
+  { id: 'electronics',     title: 'Electronics & Signals',      icon: Cpu,          color: 'text-emerald-400', glow: 'rgba(52,211,153,0.15)',  badge: 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' },
+  { id: 'mathematics',     title: 'Theoretical Mathematics',    icon: Calculator,   color: 'text-rose-400',    glow: 'rgba(251,113,133,0.15)', badge: 'bg-rose-500/10 border-rose-500/30 text-rose-400' },
+  { id: 'elementary-math', title: 'Elementary Mathematics',     icon: BookOpen,     color: 'text-violet-400',  glow: 'rgba(167,139,250,0.15)', badge: 'bg-violet-500/10 border-violet-500/30 text-violet-400' },
 ];
 
-export default function Home() {
-  const { stars, level, role, setRole, addStars } = useGame();
-  
-  // Local states
-  const [apod, setApod] = useState<ApodData | null>(null);
-  const [loadingApod, setLoadingApod] = useState(true);
-  const [selectedTrivia, setSelectedTrivia] = useState<number | null>(null);
-  const [answeredTrivia, setAnsweredTrivia] = useState(false);
-  const [triviaRewardClaimed, setTriviaRewardClaimed] = useState(false);
-  
-  // Load NASA APOD
-  useEffect(() => {
-    fetch('/api/apod')
-      .then(res => res.json())
-      .then(data => {
-        setApod(data);
-        setLoadingApod(false);
-      })
-      .catch(() => {
-        setLoadingApod(false);
-      });
-  }, []);
+/* ─── Animated floating orbs ─────────────────────────────────────────── */
+function FloatingOrbs() {
+  return (
+    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+      <div className="absolute -top-40 -left-40 w-[600px] h-[600px] rounded-full bg-indigo-600/10 blur-[120px] animate-pulse" style={{ animationDuration: '6s' }} />
+      <div className="absolute top-1/3 -right-32 w-[500px] h-[500px] rounded-full bg-violet-600/10 blur-[100px] animate-pulse" style={{ animationDuration: '8s', animationDelay: '2s' }} />
+      <div className="absolute -bottom-20 left-1/3 w-[400px] h-[400px] rounded-full bg-cyan-600/8 blur-[100px] animate-pulse" style={{ animationDuration: '10s', animationDelay: '4s' }} />
+    </div>
+  );
+}
 
-  // Custom greeting messages based on selected role
-  const getStellaMessage = () => {
-    switch (role) {
-      case 'cadet':
-        return "System Check: propulsion and trajectory parameters online. Welcome, Cadet! Head over to the Rocket Lab and test your launch capabilities.";
-      case 'scholar':
-        return "Academic Database active. Welcome, Scholar! Dive into the Keplerian physics and chemical stoichiometry challenges to expand your research.";
-      case 'explorer':
-      default:
-        return "Starchart view enabled. Welcome, Explorer! Feel free to browse cosmic findings, search NASA's catalog, or begin a learning mission.";
-    }
-  };
+/* ─── Stat counter ───────────────────────────────────────────────────── */
+function StatCard({ value, label, icon: Icon, color }: { value: number | string; label: string; icon: React.ElementType; color: string }) {
+  return (
+    <div className="flex flex-col items-center gap-1 px-6 py-4 rounded-2xl bg-white/[0.03] border border-white/[0.07] backdrop-blur-sm">
+      <Icon className={`w-5 h-5 mb-1 ${color}`} />
+      <span className={`text-3xl font-bold font-mono ${color}`}>{value}</span>
+      <span className="text-xs text-slate-500 uppercase tracking-widest font-mono">{label}</span>
+    </div>
+  );
+}
 
-  const handleTriviaAnswer = (index: number) => {
-    setSelectedTrivia(index);
-    setAnsweredTrivia(true);
-    if (index === 0 && !triviaRewardClaimed) {
-      addStars(25);
-      setTriviaRewardClaimed(true);
-    }
-  };
+/* ─── Feature highlight card ─────────────────────────────────────────── */
+function FeatureCard({ icon: Icon, title, body, color }: { icon: React.ElementType; title: string; body: string; color: string }) {
+  return (
+    <div className="relative group flex gap-4 items-start p-5 rounded-2xl bg-white/[0.02] border border-white/[0.06] hover:border-white/[0.12] hover:bg-white/[0.04] transition-all duration-300">
+      <div className={`shrink-0 w-10 h-10 flex items-center justify-center rounded-xl bg-slate-800 border border-white/10 ${color}`}>
+        <Icon className="w-5 h-5" />
+      </div>
+      <div>
+        <h3 className="font-semibold text-slate-200 mb-1">{title}</h3>
+        <p className="text-sm text-slate-500 leading-relaxed">{body}</p>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Module card ────────────────────────────────────────────────────── */
+function ModuleCard({ mod, cat }: { mod: (typeof studyModules)[0]; cat: typeof categories[0] }) {
+  const Icon = cat.icon;
+  return (
+    <Link
+      href={`/study/${mod.id}`}
+      className="group relative flex flex-col bg-slate-900/40 backdrop-blur-md border border-slate-700/40 hover:border-slate-500/60 rounded-2xl p-5 transition-all duration-300 hover:-translate-y-1 overflow-hidden shadow-[0_4px_24px_rgba(0,0,0,0.4),inset_0_1px_1px_rgba(255,255,255,0.06)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.5),inset_0_1px_2px_rgba(255,255,255,0.1)]"
+      style={{ '--glow': cat.glow } as React.CSSProperties}
+    >
+      {/* Glow on hover */}
+      <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" style={{ background: `radial-gradient(circle at 50% 0%, ${cat.glow} 0%, transparent 70%)` }} />
+
+      <div className="relative z-10 flex flex-col h-full">
+        <div className="flex items-center justify-between mb-4">
+          <span className={`px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold tracking-wider border ${cat.badge}`}>
+            LVL {mod.difficulty}
+          </span>
+          <span className="text-[10px] text-slate-600 font-mono">{mod.estimatedMinutes} MIN</span>
+        </div>
+
+        <h3 className={`text-lg font-bold text-white font-fraunces mb-1.5 group-hover:${cat.color} transition-colors`}>
+          {mod.title}
+        </h3>
+        <p className="text-sm text-slate-500 leading-relaxed mb-5 flex-1">{mod.subtitle}</p>
+
+        <div className={`flex items-center gap-1.5 text-[11px] font-mono ${cat.color} opacity-70 group-hover:opacity-100 transition-opacity uppercase tracking-widest border-t border-white/[0.06] pt-4`}>
+          Open Module <ChevronRight className="w-3.5 h-3.5" />
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+/* ─── Page ───────────────────────────────────────────────────────────── */
+export default function HomePage() {
+  const totalModules = studyModules.length;
+  const totalFlashcards = studyModules.filter(m =>
+    ['arithmetic','basic-geometry','proportions','decimals-percentages','binary','multiplication','fraction-ops','negative-numbers','exponents-roots'].includes(m.id)
+  ).length * 5;
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white font-sans selection:bg-purple-500/30">
-      {/* Stars Background Glow */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-purple-900/20 via-slate-950 to-slate-950 pointer-events-none" />
+    <div className="relative min-h-screen bg-transparent overflow-hidden">
+      <FloatingOrbs />
 
-      {/* Floating HUD Navigation */}
-      <nav className="relative z-10 border-b border-white/5 bg-slate-900/60 backdrop-blur-md px-6 py-4">
-        <div className="max-w-6xl mx-auto flex justify-between items-center">
-          <Link href="/" className="text-xl font-bold bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">
-            ✨ Stella Academy
-          </Link>
-          
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-1.5 px-3 py-1 bg-purple-500/10 border border-purple-500/30 rounded-full text-xs font-semibold text-purple-300 shadow-[0_0_12px_rgba(168,85,247,0.1)]">
-              <span>⭐</span> {stars} Stars
-            </div>
-            <div className="flex items-center gap-1.5 px-3 py-1 bg-cyan-500/10 border border-cyan-500/30 rounded-full text-xs font-semibold text-cyan-300 shadow-[0_0_12px_rgba(6,182,212,0.1)]">
-              <span>🛡️</span> Level {level}
-            </div>
+      {/* ── Subtle grid ── */}
+      <div className="absolute inset-0 z-0 pointer-events-none bg-[linear-gradient(rgba(255,255,255,0.015)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.015)_1px,transparent_1px)] bg-[size:40px_40px]" />
+
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 pb-16 sm:pb-24">
+
+        {/* ── HERO ── */}
+        <section className="pt-10 sm:pt-16 pb-10 sm:pb-14 text-center max-w-4xl mx-auto">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-[10px] sm:text-xs font-mono uppercase tracking-widest mb-6 sm:mb-8">
+            <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+            Interactive Learning Platform
           </div>
-        </div>
-      </nav>
 
-      {/* Hero Section */}
-      <section className="relative z-10 py-16 px-4">
-        <div className="max-w-4xl mx-auto text-center space-y-6">
-          <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
-            Stella Space Academy
+          <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold font-fraunces text-white mb-5 sm:mb-6 leading-[1.05] tracking-[-0.03em]">
+            Master Science &amp;<br />
+            <span className="bg-gradient-to-r from-indigo-400 via-violet-400 to-cyan-400 bg-clip-text text-transparent">
+              Mathematics
+            </span>
           </h1>
-          <p className="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto leading-relaxed">
-            Gamified learning missions grounded in real-world physics, telemetry simulations, and astronomical data. Complete challenges to level up your status!
+
+          <p className="text-base sm:text-lg md:text-xl text-slate-400 font-light max-w-2xl mx-auto leading-relaxed mb-8 sm:mb-10 px-2">
+            Textbook-grade content, interactive flashcards, and live simulations — from elementary arithmetic to orbital mechanics.
           </p>
-          <div className="pt-4">
-            <Link 
-              href="/missions" 
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-cyan-500 hover:scale-[1.02] transition-transform text-white font-bold px-8 py-4 rounded-xl shadow-lg shadow-purple-500/20"
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
+            <Link
+              href="/study"
+              className="group w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold transition-all duration-200 shadow-[0_0_30px_rgba(99,102,241,0.4)] hover:shadow-[0_0_40px_rgba(99,102,241,0.6)] hover:-translate-y-0.5 text-sm sm:text-base"
             >
-              🚀 Start Learning Campaign →
+              Open Study Hub
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </Link>
+            <Link
+              href="/about"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-2xl bg-white/5 hover:bg-white/10 text-slate-300 font-semibold border border-white/10 hover:border-white/20 transition-all duration-200 text-sm sm:text-base"
+            >
+              Learn More
             </Link>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Stella Chat & Pathway Choice */}
-      <section className="max-w-6xl mx-auto px-4 mb-12 relative z-10">
-        <div className="grid md:grid-cols-3 gap-8">
-          
-          {/* Pathway Selector */}
-          <div className="md:col-span-1 bg-slate-900/60 backdrop-blur-md p-6 rounded-2xl border border-white/10 shadow-xl space-y-4">
-            <h3 className="text-lg font-bold text-cyan-400 flex items-center gap-1.5">
-              <span>🛡️</span> Academy Pathway
-            </h3>
-            <p className="text-xs text-slate-400">
-              Select your pathway to customize your educational feedback and dashboard controls.
-            </p>
-            
-            <div className="space-y-2 pt-2">
-              {(['explorer', 'cadet', 'scholar'] as Role[]).map((r) => (
-                <button
-                  key={r}
-                  onClick={() => setRole(r)}
-                  className={`w-full p-3 text-left rounded-xl border transition-all cursor-pointer ${
-                    role === r
-                      ? 'bg-purple-600/10 border-purple-500 text-purple-300 shadow-[0_0_12px_rgba(168,85,247,0.15)] font-bold'
-                      : 'bg-slate-950/40 border-white/5 text-slate-400 hover:border-white/10 hover:bg-slate-950/70'
-                  }`}
-                >
-                  <div className="flex justify-between items-center text-sm">
-                    <span>{r.toUpperCase()}</span>
-                    {role === r && <span className="text-[10px] bg-purple-500 text-white px-1.5 py-0.5 rounded-full font-bold">Selected</span>}
-                  </div>
-                  <span className="text-[10px] text-slate-500 block font-normal mt-1">
-                    {r === 'explorer' && 'Visual mapping, stargazing & space poster missions.'}
-                    {r === 'cadet' && 'Engine telemetry calculations & rocket launch physics.'}
-                    {r === 'scholar' && 'Astrophysical stoichiometry & orbital mechanics.'}
-                  </span>
-                </button>
-              ))}
+        {/* ── STATS ── */}
+        <section className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-14 sm:mb-20">
+          <StatCard value={totalModules}    label="Modules"     icon={BookOpen}     color="text-indigo-400" />
+          <StatCard value={5}               label="Disciplines" icon={FlaskConical}  color="text-violet-400" />
+          <StatCard value={totalFlashcards} label="Flashcards"  icon={Zap}          color="text-amber-400" />
+          <StatCard value="KaTeX"           label="Math Render" icon={Trophy}        color="text-emerald-400" />
+        </section>
+
+        {/* ── FEATURES ── */}
+        <section className="mb-14 sm:mb-20">
+          <div className="text-center mb-8 sm:mb-10">
+            <h2 className="text-2xl sm:text-3xl font-bold font-fraunces text-white mb-2 sm:mb-3">Why Stella Academy?</h2>
+            <p className="text-slate-500 max-w-xl mx-auto text-sm px-2">Everything a serious student needs, built with engineering rigour.</p>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+            <FeatureCard icon={Calculator}  color="text-indigo-400"  title="Textbook-Grade Maths"    body="All equations rendered with KaTeX — the same standard used by leading academic journals and Khan Academy." />
+            <FeatureCard icon={Zap}         color="text-amber-400"   title="Interactive Flashcards"  body="Step through every calculation manually or enter your own answer, with GSAP-animated feedback on each question." />
+            <FeatureCard icon={Activity}    color="text-emerald-400" title="Live Simulations"        body="Visual GSAP simulations for physics and mechanics — watch gravity, gear ratios, and wave frequencies come alive." />
+            <FeatureCard icon={BookOpen}    color="text-violet-400"  title="Vetted References"       body="Every module links to authoritative sources — Feynman Lectures, Khan Academy, MIT OpenCourseWare, and more." />
+            <FeatureCard icon={FlaskConical} color="text-rose-400"   title="Full Curriculum"         body="From elementary arithmetic and binary to differential equations and orbital mechanics — one coherent learning path." />
+            <FeatureCard icon={Trophy}      color="text-cyan-400"    title="Difficulty Levels"       body="Modules are rated 1–3 so you always know exactly where you stand and what to tackle next." />
+          </div>
+        </section>
+
+        {/* ── CURRICULUM ── */}
+        <section>
+          <div className="flex items-start sm:items-center justify-between mb-8 sm:mb-10 gap-4">
+            <div>
+              <h2 className="text-2xl sm:text-3xl font-bold font-fraunces text-white mb-1 sm:mb-2">Curriculum</h2>
+              <p className="text-slate-500 text-sm">Browse all {totalModules} modules across 5 disciplines</p>
             </div>
+            <Link
+              href="/study"
+              className="hidden sm:inline-flex shrink-0 items-center gap-1.5 text-xs font-mono text-slate-400 hover:text-slate-200 transition-colors uppercase tracking-widest"
+            >
+              Browse All <ChevronRight className="w-4 h-4" />
+            </Link>
           </div>
 
-          {/* Socratic Assistant Dialogue */}
-          <div className="md:col-span-2 bg-slate-900/60 backdrop-blur-md p-6 rounded-2xl border border-white/10 shadow-xl flex flex-col justify-between">
-            <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <span className="w-9 h-9 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center text-lg font-bold text-white shadow-md">
-                  ✨
-                </span>
-                <div>
-                  <h4 className="font-bold text-sm text-slate-200">Stella</h4>
-                  <span className="text-[9px] text-slate-500 uppercase tracking-wider font-semibold">Academy Guide</span>
-                </div>
-              </div>
-              
-              <div className="p-4 bg-slate-950/60 border border-white/5 rounded-xl text-sm text-slate-300 leading-relaxed italic">
-                &ldquo;{getStellaMessage()}&rdquo;
-              </div>
-            </div>
+          <div className="space-y-14">
+            {categories.map(cat => {
+              const modules = studyModules.filter(m => m.category === cat.id);
+              if (!modules.length) return null;
+              const Icon = cat.icon;
 
-            {/* Micro daily quiz */}
-            <div className="mt-6 border-t border-white/5 pt-4">
-              <h4 className="text-xs font-bold text-slate-400 mb-2 uppercase tracking-wide">Daily Academy Challenge (+25 Stars)</h4>
-              <p className="text-xs text-slate-200 mb-3">
-                What does Kepler&apos;s Second Law (equal areas in equal time) imply about a planet&apos;s orbital speed?
-              </p>
-              
-              <div className="grid grid-cols-2 gap-2">
-                {[
-                  "Planets move faster when they are closer to the Sun.",
-                  "Planets maintain a perfectly constant speed in LEO.",
-                  "The orbital speed is independent of the orbital path.",
-                  "Outer planets orbit faster than inner planets."
-                ].map((opt, idx) => (
-                  <button
-                    key={idx}
-                    disabled={answeredTrivia}
-                    onClick={() => handleTriviaAnswer(idx)}
-                    className={`p-2.5 text-[10px] text-left rounded-lg border transition-all cursor-pointer ${
-                      answeredTrivia
-                        ? idx === 0
-                          ? 'bg-emerald-500/10 border-emerald-500 text-emerald-300'
-                          : selectedTrivia === idx
-                          ? 'bg-red-500/10 border-red-500 text-red-300'
-                          : 'bg-slate-950/40 border-white/5 opacity-55'
-                        : 'bg-slate-950/40 border-white/5 text-slate-300 hover:border-white/10 hover:bg-slate-950/70'
-                    }`}
-                  >
-                    {opt}
-                  </button>
-                ))}
-              </div>
-
-              {answeredTrivia && (
-                <p className="text-[9px] text-slate-400 mt-2 leading-relaxed">
-                  {selectedTrivia === 0 
-                    ? "Correct! As a planet moves closer to the Sun, gravity pulls harder, and it speeds up (achieving maximum velocity at perihelion) to sweep out equal area."
-                    : "Not quite. The correct answer is that planets move faster when they are closer to the Sun (at perihelion)."
-                  }
-                </p>
-              )}
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      {/* Featured Section: Live APOD & Space Facts */}
-      <section className="max-w-6xl mx-auto px-4 mb-16 relative z-10">
-        <div className="bg-slate-900/60 backdrop-blur-md rounded-2xl border border-white/10 p-8 shadow-xl">
-          <h2 className="text-2xl md:text-3xl font-extrabold mb-6 tracking-tight text-white flex items-center gap-2">
-            <span>📷</span> NASA Space Exploration
-          </h2>
-          
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* Space Facts */}
-            <div className="space-y-6">
-              <h3 className="text-lg font-bold text-cyan-400 border-b border-white/5 pb-2">Cosmic Facts</h3>
-              <div className="space-y-4">
-                {spaceFacts.map((fact) => (
-                  <div key={fact.id} className="space-y-1 bg-slate-950/30 p-3 rounded-lg border border-white/5 hover:border-white/10 transition-all">
-                    <h4 className="font-bold text-sm text-cyan-400">{fact.title}</h4>
-                    <p className="text-xs text-slate-400 leading-relaxed">{fact.description}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Live NASA APOD display */}
-            <div className="border-l border-white/5 pl-0 md:pl-8">
-              <h3 className="text-lg font-bold text-purple-400 mb-4">Astronomy Picture of the Day</h3>
-              
-              {loadingApod ? (
-                <div className="w-full h-64 bg-slate-950 rounded-xl animate-pulse flex items-center justify-center border border-white/5">
-                  <span className="text-xs text-slate-500">Retrieving APOD image...</span>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {apod?.bgUrl ? (
-                    <div className="rounded-xl overflow-hidden shadow-lg border border-white/10 relative group">
-                      <img 
-                        src={apod.bgUrl} 
-                        alt={apod.title || 'Stunning cosmic landscape'}
-                        className="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                      <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black via-black/70 to-transparent p-4">
-                        <h4 className="font-bold text-xs text-white">{apod.title}</h4>
-                        <span className="text-[9px] text-slate-400 mt-1 block">Copyright: {apod.credit || 'NASA'}</span>
-                      </div>
+              return (
+                <div key={cat.id}>
+                  {/* Category header */}
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className={`w-8 h-8 flex items-center justify-center rounded-xl bg-slate-800 border border-white/10 ${cat.color}`}>
+                      <Icon className="w-4 h-4" />
                     </div>
-                  ) : (
-                    <div className="w-full h-56 bg-slate-950 rounded-xl flex items-center justify-center border border-white/5 text-center p-4">
-                      <p className="text-xs text-slate-500 leading-relaxed">
-                        API rate limit reached or offline. Custom cosmic display activated.
-                      </p>
-                    </div>
-                  )}
-                  
-                  {apod?.explanation && (
-                    <p className="text-xs text-slate-400 leading-relaxed line-clamp-4 hover:line-clamp-none transition-all cursor-pointer">
-                      {apod.explanation}
-                    </p>
-                  )}
+                    <h3 className="text-sm font-bold uppercase tracking-[0.2em] font-mono text-slate-300">{cat.title}</h3>
+                    <div className="flex-1 h-px bg-white/[0.06]" />
+                    <span className="text-xs font-mono text-slate-600">{modules.length} modules</span>
+                  </div>
+
+                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+                    {modules.map(mod => <ModuleCard key={mod.id} mod={mod} cat={cat} />)}
+                  </div>
                 </div>
-              )}
-            </div>
+              );
+            })}
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Campaign Directory Grid */}
-      <section className="max-w-6xl mx-auto px-4 py-8 relative z-10 border-t border-white/5">
-        <h2 className="text-2xl font-bold mb-6 text-slate-200">Academy Hubs</h2>
-        <div className="grid md:grid-cols-3 gap-4">
-          <Link 
-            href="/about" 
-            className="bg-slate-900/50 hover:bg-slate-900/80 border border-white/5 hover:border-white/10 rounded-xl p-6 transition-all shadow-md group"
-          >
-            <div className="text-3xl mb-2 group-hover:scale-110 transition-transform w-fit">📚</div>
-            <h3 className="font-bold text-md mb-1 text-purple-300">About Stella</h3>
-            <p className="text-xs text-slate-400">Discover the educational pedagogy and goals of our platform.</p>
-          </Link>
-          
-          <Link 
-            href="/missions" 
-            className="bg-slate-900/50 hover:bg-slate-900/80 border border-white/5 hover:border-white/10 rounded-xl p-6 transition-all shadow-md group"
-          >
-            <div className="text-3xl mb-2 group-hover:scale-110 transition-transform w-fit">🚀</div>
-            <h3 className="font-bold text-md mb-1 text-cyan-300">Space Missions</h3>
-            <p className="text-xs text-slate-400">Engage in mathematical launch calculations and chemical spectrometry.</p>
-          </Link>
-          
-          <Link 
-            href="/gallery" 
-            className="bg-slate-900/50 hover:bg-slate-900/80 border border-white/5 hover:border-white/10 rounded-xl p-6 transition-all shadow-md group"
-          >
-            <div className="text-3xl mb-2 group-hover:scale-110 transition-transform w-fit">🖼️</div>
-            <h3 className="font-bold text-md mb-1 text-pink-300">Media Library</h3>
-            <p className="text-xs text-slate-400">Browse stunning high-resolution space imagery indexed from NASA.</p>
-          </Link>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="border-t border-white/5 mt-16 py-12">
-        <div className="max-w-6xl mx-auto px-4 text-center text-slate-500 text-xs space-y-2">
-          <p>&copy; 2026 Stella Academy. Gamified physics campaign.</p>
-        </div>
-      </footer>
-    </main>
+      </div>
+    </div>
   );
 }

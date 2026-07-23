@@ -67,3 +67,28 @@ export const useGame = create<GameState>()(
 // If you wanted to implement this, you would wrap the main `(set) => ({...})`
 // in another `persist` call with a different name and storage target.
 // For now, keeping `started` in localStorage is fine, but this shows an alternative.
+
+export interface AccessibilityState {
+  fontSizeScale: number;
+  fontFamily: 'sans' | 'serif' | 'mono' | 'dyslexic';
+  reduceTransparency: boolean;
+  setFontSizeScale: (scale: number) => void;
+  setFontFamily: (font: AccessibilityState['fontFamily']) => void;
+  setReduceTransparency: (reduce: boolean) => void;
+}
+
+export const useAccessibility = create<AccessibilityState>()(
+  persist(
+    (set) => ({
+      fontSizeScale: 1.15,
+      fontFamily: 'sans',
+      reduceTransparency: false,
+      setFontSizeScale: (fontSizeScale) => set({ fontSizeScale }),
+      setFontFamily: (fontFamily) => set({ fontFamily }),
+      setReduceTransparency: (reduceTransparency) => set({ reduceTransparency }),
+    }),
+    {
+      name: 'stella-accessibility',
+    }
+  )
+);

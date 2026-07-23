@@ -7,7 +7,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import rehypeRaw from 'rehype-raw';
-import rehypeMathjax from 'rehype-mathjax/svg';
+import rehypeKatex from 'rehype-katex';
 import rehypeSlug from 'rehype-slug';
 import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 
@@ -213,12 +213,12 @@ export default function MarkdownRenderer({ children, onCaptureFragment }: Props)
   };
 
   return (
-    <div className="prose prose-sm prose-invert max-w-none">
+    <div className="prose prose-invert max-w-none">
       <ReactMarkdown
         remarkPlugins={[remarkMathFromFencedCode, remarkMath, remarkGfm]}
         rehypePlugins={[
           rehypeRaw,
-          rehypeMathjax,
+          rehypeKatex,
           rehypeSlug,
           [
             rehypeAutolinkHeadings,
@@ -229,7 +229,7 @@ export default function MarkdownRenderer({ children, onCaptureFragment }: Props)
               content: (): Element[] => [{
                 type: 'element',
                 tagName: 'span',
-                properties: { 'aria-hidden': true, className: 'anchor-icon' },
+                properties: { 'aria-hidden': true, className: ['anchor-icon'] },
                 children: [{ type: 'text', value: '¶' }],
               }],
             },

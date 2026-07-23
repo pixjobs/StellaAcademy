@@ -19,44 +19,46 @@ export const revalidate = 0;
 
 type RootLayoutProps = { children: ReactNode };
 
-export default async function RootLayout({ children }: RootLayoutProps) {
-  const useApod = process.env.USE_APOD_BG === 'true';
+import AccessibilityWrapper from '@/components/AccessibilityWrapper';
 
-  let bgUrl: string | undefined;
-  if (useApod) {
-    // Simple APOD fetch without secrets (educational use)
-    const apiKey = process.env.NASA_API_KEY || '';
-    if (apiKey) {
-      try {
-        const date = new Date().toISOString().slice(0, 10);
-        const response = await fetch(`https://api.nasa.gov/planetary/apod?date=${date}&api_key=${apiKey}`);
-        if (response.ok) {
-          const data = await response.json();
-          bgUrl = data.url || undefined;
-        }
-      } catch (err) {
-        console.warn('[layout] Failed to load APOD background:', err);
+export default async function RootLayout({ children }: RootLayoutProps) {
+  let bgUrl = '/bg.jpg';
+  
+  try {
+    const res = await fetch('http://localhost:3000/api/apod', { cache: 'no-store' }).catch(() => null);
+    if (res && res.ok) {
+      const data = await res.json();
+      if (data && data.bgUrl) {
+        bgUrl = data.bgUrl;
       }
     }
+  } catch (err) {
+    // silently fallback
   }
 
   return (
     <html lang="en" suppressHydrationWarning>
       <body
         className={[
-          'min-h-screen bg-background text-foreground antialiased',
+          'min-h-screen bg-slate-950 text-slate-100 antialiased',
           'overflow-x-hidden',
           'selection:bg-accent selection:text-accent-foreground',
         ].join(' ')}
       >
-        {/* Wrap the whole app in Providers if needed - currently just passes children */}
-        <Providers>
-          <div className="relative z-20 flex min-h-screen flex-col">
-            <Header />
-            <main className="flex-1">{children}</main>
-            <Footer />
-          </div>
-        </Providers>
+        <AccessibilityWrapper>
+          <div 
+            className="fixed inset-0 z-0 opacity-20 bg-cover bg-center bg-no-repeat mix-blend-screen pointer-events-none"
+            style={{ backgroundImage: `url('${bgUrl}')` }}
+          />
+          {/* Wrap the whole app in Providers if needed - currently just passes children */}
+          <Providers>
+            <div className="relative z-20 flex min-h-screen flex-col">
+              <Header />
+              <main className="flex-1">{children}</main>
+              <Footer />
+            </div>
+          </Providers>
+        </AccessibilityWrapper>
       </body>
     </html>
   );

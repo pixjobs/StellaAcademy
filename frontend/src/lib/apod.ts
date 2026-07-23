@@ -41,7 +41,7 @@ export async function getApod(): Promise<Apod | null> {
       throw new Error(`APOD API error: ${response.status}`);
     }
 
-    const data: NasaApodResponse = await response.json();
+    const data = (await response.json()) as NasaApodResponse;
     
     return {
       date: data.date,

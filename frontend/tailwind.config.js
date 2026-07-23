@@ -26,6 +26,10 @@ module.exports = {
         popover: { DEFAULT: 'hsl(var(--popover))', foreground: 'hsl(var(--popover-foreground))' },
         card: { DEFAULT: 'hsl(var(--card))', foreground: 'hsl(var(--card-foreground))' },
       },
+      fontFamily: {
+        fraunces: ['Fraunces', 'serif'],
+        hanken: ['"Hanken Grotesk"', 'sans-serif'],
+      },
       borderRadius: {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',

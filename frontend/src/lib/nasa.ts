@@ -30,6 +30,9 @@ export type NivlItem = {
   description?: string;
   sourceUrl?: string;
   thumbnailUrl?: string;
+  dateCreated?: string;
+  center?: string;
+  keywords?: string[];
 };
 
 export type MarsPhoto = {
@@ -141,17 +144,10 @@ export async function searchNIVL(
   opts?: { page?: number; limit?: number; expandAssets?: boolean; prefer?: "orig" | "large" | "any" }
 ): Promise<NivlItem[]> {
   const { page, limit } = opts || {};
-  const apiKey = process.env.NASA_API_KEY || '';
-  
-  if (!apiKey) {
-    console.warn('[NASA] No NASA_API_KEY configured for NIVL search');
-    return [];
-  }
-
-  const params = new URLSearchParams({ api_key: apiKey });
+  const params = new URLSearchParams();
   params.set('q', q);
+  params.set('media_type', 'image'); // filter only images
   if (page) params.set('page', page.toString());
-  if (limit) params.set('limit', limit.toString());
   
   const url = `https://images-api.nasa.gov/search?${params.toString()}`;
 
@@ -174,6 +170,9 @@ export async function searchNIVL(
         description: media.description,
         sourceUrl: item.href,
         thumbnailUrl: item.links?.[0]?.href || undefined,
+        dateCreated: media.date_created,
+        center: media.center,
+        keywords: media.keywords,
       } : [];
     });
 
@@ -191,6 +190,9 @@ interface NivlSearchResponse {
         title: string;
         description: string;
         media_type: string;
+        date_created?: string;
+        center?: string;
+        keywords?: string[];
       }>;
       links: Array<{ href: string }>;
       href: string;
