@@ -184,7 +184,7 @@ export default function ConceptStepper({
 
             {/* ── Expandable content area (CSS grid‑rows trick) ── */}
             <div
-              className="grid transition-[grid-template-rows] duration-500 ease-[cubic-bezier(0.33,1,0.68,1)]"
+              className="grid transition-[grid-template-rows] duration-500 ease-out"
               style={{
                 gridTemplateRows: isExpanded ? '1fr' : '0fr',
               }}

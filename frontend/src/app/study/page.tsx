@@ -11,6 +11,39 @@ import MarkdownRenderer from '@/components/MarkdownRenderer';
 import { ArrowLeft, BookOpen, Search, Sparkles, ChevronDown, Filter } from 'lucide-react';
 import Link from 'next/link';
 
+const ACCENT_STYLES = {
+  indigo: {
+    dot: 'bg-indigo-400',
+    badge: 'bg-indigo-500/10 border-indigo-500/20 text-indigo-400',
+    formulaBadge: 'border-indigo-500/30 text-indigo-300 bg-indigo-500/10',
+  },
+  amber: {
+    dot: 'bg-amber-400',
+    badge: 'bg-amber-500/10 border-amber-500/20 text-amber-400',
+    formulaBadge: 'border-amber-500/30 text-amber-300 bg-amber-500/10',
+  },
+  emerald: {
+    dot: 'bg-emerald-400',
+    badge: 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400',
+    formulaBadge: 'border-emerald-500/30 text-emerald-300 bg-emerald-500/10',
+  },
+  violet: {
+    dot: 'bg-violet-400',
+    badge: 'bg-violet-500/10 border-violet-500/20 text-violet-400',
+    formulaBadge: 'border-violet-500/30 text-violet-300 bg-violet-500/10',
+  },
+  rose: {
+    dot: 'bg-rose-400',
+    badge: 'bg-rose-500/10 border-rose-500/20 text-rose-400',
+    formulaBadge: 'border-rose-500/30 text-rose-300 bg-rose-500/10',
+  },
+  cyan: {
+    dot: 'bg-cyan-400',
+    badge: 'bg-cyan-500/10 border-cyan-500/20 text-cyan-400',
+    formulaBadge: 'border-cyan-500/30 text-cyan-300 bg-cyan-500/10',
+  },
+} as const;
+
 export default function StudyPage() {
   const [activeModuleId, setActiveModuleId] = useState<ConceptId>(studyModules[0].id);
   const [activeVariable, setActiveVariable] = useState<string | null>(null);
@@ -24,6 +57,7 @@ export default function StudyPage() {
 
   // Safely fallback if activeModuleId is somehow not in the array (e.g. during fast refresh)
   const activeModule = studyModules.find(m => m.id === activeModuleId) || studyModules[0];
+  const activeAccent = ACCENT_STYLES[activeModule.accentColor] || ACCENT_STYLES.indigo;
 
   // Handle module change
   const handleModuleChange = (id: ConceptId) => {
@@ -85,7 +119,7 @@ export default function StudyPage() {
             className="flex items-center justify-between w-full px-4 py-3 rounded-xl bg-slate-900 border border-white/10 text-sm font-semibold hover:bg-slate-800/80 transition-colors"
           >
             <div className="flex items-center gap-2">
-              <span className={`w-2.5 h-2.5 rounded-full bg-${activeModule.accentColor}-400 animate-pulse`} />
+              <span className={`w-2.5 h-2.5 rounded-full ${activeAccent.dot} animate-pulse`} />
               <span className="text-slate-200">Module: {activeModule.title}</span>
             </div>
             <span className="text-xs text-indigo-400 font-mono flex items-center gap-1">
@@ -220,30 +254,33 @@ export default function StudyPage() {
             {/* Scrollable list of modules */}
             <div className="flex-1 overflow-y-auto space-y-2 pr-1.5 max-h-[calc(100vh-320px)] scrollbar-thin scrollbar-thumb-slate-800 scrollbar-track-transparent">
               {filteredModules.length > 0 ? (
-                filteredModules.map(module => (
-                  <button
-                    key={module.id}
-                    onClick={() => handleModuleChange(module.id as ConceptId)}
-                    className={`w-full text-left p-3.5 rounded-xl border transition-all duration-200 flex flex-col gap-1.5 ${
-                      activeModule.id === module.id
-                        ? 'bg-slate-900/90 border-indigo-500/50 shadow-[0_4px_16px_rgba(99,102,241,0.12),inset_0_1px_1px_rgba(255,255,255,0.06)]'
-                        : 'bg-slate-950/20 border-white/[0.04] hover:bg-slate-900/40 hover:border-white/10'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between w-full">
-                      <span className={`px-2 py-0.5 rounded text-[8px] font-mono tracking-wider font-bold bg-${module.accentColor}-500/10 border border-${module.accentColor}-500/20 text-${module.accentColor}-400`}>
-                        LVL {module.difficulty}
-                      </span>
-                      <span className="text-[9px] text-slate-500 font-mono">{module.estimatedMinutes} min</span>
-                    </div>
-                    <h3 className="font-semibold text-xs text-slate-100 group-hover:text-white transition-colors truncate w-full">
-                      {module.title}
-                    </h3>
-                    <p className="text-[11px] text-slate-500 font-light line-clamp-1 w-full leading-normal">
-                      {module.subtitle}
-                    </p>
-                  </button>
-                ))
+                filteredModules.map(module => {
+                  const modAccent = ACCENT_STYLES[module.accentColor] || ACCENT_STYLES.indigo;
+                  return (
+                    <button
+                      key={module.id}
+                      onClick={() => handleModuleChange(module.id as ConceptId)}
+                      className={`w-full text-left p-3.5 rounded-xl border transition-all duration-200 flex flex-col gap-1.5 ${
+                        activeModule.id === module.id
+                          ? 'bg-slate-900/90 border-indigo-500/50 shadow-[0_4px_16px_rgba(99,102,241,0.12),inset_0_1px_1px_rgba(255,255,255,0.06)]'
+                          : 'bg-slate-950/20 border-white/[0.04] hover:bg-slate-900/40 hover:border-white/10'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between w-full">
+                        <span className={`px-2 py-0.5 rounded text-[8px] font-mono tracking-wider font-bold border ${modAccent.badge}`}>
+                          LVL {module.difficulty}
+                        </span>
+                        <span className="text-[9px] text-slate-500 font-mono">{module.estimatedMinutes} min</span>
+                      </div>
+                      <h3 className="font-semibold text-xs text-slate-100 group-hover:text-white transition-colors truncate w-full">
+                        {module.title}
+                      </h3>
+                      <p className="text-[11px] text-slate-500 font-light line-clamp-1 w-full leading-normal">
+                        {module.subtitle}
+                      </p>
+                    </button>
+                  );
+                })
               ) : (
                 <div className="text-center py-8 text-slate-500 text-xs font-mono">
                   No modules found.
@@ -288,7 +325,7 @@ export default function StudyPage() {
                     <div className="bg-slate-950/60 border border-white/10 rounded-2xl p-5 md:p-6 backdrop-blur-md shadow-xl flex flex-col justify-between">
                       <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-4">
                         <div className="flex items-center gap-2">
-                          <span className={`w-2.5 h-2.5 rounded-full bg-${activeModule.accentColor}-400 animate-pulse`} />
+                          <span className={`w-2.5 h-2.5 rounded-full ${activeAccent.dot} animate-pulse`} />
                           <span className="text-xs font-bold text-slate-200 uppercase tracking-wider font-mono">Simulation Viewport</span>
                         </div>
                         <span className="text-[9px] text-slate-500 font-mono">{activeModule.title}</span>
@@ -330,7 +367,7 @@ export default function StudyPage() {
                       <h3 className="font-mono text-xs uppercase tracking-widest text-slate-400 font-semibold flex items-center gap-2">
                         <span className="text-indigo-400">02</span> Interactive Formula
                       </h3>
-                      <span className={`text-[8px] uppercase font-mono px-2 py-0.5 rounded border border-${activeModule.accentColor}-500/30 text-${activeModule.accentColor}-300 bg-${activeModule.accentColor}-500/10`}>
+                      <span className={`text-[8px] uppercase font-mono px-2 py-0.5 rounded border ${activeAccent.formulaBadge}`}>
                         Hover symbols
                       </span>
                     </div>

@@ -7,6 +7,9 @@ const nextConfig: NextConfig = {
    */
   output: "standalone",
 
+  /** Allow local network IPs during development */
+  allowedDevOrigins: ['192.168.50.190', 'localhost', '127.0.0.1'],
+
   /** Stricter runtime checks */
   reactStrictMode: true,
 
