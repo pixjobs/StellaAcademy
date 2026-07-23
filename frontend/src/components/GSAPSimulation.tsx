@@ -871,6 +871,321 @@ export default function GSAPSimulation({
             { expr: '(2^3)^2', steps: ['2^{3 \\times 2}', '2^6', '64'], ans: '64' }
           ]);
         }
+      } else if (conceptId === 'thermodynamics') {
+        // --- THERMODYNAMICS: bouncing gas particles in a container ---
+        container.className = 'relative w-full h-full flex flex-col items-center justify-center bg-slate-950 overflow-hidden';
+
+        const label = document.createElement('div');
+        label.className = 'absolute top-4 text-slate-500 text-[10px] uppercase tracking-[0.2em] font-mono';
+        label.innerText = 'Ideal Gas — Particle Simulation';
+        container.appendChild(label);
+
+        const box = document.createElement('div');
+        box.className = 'relative border-2 border-rose-500/40 rounded-lg bg-slate-900/60 overflow-hidden';
+        box.style.width = '280px';
+        box.style.height = '220px';
+        container.appendChild(box);
+
+        const infoRow = document.createElement('div');
+        infoRow.className = 'absolute bottom-4 flex gap-6 text-[10px] font-mono text-rose-300';
+        container.appendChild(infoRow);
+
+        const pLabel = document.createElement('span');
+        pLabel.innerText = 'P ↑ with T';
+        const eLabel = document.createElement('span');
+        eLabel.className = 'text-orange-300';
+        eLabel.innerText = 'Entropy → disorder';
+        infoRow.appendChild(pLabel);
+        infoRow.appendChild(eLabel);
+
+        const colors = ['#fb7185','#f97316','#fbbf24','#34d399','#60a5fa','#c084fc','#e879f9'];
+        const NUM = 14;
+        const particles: {el: HTMLDivElement; vx: number; vy: number; x: number; y: number}[] = [];
+        const W = 280, H = 220, R = 7;
+
+        for (let i = 0; i < NUM; i++) {
+          const p = document.createElement('div');
+          p.className = 'absolute rounded-full';
+          const c = colors[i % colors.length];
+          p.style.cssText = `width:${R*2}px;height:${R*2}px;background:${c};box-shadow:0 0 6px ${c};`;
+          box.appendChild(p);
+          const speed = 1.2 + Math.random() * 1.5;
+          const angle = Math.random() * Math.PI * 2;
+          particles.push({
+            el: p,
+            x: R + Math.random() * (W - R * 2),
+            y: R + Math.random() * (H - R * 2),
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+          });
+        }
+
+        const tick = gsap.ticker.add(() => {
+          for (const p of particles) {
+            p.x += p.vx;
+            p.y += p.vy;
+            if (p.x <= R || p.x >= W - R) { p.vx *= -1; p.x = Math.max(R, Math.min(W - R, p.x)); }
+            if (p.y <= R || p.y >= H - R) { p.vy *= -1; p.y = Math.max(R, Math.min(H - R, p.y)); }
+            gsap.set(p.el, { x: p.x - R, y: p.y - R });
+          }
+        });
+
+        return () => { gsap.ticker.remove(tick); };
+
+      } else if (conceptId === 'momentum') {
+        // --- MOMENTUM: two balls colliding and conserving momentum ---
+        container.className = 'relative w-full h-full flex items-center justify-center bg-slate-950 overflow-hidden';
+
+        const track = document.createElement('div');
+        track.className = 'relative w-[340px] h-[80px] border-b-2 border-violet-500/30';
+        container.appendChild(track);
+
+        const infoEl = document.createElement('div');
+        infoEl.className = 'absolute bottom-6 text-[11px] font-mono text-violet-300 tracking-widest text-center w-full';
+        infoEl.innerText = 'p₁ + p₂ = constant';
+        container.appendChild(infoEl);
+
+        const ball1 = document.createElement('div');
+        ball1.className = 'absolute rounded-full bg-violet-500';
+        ball1.style.cssText = 'width:44px;height:44px;box-shadow:0 0 18px rgba(139,92,246,0.8);top:18px;';
+        track.appendChild(ball1);
+
+        const ball2 = document.createElement('div');
+        ball2.className = 'absolute rounded-full bg-indigo-400';
+        ball2.style.cssText = 'width:30px;height:30px;box-shadow:0 0 14px rgba(99,102,241,0.8);top:25px;';
+        track.appendChild(ball2);
+
+        const lbl1 = document.createElement('div');
+        lbl1.className = 'absolute text-[9px] font-mono text-violet-300 text-center';
+        lbl1.style.cssText = 'width:44px;top:2px;';
+        lbl1.innerText = 'm=5kg';
+        track.appendChild(lbl1);
+
+        const lbl2 = document.createElement('div');
+        lbl2.className = 'absolute text-[9px] font-mono text-indigo-300 text-center';
+        lbl2.style.cssText = 'width:30px;top:9px;';
+        lbl2.innerText = 'm=3kg';
+        track.appendChild(lbl2);
+
+        const tl = gsap.timeline({ repeat: -1, repeatDelay: 1 });
+        // Ball 1 moves right, hits ball 2, both move (momentum conserved)
+        tl.set([ball1, ball2, lbl1, lbl2], { x: 0 })
+          .set(ball1, { x: 10 })
+          .set(ball2, { x: 230 })
+          .set(lbl1, { x: 10 })
+          .set(lbl2, { x: 230 })
+          .to([ball1, lbl1], { x: 186, duration: 1.4, ease: 'power1.in' })           // ball1 approaches
+          .to([ball1, lbl1], { x: 160, duration: 0.3, ease: 'power2.out' }, '+=0')   // ball1 slows (gave momentum)
+          .to([ball2, lbl2], { x: 290, duration: 0.9, ease: 'power1.out' }, '<0.05') // ball2 shoots off
+
+      } else if (conceptId === 'statistics') {
+        // --- STATISTICS: animated normal distribution bell curve ---
+        container.className = 'relative w-full h-full flex flex-col items-center justify-center bg-slate-950 overflow-hidden';
+
+        const titleEl = document.createElement('div');
+        titleEl.className = 'absolute top-4 text-slate-500 text-[10px] uppercase tracking-[0.2em] font-mono';
+        titleEl.innerText = 'Normal Distribution — 68-95-99.7 Rule';
+        container.appendChild(titleEl);
+
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('viewBox', '0 0 320 180');
+        svg.setAttribute('class', 'w-full max-w-sm');
+        container.appendChild(svg);
+
+        // Axes
+        const xAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        xAxis.setAttribute('x1', '20'); xAxis.setAttribute('y1', '150');
+        xAxis.setAttribute('x2', '300'); xAxis.setAttribute('y2', '150');
+        xAxis.setAttribute('stroke', 'rgba(255,255,255,0.15)'); xAxis.setAttribute('stroke-width', '1');
+        svg.appendChild(xAxis);
+
+        // Bell curve path (pre-calculated gaussian, mu=160, sigma=45)
+        const pts: string[] = [];
+        for (let px = 20; px <= 300; px += 2) {
+          const z = (px - 160) / 45;
+          const y = 150 - 110 * Math.exp(-0.5 * z * z);
+          pts.push(`${px},${y}`);
+        }
+        const curvePath = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+        curvePath.setAttribute('points', pts.join(' '));
+        curvePath.setAttribute('fill', 'none');
+        curvePath.setAttribute('stroke', '#06b6d4');
+        curvePath.setAttribute('stroke-width', '2.5');
+        curvePath.setAttribute('stroke-linecap', 'round');
+        svg.appendChild(curvePath);
+
+        // Fill regions with animated opacity
+        const fillRegions = [
+          { x1: 115, x2: 205, color: 'rgba(6,182,212,0.35)', label: '68%', y: 90 },  // ±1σ
+          { x1: 70,  x2: 250, color: 'rgba(6,182,212,0.15)', label: '95%', y: 110 },  // ±2σ
+          { x1: 25,  x2: 295, color: 'rgba(6,182,212,0.08)', label: '99.7%', y: 130 }, // ±3σ
+        ];
+        fillRegions.forEach(({ x1, x2, color, label, y }, i) => {
+          const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+          rect.setAttribute('x', x1.toString());
+          rect.setAttribute('y', '40');
+          rect.setAttribute('width', (x2 - x1).toString());
+          rect.setAttribute('height', '110');
+          rect.setAttribute('fill', color);
+          rect.setAttribute('opacity', '0');
+          svg.appendChild(rect);
+
+          const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          text.setAttribute('x', ((x1 + x2) / 2).toString());
+          text.setAttribute('y', y.toString());
+          text.setAttribute('text-anchor', 'middle');
+          text.setAttribute('fill', '#67e8f9');
+          text.setAttribute('font-size', '10');
+          text.setAttribute('font-family', 'monospace');
+          text.setAttribute('opacity', '0');
+          text.textContent = label;
+          svg.appendChild(text);
+
+          gsap.to([rect, text], { opacity: 1, duration: 0.8, delay: 0.5 + i * 0.6, ease: 'power2.out' });
+        });
+
+        // Animate mu line pulsing
+        const muLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        muLine.setAttribute('x1', '160'); muLine.setAttribute('y1', '40');
+        muLine.setAttribute('x2', '160'); muLine.setAttribute('y2', '150');
+        muLine.setAttribute('stroke', '#f0abfc'); muLine.setAttribute('stroke-width', '1.5');
+        muLine.setAttribute('stroke-dasharray', '4,3');
+        svg.appendChild(muLine);
+
+        const muLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        muLabel.setAttribute('x', '162'); muLabel.setAttribute('y', '35');
+        muLabel.setAttribute('fill', '#f0abfc'); muLabel.setAttribute('font-size', '10');
+        muLabel.setAttribute('font-family', 'monospace');
+        muLabel.textContent = 'μ';
+        svg.appendChild(muLabel);
+
+        gsap.to(muLine, { opacity: 0.3, duration: 1.2, repeat: -1, yoyo: true, ease: 'sine.inOut' });
+
+      } else if (conceptId === 'electromagnetism') {
+        // --- ELECTROMAGNETISM: rotating coil in magnetic field, induced voltage ---
+        container.className = 'relative w-full h-full flex flex-col items-center justify-center bg-slate-950 overflow-hidden';
+
+        const titleEl = document.createElement('div');
+        titleEl.className = 'absolute top-4 text-slate-500 text-[10px] uppercase tracking-[0.2em] font-mono';
+        titleEl.innerText = "Faraday's Law — Rotating Coil";
+        container.appendChild(titleEl);
+
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('viewBox', '-120 -90 240 180');
+        svg.setAttribute('class', 'w-56 h-56');
+        container.appendChild(svg);
+
+        // Magnetic field arrows (static)
+        for (let i = -3; i <= 3; i++) {
+          const arrow = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+          const y = i * 22;
+          arrow.setAttribute('x1', '-100'); arrow.setAttribute('y1', y.toString());
+          arrow.setAttribute('x2', '100'); arrow.setAttribute('y2', y.toString());
+          arrow.setAttribute('stroke', 'rgba(56,189,248,0.2)'); arrow.setAttribute('stroke-width', '1.5');
+          arrow.setAttribute('marker-end', 'url(#arr)');
+          svg.appendChild(arrow);
+        }
+
+        // Coil ellipse (represents rotating loop)
+        const coil = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+        coil.setAttribute('rx', '55'); coil.setAttribute('ry', '30');
+        coil.setAttribute('fill', 'none');
+        coil.setAttribute('stroke', '#06b6d4'); coil.setAttribute('stroke-width', '3');
+        svg.appendChild(coil);
+
+        // Center dot
+        const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        dot.setAttribute('r', '4'); dot.setAttribute('fill', '#67e8f9');
+        svg.appendChild(dot);
+
+        // Voltage readout
+        const voltEl = document.createElement('div');
+        voltEl.className = 'mt-2 text-lg font-mono text-cyan-300 tracking-widest';
+        voltEl.innerText = 'ε = 0 V';
+        container.appendChild(voltEl);
+
+        const data = { angle: 0 };
+        gsap.to(data, {
+          angle: Math.PI * 2,
+          duration: 2.5,
+          repeat: -1,
+          ease: 'none',
+          onUpdate: () => {
+            const ry = Math.abs(30 * Math.cos(data.angle));
+            coil.setAttribute('ry', ry.toFixed(1));
+            // induced EMF is proportional to d(flux)/dt = -N * d(B*A*cos θ)/dt ∝ sin θ
+            const emf = (Math.sin(data.angle) * 400).toFixed(0);
+            voltEl.innerText = `ε = ${emf} V`;
+            voltEl.style.color = Number(emf) >= 0 ? '#67e8f9' : '#fb7185';
+          }
+        });
+
+      } else if (conceptId === 'quantum') {
+        // --- QUANTUM: double-slit interference + probability wave ---
+        container.className = 'relative w-full h-full flex flex-col items-center justify-center bg-slate-950 overflow-hidden';
+
+        const titleEl = document.createElement('div');
+        titleEl.className = 'absolute top-4 text-slate-500 text-[10px] uppercase tracking-[0.2em] font-mono';
+        titleEl.innerText = 'Wave-Particle Duality — Photon Energy';
+        container.appendChild(titleEl);
+
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('viewBox', '0 0 300 200');
+        svg.setAttribute('class', 'w-full max-w-xs');
+        container.appendChild(svg);
+
+        // Draw probability wave (|Ψ|² interference pattern)
+        const NUM_BARS = 24;
+        for (let i = 0; i < NUM_BARS; i++) {
+          const x = 10 + i * (280 / NUM_BARS);
+          const z = (i - NUM_BARS / 2) / (NUM_BARS / 6);
+          const intensity = Math.pow(Math.cos(z * 1.5), 2) * Math.exp(-z * z * 0.25);
+          const bar = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+          const h = intensity * 140;
+          bar.setAttribute('x', x.toString());
+          bar.setAttribute('y', (170 - h).toString());
+          bar.setAttribute('width', '9');
+          bar.setAttribute('height', h.toString());
+          bar.setAttribute('rx', '2');
+          const alpha = 0.2 + intensity * 0.8;
+          bar.setAttribute('fill', `rgba(139,92,246,${alpha.toFixed(2)})`);
+          bar.setAttribute('opacity', '0');
+          svg.appendChild(bar);
+          gsap.to(bar, { opacity: 1, duration: 0.4 + intensity * 0.6, delay: i * 0.06, ease: 'power2.out' });
+          // pulsing
+          gsap.to(bar, { scaleY: 0.85, duration: 1.2 + Math.random() * 0.8, repeat: -1, yoyo: true, ease: 'sine.inOut', transformOrigin: 'bottom', delay: Math.random() });
+        }
+
+        // Particle dot randomly landing
+        const particle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        particle.setAttribute('r', '4');
+        particle.setAttribute('fill', '#e879f9');
+        particle.setAttribute('opacity', '0');
+        svg.appendChild(particle);
+
+        const spawnParticle = () => {
+          // weighted random position toward centre (like interference)
+          const r = Math.random();
+          const slot = Math.floor(r * r * NUM_BARS * 0.5 + NUM_BARS * 0.25);
+          const px = 10 + Math.min(slot, NUM_BARS - 1) * (280 / NUM_BARS) + 4;
+          particle.setAttribute('cx', px.toString());
+          particle.setAttribute('cy', (20 + Math.random() * 30).toString());
+          gsap.fromTo(particle,
+            { opacity: 0, attr: { cy: 20 } },
+            { opacity: 1, attr: { cy: 160 + Math.random() * 10 }, duration: 0.8, ease: 'power2.in',
+              onComplete: () => gsap.to(particle, { opacity: 0, duration: 0.3, onComplete: () => setTimeout(spawnParticle, 400 + Math.random() * 600) })
+            }
+          );
+        };
+        setTimeout(spawnParticle, 800);
+
+        // EMF label
+        const eLabel = document.createElement('div');
+        eLabel.className = 'mt-1 text-[10px] font-mono text-violet-300 tracking-widest';
+        eLabel.innerHTML = 'E = hf &nbsp;|&nbsp; |Ψ|² = probability density';
+        container.appendChild(eLabel);
+
+        // Flashcards for new modules (reuse createFlashcardApp pattern but inline here)
       } else if (conceptId === 'angles') {
         container.className = 'relative w-full h-full flex flex-col items-center justify-center bg-slate-950 overflow-hidden';
         
