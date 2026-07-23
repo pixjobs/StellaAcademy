@@ -34,11 +34,16 @@ export default function StudyPage() {
     setMobileSelectorOpen(false); // Auto close mobile drawer on select
   };
 
-  // Dynamic Categories extracted from the modules list
+  // Dynamic Categories extracted from the modules list with counts
   const categories = useMemo(() => {
     const cats = Array.from(new Set(studyModules.map(m => m.category)));
     return ['all', ...cats];
   }, []);
+
+  const getCategoryCount = (cat: string) => {
+    if (cat === 'all') return studyModules.length;
+    return studyModules.filter(m => m.category === cat).length;
+  };
 
   // Filtered Modules
   const filteredModules = useMemo(() => {
@@ -101,8 +106,16 @@ export default function StudyPage() {
                   placeholder="Search modules..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-slate-900 border border-white/10 rounded-lg py-2 pl-9 pr-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  className="w-full bg-slate-900 border border-white/10 rounded-lg py-2 pl-9 pr-8 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                 />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-xs text-slate-500 hover:text-white"
+                  >
+                    ×
+                  </button>
+                )}
               </div>
 
               {/* Category selector row */}
@@ -117,7 +130,7 @@ export default function StudyPage() {
                         : 'bg-slate-900 text-slate-400 border-white/5 hover:text-slate-200'
                     }`}
                   >
-                    {category.replace('-', ' ')}
+                    {category.replace('-', ' ')} ({getCategoryCount(category)})
                   </button>
                 ))}
               </div>
@@ -169,8 +182,16 @@ export default function StudyPage() {
                 placeholder="Search modules..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-slate-900/60 border border-white/10 rounded-xl py-2 pl-9 pr-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all"
+                className="w-full bg-slate-900/60 border border-white/10 rounded-xl py-2 pl-9 pr-8 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all"
               />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-xs text-slate-400 hover:text-white font-bold"
+                >
+                  ×
+                </button>
+              )}
             </div>
 
             {/* Compact Category List */}
@@ -190,7 +211,7 @@ export default function StudyPage() {
                         : 'bg-slate-950/40 text-slate-400 border-white/5 hover:bg-slate-800 hover:text-slate-200'
                     }`}
                   >
-                    {category.replace('-', ' ')}
+                    {category.replace('-', ' ')} <span className="opacity-60">({getCategoryCount(category)})</span>
                   </button>
                 ))}
               </div>
