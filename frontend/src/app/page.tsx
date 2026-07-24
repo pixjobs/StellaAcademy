@@ -143,14 +143,14 @@ export default function HomePage() {
           </div>
 
           <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold font-fraunces text-white mb-5 sm:mb-6 leading-[1.05] tracking-[-0.03em]">
-            Master Science &amp;<br />
+            Explore Science &amp;<br />
             <span className="bg-gradient-to-r from-indigo-400 via-violet-400 to-cyan-400 bg-clip-text text-transparent">
               Mathematics
             </span>
           </h1>
 
           <p className="text-base sm:text-lg md:text-xl text-slate-400 font-light max-w-2xl mx-auto leading-relaxed mb-8 sm:mb-10 px-2">
-            Textbook-grade content, interactive flashcards, and live simulations — from elementary arithmetic to orbital mechanics.
+            Interactive visual labs, concept guides, and practice modules — from basic arithmetic to orbital mechanics.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
@@ -181,16 +181,16 @@ export default function HomePage() {
         {/* ── FEATURES ── */}
         <section className="mb-14 sm:mb-20">
           <div className="text-center mb-8 sm:mb-10">
-            <h2 className="text-2xl sm:text-3xl font-bold font-fraunces text-white mb-2 sm:mb-3">Why Stella Academy?</h2>
-            <p className="text-slate-500 max-w-xl mx-auto text-sm px-2">Everything a serious student needs, built with engineering rigour.</p>
+            <h2 className="text-2xl sm:text-3xl font-bold font-fraunces text-white mb-2 sm:mb-3">Study Features</h2>
+            <p className="text-slate-500 max-w-xl mx-auto text-sm px-2">Interactive visual tools, concept notes, and curated references to support your study.</p>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-            <FeatureCard icon={Calculator}  color="text-indigo-400"  title="Textbook-Grade Maths"    body="All equations rendered with KaTeX — the same standard used by leading academic journals and Khan Academy." />
-            <FeatureCard icon={Zap}         color="text-amber-400"   title="Interactive Flashcards"  body="Step through every calculation manually or enter your own answer, with GSAP-animated feedback on each question." />
-            <FeatureCard icon={Activity}    color="text-emerald-400" title="Live Simulations"        body="Visual GSAP simulations for physics and mechanics — watch gravity, gear ratios, and wave frequencies come alive." />
-            <FeatureCard icon={BookOpen}    color="text-violet-400"  title="Vetted References"       body="Every module links to authoritative sources — Feynman Lectures, Khan Academy, MIT OpenCourseWare, and more." />
-            <FeatureCard icon={FlaskConical} color="text-rose-400"   title="Full Curriculum"         body="From elementary arithmetic and binary to differential equations and orbital mechanics — one coherent learning path." />
-            <FeatureCard icon={Trophy}      color="text-cyan-400"    title="Difficulty Levels"       body="Modules are rated 1–3 so you always know exactly where you stand and what to tackle next." />
+            <FeatureCard icon={Calculator}  color="text-indigo-400"  title="KaTeX Math Formatting"    body="All mathematical formulas rendered cleanly with LaTeX notation for clear readability." />
+            <FeatureCard icon={Zap}         color="text-amber-400"   title="Interactive Practice"     body="Step through calculation steps manually or test your understanding with guided problem sets." />
+            <FeatureCard icon={Activity}    color="text-emerald-400" title="Visual Simulations"       body="GSAP visual models for physics and mechanics — observe gravity, gear ratios, and wave behavior." />
+            <FeatureCard icon={BookOpen}    color="text-violet-400"  title="Curated References"      body="Each module points to recommended reading and open academic resources for further study." />
+            <FeatureCard icon={FlaskConical} color="text-rose-400"   title="5 Core Disciplines"       body="From elementary arithmetic and binary logic to differential calculus and astrophysics." />
+            <FeatureCard icon={Trophy}      color="text-cyan-400"    title="Graded Difficulty"        body="Modules are labeled Level 1–3 to help you navigate topics at your preferred pace." />
           </div>
         </section>
 

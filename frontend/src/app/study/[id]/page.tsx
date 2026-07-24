@@ -25,7 +25,7 @@ export default function StudyModulePage({ params }: { params: Promise<{ id: Conc
   
   // Interactive Formula State
   const [activeVariable, setActiveVariable] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'interactive' | 'textbook'>('interactive');
+  const [activeTab, setActiveTab] = useState<'combined' | 'interactive' | 'textbook'>('combined');
   const [rightPanelOpen, setRightPanelOpen] = useState(false);
 
   // Calibration checklist states
@@ -112,18 +112,24 @@ export default function StudyModulePage({ params }: { params: Promise<{ id: Conc
           {/* COLUMN 1 (Center, lg:7): INTERACTIVE VISUALISER & CONCEPT DIRECTIVE */}
           <div className="lg:col-span-7 flex flex-col">
             {/* Tabs */}
-            <div className="flex space-x-2 mb-4 px-2">
+            <div className="flex flex-wrap gap-2 mb-4 px-2">
+              <button 
+                onClick={() => setActiveTab('combined')} 
+                className={`pb-2 px-3 text-[11px] sm:text-xs font-bold uppercase tracking-wider font-mono transition-colors border-b-2 ${activeTab === 'combined' ? 'border-cyan-400 text-cyan-300' : 'border-transparent text-slate-500 hover:text-slate-300'}`}
+              >
+                Combined View
+              </button>
               <button 
                 onClick={() => setActiveTab('interactive')} 
-                className={`pb-2 px-4 text-[11px] sm:text-xs font-bold uppercase tracking-wider font-mono transition-colors border-b-2 ${activeTab === 'interactive' ? 'border-indigo-400 text-indigo-400' : 'border-transparent text-slate-500 hover:text-slate-300'}`}
+                className={`pb-2 px-3 text-[11px] sm:text-xs font-bold uppercase tracking-wider font-mono transition-colors border-b-2 ${activeTab === 'interactive' ? 'border-indigo-400 text-indigo-400' : 'border-transparent text-slate-500 hover:text-slate-300'}`}
               >
                 Interactive Lab
               </button>
               <button 
                 onClick={() => setActiveTab('textbook')} 
-                className={`pb-2 px-4 text-[11px] sm:text-xs font-bold uppercase tracking-wider font-mono transition-colors border-b-2 ${activeTab === 'textbook' ? 'border-emerald-400 text-emerald-400' : 'border-transparent text-slate-500 hover:text-slate-300'}`}
+                className={`pb-2 px-3 text-[11px] sm:text-xs font-bold uppercase tracking-wider font-mono transition-colors border-b-2 ${activeTab === 'textbook' ? 'border-emerald-400 text-emerald-400' : 'border-transparent text-slate-500 hover:text-slate-300'}`}
               >
-                Vetted Theory
+                Theory &amp; Reference
               </button>
             </div>
 
@@ -132,7 +138,7 @@ export default function StudyModulePage({ params }: { params: Promise<{ id: Conc
               {activeTab === 'textbook' ? (
                 <div className="textbook-content-wrapper">
                   <MarkdownRenderer>
-                    {currentSub.textbookContent || "_The Academy Editorial Board is currently vetting the formal theoretical documentation for this module. Please use the Interactive Lab in the meantime._"}
+                    {currentSub.textbookContent || "_Detailed reference notes for this module are currently being compiled. Please explore the interactive simulation and lesson steps above, or consult the recommended reading._"}
                   </MarkdownRenderer>
                 </div>
               ) : (
@@ -194,6 +200,31 @@ export default function StudyModulePage({ params }: { params: Promise<{ id: Conc
                         ))}
                       </div>
                     </div>
+                  </div>
+
+                  {/* Integrated Theory & Reference section in Combined View */}
+                  {activeTab === 'combined' && currentSub.textbookContent && (
+                    <div className="border-t border-white/10 pt-8 mt-6 space-y-4">
+                      <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                        <span className="text-xs uppercase font-mono tracking-wider text-emerald-400 font-bold">
+                          Detailed Theory &amp; References
+                        </span>
+                        <span className="text-[10px] text-slate-500 font-mono">EXT_DOC</span>
+                      </div>
+                      <div className="textbook-content-wrapper text-slate-300 leading-relaxed text-sm">
+                        <MarkdownRenderer>
+                          {currentSub.textbookContent}
+                        </MarkdownRenderer>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* AI Disclaimer Callout */}
+                  <div className="mt-8 pt-6 border-t border-white/10 flex items-start gap-3 p-4 rounded-xl bg-white/[0.02] border border-white/[0.08] text-xs text-slate-400 font-sans">
+                    <div className="p-1.5 rounded-lg bg-indigo-500/10 text-indigo-400 shrink-0 font-mono text-[10px] font-bold">AI NOTICE</div>
+                    <p className="leading-relaxed">
+                      <strong className="text-slate-300">AI Assistance Disclaimer:</strong> This module uses AI-assisted educational models and interactive visual representations to help explain scientific and mathematical concepts. For formal research or academic evaluation, please verify formulas and data against standard primary reference materials.
+                    </p>
                   </div>
                 </>
               )}

@@ -48,7 +48,7 @@ export default function StudyPage() {
   const [activeModuleId, setActiveModuleId] = useState<ConceptId>(studyModules[0].id);
   const [activeVariable, setActiveVariable] = useState<string | null>(null);
   const [activeStep, setActiveStep] = useState<number>(1);
-  const [activeTab, setActiveTab] = useState<'interactive' | 'textbook'>('interactive');
+  const [activeTab, setActiveTab] = useState<'combined' | 'interactive' | 'textbook'>('combined');
 
   // Search & Filter State
   const [searchQuery, setSearchQuery] = useState('');
@@ -352,25 +352,31 @@ export default function StudyPage() {
               <div className="xl:col-span-7 flex flex-col space-y-6">
                 
                 {/* Tabs */}
-                <div className="flex space-x-2 px-2 border-b border-white/5 pb-2">
+                <div className="flex flex-wrap gap-2 px-2 border-b border-white/5 pb-2">
+                  <button 
+                    onClick={() => setActiveTab('combined')} 
+                    className={`pb-2 px-3 text-[11px] sm:text-xs font-bold uppercase tracking-wider font-mono transition-colors border-b-2 ${activeTab === 'combined' ? 'border-cyan-400 text-cyan-300' : 'border-transparent text-slate-500 hover:text-slate-300'}`}
+                  >
+                    Combined View
+                  </button>
                   <button 
                     onClick={() => setActiveTab('interactive')} 
-                    className={`pb-2 px-4 text-[11px] sm:text-xs font-bold uppercase tracking-wider font-mono transition-colors border-b-2 ${activeTab === 'interactive' ? 'border-indigo-400 text-indigo-400' : 'border-transparent text-slate-500 hover:text-slate-300'}`}
+                    className={`pb-2 px-3 text-[11px] sm:text-xs font-bold uppercase tracking-wider font-mono transition-colors border-b-2 ${activeTab === 'interactive' ? 'border-indigo-400 text-indigo-400' : 'border-transparent text-slate-500 hover:text-slate-300'}`}
                   >
                     Interactive Lab
                   </button>
                   <button 
                     onClick={() => setActiveTab('textbook')} 
-                    className={`pb-2 px-4 text-[11px] sm:text-xs font-bold uppercase tracking-wider font-mono transition-colors border-b-2 ${activeTab === 'textbook' ? 'border-emerald-400 text-emerald-400' : 'border-transparent text-slate-500 hover:text-slate-300'}`}
+                    className={`pb-2 px-3 text-[11px] sm:text-xs font-bold uppercase tracking-wider font-mono transition-colors border-b-2 ${activeTab === 'textbook' ? 'border-emerald-400 text-emerald-400' : 'border-transparent text-slate-500 hover:text-slate-300'}`}
                   >
-                    Vetted Theory
+                    Theory &amp; Reference
                   </button>
                 </div>
 
                 {activeTab === 'textbook' ? (
                   <div className="bg-slate-950/60 border border-white/10 rounded-2xl p-6 backdrop-blur-md shadow-xl textbook-content-wrapper min-h-[400px]">
                     <MarkdownRenderer>
-                      {activeModule.textbookContent || "_The Academy Editorial Board is currently vetting the formal theoretical documentation for this module. Please use the Interactive Lab in the meantime._"}
+                      {activeModule.textbookContent || "_Detailed reference notes for this module are currently being compiled. Please explore the interactive simulation and lesson steps above, or consult the recommended reading._"}
                     </MarkdownRenderer>
                   </div>
                 ) : (
@@ -404,6 +410,31 @@ export default function StudyPage() {
                         accentColor={activeModule.accentColor}
                         activeVariable={activeVariable}
                       />
+                    </div>
+
+                    {/* Combined View: Theory & Reference section */}
+                    {activeTab === 'combined' && activeModule.textbookContent && (
+                      <div className="bg-slate-950/60 border border-white/10 rounded-2xl p-6 backdrop-blur-md shadow-xl text-slate-300">
+                        <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-4">
+                          <span className="text-xs uppercase font-mono tracking-wider text-emerald-400 font-bold">
+                            Detailed Theory &amp; References
+                          </span>
+                          <span className="text-[9px] text-slate-500 font-mono">EXT_DOC</span>
+                        </div>
+                        <div className="textbook-content-wrapper text-sm leading-relaxed">
+                          <MarkdownRenderer>
+                            {activeModule.textbookContent}
+                          </MarkdownRenderer>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* AI Disclaimer Callout */}
+                    <div className="flex items-start gap-3 p-4 rounded-2xl bg-slate-950/60 border border-white/10 text-xs text-slate-400 font-sans backdrop-blur-md">
+                      <div className="p-1.5 rounded-lg bg-indigo-500/10 text-indigo-400 shrink-0 font-mono text-[10px] font-bold">AI NOTICE</div>
+                      <p className="leading-relaxed">
+                        <strong className="text-slate-300">AI Assistance Disclaimer:</strong> Stella Academy uses AI-assisted educational models to generate interactive visual models and lesson summaries. For academic or professional work, please verify equations and data with standard primary reference materials.
+                      </p>
                     </div>
                   </>
                 )}
