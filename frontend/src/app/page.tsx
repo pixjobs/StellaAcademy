@@ -187,7 +187,7 @@ export default function HomePage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             <FeatureCard icon={Calculator}  color="text-indigo-400"  title="KaTeX Math Formatting"    body="All mathematical formulas rendered cleanly with LaTeX notation for clear readability." />
             <FeatureCard icon={Zap}         color="text-amber-400"   title="Interactive Practice"     body="Step through calculation steps manually or test your understanding with guided problem sets." />
-            <FeatureCard icon={Activity}    color="text-emerald-400" title="Visual Simulations"       body="GSAP visual models for physics and mechanics — observe gravity, gear ratios, and wave behavior." />
+            <FeatureCard icon={Activity}    color="text-emerald-400" title="Visual Simulations"       body="GSAP visual models for physics and mechanics — observe gravity, gear ratios, and wave behaviour." />
             <FeatureCard icon={BookOpen}    color="text-violet-400"  title="Curated References"      body="Each module points to recommended reading and open academic resources for further study." />
             <FeatureCard icon={FlaskConical} color="text-rose-400"   title="5 Core Disciplines"       body="From elementary arithmetic and binary logic to differential calculus and astrophysics." />
             <FeatureCard icon={Trophy}      color="text-cyan-400"    title="Graded Difficulty"        body="Modules are labeled Level 1–3 to help you navigate topics at your preferred pace." />

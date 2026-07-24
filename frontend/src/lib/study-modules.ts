@@ -106,7 +106,7 @@ export const studyModules: StudyModule[] = [
         symbol: 'r',
         name: 'Distance',
         unit: 'Meters (m)',
-        description: 'The distance between the centers of mass of the two objects. Because it is squared in the denominator, gravity weakens quickly as distance increases.',
+        description: 'The distance between the centres of mass of the two objects. Because it is squared in the denominator, gravity weakens quickly as distance increases.',
         color: 'text-rose-400',
         range: { min: 1, max: 10, default: 2 }
       }
@@ -122,7 +122,7 @@ export const studyModules: StudyModule[] = [
       {
         stepNumber: 2,
         title: 'The Inverse-Square Law',
-        content: 'The gravitational force is inversely proportional to the square of the distance between the centers of the masses. If you double the distance, the force becomes one-fourth as strong.',
+        content: 'The gravitational force is inversely proportional to the square of the distance between the centres of the masses. If you double the distance, the force becomes one-fourth as strong.',
         keyInsight: 'Gravity weakens very quickly as you move away from a planet.',
         relatedVariables: ['r', 'F_g']
       },
@@ -170,7 +170,7 @@ $F = G \\frac{m_1 m_2}{r^2}$
 *   **$F$ (Gravitational Force):** The magnitude of the attractive force between the two bodies, measured in Newtons (N). This force is mutual; body 1 attracts body 2 with the exact same force that body 2 attracts body 1 (Newton's Third Law).
 *   **$G$ (Gravitational Constant):** An empirical physical constant. Its value is approximately $6.674 \\times 10^{-11} \\text{ N}\\cdot\\text{m}^2/\\text{kg}^2$. This extremely small value explains why gravitational attraction is only noticeable when at least one mass is extraordinarily large (like a planet).
 *   **$m_1, m_2$ (Masses):** The masses of the two interacting objects, measured in kilograms (kg).
-*   **$r$ (Distance):** The straight-line distance between the centers of mass of the two objects, measured in meters (m).
+*   **$r$ (Distance):** The straight-line distance between the centres of mass of the two objects, measured in metres (m).
 
 ### The Inverse-Square Law
 
@@ -293,7 +293,7 @@ Newton's law is an excellent approximation for most engineering and orbital mech
         answer: 'Away from the normal.'
       }
     ],
-    realWorldConnection: 'Spectrometers use prisms or diffraction gratings to analyze the light from distant stars, revealing their chemical composition.',
+    realWorldConnection: 'Spectrometers use prisms or diffraction gratings to analyse the light from distant stars, revealing their chemical composition.',
     textbookContent: `
 ## Snell's Law and Refraction
 
@@ -317,7 +317,7 @@ Snell's Law can be derived from Fermat's Principle, which states that the path t
 
 ### References
 
-*   [Optics (5th Edition)](https://www.pearson.com/en-us/subject-catalog/p/optics/P200000003284) (Eugene Hecht)
+*   [Optics (5th Edition)](https://www.pearson.com/en-us/subject-catalogue/p/optics/P200000003284) (Eugene Hecht)
 *   [Principles of Optics](https://en.wikipedia.org/wiki/Principles_of_Optics) (Max Born & Emil Wolf)
 *   [Fermat's Principle of Least Time - Feynman Lectures](https://www.feynmanlectures.caltech.edu/I_26.html)
 `
@@ -326,7 +326,7 @@ Snell's Law can be derived from Fermat's Principle, which states that the path t
     id: 'gears',
     category: 'mechanics',
     title: 'Gears & Torque',
-    subtitle: 'Analyze rotational velocity and mechanical gear ratios.',
+    subtitle: 'Analyse rotational velocity and mechanical gear ratios.',
     icon: 'Activity',
     accentColor: 'amber',
     difficulty: 1,
@@ -491,21 +491,21 @@ If $N_{\\text{out}} > N_{\\text{in}}$, the system is a *speed reducer* and a *to
       {
         symbol: 'a',
         name: 'Semi-major Axis',
-        unit: 'Meters or Kilometers',
+        unit: 'Meters or Kilometres',
         description: 'Half of the longest diameter of the elliptical transfer orbit. It defines the size and energy of the orbit.',
         color: 'text-amber-400'
       },
       {
         symbol: 'r_1',
         name: 'Initial Orbit Radius',
-        unit: 'Meters or Kilometers',
+        unit: 'Meters or Kilometres',
         description: 'The radius of the circular orbit the spacecraft starts in.',
         color: 'text-orange-400'
       },
       {
         symbol: 'r_2',
         name: 'Target Orbit Radius',
-        unit: 'Meters or Kilometers',
+        unit: 'Meters or Kilometres',
         description: 'The radius of the destination circular orbit.',
         color: 'text-yellow-400'
       }
@@ -782,13 +782,13 @@ This principle is crucial in spacecraft thermal management; resistive components
         'Use the formula: $\\lambda = \\frac{v}{f}$.',
         'Substitute the numbers: $\\lambda = \\frac{3 \\times 10^8}{10^8}$.'
       ],
-      resultFormula: '\\lambda = 3.0 \\text{ meters}'
+      resultFormula: '\\lambda = 3.0 \\text{ metres}'
     },
     practiceProblems: [
       {
         question: 'If a wave has a speed of 343 m/s (sound) and a frequency of 343 Hz, what is its wavelength?',
         hint: 'Divide speed by frequency.',
-        answer: '1 meter'
+        answer: '1 metre'
       },
       {
         question: 'Which has a shorter wavelength: a 2 GHz Wi-Fi signal or a 5 GHz Wi-Fi signal?',
@@ -807,7 +807,7 @@ $v = f \\cdot \\lambda$
 
 ### Wave Parameters
 
-*   **$\\lambda$ (Wavelength):** The spatial period of the wave—the distance over which the wave's shape repeats. In the SI system, it is measured in meters (m).
+*   **$\\lambda$ (Wavelength):** The spatial period of the wave—the distance over which the wave's shape repeats. In the SI system, it is measured in metres (m).
 *   **$f$ (Frequency):** The number of occurrences of a repeating event per unit of time, measured in Hertz (Hz), where 1 Hz = 1 cycle per second.
 *   **$v$ (Phase Velocity):** The rate at which the phase of the wave propagates in space. For EM waves in a perfect vacuum, $v = c$ (the speed of light, $\\approx 3 \\times 10^8$ m/s).
 
@@ -1209,7 +1209,7 @@ This technique is responsible for defining the unit of the "parsec" (parallax se
       }
     ],
     solvedExample: {
-      problem: 'A probe\'s distance from a moon is given by $s(t) = 5t^2 + 10t$ meters. Find its velocity $v(t)$ at $t = 3$ seconds.',
+      problem: 'A probe\'s distance from a moon is given by $s(t) = 5t^2 + 10t$ metres. Find its velocity $v(t)$ at $t = 3$ seconds.',
       steps: [
         'Take the derivative of position: $v(t) = \\frac{d}{dt}(5t^2 + 10t)$.',
         'Apply the power rule: $v(t) = 10t + 10$.',
@@ -1254,7 +1254,7 @@ Euler's method is the simplest first-order numerical procedure:
 $s(t_{n+1}) \\approx s(t_n) + v(t_n) \\Delta t$
 $v(t_{n+1}) \\approx v(t_n) + a(t_n) \\Delta t$
 
-While Euler's method provides the foundation for understanding computational integration, modern spacecraft simulators utilize more stable and accurate higher-order algorithms like Runge-Kutta (RK4) to minimize accumulated truncation errors over time.
+While Euler's method provides the foundation for understanding computational integration, modern spacecraft simulators utilise more stable and accurate higher-order algorithms like Runge-Kutta (RK4) to minimize accumulated truncation errors over time.
 
 *Reference: Stewart, J. (2015). Calculus: Early Transcendentals (8th ed.). Cengage Learning.*
     
@@ -1354,7 +1354,7 @@ While Euler's method provides the foundation for understanding computational int
       }
     ],
     solvedExample: {
-      problem: "A spacecraft is traveling with a horizontal velocity ($v_x$) of $3000$ m/s and a vertical velocity ($v_y$) of $4000$ m/s. What is its total speed ($\\vec{v}$)?",
+      problem: "A spacecraft is travelling with a horizontal velocity ($v_x$) of $3000$ m/s and a vertical velocity ($v_y$) of $4000$ m/s. What is its total speed ($\\vec{v}$)?",
       steps: [
         "Identify the components: $v_x = 3000$ and $v_y = 4000$.",
         "Square both components: $3000^2 = 9,000,000$ and $4000^2 = 16,000,000$.",
@@ -1607,7 +1607,7 @@ The logical AND operator yields *true* if and only if all of its operands are *t
 
 ### Hardware Implementation: Triple Modular Redundancy
 
-In mission-critical aerospace applications (where radiation can cause bit-flips or hardware components can fail), a single logic gate is insufficient. Spacecraft flight computers utilize a fault-tolerant architecture called Triple Modular Redundancy (TMR).
+In mission-critical aerospace applications (where radiation can cause bit-flips or hardware components can fail), a single logic gate is insufficient. Spacecraft flight computers utilise a fault-tolerant architecture called Triple Modular Redundancy (TMR).
 
 In TMR, three identical independent computer processors execute the exact same boolean logic simultaneously. Their outputs are fed into a "majority voting" logic circuit. 
 $$V = (A \\land B) \\lor (B \\land C) \\lor (A \\land C)$$
@@ -1720,7 +1720,7 @@ A differential equation is a mathematical equation that relates one or more unkn
 
 ### The Drag Equation ODE
 
-When a spacecraft enters an atmosphere, it experiences aerodynamic drag. The magnitude of the drag force is modeled by the equation:
+When a spacecraft enters an atmosphere, it experiences aerodynamic drag. The magnitude of the drag force is modelled by the equation:
 $$F_D = \\frac{1}{2} \\rho v^2 C_D A$$
 
 According to Newton's Second Law ($F = m a$), and knowing that acceleration is the derivative of velocity ($a = dv/dt$), we can express the deceleration of the spacecraft as a non-linear first-order Ordinary Differential Equation:
@@ -1932,7 +1932,7 @@ When an expression contains multiple sets of parentheses, such as $[ 2 + (3 \\ti
         stepNumber: 1,
         title: 'What is Area?',
         content: 'Area is the amount of flat space a shape takes up. You can think of it as the number of 1x1 unit squares needed to completely cover the inside of the shape without overlapping.',
-        keyInsight: 'Area is measured in square units (e.g., square inches, square centimeters).',
+        keyInsight: 'Area is measured in square units (e.g., square inches, square centimetres).',
         relatedVariables: ['A']
       },
       {
@@ -1951,12 +1951,12 @@ When an expression contains multiple sets of parentheses, such as $[ 2 + (3 \\ti
       }
     ],
     solvedExample: {
-      problem: 'Find the Area and Perimeter of a rectangular garden with length $l = 8$ meters and width $w = 3$ meters.',
+      problem: 'Find the Area and Perimeter of a rectangular garden with length $l = 8$ metres and width $w = 3$ metres.',
       steps: [
         'To find the Area, multiply length by width: $A = l \\times w$.',
-        'Substitute the values: $A = 8 \\times 3 = 24$. The Area is 24 square meters.',
+        'Substitute the values: $A = 8 \\times 3 = 24$. The Area is 24 square metres.',
         'To find the Perimeter, add all four sides: $P = 2l + 2w$.',
-        'Substitute the values: $P = 2(8) + 2(3) = 16 + 6 = 22$. The Perimeter is 22 meters.'
+        'Substitute the values: $P = 2(8) + 2(3) = 16 + 6 = 22$. The Perimeter is 22 metres.'
       ],
       resultFormula: 'A = 24 \\text{ m}^2, P = 22 \\text{ m}'
     },
@@ -1996,7 +1996,7 @@ Conceptually, finding the area of a rectangle is like covering it with a grid of
 
 ### The Relationship Between Area and Perimeter
 
-A common source of confusion is the relationship (or lack thereof) between area and perimeter. It is important to realize that:
+A common source of confusion is the relationship (or lack thereof) between area and perimeter. It is important to realise that:
 1.  Shapes with the **same perimeter** can have **different areas**. For example, a rectangle with perimeter 20 can have dimensions $1 \\times 9$ (Area = 9) or $4 \\times 6$ (Area = 24).
 2.  Shapes with the **same area** can have **different perimeters**. For example, a rectangle with area 16 can have dimensions $4 \\times 4$ (Perimeter = 16) or $2 \\times 8$ (Perimeter = 20).
 
@@ -2299,7 +2299,7 @@ The tip is $\\$4.50$.
         symbol: 'r',
         name: 'Radius',
         unit: 'm',
-        description: 'The straight-line distance from the center to the edge.',
+        description: 'The straight-line distance from the centre to the edge.',
         color: 'text-rose-400',
         range: { min: 1, max: 10, default: 5 }
       },
@@ -2364,7 +2364,7 @@ Angles measure the amount of rotation between two intersecting lines. While ever
 
 ### Radians
 
-A **radian** is defined as the angle subtended at the center of a circle by an arc whose length is equal to the circle's radius. 
+A **radian** is defined as the angle subtended at the centre of a circle by an arc whose length is equal to the circle's radius. 
 Because the total circumference of a circle is $C = 2\\pi r$, there are exactly $2\\pi$ radians in a full $360^\\circ$ rotation.
 
 To convert between them:

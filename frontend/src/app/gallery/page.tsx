@@ -87,7 +87,7 @@ export default function GalleryPage() {
       setResults(data);
     } catch (err) {
       console.error('[gallery-fetch] Failed:', err);
-      setErrorMsg('Failed to establish satellite uplink with NASA catalog database.');
+      setErrorMsg('Failed to establish satellite uplink with NASA catalogue database.');
     } finally {
       setLoading(false);
     }

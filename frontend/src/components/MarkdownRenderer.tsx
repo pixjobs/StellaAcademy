@@ -223,7 +223,7 @@ export default function MarkdownRenderer({ children, onCaptureFragment }: Props)
           [
             rehypeAutolinkHeadings,
             {
-              behavior: 'append',
+              behaviour: 'append',
               properties: { className: ['no-underline', 'ml-1', 'opacity-60', 'hover:opacity-90'] },
              
               content: (): Element[] => [{
