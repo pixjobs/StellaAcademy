@@ -192,7 +192,8 @@ Newton's law is an excellent approximation for most engineering and orbital mech
 
 *   [The Feynman Lectures on Physics, Vol. I, Ch. 7: The Theory of Gravitation](https://www.feynmanlectures.caltech.edu/I_07.html) (Richard P. Feynman)
 *   [Philosophiæ Naturalis Principia Mathematica](https://en.wikipedia.org/wiki/Philosophi%C3%A6_Naturalis_Principia_Mathematica) (Isaac Newton, 1687)
-*   [NASA JPL: Basics of Space Flight - Gravity & Mechanics](https://solarsystem.nasa.gov/basics/)`
+*   [NASA JPL: Basics of Space Flight - Gravity & Mechanics](https://solarsystem.nasa.gov/basics/)
+`
   },
   {
     id: 'prism',
@@ -318,7 +319,8 @@ Snell's Law can be derived from Fermat's Principle, which states that the path t
 
 *   [Optics (5th Edition)](https://www.pearson.com/en-us/subject-catalog/p/optics/P200000003284) (Eugene Hecht)
 *   [Principles of Optics](https://en.wikipedia.org/wiki/Principles_of_Optics) (Max Born & Emil Wolf)
-*   [Fermat's Principle of Least Time - Feynman Lectures](https://www.feynmanlectures.caltech.edu/I_26.html)`
+*   [Fermat's Principle of Least Time - Feynman Lectures](https://www.feynmanlectures.caltech.edu/I_26.html)
+`
   },
   {
     id: 'gears',
@@ -456,8 +458,9 @@ If $N_{\\text{out}} > N_{\\text{in}}$, the system is a *speed reducer* and a *to
 ### References
 
 *   [Shigley's Mechanical Engineering Design](https://www.mheducation.com/highered/product/shigley-s-mechanical-engineering-design-budynas-nisbett/M9781260128315.html) (Richard G. Budynas, J. Keith Nisbett)
-*   [Machinery's Handbook (31st Edition)](https://industrialpress.com/machinerys-handbook/) (Erik Oberg)
-*   [MIT OCW: 2.007 Design and Manufacturing I](https://ocw.mit.edu/courses/2-007-design-and-manufacturing-i-spring-2009/)`
+*   [Machinery's Handbook (31st Edition)](https://www.industrialpress.com/product/machinerys-handbook-31st-edition/) (Erik Oberg)
+*   [MIT OCW: 2.007 Design and Manufacturing I](https://ocw.mit.edu/courses/2-007-design-and-manufacturing-i-spring-2009/)
+`
   },
   {
     id: 'trajectory',
@@ -580,7 +583,8 @@ The total $\\Delta v$ budget for the mission is the sum of both impulses: $\\Del
 
 *   [Fundamentals of Astrodynamics](https://store.doverpublications.com/products/9780486600611) (Roger R. Bate, Donald D. Mueller, Jerry E. White)
 *   [Orbital Mechanics for Engineering Students](https://www.elsevier.com/books/orbital-mechanics-for-engineering-students/curtis/978-0-08-102133-0) (Howard D. Curtis)
-*   [NASA: Orbital Mechanics Educational Material](https://www.nasa.gov/audience/forstudents/5-8/features/nasa-knows/what-is-an-orbit-58.html)`
+*   [NASA: Orbital Mechanics Educational Material](https://science.nasa.gov/solar-system/orbits-and-keplers-laws/)
+`
   },
   {
     id: 'circuit',
@@ -702,7 +706,8 @@ This principle is crucial in spacecraft thermal management; resistive components
 
 *   [The Art of Electronics (3rd Edition)](https://artofelectronics.net/) (Paul Horowitz, Winfield Hill)
 *   [Fundamentals of Electric Circuits](https://www.mheducation.com/highered/product/fundamentals-electric-circuits-alexander-sadiku/M9781260226409.html) (Charles K. Alexander, Matthew Sadiku)
-*   [MIT OCW: 6.002 Circuits and Electronics](https://ocw.mit.edu/courses/6-002-circuits-and-electronics-spring-2007/)`
+*   [MIT OCW: 6.002 Circuits and Electronics](https://ocw.mit.edu/courses/6-002-circuits-and-electronics-spring-2007/)
+`
   },
   {
     id: 'waves',
@@ -819,7 +824,8 @@ For parabolic reflector antennas (like those used in the NASA Deep Space Network
 
 *   [Vibrations and Waves (MIT Introductory Physics Series)](https://wwnorton.com/books/Vibrations-and-Waves/) (A.P. French)
 *   [Fundamentals of Physics](https://www.wiley.com/en-us/Fundamentals+of+Physics%2C+12th+Edition-p-9781119801146) (David Halliday, Robert Resnick, Jearl Walker)
-*   [The Physics Classroom: Properties of Waves](https://www.physicsclassroom.com/class/waves)`
+*   [The Physics Classroom: Properties of Waves](https://www.physicsclassroom.com/class/waves)
+`
   },
   {
     id: 'fractions',
@@ -932,8 +938,9 @@ This logarithmic relationship is the "tyranny of the rocket equation." To linear
 ### References
 
 *   [Euclid's Elements, Book VII (Proportions & Divisibility)](https://mathcs.clarku.edu/~djoyce/java/elements/bookVII/bookVII.html) (Euclid)
-*   [The Art of Problem Solving: Prealgebra](https://artofproblemsolving.com/store/item/prealgebra) (Richard Rusczyk, David Patrick, Ravi Boppana)
-*   [Khan Academy: Fractions Mastery](https://www.khanacademy.org/math/arithmetic/fraction-arithmetic)`
+*   [The Art of Problem Solving: Prealgebra](https://artofproblemsolving.com/wiki/index.php/Prealgebra) (Richard Rusczyk, David Patrick, Ravi Boppana)
+*   [Khan Academy: Fractions Mastery](https://www.khanacademy.org/math/arithmetic/fraction-arithmetic)
+`
   },
   {
     id: 'binary',
@@ -1132,7 +1139,8 @@ This technique is responsible for defining the unit of the "parsec" (parallax se
 
 *   [Trigonometry](https://link.springer.com/book/10.1007/978-1-4612-4074-7) (I.M. Gelfand, Mark Saul)
 *   [Euler's Introductio in analysin infinitorum](https://en.wikipedia.org/wiki/Introductio_in_analysin_infinitorum) (Leonhard Euler, 1748)
-*   [MIT OCW: 18.01 Single Variable Calculus (Trig Review)](https://ocw.mit.edu/courses/18-01sc-single-variable-calculus-fall-2010/)`
+*   [MIT OCW: 18.01 Single Variable Calculus (Trig Review)](https://ocw.mit.edu/courses/18-01sc-single-variable-calculus-fall-2010/)
+`
   },
   {
     id: 'calculus',
@@ -1255,7 +1263,8 @@ While Euler's method provides the foundation for understanding computational int
 
 *   [Calculus (4th Edition)](https://www.amazon.com/Calculus-4th-Michael-Spivak/dp/0914098918) (Michael Spivak)
 *   [Calculus: Early Transcendentals](https://www.cengage.com/c/calculus-early-transcendentals-9e-stewart/9781337613927/) (James Stewart)
-*   [MIT OCW: 18.01 Single Variable Calculus](https://ocw.mit.edu/courses/18-01-single-variable-calculus-fall-2006/)`
+*   [MIT OCW: 18.01 Single Variable Calculus](https://ocw.mit.edu/courses/18-01-single-variable-calculus-fall-2006/)
+`
   },
   {
     id: "vectors",
@@ -2569,7 +2578,7 @@ $$\\frac{a}{b} \\div \\frac{c}{d} = \\frac{a}{b} \\times \\frac{d}{c}$$
 ### References
 
 *   [Khan Academy: Fractions](https://www.khanacademy.org/math/arithmetic/fraction-arithmetic)
-*   [NRICH: Fractions](https://nrich.maths.org/fractions)
+*   [NRICH: Fractions](https://nrich.maths.org/content/id/1341/fractions.pdf)
     `
   },
   {
@@ -3043,7 +3052,7 @@ $$\\Delta v = v_e \\ln\\left(\\frac{m_0}{m_f}\\right)$$
 
 ### References
 
-*   [Classical Mechanics](https://uscibooks.aip.org/books/classical-mechanics/) (John R. Taylor, University Science Books)
+*   [Classical Mechanics](https://www.cambridge.org/us/universitypress/subjects/physics/classical-mechanics-and-fluid-mechanics/classical-mechanics) (John R. Taylor, University Science Books)
 *   [Feynman Lectures, Vol. I, Ch. 10: Conservation of Momentum](https://www.feynmanlectures.caltech.edu/I_10.html)
 *   [NASA: How Rockets Work](https://www.grc.nasa.gov/WWW/k-12/airplane/rktpow.html)
     `
@@ -3187,7 +3196,7 @@ Two variables may be statistically correlated without one causing the other. Est
 
 ### References
 
-*   [The Art of Statistics](https://www.pelicanbookgroup.co.uk/ec/9780241258767/the-art-of-statistics.html) (David Spiegelhalter, Pelican)
+*   [The Art of Statistics](https://www.penguin.co.uk/books/294857/the-art-of-statistics-by-spiegelhalter-david/9780241258767) (David Spiegelhalter, Pelican)
 *   [Statistics](https://www.amazon.co.uk/Statistics-4th-David-Freedman/dp/0393929728) (Freedman, Pisani & Purves, 4th ed.)
 *   [Khan Academy: Statistics and Probability](https://www.khanacademy.org/math/statistics-probability)
     `
