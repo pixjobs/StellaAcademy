@@ -1,6 +1,6 @@
 import { type FormulaElement } from '@/components/study/VariableHighlighter';
 
-export type ConceptId = 'gravity' | 'prism' | 'gears' | 'trajectory' | 'circuit' | 'waves' | 'fractions' | 'trigonometry' | 'calculus' | 'vectors' | 'matrices' | 'probability' | 'diffeq' | 'arithmetic' | 'basic-geometry' | 'proportions' | 'decimals-percentages' | 'angles' | 'binary' | 'multiplication' | 'fraction-ops' | 'negative-numbers' | 'exponents-roots' | 'thermodynamics' | 'momentum' | 'statistics' | 'electromagnetism' | 'quantum';
+export type ConceptId = 'gravity' | 'prism' | 'gears' | 'trajectory' | 'circuit' | 'waves' | 'fractions' | 'trigonometry' | 'calculus' | 'vectors' | 'matrices' | 'probability' | 'diffeq' | 'arithmetic' | 'basic-geometry' | 'proportions' | 'decimals-percentages' | 'angles' | 'binary' | 'multiplication' | 'fraction-ops' | 'negative-numbers' | 'exponents-roots' | 'thermodynamics' | 'momentum' | 'statistics' | 'electromagnetism' | 'quantum' | 'units';
 export type CategoryId = 'physics' | 'mechanics' | 'electronics' | 'mathematics' | 'elementary-math';
 
 export interface StudyModule {
@@ -105,7 +105,7 @@ export const studyModules: StudyModule[] = [
       {
         symbol: 'r',
         name: 'Distance',
-        unit: 'Meters (m)',
+        unit: 'Metres (m)',
         description: 'The distance between the centres of mass of the two objects. Because it is squared in the denominator, gravity weakens quickly as distance increases.',
         color: 'text-rose-400',
         range: { min: 1, max: 10, default: 2 }
@@ -122,14 +122,14 @@ export const studyModules: StudyModule[] = [
       {
         stepNumber: 2,
         title: 'The Inverse-Square Law',
-        content: 'The gravitational force is inversely proportional to the square of the distance between the centres of the masses. If you double the distance, the force becomes one-fourth as strong.',
+        content: 'The gravitational force is inversely proportional to the square of the distance between the centres of the masses. If you double the distance, the force becomes a quarter as strong.',
         keyInsight: 'Gravity weakens very quickly as you move away from a planet.',
         relatedVariables: ['r', 'F_g']
       },
       {
         stepNumber: 3,
         title: 'Orbital Mechanics',
-        content: 'In orbit, a satellite moves sideways so fast that as it falls toward the planet, the surface curves away beneath it. It is constantly in free-fall.',
+        content: 'In orbit, a satellite moves sideways so fast that as it falls towards the planet, the surface curves away beneath it. It is constantly in free-fall.',
         keyInsight: 'Orbits are just falling while moving sideways fast enough to miss the ground.',
         relatedVariables: ['F_g']
       }
@@ -142,7 +142,7 @@ export const studyModules: StudyModule[] = [
         'Substitute the numbers: $F_g = (6.674 \\times 10^{-11}) \\frac{5.97 \\times 10^{24} \\cdot 1000}{(6.7 \\times 10^6)^2}$.',
         'Calculate the result.'
       ],
-      resultFormula: 'F_g \\approx 8870 \\text{ N}'
+      resultFormula: 'F_g \\approx 8880 \\text{ N}'
     },
     practiceProblems: [
       {
@@ -181,7 +181,7 @@ The most defining characteristic of gravity is its $1/r^2$ decay. If you double 
 While the formula above calculates the *magnitude* of the force, force is fundamentally a vector quantity. The complete vector form of Newton's law is:
 $\\vec{F}_{12} = -G \\frac{m_1 m_2}{|\\vec{r}_{12}|^2} \\hat{r}_{12}$
 
-Where $\\vec{F}_{12}$ is the force exerted on mass 1 by mass 2, $\\vec{r}_{12}$ is the distance vector from mass 1 to mass 2, and $\\hat{r}_{12}$ is the unit vector pointing from mass 1 to mass 2. The negative sign explicitly indicates that the force is attractive (pulling mass 1 *towards* mass 2).
+Where $\\vec{F}_{12}$ is the force exerted on mass 2 by mass 1, $\\vec{r}_{12}$ is the displacement vector from mass 1 to mass 2, and $\\hat{r}_{12}$ is the unit vector pointing from mass 1 to mass 2. The negative sign shows that the force is attractive: it pulls mass 2 back *towards* mass 1.
 
 ### Limitations
 
@@ -259,13 +259,13 @@ Newton's law is an excellent approximation for most engineering and orbital mech
         stepNumber: 2,
         title: 'Bending of Light',
         content: 'When light enters a new medium at an angle, the change in speed causes the ray to bend. This is called refraction.',
-        keyInsight: 'Light bends toward the normal when slowing down, and away when speeding up.',
+        keyInsight: 'Light bends towards the normal when slowing down, and away when speeding up.',
         relatedVariables: ['\\theta_i', '\\theta_r']
       },
       {
         stepNumber: 3,
         title: 'Dispersion',
-        content: 'Different colors of light have slightly different refractive indices in materials like glass. This causes white light to split into a rainbow spectrum when passing through a prism.',
+        content: 'Different colours of light have slightly different refractive indices in materials like glass. This causes white light to split into a rainbow spectrum when passing through a prism.',
         keyInsight: 'Blue light bends more than red light because it has a shorter wavelength.',
         relatedVariables: ['n_2', '\\theta_r']
       }
@@ -284,8 +284,8 @@ Newton's law is an excellent approximation for most engineering and orbital mech
     practiceProblems: [
       {
         question: 'If light enters water (n = 1.33) from air (n = 1.0) at an angle of 45°, what is the angle of refraction?',
-        hint: 'Use Snell\'s law and solve for \\theta_r.',
-        answer: '\\theta_r ≈ 32.1°'
+        hint: 'Use Snell\'s law and solve for $\\theta_r$.',
+        answer: '$\\theta_r \\approx 32.1^\\circ$'
       },
       {
         question: 'Does light bend towards or away from the normal when moving from glass to air?',
@@ -310,14 +310,14 @@ $n_1 \\sin(\\theta_1) = n_2 \\sin(\\theta_2)$
 
 ### Fermat's Principle of Least Time
 
-Snell's Law can be derived from Fermat's Principle, which states that the path taken by a ray between two given points is the path that can be traversed in the least time. When light enters a denser medium (higher index of refraction), its phase velocity decreases. To minimize the overall travel time, the light ray bends *towards* the normal to shorten its path length within the slower medium.
+Snell's Law can be derived from Fermat's Principle, which states that the path taken by a ray between two given points is the path that can be traversed in the least time. When light enters a denser medium (higher index of refraction), its phase velocity decreases. To minimise the overall travel time, the light ray bends *towards* the normal to shorten its path length within the slower medium.
 
 *Reference: Hecht, E. (2016). Optics (5th ed.). Pearson.*
     
 
 ### References
 
-*   [Optics (5th Edition)](https://www.pearson.com/en-us/subject-catalogue/p/optics/P200000003284) (Eugene Hecht)
+*   [Optics (5th Edition)](https://www.pearson.com/en-us/subject-catalog/p/optics/P200000003284) (Eugene Hecht)
 *   [Principles of Optics](https://en.wikipedia.org/wiki/Principles_of_Optics) (Max Born & Emil Wolf)
 *   [Fermat's Principle of Least Time - Feynman Lectures](https://www.feynmanlectures.caltech.edu/I_26.html)
 `
@@ -458,7 +458,7 @@ If $N_{\\text{out}} > N_{\\text{in}}$, the system is a *speed reducer* and a *to
 ### References
 
 *   [Shigley's Mechanical Engineering Design](https://www.mheducation.com/highered/product/shigley-s-mechanical-engineering-design-budynas-nisbett/M9781260128315.html) (Richard G. Budynas, J. Keith Nisbett)
-*   [Machinery's Handbook (31st Edition)](https://www.industrialpress.com/product/machinerys-handbook-31st-edition/) (Erik Oberg)
+*   Machinery's Handbook, 31st Edition (Erik Oberg; Industrial Press)
 *   [MIT OCW: 2.007 Design and Manufacturing I](https://ocw.mit.edu/courses/2-007-design-and-manufacturing-i-spring-2009/)
 `
   },
@@ -491,21 +491,21 @@ If $N_{\\text{out}} > N_{\\text{in}}$, the system is a *speed reducer* and a *to
       {
         symbol: 'a',
         name: 'Semi-major Axis',
-        unit: 'Meters or Kilometres',
+        unit: 'Metres or Kilometres',
         description: 'Half of the longest diameter of the elliptical transfer orbit. It defines the size and energy of the orbit.',
         color: 'text-amber-400'
       },
       {
         symbol: 'r_1',
         name: 'Initial Orbit Radius',
-        unit: 'Meters or Kilometres',
+        unit: 'Metres or Kilometres',
         description: 'The radius of the circular orbit the spacecraft starts in.',
         color: 'text-orange-400'
       },
       {
         symbol: 'r_2',
         name: 'Target Orbit Radius',
-        unit: 'Meters or Kilometres',
+        unit: 'Metres or Kilometres',
         description: 'The radius of the destination circular orbit.',
         color: 'text-yellow-400'
       }
@@ -515,7 +515,7 @@ If $N_{\\text{out}} > N_{\\text{in}}$, the system is a *speed reducer* and a *to
         stepNumber: 1,
         title: 'Orbital Transfers',
         content: 'To move from one orbit to another, a spacecraft must change its velocity (ΔV). A Hohmann transfer is the most fuel-efficient way to transfer between two circular, coplanar orbits.',
-        keyInsight: 'Transferring orbits requires exactly two engine burns.',
+        keyInsight: 'A Hohmann transfer needs exactly two engine burns.',
         relatedVariables: []
       },
       {
@@ -527,9 +527,9 @@ If $N_{\\text{out}} > N_{\\text{in}}$, the system is a *speed reducer* and a *to
       },
       {
         stepNumber: 3,
-        title: 'Circularizing',
-        content: 'When the spacecraft reaches the target altitude, it is moving too slowly to stay there. A second burn is required to circularize the orbit at the new altitude.',
-        keyInsight: 'Without the second burn, the spacecraft would fall back to its original orbit.',
+        title: 'Circularising',
+        content: 'When the spacecraft reaches the target altitude, it is moving too slowly to stay there. A second burn is required to circularise the orbit at the new altitude.',
+        keyInsight: 'Without the second burn, the spacecraft stays on the transfer ellipse and swings back down to its original altitude.',
         relatedVariables: []
       }
     ],
@@ -555,7 +555,7 @@ If $N_{\\text{out}} > N_{\\text{in}}$, the system is a *speed reducer* and a *to
     ],
     realWorldConnection: 'This trajectory is used by satellites moving from Low Earth Orbit to Geostationary Orbit, as well as missions sending probes to Mars.',
     textbookContent: `
-## Orbital Maneuvers: The Hohmann Transfer
+## Orbital Manoeuvres: The Hohmann Transfer
 
 In orbital mechanics, the Hohmann transfer orbit is an elliptical orbit used to transfer between two circular orbits of different radii around a central body in the same plane. It was first described by Walter Hohmann in 1925.
 
@@ -565,13 +565,13 @@ The foundation for calculating required velocity changes ($\\Delta v$) is the vi
 $v^2 = GM \\left( \\frac{2}{r} - \\frac{1}{a} \\right)$
 where $v$ is orbital velocity, $r$ is the current distance to the central body, $a$ is the semi-major axis, and $GM$ is the standard gravitational parameter ($\\mu$).
 
-### Maneuver Execution
+### Carrying Out the Manoeuvre
 
 The Hohmann transfer requires two impulsive velocity changes (engine burns):
 
 1.  **First Burn ($\\Delta v_1$):** Accelerates the spacecraft from the inner circular orbit (radius $r_1$) into an elliptical transfer orbit. The periapsis of this ellipse is $r_1$, and the apoapsis is $r_2$.
     $\\Delta v_1 = \\sqrt{\\frac{\\mu}{r_1}} \\left( \\sqrt{\\frac{2r_2}{r_1 + r_2}} - 1 \\right)$
-2.  **Second Burn ($\\Delta v_2$):** Executed half an orbit later at apoapsis ($r_2$), accelerating the spacecraft again to circularize the orbit at the new altitude.
+2.  **Second Burn ($\\Delta v_2$):** Executed half an orbit later at apoapsis ($r_2$), accelerating the spacecraft again to circularise the orbit at the new altitude.
     $\\Delta v_2 = \\sqrt{\\frac{\\mu}{r_2}} \\left( 1 - \\sqrt{\\frac{2r_1}{r_1 + r_2}} \\right)$
 
 The total $\\Delta v$ budget for the mission is the sum of both impulses: $\\Delta v_{\\text{total}} = \\Delta v_1 + \\Delta v_2$. The Hohmann transfer is proven to be the most fuel-efficient two-impulse transfer between coplanar circular orbits when the ratio of the final to initial radius is less than roughly 11.94.
@@ -581,7 +581,7 @@ The total $\\Delta v$ budget for the mission is the sum of both impulses: $\\Del
 
 ### References
 
-*   [Fundamentals of Astrodynamics](https://store.doverpublications.com/products/9780486600611) (Roger R. Bate, Donald D. Mueller, Jerry E. White)
+*   Fundamentals of Astrodynamics (Roger R. Bate, Donald D. Mueller, Jerry E. White; Dover Publications)
 *   [Orbital Mechanics for Engineering Students](https://www.elsevier.com/books/orbital-mechanics-for-engineering-students/curtis/978-0-08-102133-0) (Howard D. Curtis)
 *   [NASA: Orbital Mechanics Educational Material](https://science.nasa.gov/solar-system/orbits-and-keplers-laws/)
 `
@@ -669,7 +669,7 @@ The total $\\Delta v$ budget for the mission is the sum of both impulses: $\\Del
       },
       {
         question: 'If you want 20 mA (0.02 A) of current from a 10V source, what resistor should you use?',
-        hint: 'Rearrange to R = V / I.',
+        hint: 'Work in amperes, not milliamperes (see [Converting Units](/study/units)), then rearrange to R = V / I.',
         answer: '500 Ω'
       }
     ],
@@ -732,7 +732,7 @@ This principle is crucial in spacecraft thermal management; resistive components
       {
         symbol: '\\lambda',
         name: 'Wavelength',
-        unit: 'Meters (m)',
+        unit: 'Metres (m)',
         description: 'The physical distance between two consecutive peaks of a wave.',
         color: 'text-emerald-400'
       },
@@ -778,6 +778,7 @@ This principle is crucial in spacecraft thermal management; resistive components
     solvedExample: {
       problem: 'Find the wavelength ($\\lambda$) of a radio wave transmitting at $f = 100$ MHz ($10^8$ Hz).',
       steps: [
+        'Convert the frequency to hertz: $100\\text{ MHz} = 100 \\times 10^6\\text{ Hz} = 10^8\\text{ Hz}$ (see [Converting Units](/study/units)).',
         'Note the speed of light $v = c \\approx 3 \\times 10^8$ m/s.',
         'Use the formula: $\\lambda = \\frac{v}{f}$.',
         'Substitute the numbers: $\\lambda = \\frac{3 \\times 10^8}{10^8}$.'
@@ -887,7 +888,7 @@ For parabolic reflector antennas (like those used in the NASA Deep Space Network
       {
         stepNumber: 3,
         title: "Equivalent Fractions",
-        content: "Scaling up a small satellite to a massive rocket often requires keeping these proportions equivalent (e.g., 2/4 is the same ratio as 1/2). This concept naturally scales into predicting rates of change in [Calculus](/study/calculus).",
+        content: "Scaling up a small satellite to a massive rocket often requires keeping these proportions equivalent (e.g., 2/4 is the same ratio as 1/2).",
         keyInsight: "Proportions remain constant even if the scale changes.",
         relatedVariables: []
       }
@@ -921,7 +922,7 @@ In orbital mechanics and aerospace engineering, absolute mass is less critical t
 
 ### Propellant Mass Fraction ($\\zeta$)
 
-The propellant mass fraction represents the percentage of a rocket's total launch mass that consists solely of fuel and oxidizer:
+The propellant mass fraction represents the percentage of a rocket's total launch mass that consists solely of fuel and oxidiser:
 $\\zeta = \\frac{m_{\\text{propellant}}}{m_{\\text{initial}}} = \\frac{m_{\\text{initial}} - m_{\\text{final}}}{m_{\\text{initial}}}$
 
 ### The Tsiolkovsky Rocket Equation
@@ -930,7 +931,7 @@ Formulated by Konstantin Tsiolkovsky in 1903, the ideal rocket equation dictates
 $\\Delta v = v_e \\ln \\left( \\frac{m_{\\text{initial}}}{m_{\\text{final}}} \\right)$
 where $v_e$ is the effective exhaust velocity.
 
-This logarithmic relationship is the "tyranny of the rocket equation." To linearly double the $\\Delta v$ capability of a spacecraft, the initial mass ratio must be squared. Because the structural mass of tanks, engines, and payloads limits how close $m_{\\text{final}}$ can get to zero, achieving orbital velocity requires extreme engineering to maximize the propellant mass fraction—often exceeding 85% for orbital launch vehicles.
+This logarithmic relationship is the "tyranny of the rocket equation." To linearly double the $\\Delta v$ capability of a spacecraft, the initial mass ratio must be squared. Because the structural mass of tanks, engines, and payloads limits how close $m_{\\text{final}}$ can get to zero, achieving orbital velocity requires extreme engineering to maximise the propellant mass fraction—often exceeding 85% for orbital launch vehicles.
 
 *Reference: Sutton, G. P., & Biblarz, O. (2016). Rocket Propulsion Elements (9th ed.). Wiley.*
     
@@ -989,7 +990,7 @@ This logarithmic relationship is the "tyranny of the rocket equation." To linear
     },
     practiceProblems: [
       {
-        question: 'What is 100 in decimal?',
+        question: 'What is the binary number $100_2$ in decimal?',
         hint: 'The bits are 4, 2, and 1.',
         answer: '4'
       }
@@ -1095,9 +1096,9 @@ For example, $1101_2$:
     },
     practiceProblems: [
       {
-        question: 'If the angle to a star is 45° and the line-of-sight distance is 1.414 lightyears, what is the vertical distance relative to the orbital plane? (sin(45°) ≈ 0.707)',
+        question: 'If the angle to a star is 45° and the line-of-sight distance is 1.414 light-years, what is the vertical distance relative to the orbital plane? (sin(45°) ≈ 0.707)',
         hint: 'O = H * sin(θ)',
-        answer: '~1.0 lightyear'
+        answer: 'About 1.0 light-year'
       },
       {
         question: 'A rocket launches straight up and is 100 km away (hypotenuse) from an observer who looks directly up at a 90° angle. What is its altitude?',
@@ -1230,7 +1231,7 @@ This technique is responsible for defining the unit of the "parsec" (parallax se
         answer: '20 m/s²'
       }
     ],
-    realWorldConnection: 'Orbital mechanics heavily utilizes differential equations (calculus) to predict the future positions of planets, moons, and artificial satellites over time.',
+    realWorldConnection: 'Orbital mechanics heavily utilises differential equations (calculus) to predict the future positions of planets, moons, and artificial satellites over time.',
     textbookContent: `
 ## Differential Calculus and Rates of Change
 
@@ -1254,7 +1255,7 @@ Euler's method is the simplest first-order numerical procedure:
 $s(t_{n+1}) \\approx s(t_n) + v(t_n) \\Delta t$
 $v(t_{n+1}) \\approx v(t_n) + a(t_n) \\Delta t$
 
-While Euler's method provides the foundation for understanding computational integration, modern spacecraft simulators utilise more stable and accurate higher-order algorithms like Runge-Kutta (RK4) to minimize accumulated truncation errors over time.
+While Euler's method provides the foundation for understanding computational integration, modern spacecraft simulators utilise more stable and accurate higher-order algorithms like Runge-Kutta (RK4) to minimise accumulated truncation errors over time.
 
 *Reference: Stewart, J. (2015). Calculus: Early Transcendentals (8th ed.). Cengage Learning.*
     
@@ -1275,9 +1276,9 @@ While Euler's method provides the foundation for understanding computational int
     accentColor: "indigo",
     difficulty: 2,
     estimatedMinutes: 15,
-    formula: "\\vec{v}^2 = v_x^2 + v_y^2",
+    formula: "|\\vec{v}|^2 = v_x^2 + v_y^2",
     formulaLayout: [
-      { type: "variable", symbol: "\\vec{v}" },
+      { type: "variable", symbol: "|\\vec{v}|" },
       { type: "static", latex: "^2" },
       { type: "operator", content: "=" },
       { type: "variable", symbol: "v_x" },
@@ -1288,10 +1289,10 @@ While Euler's method provides the foundation for understanding computational int
     ],
     variables: [
       {
-        symbol: "\\vec{v}",
-        name: "Total Velocity",
+        symbol: "|\\vec{v}|",
+        name: "Speed",
         unit: "m/s",
-        description: "The total speed of the spacecraft along its trajectory.",
+        description: "The magnitude of the velocity vector: how fast the spacecraft is moving, ignoring direction.",
         color: "text-indigo-400"
       },
       {
@@ -1315,7 +1316,7 @@ While Euler's method provides the foundation for understanding computational int
         title: "What is a Vector?",
         content: "Imagine drawing an arrow on a map. A vector is exactly that: a mathematical arrow that has both a length (called magnitude) and a direction. Unlike a simple number like '5 kg' (a scalar), a vector tells you '5 m/s going North'.",
         keyInsight: "A vector requires two pieces of information: how much (magnitude), and which way (direction).",
-        relatedVariables: ["\\vec{v}"]
+        relatedVariables: ["|\\vec{v}|"]
       },
       {
         stepNumber: 2,
@@ -1329,7 +1330,7 @@ While Euler's method provides the foundation for understanding computational int
         title: "The Pythagorean Theorem",
         content: "Because the X and Y steps form a 90-degree right angle, we can use the Pythagorean theorem ($a^2 + b^2 = c^2$) to find the length of the hypotenuse, which gives us the original vector's total length (magnitude).",
         keyInsight: "Squaring the components, adding them, and taking the square root gives you the total speed.",
-        relatedVariables: ["\\vec{v}", "v_x", "v_y"]
+        relatedVariables: ["|\\vec{v}|", "v_x", "v_y"]
       },
       {
         stepNumber: 4,
@@ -1350,22 +1351,22 @@ While Euler's method provides the foundation for understanding computational int
         title: "Transformations and Thrust",
         content: "When a spacecraft fires its thrusters, it essentially 'adds' a new thrust vector to its current velocity vector. If you want to change direction, you calculate a transformation to figure out exactly which angle to point your engines.",
         keyInsight: "Thrusting forward adds to your magnitude (speed). Thrusting sideways changes your direction.",
-        relatedVariables: ["\\vec{v}"]
+        relatedVariables: ["|\\vec{v}|"]
       }
     ],
     solvedExample: {
-      problem: "A spacecraft is travelling with a horizontal velocity ($v_x$) of $3000$ m/s and a vertical velocity ($v_y$) of $4000$ m/s. What is its total speed ($\\vec{v}$)?",
+      problem: "A spacecraft is travelling with a horizontal velocity ($v_x$) of $3000$ m/s and a vertical velocity ($v_y$) of $4000$ m/s. What is its speed ($|\\vec{v}|$)?",
       steps: [
         "Identify the components: $v_x = 3000$ and $v_y = 4000$.",
         "Square both components: $3000^2 = 9,000,000$ and $4000^2 = 16,000,000$.",
         "Add the squared values together: $9,000,000 + 16,000,000 = 25,000,000$.",
         "Take the square root of the sum: $\\sqrt{25,000,000}$."
       ],
-      resultFormula: "\\vec{v} = 5000 \\text{ m/s}"
+      resultFormula: "|\\vec{v}| = 5000 \\text{ m/s}"
     },
     practiceProblems: [
       {
-        question: "If a probe has an x-velocity of 6 km/s and a y-velocity of 8 km/s, what is its total velocity magnitude?",
+        question: "If a probe has an x-velocity of 6 km/s and a y-velocity of 8 km/s, what is its speed?",
         hint: "Square both, add them, and take the square root. (Think of the 3-4-5 triangle rule).",
         answer: "10 km/s"
       },
@@ -1464,7 +1465,7 @@ Combined, these six variables $[x, y, z, v_x, v_y, v_z]$ completely and determin
       }
     ],
     solvedExample: {
-      problem: "Rotate a position vector $\\vec{v} = (1, 0)$ by $90^\\circ$ ($\\pi/2$ radians) counter-clockwise.",
+      problem: "Rotate a position vector $\\vec{v} = (1, 0)$ by $90^\\circ$ ($\\pi/2$ radians) anticlockwise.",
       steps: [
         "Set up the rotation matrix for $90^\\circ$: $R(90^\\circ) = \\begin{bmatrix} 0 & -1 \\\\ 1 & 0 \\end{bmatrix}$.",
         "Multiply the matrix by the vector: $\\begin{bmatrix} 0 & -1 \\\\ 1 & 0 \\end{bmatrix} \\begin{bmatrix} 1 \\\\ 0 \\end{bmatrix}$.",
@@ -1493,7 +1494,7 @@ A matrix is a rectangular array of numbers arranged in rows and columns. In line
 
 ### The Rotation Matrix
 
-A rotation matrix $R$ is a transformation matrix that performs a rotation in Euclidean space. For a two-dimensional counter-clockwise rotation by an angle $\\theta$ about the origin, the standard rotation matrix is defined as:
+A rotation matrix $R$ is a transformation matrix that performs a rotation in Euclidean space. For a two-dimensional anticlockwise rotation by an angle $\\theta$ about the origin, the standard rotation matrix is defined as:
 $$R(\\theta) = \\begin{bmatrix} \\cos\\theta & -\\sin\\theta \\\\ \\sin\\theta & \\cos\\theta \\end{bmatrix}$$
 
 To rotate a column vector $\\vec{v} = [x, y]^T$, the matrix is multiplied by the vector using the dot product rule (rows of the matrix multiplied by the column of the vector):
@@ -1503,7 +1504,7 @@ $$\\vec{v}' = R(\\theta) \\cdot \\vec{v} = \\begin{bmatrix} \\cos\\theta & -\\si
 
 Rotation matrices are orthogonal matrices with a determinant of 1 ($R^T R = I$). This property ensures that rotations are rigid-body transformations: they preserve the length of the vector ($|\\vec{v}'| = |\\vec{v}|$) and the relative angles between multiple vectors.
 
-In three-dimensional aerospace applications (Attitude Determination and Control), a spacecraft's orientation is described using three sequential matrices corresponding to roll, pitch, and yaw (Euler angles). Because matrix multiplication is non-commutative ($AB \\neq BA$), the order of these rotations strictly matters. To avoid mathematical singularities known as "gimbal lock" inherent in Euler angle sequences, modern flight software predominantly utilizes 4-dimensional Quaternions instead of 3x3 matrices.
+In three-dimensional aerospace applications (Attitude Determination and Control), a spacecraft's orientation is described using three sequential matrices corresponding to roll, pitch, and yaw (Euler angles). Because matrix multiplication is non-commutative ($AB \\neq BA$), the order of these rotations strictly matters. To avoid mathematical singularities known as "gimbal lock" inherent in Euler angle sequences, modern flight software predominantly utilises 4-dimensional Quaternions instead of 3x3 matrices.
 
 *Reference: Strang, G. (2016). Introduction to Linear Algebra (5th ed.). Wellesley-Cambridge Press.*
     `
@@ -1532,14 +1533,14 @@ In three-dimensional aerospace applications (Attitude Determination and Control)
       {
         symbol: "P_{sys}",
         name: "System Reliability",
-        unit: "%",
+        unit: "Probability (0 to 1)",
         description: "The overall probability that the redundant system will function successfully.",
         color: "text-emerald-400"
       },
       {
         symbol: "p",
         name: "Component Reliability",
-        unit: "%",
+        unit: "Probability (0 to 1)",
         description: "The probability that a single independent component functions successfully.",
         color: "text-teal-400"
       },
@@ -1563,7 +1564,7 @@ In three-dimensional aerospace applications (Attitude Determination and Control)
         stepNumber: 2,
         title: "Adding Redundancy",
         content: "To increase reliability, engineers add backup components in parallel. The system only fails if ALL of the redundant components fail at the exact same time.",
-        keyInsight: "The probability of all components failing is the failure rate of one component multiplied by itself n times.",
+        keyInsight: "The probability of all n components failing is the failure probability of one component raised to the power n.",
         relatedVariables: ["n"]
       },
       {
@@ -1595,25 +1596,46 @@ In three-dimensional aerospace applications (Attitude Determination and Control)
         answer: "0.0001 (or 0.01%)"
       }
     ],
-    realWorldConnection: "The Space Shuttle used four redundant flight computers processing the same data, plus a fifth independent backup computer, ensuring the catastrophic failure rate was almost zero.",
+    realWorldConnection: "The Space Shuttle flew with four redundant flight computers processing the same data, plus a fifth backup computer running independently written software, so that no single computer failure could endanger the vehicle.",
     textbookContent: `
-## Boolean Algebra and Logic Gates
+## Independent Events and Redundancy
 
-Boolean algebra, introduced by George Boole in 1847, is the branch of algebra in which the values of the variables are the truth values *true* and *false*, usually denoted 1 and 0. It is the foundational mathematical framework for all digital logic and computer science.
+Probability measures how likely an event is, on a scale from 0 (impossible) to 1 (certain). It can be written as a fraction, a decimal or a percentage: $\\frac{9}{10} = 0.9 = 90\\%$.
 
-### The AND Operator (Conjunction)
+### The Complement Rule
 
-The logical AND operator yields *true* if and only if all of its operands are *true*. In mathematical notation, it is represented as $A \\land B$, or simply $A \\cdot B$.
+An event either happens or it does not, so the two probabilities add up to 1:
+$$P(\\text{not } A) = 1 - P(A)$$
 
-### Hardware Implementation: Triple Modular Redundancy
+If a component works with probability $p$, it fails with probability $1 - p$.
 
-In mission-critical aerospace applications (where radiation can cause bit-flips or hardware components can fail), a single logic gate is insufficient. Spacecraft flight computers utilise a fault-tolerant architecture called Triple Modular Redundancy (TMR).
+### Independent Events (the AND rule)
 
-In TMR, three identical independent computer processors execute the exact same boolean logic simultaneously. Their outputs are fed into a "majority voting" logic circuit. 
-$$V = (A \\land B) \\lor (B \\land C) \\lor (A \\land C)$$
-If processor A is struck by cosmic radiation and outputs a 0 while B and C output 1, the voting circuit evaluates as $(0) \\lor (1) \\lor (0) = 1$. The error is masked, and the system continues operating correctly.
+Two events are **independent** if one happening does not change the probability of the other. For independent events, multiply the probabilities:
+$$P(A \\text{ and } B) = P(A) \\times P(B)$$
 
-*Reference: Mano, M. M., & Ciletti, M. D. (2012). Digital Design (5th ed.). Pearson.*
+So the probability that $n$ independent components **all** fail is $(1 - p)^n$.
+
+### At Least One
+
+"At least one works" is the complement of "all of them fail":
+$$P(\\text{at least one works}) = 1 - (1 - p)^n$$
+
+For components that each work with probability $p = 0.9$:
+
+| Components ($n$) | All fail | At least one works |
+|---|---|---|
+| 1 | $0.1$ | $0.9$ |
+| 2 | $0.01$ | $0.99$ |
+| 3 | $0.001$ | $0.999$ |
+
+### When the Model Breaks Down
+
+The formula only holds if failures are independent. Real backups often share a power supply, a location or the same software, so one cause can knock out several at once. This is called a common-cause failure. It is why the Space Shuttle's fifth backup computer ran software written separately from the other four.
+
+### References
+
+*   [BBC Bitesize: GCSE Maths](https://www.bbc.co.uk/bitesize/subjects/z38pycw)
     `
   },
   {
@@ -1686,7 +1708,7 @@ If processor A is struck by cosmic radiation and outputs a 0 while B and C outpu
       {
         stepNumber: 3,
         title: "Decay Curve",
-        content: "Because the deceleration depends on velocity, as the spacecraft slows down, the drag force also decreases. This creates a smooth exponential decay curve, bringing the capsule to a safe, steady speed rather than a sudden stop.",
+        content: "Because the deceleration depends on velocity, the drag force shrinks as the spacecraft slows. Solving the equation gives $v = \\frac{v_0}{1 + k v_0 t}$: the speed falls steeply at first, then more and more gently. This is not exponential decay, which belongs to drag proportional to $v$ rather than $v^2$. Drag alone never settles at a steady speed; a steady (terminal) speed only appears once gravity is included.",
         keyInsight: "The negative sign ensures that drag opposes the direction of motion.",
         relatedVariables: ["k"]
       }
@@ -1728,7 +1750,13 @@ $$\\frac{dv}{dt} = -\\left( \\frac{\\rho C_D A}{2m} \\right) v^2$$
 
 ### Analytical vs. Numerical Solutions
 
-If atmospheric density ($\\rho$) were constant, this ODE could be solved analytically using the separation of variables technique. However, in reality, atmospheric density changes exponentially with altitude, and gravity continues to accelerate the capsule downwards. 
+If atmospheric density ($\\rho$) were constant, this ODE could be solved analytically by separating the variables. Writing $k = \\frac{\\rho C_D A}{2m}$:
+
+$$\\frac{dv}{v^2} = -k \\, dt \\quad\\Rightarrow\\quad \\int_{v_0}^{v} \\frac{dv}{v^2} = -k\\int_0^t dt \\quad\\Rightarrow\\quad \\frac{1}{v} - \\frac{1}{v_0} = kt$$
+
+$$v(t) = \\frac{v_0}{1 + k v_0 t}$$
+
+The speed falls as $1/t$ for large $t$, which is slower than an exponential. However, in reality, atmospheric density changes exponentially with altitude, and gravity continues to accelerate the capsule downwards. 
 
 This results in a coupled system of ODEs that has no closed-form analytical solution. Aerospace engineers must use numerical integration computers to simulate the reentry trajectory, dynamically calculating the updated velocity and position frame-by-frame until touchdown.
 
@@ -1739,95 +1767,95 @@ This results in a coupled system of ODEs that has no closed-form analytical solu
     id: 'arithmetic',
     category: 'elementary-math',
     title: 'Order of Operations',
-    subtitle: 'Master the rules of arithmetic with PEMDAS.',
+    subtitle: 'Master the order of operations with BIDMAS.',
     icon: 'Calculator',
     accentColor: 'indigo',
     difficulty: 1,
     estimatedMinutes: 10,
-    formula: '8 - 4 \\times 2 + (1 + 1)^2',
+    formula: '8 - 4 \\div 2 + (1 + 1)^2',
     formulaLayout: [
-      { type: 'static', latex: 'PEMDAS:' },
-      { type: 'variable', symbol: 'P' },
-      { type: 'variable', symbol: 'E' },
-      { type: 'variable', symbol: 'M' },
+      { type: 'static', latex: 'BIDMAS:' },
+      { type: 'variable', symbol: 'B' },
+      { type: 'variable', symbol: 'I' },
       { type: 'variable', symbol: 'D' },
+      { type: 'variable', symbol: 'M' },
       { type: 'variable', symbol: 'A' },
       { type: 'variable', symbol: 'S' }
     ],
     variables: [
       {
-        symbol: 'P',
-        name: 'Parentheses',
-        unit: '()',
-        description: 'Operations inside parentheses or grouping symbols are evaluated first.',
+        symbol: 'B',
+        name: 'Brackets',
+        unit: '( )',
+        description: 'Anything inside brackets is worked out first.',
         color: 'text-indigo-400'
       },
       {
-        symbol: 'E',
-        name: 'Exponents',
-        unit: 'x^y',
-        description: 'Exponents and roots are evaluated second.',
+        symbol: 'I',
+        name: 'Indices',
+        unit: 'x²',
+        description: 'Indices (powers and roots) are worked out second.',
         color: 'text-cyan-400'
-      },
-      {
-        symbol: 'M',
-        name: 'Multiplication',
-        unit: '×',
-        description: 'Multiplication (and division) is evaluated third, from left to right.',
-        color: 'text-emerald-400'
       },
       {
         symbol: 'D',
         name: 'Division',
         unit: '÷',
-        description: 'Division (and multiplication) is evaluated third, from left to right.',
+        description: 'Division and multiplication come third, worked from left to right.',
         color: 'text-amber-400'
+      },
+      {
+        symbol: 'M',
+        name: 'Multiplication',
+        unit: '×',
+        description: 'Multiplication and division come third, worked from left to right.',
+        color: 'text-emerald-400'
       },
       {
         symbol: 'A',
         name: 'Addition',
         unit: '+',
-        description: 'Addition (and subtraction) is evaluated last, from left to right.',
+        description: 'Addition and subtraction come last, worked from left to right.',
         color: 'text-rose-400'
       },
       {
         symbol: 'S',
         name: 'Subtraction',
-        unit: '-',
-        description: 'Subtraction (and addition) is evaluated last, from left to right.',
+        unit: '−',
+        description: 'Subtraction and addition come last, worked from left to right.',
         color: 'text-violet-400'
       }
     ],
     conceptSteps: [
       {
         stepNumber: 1,
-        title: 'Grouping Symbols',
-        content: 'Any expression inside parentheses (), brackets [], or braces {} must be evaluated before anything outside of them. If there are nested symbols, evaluate from the inside out.',
-        keyInsight: 'Parentheses act as a VIP pass, moving the operation to the front of the line.',
-        relatedVariables: ['P']
+        title: 'Brackets',
+        content: 'Anything inside brackets must be worked out before anything outside them. If brackets sit inside other brackets, work from the inside out.',
+        keyInsight: 'Brackets act as a VIP pass, moving the operation to the front of the queue.',
+        relatedVariables: ['B']
       },
       {
         stepNumber: 2,
-        title: 'Exponents & Powers',
-        content: 'After parentheses, evaluate any terms with exponents or roots. These represent repeated multiplication, so they carry more weight than standard multiplication.',
-        keyInsight: 'Exponents are resolved before basic arithmetic operations.',
-        relatedVariables: ['E']
+        title: 'Indices (Powers)',
+        content: 'After brackets, work out any indices: powers and roots. A power is repeated multiplication, so it comes before ordinary multiplication.',
+        keyInsight: 'Indices are worked out before multiplying, dividing, adding or subtracting.',
+        relatedVariables: ['I']
       },
       {
         stepNumber: 3,
         title: 'Left-to-Right Operations',
-        content: 'Multiplication and Division share the same priority. Evaluate them from left to right. Then, Addition and Subtraction share the lowest priority, and are also evaluated from left to right.',
-        keyInsight: 'Do not multiply before dividing if the division comes first reading left-to-right.',
-        relatedVariables: ['M', 'D', 'A', 'S']
+        content: 'Division and Multiplication share the same priority, so work through them from left to right. Then Addition and Subtraction share the lowest priority, and are also worked from left to right.',
+        keyInsight: 'The D before the M in BIDMAS does not mean divide first. Do whichever comes first reading left to right.',
+        relatedVariables: ['D', 'M', 'A', 'S']
       }
     ],
     solvedExample: {
       problem: 'Evaluate the expression: $8 - 4 \\div 2 + (1 + 1)^2$',
       steps: [
-        'First, evaluate the expression inside the parentheses: $(1 + 1) = 2$. The expression is now $8 - 4 \\div 2 + 2^2$.',
-        'Next, evaluate the exponent: $2^2 = 4$. The expression is now $8 - 4 \\div 2 + 4$.',
-        'Then, evaluate the division: $4 \\div 2 = 2$. The expression is now $8 - 2 + 4$.',
-        'Finally, evaluate addition and subtraction from left to right: $8 - 2 = 6$, then $6 + 4 = 10$.'
+        'First, work out the brackets: $(1 + 1) = 2$. The expression is now $8 - 4 \\div 2 + 2^2$.',
+        'Next, work out the index: $2^2 = 4$. The expression is now $8 - 4 \\div 2 + 4$.',
+        'Then do the division: $4 \\div 2 = 2$. The expression is now $8 - 2 + 4$.',
+        'Finally, add and subtract from left to right: $8 - 2 = 6$, then $6 + 4 = 10$.'
       ],
       resultFormula: '= 10'
     },
@@ -1839,23 +1867,25 @@ This results in a coupled system of ODEs that has no closed-form analytical solu
       },
       {
         question: 'Evaluate $12 \\div 3 \\times 2$.',
-        hint: 'Multiplication and division are evaluated left-to-right.',
+        hint: 'Division and multiplication are worked from left to right.',
         answer: '8'
       }
     ],
-    realWorldConnection: 'Computer programming relies heavily on the order of operations. Software engineers must use parentheses explicitly to ensure computers calculate complex financial or scientific algorithms in the correct order.',
+    realWorldConnection: 'Computer programming relies heavily on the order of operations. Programmers add brackets to make sure a computer carries out a calculation in the order they intend.',
     textbookContent: `
 ## Arithmetic and Order of Operations
 
 The order of operations is a collection of rules that dictate which procedures to perform first in order to evaluate a given mathematical expression. Without a standard order of operations, a single expression could yield multiple different, yet seemingly valid, results.
 
-### The PEMDAS Rule
+### The BIDMAS Rule
 
-In the United States, the acronym **PEMDAS** is commonly used as a mnemonic to remember the order of operations:
-1.  **P**arentheses: Evaluate expressions inside grouping symbols like \`()\`, \`[]\`, or \`{}\`.
-2.  **E**xponents: Evaluate powers and roots.
-3.  **M**ultiplication and **D**ivision: Evaluate these operations from left to right.
-4.  **A**ddition and **S**ubtraction: Evaluate these operations from left to right.
+In UK schools the order of operations is remembered with the acronym **BIDMAS**. Some schools say **BODMAS**, where the O stands for "orders" (another word for powers).
+1.  **B**rackets: work out anything inside brackets first.
+2.  **I**ndices: work out powers and roots.
+3.  **D**ivision and **M**ultiplication: work through these from left to right.
+4.  **A**ddition and **S**ubtraction: work through these from left to right.
+
+In the United States the same rule is taught as PEMDAS (parentheses, exponents, multiplication, division, addition, subtraction). The order is identical; only the names differ.
 
 ### The Left-to-Right Convention
 
@@ -1865,9 +1895,9 @@ Consider the expression: $16 \\div 4 \\times 2$
 *   **Incorrect (Multiply first):** $16 \\div 8 = 2$
 *   **Correct (Left to right):** $4 \\times 2 = 8$
 
-### Nested Grouping Symbols
+### Brackets Inside Brackets
 
-When an expression contains multiple sets of parentheses, such as $[ 2 + (3 \\times 4) ]$, always start with the innermost set and work outwards.
+When an expression has brackets inside brackets, such as $[ 2 + (3 \\times 4) ]$, always start with the innermost set and work outwards.
 
 *   $[ 2 + (12) ]$
 *   $14$
@@ -1875,7 +1905,7 @@ When an expression contains multiple sets of parentheses, such as $[ 2 + (3 \\ti
 ### References
 
 *   [Khan Academy: Order of Operations](https://www.khanacademy.org/math/pre-algebra/pre-algebra-arith-prop/pre-algebra-order-of-operations/v/introduction-to-order-of-operations)
-*   Common Core State Standards for Mathematics: CCSS.5.OA.A.1, CCSS.6.EE.A.2.c
+*   [National curriculum in England: mathematics programmes of study](https://www.gov.uk/government/publications/national-curriculum-in-england-mathematics-programmes-of-study)
     `
   },
   {
@@ -1893,6 +1923,14 @@ When an expression contains multiple sets of parentheses, such as $[ 2 + (3 \\ti
       { type: 'operator', content: '=' },
       { type: 'variable', symbol: 'l' },
       { type: 'operator', content: '\\times' },
+      { type: 'variable', symbol: 'w' },
+      { type: 'static', latex: '\\qquad' },
+      { type: 'variable', symbol: 'P' },
+      { type: 'operator', content: '=' },
+      { type: 'static', latex: '2' },
+      { type: 'variable', symbol: 'l' },
+      { type: 'operator', content: '+' },
+      { type: 'static', latex: '2' },
       { type: 'variable', symbol: 'w' }
     ],
     variables: [
@@ -1932,7 +1970,7 @@ When an expression contains multiple sets of parentheses, such as $[ 2 + (3 \\ti
         stepNumber: 1,
         title: 'What is Area?',
         content: 'Area is the amount of flat space a shape takes up. You can think of it as the number of 1x1 unit squares needed to completely cover the inside of the shape without overlapping.',
-        keyInsight: 'Area is measured in square units (e.g., square inches, square centimetres).',
+        keyInsight: 'Area is measured in square units (e.g., square centimetres, square metres).',
         relatedVariables: ['A']
       },
       {
@@ -1962,21 +2000,21 @@ When an expression contains multiple sets of parentheses, such as $[ 2 + (3 \\ti
     },
     practiceProblems: [
       {
-        question: 'A square has a side length of 4 inches. What is its area?',
+        question: 'A square has a side length of 4 cm. What is its area?',
         hint: 'A square is a special rectangle where length equals width.',
-        answer: '16 square inches'
+        answer: '16 square centimetres (16 cm²)'
       },
       {
-        question: 'A rectangle has a perimeter of 20 feet and a length of 6 feet. What is its width?',
+        question: 'A rectangle has a perimeter of 20 m and a length of 6 m. What is its width?',
         hint: 'Subtract the two lengths from the perimeter, then divide the remainder by 2.',
-        answer: '4 feet'
+        answer: '4 m'
       }
     ],
-    realWorldConnection: 'Architects and builders use area to determine how much carpet or tile is needed for a floor, and perimeter to determine how much fencing is needed to enclose a yard.',
+    realWorldConnection: 'Architects and builders use area to determine how much carpet or tile is needed for a floor, and perimeter to determine how much fencing is needed to enclose a garden.',
     textbookContent: `
 ## Basic Geometry: Area and Perimeter
 
-Understanding area and perimeter is fundamental to geometry and has countless real-world applications. These concepts are formally introduced in elementary school, bridging the gap between basic counting and abstract geometric formulas.
+Understanding area and perimeter is fundamental to geometry and has countless real-world applications. These concepts are first taught in primary school, bridging the gap between basic counting and abstract geometric formulas.
 
 ### Perimeter: The Outer Boundary
 
@@ -1988,7 +2026,7 @@ For any polygon, the perimeter is found by summing the lengths of all its sides.
 
 ### Area: The Inside Space
 
-**Area** measures the amount of surface space contained within a two-dimensional boundary. It is measured in square units (e.g., $\\text{cm}^2$, $\\text{m}^2$, $\\text{in}^2$).
+**Area** measures the amount of surface space contained within a two-dimensional boundary. It is measured in square units (e.g., $\\text{cm}^2$, $\\text{m}^2$, $\\text{km}^2$).
 
 Conceptually, finding the area of a rectangle is like covering it with a grid of unit squares and counting them. 
 *   **Rectangle:** The formula $A = l \\times w$ represents multiplying the number of squares in one row (length) by the number of rows (width).
@@ -2003,7 +2041,7 @@ A common source of confusion is the relationship (or lack thereof) between area 
 ### References
 
 *   [Khan Academy: Area and Perimeter](https://www.khanacademy.org/math/basic-geo/basic-geo-area-and-perimeter)
-*   Common Core State Standards for Mathematics: CCSS.3.MD.C.5, CCSS.3.MD.D.8, CCSS.4.MD.A.3
+*   [National curriculum in England: mathematics programmes of study](https://www.gov.uk/government/publications/national-curriculum-in-england-mathematics-programmes-of-study)
     `
   },
   {
@@ -2063,14 +2101,14 @@ A common source of confusion is the relationship (or lack thereof) between area 
       {
         stepNumber: 1,
         title: 'What is a Ratio?',
-        content: 'A ratio is a way to compare two or more quantities. If a recipe calls for 2 cups of flour for every 1 cup of sugar, the ratio of flour to sugar is 2 to 1 (written as 2:1 or 2/1).',
+        content: 'A ratio is a way to compare two or more quantities. If a recipe calls for 200 g of flour for every 100 g of sugar, the ratio of flour to sugar is 2 to 1 (written as 2:1 or 2/1).',
         keyInsight: 'Ratios describe the relative sizes of two or more values.',
         relatedVariables: ['a', 'b']
       },
       {
         stepNumber: 2,
         title: 'What is a Proportion?',
-        content: 'A proportion is simply an equation stating that two ratios are equal. If 2 cups of flour need 1 cup of sugar, then 4 cups of flour will need 2 cups of sugar.',
+        content: 'A proportion is simply an equation stating that two ratios are equal. If 200 g of flour needs 100 g of sugar, then 400 g of flour will need 200 g of sugar.',
         keyInsight: 'Proportions are scaled-up or scaled-down versions of the same ratio.',
         relatedVariables: ['a', 'b', 'c', 'd']
       },
@@ -2083,25 +2121,25 @@ A common source of confusion is the relationship (or lack thereof) between area 
       }
     ],
     solvedExample: {
-      problem: 'A car travels 150 miles on 5 gallons of gas. How many miles can it travel on 8 gallons?',
+      problem: 'A car travels 150 miles on 15 litres of petrol. How many miles can it travel on 24 litres?',
       steps: [
-        'Set up a proportion: $\\frac{\\text{miles}}{\\text{gallons}} = \\frac{\\text{miles}}{\\text{gallons}}$.',
-        'Plug in the known values: $\\frac{150}{5} = \\frac{x}{8}$.',
-        'Cross-multiply: $150 \\times 8 = 5 \\times x$.',
-        'Solve the equation: $1200 = 5x$, so $x = \\frac{1200}{5} = 240$.'
+        'Set up a proportion: $\\frac{\\text{miles}}{\\text{litres}} = \\frac{\\text{miles}}{\\text{litres}}$.',
+        'Put in the known values: $\\frac{150}{15} = \\frac{x}{24}$.',
+        'Cross-multiply: $150 \\times 24 = 15 \\times x$.',
+        'Solve the equation: $3600 = 15x$, so $x = \\frac{3600}{15} = 240$.'
       ],
       resultFormula: 'x = 240 \\text{ miles}'
     },
     practiceProblems: [
       {
-        question: 'If 3 apples cost $2, how much do 9 apples cost?',
+        question: 'If 3 apples cost £2, how much do 9 apples cost?',
         hint: 'Set up the ratio 3/2 = 9/x and cross-multiply.',
-        answer: '$6'
+        answer: '£6'
       },
       {
-        question: 'A map has a scale of 1 inch = 10 miles. How many inches represent 45 miles?',
+        question: 'A map has a scale of 1 cm = 10 km. How many centimetres represent 45 km?',
         hint: 'Set up the ratio 1/10 = x/45.',
-        answer: '4.5 inches'
+        answer: '4.5 cm'
       }
     ],
     realWorldConnection: 'Chefs use proportions constantly to scale recipes up or down depending on the number of guests. Mapmakers use ratios (scales) to accurately represent large geographic areas on small pieces of paper.',
@@ -2141,14 +2179,14 @@ $x = 12$
 ### References
 
 *   [Khan Academy: Ratios, rates, & percentages](https://www.khanacademy.org/math/cc-sixth-grade-math/cc-6th-ratios-prop-topic)
-*   Common Core State Standards for Mathematics: CCSS.6.RP.A.1, CCSS.6.RP.A.3
+*   [National curriculum in England: mathematics programmes of study](https://www.gov.uk/government/publications/national-curriculum-in-england-mathematics-programmes-of-study)
     `
   },
   {
     id: 'decimals-percentages',
     category: 'elementary-math',
     title: 'Decimals & Percentages',
-    subtitle: 'Translate between fractions, decimals, and percents.',
+    subtitle: 'Convert between fractions, decimals and percentages.',
     icon: 'Percent',
     accentColor: 'violet',
     difficulty: 2,
@@ -2193,20 +2231,20 @@ $x = 12$
       },
       {
         stepNumber: 3,
-        title: 'Finding the Percent of a Number',
+        title: 'Finding a Percentage of a Number',
         content: 'To find a percentage of a number, first convert the percentage to a decimal, then multiply. For example, to find 20% of 50: convert 20% to 0.20, then multiply 0.20 × 50 = 10.',
-        keyInsight: 'The word "of" in math often means "multiply".',
+        keyInsight: 'The word "of" in maths often means "multiply".',
         relatedVariables: ['X']
       }
     ],
     solvedExample: {
-      problem: 'A $40 shirt is on sale for 25% off. What is the discount amount, and what is the final price?',
+      problem: 'A £40 shirt is on sale for 25% off. What is the discount amount, and what is the final price?',
       steps: [
         'Convert the percentage to a decimal: $25\\% = 0.25$.',
-        'Find the discount amount by multiplying the original price by the decimal: $40 \\times 0.25 = 10$. The discount is $10.',
+        'Find the discount amount by multiplying the original price by the decimal: $40 \\times 0.25 = 10$. The discount is £10.',
         'Subtract the discount from the original price to find the final price: $40 - 10 = 30$.'
       ],
-      resultFormula: '\\text{Discount} = \\$10, \\text{Final Price} = \\$30'
+      resultFormula: '\\text{Discount} = \\pounds 10, \\text{Final Price} = \\pounds 30'
     },
     practiceProblems: [
       {
@@ -2224,7 +2262,7 @@ $x = 12$
     textbookContent: `
 ## Decimals and Percentages
 
-Fractions, decimals, and percentages are three different mathematical languages used to describe the exact same concept: a part of a whole. Fluently translating between these three forms is a critical skill in elementary mathematics.
+Fractions, decimals, and percentages are three different mathematical languages used to describe the exact same concept: a part of a whole. Fluently translating between these three forms is a core skill in school mathematics.
 
 ### The Base-10 Decimal System
 
@@ -2257,17 +2295,17 @@ Divide the percentage by 100 (which moves the decimal point two places to the le
 ### Calculating with Percentages
 
 When solving real-world problems involving percentages (like calculating tax, tips, or discounts), the most reliable method is to first convert the percentage into its decimal form, and then perform the arithmetic. 
-When asked to find a percent *of* a number, the operation is multiplication.
+When asked to find a percentage *of* a number, the operation is multiplication.
 
-*Example: Find a 15% tip on a $30 bill.*
+*Example: Find a 15% tip on a £30 bill.*
 $15\\% = 0.15$
 $0.15 \\times 30 = 4.5$
-The tip is $\\$4.50$.
+The tip is £4.50.
 
 ### References
 
 *   [Khan Academy: Decimals, fractions, and percentages](https://www.khanacademy.org/math/cc-sixth-grade-math/cc-6th-ratios-prop-topic/cc-6th-percent-decimals/v/representing-a-number-as-a-decimal-percent-and-fraction)
-*   Common Core State Standards for Mathematics: CCSS.6.RP.A.3.c
+*   [National curriculum in England: mathematics programmes of study](https://www.gov.uk/government/publications/national-curriculum-in-england-mathematics-programmes-of-study)
     `
   },
   {
@@ -2400,7 +2438,7 @@ $$A = \\frac{1}{2} r^2 \\theta$$
     accentColor: 'amber',
     difficulty: 1,
     estimatedMinutes: 10,
-    formula: 'a \\times b = b + b + \\cdots + b \\; (a \\text{ times})',
+    formula: 'a \\times b = a + a + \\cdots + a \\; (b \\text{ times})',
     formulaLayout: [
       { type: 'variable', symbol: 'a' },
       { type: 'operator', content: '\\times' },
@@ -2451,7 +2489,7 @@ $$A = \\frac{1}{2} r^2 \\theta$$
       { question: 'Calculate 15 × 12.', hint: 'Partial products: 15×2=30, 15×10=150.', answer: '180' },
       { question: 'Calculate 23 × 11.', hint: 'Partial products: 23×1=23, 23×10=230.', answer: '253' }
     ],
-    realWorldConnection: 'Long multiplication is the foundation of all computer arithmetic — your CPU performs billions of these operations per second using binary circuits.',
+    realWorldConnection: 'Computers multiply in a very similar way: a processor works through the digits of a binary number, shifting and adding partial products, just as you do in long multiplication.',
     textbookContent: `
 ## Long Multiplication
 
@@ -2578,7 +2616,7 @@ $$\\frac{a}{b} \\div \\frac{c}{d} = \\frac{a}{b} \\times \\frac{d}{c}$$
 ### References
 
 *   [Khan Academy: Fractions](https://www.khanacademy.org/math/arithmetic/fraction-arithmetic)
-*   [NRICH: Fractions](https://nrich.maths.org/content/id/1341/fractions.pdf)
+*   [BBC Bitesize: KS3 Maths](https://www.bbc.co.uk/bitesize/subjects/zqhs34j)
     `
   },
   {
@@ -2828,21 +2866,21 @@ $$93{,}000{,}000 = 9.3 \\times 10^7$$
         stepNumber: 1,
         title: 'The Ideal Gas Model',
         content: 'An ideal gas is a theoretical model where gas molecules are perfectly elastic point particles that do not interact with each other. Real gases approximate this model well under low pressure and high temperature conditions.',
-        keyInsight: 'Pressure is caused by gas molecules bouncing off container walls millions of times per second.',
+        keyInsight: 'Pressure is caused by enormous numbers of gas molecules bouncing off the container walls every second.',
         relatedVariables: ['P', 'V']
       },
       {
         stepNumber: 2,
-        title: 'The Four Laws Combined',
-        content: 'PV = nRT combines Boyle\'s Law (P ∝ 1/V at constant T), Charles\'s Law (V ∝ T at constant P), and Avogadro\'s Law (V ∝ n) into a single unified equation for predicting gas behaviour.',
+        title: 'Four Gas Laws in One',
+        content: 'PV = nRT combines Boyle\'s Law (P ∝ 1/V at constant T), Charles\'s Law (V ∝ T at constant P), the pressure law (P ∝ T at constant V) and Avogadro\'s Law (V ∝ n) into a single equation for predicting gas behaviour.',
         keyInsight: 'If you know any four of the five quantities, you can solve for the fifth.',
         relatedVariables: ['P', 'V', 'n', 'T']
       },
       {
         stepNumber: 3,
         title: 'Entropy & the Second Law',
-        content: 'The Second Law of Thermodynamics states that the total entropy of an isolated system always increases. Heat flows spontaneously from hot to cold — never the reverse — because the disordered state is statistically overwhelmingly more probable.',
-        keyInsight: 'Entropy always increases. Ordered systems naturally tend toward disorder.',
+        content: 'The Second Law of Thermodynamics states that the total entropy of an isolated system never decreases. Heat flows spontaneously from hot to cold — never the reverse — because the disordered state is statistically overwhelmingly more probable.',
+        keyInsight: 'Entropy never decreases in an isolated system. Left alone, ordered systems tend towards disorder.',
         relatedVariables: ['T']
       }
     ],
@@ -3006,7 +3044,7 @@ where $k_B = 1.38 \\times 10^{-23}$ J/K is the Boltzmann constant.
         answer: '3 m/s'
       }
     ],
-    realWorldConnection: 'Spacecraft navigation uses momentum conservation. When a rocket expels propellant backward at high speed, the spacecraft is propelled forward — just like an astronaut throwing a wrench.',
+    realWorldConnection: 'Spacecraft navigation uses momentum conservation. When a rocket expels propellant backward at high speed, the spacecraft is propelled forward — just like an astronaut throwing a spanner.',
     textbookContent: `
 ## Momentum, Impulse, and Conservation Laws
 
@@ -3071,6 +3109,7 @@ $$\\Delta v = v_e \\ln\\left(\\frac{m_0}{m_f}\\right)$$
     formula: '\\sigma = \\sqrt{\\frac{\\sum(x_i - \\mu)^2}{N}}',
     formulaLayout: [
       { type: 'variable', symbol: '\\sigma' },
+      { type: 'static', latex: '^2' },
       { type: 'operator', content: '=' },
       {
         type: 'fraction',
@@ -3158,7 +3197,7 @@ $$\\Delta v = v_e \\ln\\left(\\frac{m_0}{m_f}\\right)$$
         answer: '80'
       }
     ],
-    realWorldConnection: 'Data scientists at space agencies use statistics to filter sensor noise from telemetry signals — a single anomalous reading beyond 3σ from the mean triggers an automatic spacecraft health alert.',
+    realWorldConnection: 'Engineers use statistics to separate real signals from sensor noise. A reading several standard deviations from the mean is unlikely to be chance, so it is flagged for a closer look.',
     textbookContent: `
 ## Descriptive Statistics and Distributions
 
@@ -3292,7 +3331,7 @@ Two variables may be statistically correlated without one causing the other. Est
         answer: "No. Faraday's law requires a *changing* flux. Static fields produce no EMF."
       }
     ],
-    realWorldConnection: "Every solar panel on the International Space Station drives power through transformer circuits governed by Faraday's law. Induction is also used in spacecraft docking for wireless power transfer.",
+    realWorldConnection: "Every power station generator and every transformer on the electricity grid works by Faraday's law. So do wireless phone chargers, induction hobs and the pickups on an electric guitar.",
     textbookContent: `
 ## Faraday's Law of Electromagnetic Induction
 
@@ -3382,8 +3421,8 @@ $$\\nabla \\times \\vec{E} = -\\frac{\\partial \\vec{B}}{\\partial t}$$
     conceptSteps: [
       {
         stepNumber: 1,
-        title: 'The Ultraviolet Catastrophe',
-        content: 'In 1900, Max Planck solved a crisis in physics. Classical theory predicted that hot objects should radiate infinite energy at high frequencies (the "ultraviolet catastrophe"). Planck proposed that energy comes in discrete packets, or **quanta**, of size $E = hf$.',
+        title: 'Planck and the Quantum',
+        content: 'In 1900, Max Planck was trying to explain the spectrum of light given off by hot objects. Classical theory got it badly wrong: it predicted ever more energy at high frequencies, a failure later nicknamed the "ultraviolet catastrophe". Planck found a formula that matched the measurements by assuming energy is exchanged in discrete packets, or **quanta**, of size $E = hf$.',
         keyInsight: 'Energy is quantised — it exists in discrete chunks, not a continuous flow.',
         relatedVariables: ['E', 'h', 'f']
       },
@@ -3409,7 +3448,7 @@ $$\\nabla \\times \\vec{E} = -\\frac{\\partial \\vec{B}}{\\partial t}$$
         'Substitute: $E = 6.626 \\times 10^{-34} \\times 6.0 \\times 10^{14}$.',
         'Multiply: $E = 6.626 \\times 6.0 \\times 10^{-20} = 39.756 \\times 10^{-20}$.'
       ],
-      resultFormula: 'E \\approx 3.98 \\times 10^{-19} \\text{ J} \\approx 2.49 \\text{ eV}'
+      resultFormula: 'E \\approx 3.98 \\times 10^{-19} \\text{ J} \\approx 2.48 \\text{ eV}'
     },
     practiceProblems: [
       {
@@ -3436,7 +3475,7 @@ Quantum mechanics governs the behaviour of matter and energy at atomic and subat
 
 ### Planck's Quantum Hypothesis (1900)
 
-Max Planck resolved the ultraviolet catastrophe by postulating that electromagnetic oscillators emit or absorb energy only in discrete amounts:
+Max Planck explained the spectrum of hot objects by postulating that electromagnetic oscillators emit or absorb energy only in discrete amounts:
 $$E_n = nhf \\quad (n = 0, 1, 2, \\ldots)$$
 
 where $h \\approx 6.626 \\times 10^{-34}$ J·s is **Planck's constant**.
@@ -3471,6 +3510,178 @@ The wavefunction $\\Psi$ gives the probability amplitude for finding the particl
 *   [Quantum Mechanics: The Theoretical Minimum](https://theoreticalminimum.com/courses/quantum-mechanics) (Leonard Susskind & Art Friedman)
 *   [Feynman Lectures, Vol. III: Quantum Mechanics](https://www.feynmanlectures.caltech.edu/III_toc.html)
 *   [Introduction to Quantum Mechanics, 3rd ed.](https://www.cambridge.org/core/books/introduction-to-quantum-mechanics/990799CA07A83FC5312402AF6860311E) (David J. Griffiths)
+    `
+  },
+  {
+    id: 'units',
+    category: 'physics',
+    title: 'Converting Units',
+    subtitle: 'Use prefixes and conversion factors to change the unit without changing the quantity.',
+    icon: 'Activity',
+    accentColor: 'cyan',
+    difficulty: 1,
+    estimatedMinutes: 15,
+    formula: 'x_{\\text{base}} = x \\times 10^{n}',
+    formulaLayout: [
+      { type: 'variable', symbol: 'x_{\\text{base}}' },
+      { type: 'operator', content: '=' },
+      { type: 'variable', symbol: 'x' },
+      { type: 'operator', content: '\\times' },
+      { type: 'variable', symbol: '10^{n}' }
+    ],
+    variables: [
+      {
+        symbol: 'x_{\\text{base}}',
+        name: 'Value in the base unit',
+        unit: 'e.g. m, A, Hz',
+        description: 'The same quantity written with no prefix, ready to use in a formula.',
+        color: 'text-cyan-400'
+      },
+      {
+        symbol: 'x',
+        name: 'Value with a prefix',
+        unit: 'e.g. km, mA, MHz',
+        description: 'The number as you were given it, in a unit that carries a prefix.',
+        color: 'text-indigo-400'
+      },
+      {
+        symbol: '10^{n}',
+        name: 'Prefix factor',
+        unit: 'power of ten',
+        description: 'What the prefix stands for: kilo is 10³, milli is 10⁻³, mega is 10⁶ and so on.',
+        color: 'text-amber-400'
+      }
+    ],
+    conceptSteps: [
+      {
+        stepNumber: 1,
+        title: 'Same Quantity, Different Number',
+        content: 'A length of 2 km and a length of 2000 m are exactly the same distance. Converting units never changes the quantity; it changes the number and the unit together. A smaller unit needs a bigger number to describe the same thing.',
+        keyInsight: 'Smaller unit, bigger number. Bigger unit, smaller number.',
+        relatedVariables: ['x', 'x_{\\text{base}}']
+      },
+      {
+        stepNumber: 2,
+        title: 'Prefixes Are Powers of Ten',
+        content: 'A prefix is shorthand for a power of ten: giga (G) is $10^9$, mega (M) is $10^6$, kilo (k) is $10^3$, centi (c) is $10^{-2}$, milli (m) is $10^{-3}$, micro (μ) is $10^{-6}$ and nano (n) is $10^{-9}$. To get to the base unit, replace the prefix with its power of ten: $20\\text{ mA} = 20 \\times 10^{-3}\\text{ A} = 0.02\\text{ A}$.',
+        keyInsight: 'To reach the base unit, multiply by the prefix factor. To go back, divide by it.',
+        relatedVariables: ['10^{n}']
+      },
+      {
+        stepNumber: 3,
+        title: 'Compound Units, One Unit at a Time',
+        content: 'Units such as km/h are built from two units, so convert each one separately. For $72\\text{ km/h}$: the distance is $72\\text{ km} = 72\\,000\\text{ m}$ and the time is $1\\text{ h} = 3600\\text{ s}$, so the speed is $72\\,000 \\div 3600 = 20\\text{ m/s}$.',
+        keyInsight: 'To change km/h into m/s, divide by 3.6. To change m/s into km/h, multiply by 3.6.',
+        relatedVariables: ['x']
+      },
+      {
+        stepNumber: 4,
+        title: 'Areas and Volumes',
+        content: 'Because $1\\text{ m} = 100\\text{ cm}$, a square metre is $100 \\times 100 = 10\\,000\\text{ cm}^2$ and a cubic metre is $100 \\times 100 \\times 100 = 1\\,000\\,000\\text{ cm}^3$. A common mistake is to use 100 for all three.',
+        keyInsight: 'Square the length factor for an area and cube it for a volume.',
+        relatedVariables: ['10^{n}']
+      }
+    ],
+    solvedExample: {
+      problem: 'A radio station broadcasts at $97.5$ MHz. Write this frequency in hertz, in standard form.',
+      steps: [
+        'Read the prefix: mega (M) means $10^6$.',
+        'Replace the prefix with its power of ten: $97.5\\text{ MHz} = 97.5 \\times 10^6\\text{ Hz}$.',
+        'Standard form needs a number between 1 and 10 at the front. Write $97.5$ as $9.75 \\times 10^1$.',
+        'Combine the powers of ten: $9.75 \\times 10^1 \\times 10^6 = 9.75 \\times 10^7$.'
+      ],
+      resultFormula: '97.5\\text{ MHz} = 9.75 \\times 10^{7}\\text{ Hz}'
+    },
+    practiceProblems: [
+      {
+        question: 'Convert 450 mA to amperes.',
+        hint: 'Milli means $10^{-3}$, so divide by 1000.',
+        answer: '0.45 A'
+      },
+      {
+        question: 'Convert 3.2 km to metres.',
+        hint: 'Kilo means $10^3$, so multiply by 1000.',
+        answer: '3200 m'
+      },
+      {
+        question: 'A car travels at 90 km/h. What is its speed in m/s?',
+        hint: 'Divide by 3.6, or convert 90 km to metres and 1 hour to seconds.',
+        answer: '25 m/s'
+      },
+      {
+        question: 'A cyclist travels at 15 m/s. What is this in km/h?',
+        hint: 'Going from m/s to km/h, multiply by 3.6.',
+        answer: '54 km/h'
+      },
+      {
+        question: 'A tabletop has an area of 2 m². What is this in cm²?',
+        hint: 'One square metre is $100 \\times 100$ square centimetres.',
+        answer: '20 000 cm²'
+      },
+      {
+        question: 'Red light has a wavelength of 650 nm. Write this in metres, in standard form.',
+        hint: 'Nano means $10^{-9}$. Then move the decimal point so the number is between 1 and 10.',
+        answer: '$6.5 \\times 10^{-7}$ m'
+      }
+    ],
+    realWorldConnection: 'In 1999 NASA lost the Mars Climate Orbiter because of a unit mix-up. One team\'s software reported thruster impulse in pound-force seconds, and the navigation software expected newton seconds. Nobody converted, the spacecraft approached Mars far too low, and it was lost.',
+    textbookContent: `
+## Converting Units
+
+Physics formulas only give the right answer if every quantity is in a consistent set of units, normally the SI base units. Converting first, then substituting, avoids most errors.
+
+### SI Prefixes
+
+| Prefix | Symbol | Factor | Example |
+|---|---|---|---|
+| giga | G | $10^{9}$ | 1 GW = 1 000 000 000 W |
+| mega | M | $10^{6}$ | 1 MHz = 1 000 000 Hz |
+| kilo | k | $10^{3}$ | 1 km = 1000 m |
+| centi | c | $10^{-2}$ | 1 cm = 0.01 m |
+| milli | m | $10^{-3}$ | 1 mA = 0.001 A |
+| micro | μ | $10^{-6}$ | 1 μm = 0.000 001 m |
+| nano | n | $10^{-9}$ | 1 nm = 0.000 000 001 m |
+
+Take care with capital letters: m is milli but M is mega, a difference of a billion.
+
+### Conversion Factors
+
+A conversion factor is a fraction equal to 1, because its top and bottom are the same quantity in different units. Multiplying by it changes the units but not the quantity. Choose the fraction that cancels the unit you want to remove:
+
+$$72\\ \\frac{\\text{km}}{\\text{h}} \\times \\frac{1000\\ \\text{m}}{1\\ \\text{km}} \\times \\frac{1\\ \\text{h}}{3600\\ \\text{s}} = 20\\ \\frac{\\text{m}}{\\text{s}}$$
+
+The kilometres cancel, the hours cancel, and metres per second are left.
+
+### Time
+
+*   1 minute = 60 s
+*   1 hour = 60 minutes = 3600 s
+*   1 day = 24 hours = 86 400 s
+
+### Area and Volume
+
+Square the length factor for area and cube it for volume:
+
+*   $1\\text{ m}^2 = 10^4\\text{ cm}^2$
+*   $1\\text{ m}^3 = 10^6\\text{ cm}^3$
+*   $1\\text{ litre} = 1000\\text{ cm}^3 = 10^{-3}\\text{ m}^3$
+
+### Conversions That Are Not a Simple Multiplication
+
+Temperature is the usual exception. To go from degrees Celsius to kelvin you add, you do not multiply:
+
+$$T(\\text{K}) = T(^\\circ\\text{C}) + 273$$
+
+### Useful Energy Conversions
+
+*   $1\\text{ kWh} = 3.6 \\times 10^{6}\\text{ J}$, because 1 kW for 1 hour is 1000 W for 3600 s.
+*   $1\\text{ eV} = 1.60 \\times 10^{-19}\\text{ J}$ (A-level).
+
+### References
+
+*   [BIPM: SI prefixes](https://www.bipm.org/en/measurement-units/si-prefixes)
+*   [BBC Bitesize: GCSE Physics](https://www.bbc.co.uk/bitesize/subjects/zpm6fg8)
+*   [NASA: Mars Climate Orbiter](https://science.nasa.gov/mission/mars-climate-orbiter/)
     `
   }
 ];

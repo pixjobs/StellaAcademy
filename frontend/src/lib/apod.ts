@@ -21,6 +21,17 @@ interface NasaApodResponse {
   copyright: string | null;
 }
 
+/** Real pictures are hosted under apod.nasa.gov/apod/image/; anything else is not the picture of the day. */
+function isRealApodImage(data: NasaApodResponse): boolean {
+  if (data.media_type !== 'image' || typeof data.url !== 'string') return false;
+  try {
+    const url = new URL(data.url);
+    return url.hostname === 'apod.nasa.gov' && url.pathname.startsWith('/apod/image/') && !/logo/i.test(url.pathname);
+  } catch {
+    return false;
+  }
+}
+
 /**
  * Simple APOD fetcher for educational website
  * No caching, no secrets, no complex setup
@@ -30,7 +41,8 @@ export async function getApod(): Promise<Apod | null> {
 
   try {
     const response = await fetch(`https://api.nasa.gov/planetary/apod?api_key=${apiKey}`, {
-      next: { revalidate: 86400 }
+      next: { revalidate: 86400 },
+      signal: AbortSignal.timeout(5000),
     });
     
     if (!response.ok) {
@@ -38,7 +50,13 @@ export async function getApod(): Promise<Apod | null> {
     }
 
     const data = (await response.json()) as NasaApodResponse;
-    
+
+    // The API sometimes answers with a placeholder (in October 2026 every day came back as
+    // "NASA Science" with NASA's logo as the picture). Only accept a real APOD image.
+    if (!isRealApodImage(data)) {
+      throw new Error(`APOD returned a placeholder: ${data.title} (${data.url})`);
+    }
+
     return {
       date: data.date,
       title: data.title,

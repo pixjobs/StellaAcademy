@@ -4,15 +4,11 @@
 ---
 
 ## 📺 Demo & Links
-- Live demo: https://stella-academy.org
+- Live demo: https://www.stella-academy.org
 - Source code: https://github.com/pixjobs/StellaAcademy
 - Devpost page: https://devpost.com/software/stella-academy
 
-### Judge Login (pre-configured in Clerk)
-We created a dedicated test user so judges can log in without signing up:
-
-- Email: judge@stella-academy.org
-- Password: StellaRocks2025!
+_Competition judge login has been removed from the repository; contact the maintainers for access if required._
 
 ---
 

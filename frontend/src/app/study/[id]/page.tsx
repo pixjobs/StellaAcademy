@@ -1,374 +1,292 @@
-'use client';
-
-import { useState, useEffect, use } from 'react';
+import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ChevronDown } from 'lucide-react';
-import GSAPSimulation from '@/components/GSAPSimulation';
-import MathFormula, { RichText } from '@/components/MathFormula';
+import { notFound } from 'next/navigation';
+import type { CSSProperties, ReactNode } from 'react';
+import LessonDiagram from '@/components/LessonDiagram';
 import MarkdownRenderer from '@/components/MarkdownRenderer';
-import VariableHighlighter from '@/components/study/VariableHighlighter';
+import { LessonCard } from '@/components/paper/LevelCards';
+import { Rich, Tex } from '@/components/paper/maths';
+import { SkyBand } from '@/components/Sky';
+import LessonModel from '@/components/study/LessonModel';
+import TrackedDetails from '@/components/study/TrackedDetails';
+import SupportLink from '@/components/SupportLink';
+import { MarkDone } from '@/components/journey/MissionSteps';
+import { summaryOf } from '@/lib/lessons';
+import { placeOf, stepAfter } from '@/lib/missions';
+import { levelAges, levelLabel, subjectOf, SUBJECT_LABEL } from '@/lib/levels';
+import { PAPER_SUBJECT } from '@/lib/paper';
+import { SITE_NAME, SITE_URL, supportEnabled } from '@/lib/site';
 import { studyModules, type ConceptId } from '@/lib/study-modules';
 
-export default function StudyModulePage({ params }: { params: Promise<{ id: ConceptId }> }) {
-  const resolvedParams = use(params);
-  const currentSub = studyModules.find(m => m.id === resolvedParams.id);
-  const [mounted, setMounted] = useState(false);
+type Props = { params: Promise<{ id: string }> };
 
-  // Interactive Sliders State
-  const [mass, setMass] = useState(1);                     // Gravity: 1 to 4
-  const [refractiveIndex, setRefractiveIndex] = useState(1.5); // Prism: 1 to 2.5
-  const [gearRatio, setGearRatio] = useState(2);           // Gears: 1 to 3
-  const [deltaV, setDeltaV] = useState(1);                 // Trajectory: 1 to 2.5
-  const [resistance, setResistance] = useState(150);       // Circuit: 10 to 1000
-  const [frequency, setFrequency] = useState(2);           // Waves: 1 to 5
-  const [amplitude, setAmplitude] = useState(35);           // Waves: 10 to 60
-  
-  // Interactive Formula State
-  const [activeVariable, setActiveVariable] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'combined' | 'interactive' | 'textbook'>('combined');
-  const [rightPanelOpen, setRightPanelOpen] = useState(false);
+export function generateStaticParams() {
+  return studyModules.map((m) => ({ id: m.id }));
+}
 
-  // Calibration checklist states
-  const [checklist, setChecklist] = useState<Record<string, boolean>>({
-    sensorGrid: false,
-    receiverAlign: false,
-    coordsSync: false,
-  });
+export const dynamicParams = false;
 
-  const toggleCheck = (key: string) => {
-    setChecklist(prev => ({ ...prev, [key]: !prev[key] }));
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { id } = await params;
+  const mod = studyModules.find((m) => m.id === id);
+  if (!mod) return {};
+  const description = `${mod.subtitle} Free ${levelLabel(mod.id as ConceptId)} lesson with an interactive model, a worked example and practice questions (about ${mod.estimatedMinutes} minutes).`;
+  return {
+    title: { absolute: `${mod.title} | ${SITE_NAME}` },
+    description,
+    alternates: { canonical: `/study/${mod.id}` },
+    openGraph: { title: `${mod.title} | ${SITE_NAME}`, description, url: `${SITE_URL}/study/${mod.id}`, type: 'article' },
+  };
+}
+
+function Section({ id, title, children }: { id: string; title: string; children: ReactNode }) {
+  return (
+    <section id={id} aria-labelledby={`${id}-title`} className="scroll-mt-6 border-t border-[var(--rule)] pt-9">
+      <h2 id={`${id}-title`} className="font-fraunces text-3xl font-semibold tracking-[-0.02em] text-[var(--ink)]">
+        {title}
+      </h2>
+      <div className="mt-5">{children}</div>
+    </section>
+  );
+}
+
+export default async function LessonPage({ params }: Props) {
+  const { id } = await params;
+  const lesson = studyModules.find((m) => m.id === id);
+  if (!lesson) notFound();
+
+  const subject = PAPER_SUBJECT[lesson.category];
+  const level = levelLabel(lesson.id);
+  const place = placeOf(lesson.id);
+  const after = stepAfter(lesson.id);
+  const next = after ? summaryOf(after.lesson) : null;
+  const accent = { '--diagram-accent': subject.ink } as CSSProperties;
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'LearningResource',
+    name: lesson.title,
+    description: lesson.subtitle,
+    url: `${SITE_URL}/study/${lesson.id}`,
+    inLanguage: 'en-GB',
+    isAccessibleForFree: true,
+    learningResourceType: 'Interactive lesson',
+    educationalLevel: level,
+    timeRequired: `PT${lesson.estimatedMinutes}M`,
+    provider: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL },
   };
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!currentSub) {
-    return <div className="text-white p-20 text-center flex flex-col items-center justify-center min-h-[50vh]">
-        <h1 className="text-4xl font-bold font-fraunces mb-4">Module Not Found</h1>
-        <Link href="/" className="text-purple-400 hover:text-purple-300 underline underline-offset-4">Return to Dashboard</Link>
-    </div>;
-  }
-
-  // Dynamic Theme Styling depending on the selected curriculum category
-  const getThemeStyles = () => {
-    switch (currentSub.category) {
-      case 'mechanics':
-        return {
-          textAccent: 'text-amber-400',
-          borderAccent: 'border-amber-500/30',
-          bgAccent: 'bg-amber-500/10',
-          activeBtnClass: 'bg-amber-600/20 border-amber-400 text-amber-300',
-        };
-      case 'electronics':
-        return {
-          textAccent: 'text-emerald-400',
-          borderAccent: 'border-emerald-500/30',
-          bgAccent: 'bg-emerald-500/10',
-          activeBtnClass: 'bg-emerald-600/20 border-emerald-400 text-emerald-300',
-        };
-      case 'mathematics':
-        return {
-          textAccent: 'text-rose-400',
-          borderAccent: 'border-rose-500/30',
-          bgAccent: 'bg-rose-500/10',
-          activeBtnClass: 'bg-rose-600/20 border-rose-400 text-rose-300',
-        };
-      case 'physics':
-      default:
-        return {
-          textAccent: 'text-indigo-400',
-          borderAccent: 'border-indigo-500/30',
-          bgAccent: 'bg-indigo-500/10',
-          activeBtnClass: 'bg-indigo-600/20 border-indigo-400 text-indigo-300',
-        };
-    }
-  };
-
-  const { textAccent, borderAccent, bgAccent, activeBtnClass } = getThemeStyles();
+  const jump = [
+    { href: '#idea', label: 'The idea' },
+    { href: '#example', label: 'Worked example' },
+    { href: '#practice', label: 'Practice' },
+    ...(lesson.textbookContent ? [{ href: '#notes', label: 'Notes' }] : []),
+  ];
 
   return (
-    <div
-      className="relative min-h-[calc(100vh-135px)] text-slate-100 font-hanken overflow-hidden bg-transparent flex flex-col pt-0 pb-12"
-    >
-      <div className="absolute inset-0 z-0 pointer-events-none bg-[linear-gradient(rgba(18,24,38,0)_95%,rgba(168,85,247,0.012)_95%),linear-gradient(90deg,rgba(18,24,38,0)_95%,rgba(168,85,247,0.012)_95%)] bg-[size:30px_30px]" />
+    <article>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
+      />
 
-      <section className="relative z-10 max-w-7xl w-full mx-auto px-4 sm:px-6 flex-1 flex flex-col justify-start">
-        
-        {/* Navigation Breadcrumb */}
-        <div className="mt-6 mb-4 flex items-center justify-between border-b border-white/10 pb-4">
-            <div className="flex items-center gap-3">
-              <Link href="/" className="text-slate-400 hover:text-white font-mono text-xs uppercase tracking-widest transition-colors">
-                &larr; Back to Dashboard
+      <SkyBand>
+        <nav aria-label="Breadcrumb" className="text-[15px] text-slate-300">
+          <Link href="/study" className="underline decoration-white/30 decoration-2 underline-offset-4 hover:text-white">
+            All lessons
+          </Link>
+          {place && (
+            <>
+              <span aria-hidden className="mx-2">/</span>
+              <Link href={`/journey#${place.mission.id}`} className="underline decoration-white/30 decoration-2 underline-offset-4 hover:text-white">
+                Mission {place.missionNumber}: {place.mission.title}
               </Link>
-            </div>
-            <span className="text-[10px] text-slate-500 font-mono tracking-widest uppercase">
-              {currentSub.category} Module
-            </span>
+              <span aria-hidden className="mx-2">/</span>
+              <span>
+                step {place.step} of {place.mission.lessons.length}
+              </span>
+            </>
+          )}
+        </nav>
+        <div className="mt-6 flex items-start gap-6">
+          <span
+            className="hidden h-28 w-28 shrink-0 place-items-center rounded-3xl sm:grid"
+            style={{ backgroundColor: subject.tint, color: '#eef1fb', ...accent }}
+          >
+            <LessonDiagram id={lesson.id} size={78} />
+          </span>
+          <div>
+            <p className="text-[15px] font-semibold text-[#f6c453]">
+              {level} {SUBJECT_LABEL[subjectOf(lesson.category)].toLowerCase()}, {levelAges(lesson.id)}, about {lesson.estimatedMinutes} minutes
+            </p>
+            <h1 className="mt-2 font-fraunces text-5xl font-semibold leading-[1.04] tracking-[-0.025em] text-white sm:text-6xl">
+              {lesson.title}
+            </h1>
+            <p className="mt-3 max-w-2xl text-xl leading-relaxed text-slate-200">{lesson.subtitle}</p>
+          </div>
         </div>
+      </SkyBand>
 
-        <div className="grid lg:grid-cols-12 gap-6 items-stretch mt-3 md:mt-5">
-          
-          {/* COLUMN 1 (Center, lg:7): INTERACTIVE VISUALISER & CONCEPT DIRECTIVE */}
-          <div className="lg:col-span-7 flex flex-col">
-            {/* Tabs */}
-            <div className="flex flex-wrap gap-2 mb-4 px-2">
-              <button 
-                onClick={() => setActiveTab('combined')} 
-                className={`pb-2 px-3 text-[11px] sm:text-xs font-bold uppercase tracking-wider font-mono transition-colors border-b-2 ${activeTab === 'combined' ? 'border-cyan-400 text-cyan-300' : 'border-transparent text-slate-500 hover:text-slate-300'}`}
-              >
-                Combined View
-              </button>
-              <button 
-                onClick={() => setActiveTab('interactive')} 
-                className={`pb-2 px-3 text-[11px] sm:text-xs font-bold uppercase tracking-wider font-mono transition-colors border-b-2 ${activeTab === 'interactive' ? 'border-indigo-400 text-indigo-400' : 'border-transparent text-slate-500 hover:text-slate-300'}`}
-              >
-                Interactive Lab
-              </button>
-              <button 
-                onClick={() => setActiveTab('textbook')} 
-                className={`pb-2 px-3 text-[11px] sm:text-xs font-bold uppercase tracking-wider font-mono transition-colors border-b-2 ${activeTab === 'textbook' ? 'border-emerald-400 text-emerald-400' : 'border-transparent text-slate-500 hover:text-slate-300'}`}
-              >
-                Theory &amp; Reference
-              </button>
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-10">
+          {/* The model: a night window that stays in view while you read. */}
+          <div>
+            <div className="lg:sticky lg:top-4 lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto lg:rounded-3xl">
+              <LessonModel id={lesson.id} />
             </div>
+          </div>
 
-            <div className="bg-slate-950/70 border border-white/10 rounded-xl p-5 sm:p-8 backdrop-blur-md flex-1 flex flex-col justify-between space-y-6 font-sans">
-              
-              {activeTab === 'textbook' ? (
-                <div className="textbook-content-wrapper">
-                  <MarkdownRenderer>
-                    {currentSub.textbookContent || "_Detailed reference notes for this module are currently being compiled. Please explore the interactive simulation and lesson steps above, or consult the recommended reading._"}
-                  </MarkdownRenderer>
-                </div>
-              ) : (
-                <>
-                  {/* GSAP Visualiser */}
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between border-b border-white/10 pb-2">
-                      <div className="flex items-center gap-2">
-                        <span className={`w-3 h-3 rounded-full ${textAccent} bg-current animate-pulse`} />
-                        <span className="text-sm font-bold text-slate-200 uppercase tracking-wider font-mono">Interactive Simulation Screen</span>
-                      </div>
-                      <span className="text-[9px] text-slate-500 font-mono">SYS_OK</span>
-                    </div>
+          {/* The lesson: a sheet of paper. */}
+          <div className="min-w-0 space-y-10 rounded-3xl border border-[var(--rule)] bg-[var(--sheet)] p-6 text-[1.0625rem] leading-[1.7] sm:p-9">
+            <section id="idea" aria-labelledby="idea-title" className="scroll-mt-6">
+              <nav aria-label="On this page" className="flex flex-wrap gap-x-5 gap-y-2 text-[15px]">
+                {jump.map((j) => (
+                  <a key={j.href} href={j.href} className="font-semibold text-[var(--action)] underline decoration-2 underline-offset-4 hover:text-[var(--action-hover)]">
+                    {j.label}
+                  </a>
+                ))}
+              </nav>
+              <h2 id="idea-title" className="mt-6 font-fraunces text-3xl font-semibold tracking-[-0.02em] text-[var(--ink)]">
+                The idea
+              </h2>
+              <div className="mt-5 overflow-x-auto rounded-2xl px-6 py-6 text-center text-2xl sm:text-3xl" style={{ backgroundColor: subject.tint }}>
+                <Tex tex={lesson.formula} block />
+              </div>
 
-                    <div className="h-[400px] md:h-[500px] w-full font-sans">
-                      <GSAPSimulation
-                        conceptId={currentSub.id}
-                        mass={mass}
-                        refractiveIndex={refractiveIndex}
-                        gearRatio={gearRatio}
-                        deltaV={deltaV}
-                        resistance={resistance}
-                        frequency={frequency}
-                        amplitude={amplitude}
-                      />
-                    </div>
+              <dl className="mt-5 divide-y divide-[var(--rule)] border-y border-[var(--rule)]">
+                {lesson.variables.map((v) => (
+                  <div key={v.symbol} className="grid grid-cols-[auto_1fr] gap-x-4 py-3.5">
+                    <dt className="row-span-2 grid h-11 min-w-11 place-items-center rounded-xl px-2 text-xl" style={{ backgroundColor: subject.tint }}>
+                      <Tex tex={v.symbol} />
+                    </dt>
+                    <dd className="font-semibold text-[var(--ink)]">
+                      {v.name}
+                      {v.unit && <span className="font-normal text-[var(--ink-soft)]">, {v.unit}</span>}
+                    </dd>
+                    <dd className="text-[15px] leading-relaxed text-[var(--ink-soft)]">{v.description}</dd>
                   </div>
+                ))}
+              </dl>
 
-                  {/* Concept Lesson */}
-                  <div className="border-t border-white/10 pt-6 flex-1 space-y-4">
-                    <div className="flex justify-between items-center">
-                      <span className={`text-xs uppercase font-mono tracking-wider ${textAccent}`}>
-                        Lesson Directive // {currentSub.title}
-                      </span>
-                      <span className="text-[10px] text-slate-500 font-mono">REF_CORE</span>
-                    </div>
-
-                    <div className="space-y-5">
-                      <h3 className="text-xl font-bold text-white font-fraunces">{currentSub.conceptSteps[0].title}</h3>
-                      
-                      {/* Dynamic Beautiful LaTeX Formula Block */}
-                      <VariableHighlighter
-                        formula={currentSub.formula}
-                        variables={currentSub.variables}
-                        formulaLayout={currentSub.formulaLayout}
-                        activeVariable={activeVariable}
-                        onVariableChange={setActiveVariable}
-                      />
-
-                      <div className="space-y-6 text-sm text-slate-300 leading-relaxed pr-2 font-sans font-light">
-                        {currentSub.conceptSteps.map((step, index) => (
-                          <div key={index} className="space-y-3">
-                            {index > 0 && <h4 className="font-bold text-white mt-4">{step.title}</h4>}
-                            <p><RichText text={step.content} /></p>
-                            <div className={`p-4 rounded-md ${bgAccent} border ${borderAccent} text-xs font-mono mt-2`}>
-                                <span className="font-bold opacity-75 mr-2">INSIGHT:</span> {step.keyInsight}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Integrated Theory & Reference section in Combined View */}
-                  {activeTab === 'combined' && currentSub.textbookContent && (
-                    <div className="border-t border-white/10 pt-8 mt-6 space-y-4">
-                      <div className="flex items-center justify-between border-b border-white/10 pb-3">
-                        <span className="text-xs uppercase font-mono tracking-wider text-emerald-400 font-bold">
-                          Detailed Theory &amp; References
-                        </span>
-                        <span className="text-[10px] text-slate-500 font-mono">EXT_DOC</span>
-                      </div>
-                      <div className="textbook-content-wrapper text-slate-300 leading-relaxed text-sm">
-                        <MarkdownRenderer>
-                          {currentSub.textbookContent}
-                        </MarkdownRenderer>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* AI Disclaimer Callout */}
-                  <div className="mt-8 pt-6 border-t border-white/10 flex items-start gap-3 p-4 rounded-xl bg-white/[0.02] border border-white/[0.08] text-xs text-slate-400 font-sans">
-                    <div className="p-1.5 rounded-lg bg-indigo-500/10 text-indigo-400 shrink-0 font-mono text-[10px] font-bold">AI NOTICE</div>
-                    <p className="leading-relaxed">
-                      <strong className="text-slate-300">AI Assistance Disclaimer:</strong> This module uses AI-assisted educational models and interactive visual representations to help explain scientific and mathematical concepts. For formal research or academic evaluation, please verify formulas and data against standard primary reference materials.
+              <div className="mt-7 space-y-7">
+                {lesson.conceptSteps.map((step) => (
+                  <div key={step.stepNumber}>
+                    <h3 className="font-fraunces text-xl font-semibold text-[var(--ink)]">{step.title}</h3>
+                    <p className="mt-2 text-[var(--ink)]">
+                      <Rich text={step.content} />
+                    </p>
+                    <p className="mt-3 rounded-r-xl border-l-4 py-3 pl-4 pr-4" style={{ borderColor: subject.ink, backgroundColor: subject.tint }}>
+                      <strong style={{ color: subject.ink }}>Key point:</strong> <Rich text={step.keyInsight} />
                     </p>
                   </div>
-                </>
-              )}
-            </div>
-          </div>
-
-          {/* COLUMN 2 (Right, lg:5): DYNAMIC INTERACTIVE TELEMETRY CONTROL PANEL & EXAMPLES */}
-          <div className="lg:col-span-5 flex flex-col gap-6">
-            {/* Mobile accordion toggle */}
-            <button
-              className="lg:hidden flex items-center justify-between w-full px-4 py-3 rounded-xl bg-slate-900/60 border border-white/10 text-sm font-mono text-slate-300"
-              onClick={() => setRightPanelOpen(o => !o)}
-            >
-              <span>Worked Example &amp; Controls</span>
-              <ChevronDown className={`w-4 h-4 transition-transform ${rightPanelOpen ? 'rotate-180' : ''}`} />
-            </button>
-            <div className={`lg:block ${rightPanelOpen ? 'block' : 'hidden'}`}>
-            <div className="bg-slate-950/70 border border-white/10 rounded-xl p-5 sm:p-6 backdrop-blur-md flex flex-col space-y-6 lg:sticky lg:top-24">
-              
-              {/* Controls Header */}
-              <div className="flex items-center justify-between border-b border-white/10 pb-3">
-                <div className="flex items-center gap-2">
-                  <span className={`text-xs ${textAccent} font-bold animate-pulse`}>●</span>
-                  <span className="text-sm font-bold text-slate-200 uppercase tracking-wider font-mono">Telemetry Control Console</span>
-                </div>
-                <span className="text-[10px] text-slate-500 font-mono">CAL_SYS</span>
+                ))}
               </div>
 
-              {/* Dynamic Interactive Sliders */}
-              <div className="space-y-5">
-                <span className="text-[10px] text-slate-500 font-mono tracking-widest uppercase block">Adjust Simulator Parameters</span>
-                
-                {/* 1. Gravity Concept Sliders */}
-                {currentSub.id === 'gravity' && (
-                  <div className="space-y-4">
-                    <div className="space-y-1.5">
-                      <div className="flex justify-between text-xs font-mono">
-                        <span className="text-slate-400">Attractor Mass:</span>
-                        <span className={`${textAccent} font-bold`}>{mass}x Earth</span>
-                      </div>
-                      <input type="range" min="1" max="4" step="0.5" value={mass} onChange={(e) => setMass(Number(e.target.value))} className="w-full accent-indigo-500 cursor-pointer h-1.5 bg-slate-900 rounded-lg appearance-none"/>
-                    </div>
-                  </div>
-                )}
-                {currentSub.id === 'prism' && (
-                  <div className="space-y-4">
-                    <div className="space-y-1.5">
-                      <div className="flex justify-between text-xs font-mono">
-                        <span className="text-slate-400">Refractive Index:</span>
-                        <span className={`${textAccent} font-bold`}>n = {refractiveIndex.toFixed(2)}</span>
-                      </div>
-                      <input type="range" min="1.0" max="2.5" step="0.1" value={refractiveIndex} onChange={(e) => setRefractiveIndex(Number(e.target.value))} className="w-full accent-indigo-500 cursor-pointer h-1.5 bg-slate-900 rounded-lg appearance-none"/>
-                    </div>
-                  </div>
-                )}
-                {currentSub.id === 'gears' && (
-                  <div className="space-y-4">
-                    <div className="space-y-1.5">
-                      <div className="flex justify-between text-xs font-mono">
-                        <span className="text-slate-400">Gear Teeth Ratio:</span>
-                        <span className={`${textAccent} font-bold`}>{gearRatio}:1 Ratio</span>
-                      </div>
-                      <input type="range" min="1" max="3" step="1" value={gearRatio} onChange={(e) => setGearRatio(Number(e.target.value))} className="w-full accent-amber-500 cursor-pointer h-1.5 bg-slate-900 rounded-lg appearance-none"/>
-                    </div>
-                  </div>
-                )}
-                {currentSub.id === 'trajectory' && (
-                  <div className="space-y-4">
-                    <div className="space-y-1.5">
-                      <div className="flex justify-between text-xs font-mono">
-                        <span className="text-slate-400">Transfer Delta-V:</span>
-                        <span className={`${textAccent} font-bold`}>{deltaV.toFixed(2)} km/s</span>
-                      </div>
-                      <input type="range" min="1.0" max="2.5" step="0.1" value={deltaV} onChange={(e) => setDeltaV(Number(e.target.value))} className="w-full accent-amber-500 cursor-pointer h-1.5 bg-slate-900 rounded-lg appearance-none"/>
-                    </div>
-                  </div>
-                )}
-                {currentSub.id === 'circuit' && (
-                  <div className="space-y-4">
-                    <div className="space-y-1.5">
-                      <div className="flex justify-between text-xs font-mono">
-                        <span className="text-slate-400">Resistor Value:</span>
-                        <span className={`${textAccent} font-bold`}>{resistance} Ω</span>
-                      </div>
-                      <input type="range" min="50" max="1000" step="50" value={resistance} onChange={(e) => setResistance(Number(e.target.value))} className="w-full accent-emerald-500 cursor-pointer h-1.5 bg-slate-900 rounded-lg appearance-none"/>
-                    </div>
-                  </div>
-                )}
-                {currentSub.id === 'waves' && (
-                  <div className="space-y-4">
-                    <div className="space-y-3">
-                      <div className="space-y-1.5">
-                        <div className="flex justify-between text-xs font-mono">
-                          <span className="text-slate-400">Frequency:</span>
-                          <span className={`${textAccent} font-bold`}>{frequency} Hz</span>
-                        </div>
-                        <input type="range" min="1" max="5" step="1" value={frequency} onChange={(e) => setFrequency(Number(e.target.value))} className="w-full accent-emerald-500 cursor-pointer h-1.5 bg-slate-900 rounded-lg appearance-none"/>
-                      </div>
-                      <div className="space-y-1.5">
-                        <div className="flex justify-between text-xs font-mono">
-                          <span className="text-slate-400">Amplitude:</span>
-                          <span className={`${textAccent} font-bold`}>{amplitude} px</span>
-                        </div>
-                        <input type="range" min="10" max="60" step="5" value={amplitude} onChange={(e) => setAmplitude(Number(e.target.value))} className="w-full accent-emerald-500 cursor-pointer h-1.5 bg-slate-900 rounded-lg appearance-none"/>
-                      </div>
-                    </div>
-                  </div>
-                )}
-                {['fractions', 'trigonometry', 'calculus'].includes(currentSub.id) && (
-                    <div className="text-xs text-slate-500 italic py-2">Simulation telemetry controls are currently offline for theoretical mathematics.</div>
-                )}
-              </div>
+              <p className="mt-7 text-[var(--ink)]">
+                <strong>Where you&rsquo;ll see this:</strong> <Rich text={lesson.realWorldConnection} />
+              </p>
+            </section>
 
-              {/* Static Tried and Tested Solved Syllabus Example */}
-              <div className="border-t border-white/10 pt-4 space-y-4">
-                <span className="text-[10px] text-slate-500 font-mono tracking-widest uppercase block mb-2">
-                  Syllabus Worked Example
+            <Section id="example" title="Worked example">
+              <p className="font-semibold text-[var(--ink)]">
+                <Rich text={lesson.solvedExample.problem} />
+              </p>
+              <ol className="mt-4 space-y-3">
+                {lesson.solvedExample.steps.map((step, i) => (
+                  <li key={i} className="flex gap-4">
+                    <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-[15px] font-semibold text-[#0b1026]" style={{ backgroundColor: subject.ink }}>
+                      {i + 1}
+                    </span>
+                    <span className="min-w-0 pt-0.5">
+                      <Rich text={step} />
+                    </span>
+                  </li>
+                ))}
+              </ol>
+              <p className="mt-5 overflow-x-auto rounded-2xl border-2 px-5 py-4 text-xl" style={{ borderColor: subject.ink }}>
+                <span className="mr-3 text-base font-semibold" style={{ color: subject.ink }}>
+                  Answer
                 </span>
-                
-                <div className="bg-slate-900/50 border border-white/5 rounded-lg p-5 space-y-4 text-xs font-mono text-slate-300">
-                  <div className="text-white font-bold leading-normal font-sans text-sm">
-                    Q: <RichText text={currentSub.solvedExample.problem} />
-                  </div>
-                  <div className="space-y-3 text-slate-400 text-xs leading-relaxed flex flex-col pt-2">
-                    {currentSub.solvedExample.steps.map((step, idx) => (
-                      <div key={idx} className="flex gap-3">
-                        <span className="opacity-50 mt-0.5">{idx + 1}.</span>
-                        <span><RichText text={step} /></span>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="border-t border-white/5 pt-4 mt-2 flex flex-wrap gap-3 items-center bg-slate-950/50 -mx-5 -mb-5 px-5 py-4 rounded-b-lg">
-                    <span className="text-slate-400 font-bold">Result:</span>
-                    <MathFormula math={currentSub.solvedExample.resultFormula} />
-                  </div>
-                </div>
-              </div>
+                <Tex tex={lesson.solvedExample.resultFormula} />
+              </p>
+            </Section>
 
-            </div>
-            </div>{/* end mobile accordion wrapper */}
+            <Section id="practice" title="Practice questions">
+              <p className="text-[var(--ink-soft)]">Have a go first, then open the hint or the answer.</p>
+              <ol className="mt-4 space-y-4">
+                {lesson.practiceProblems.map((problem, i) => (
+                  <li key={i} className="rounded-2xl border border-[var(--rule)] bg-[var(--paper)] p-5">
+                    <p className="text-[var(--ink)]">
+                      <span className="mr-2 font-semibold" style={{ color: subject.ink }}>
+                        {i + 1}.
+                      </span>
+                      <Rich text={problem.question} />
+                    </p>
+                    <div className="mt-3 space-y-2 text-[15px]">
+                      <details>
+                        <summary className="cursor-pointer font-semibold text-[var(--action)] hover:text-[var(--action-hover)]">Show a hint</summary>
+                        <p className="mt-2 text-[var(--ink-soft)]">
+                          <Rich text={problem.hint} />
+                        </p>
+                      </details>
+                      <TrackedDetails summary="Show the answer" event="practice_answer_revealed" params={{ lesson: lesson.id, question: i + 1 }}>
+                        <p className="mt-2 font-semibold text-[var(--ink)]">
+                          <Rich text={problem.answer} />
+                        </p>
+                      </TrackedDetails>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            </Section>
+
+            {lesson.textbookContent && (
+              <Section id="notes" title="Notes">
+                <MarkdownRenderer>{lesson.textbookContent}</MarkdownRenderer>
+              </Section>
+            )}
           </div>
-
         </div>
-      </section>
-    </div>
+
+        <div className="mt-14 border-t border-[var(--rule)] pt-10">
+          <MarkDone lesson={lesson.id} />
+        </div>
+
+        <div className="mt-12 grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-10">
+          <section aria-labelledby="next-title">
+            <h2 id="next-title" className="font-fraunces text-3xl font-semibold tracking-[-0.02em] text-[var(--ink)]">
+              {!next ? 'You have reached the end of the journey' : after?.newMission ? `Next mission: ${after.newMission.title}` : 'Next on this mission'}
+            </h2>
+            {next ? (
+              <div className="mt-6 max-w-sm">
+                <LessonCard lesson={next} />
+              </div>
+            ) : (
+              <p className="mt-4 text-lg text-[var(--ink-soft)]">
+                That was the last lesson of the last mission.{' '}
+                <Link href="/journey" className="font-semibold text-[var(--action)] underline decoration-2 underline-offset-4 hover:text-[var(--action-hover)]">
+                  Look back over the whole journey
+                </Link>
+                .
+              </p>
+            )}
+          </section>
+          <div className="space-y-6 self-end">
+            {supportEnabled && (
+              <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[var(--rule)] bg-[var(--sheet)] p-5">
+                <p className="max-w-md leading-relaxed text-[var(--ink)]">
+                  These lessons are free to use. If this one helped, you can chip in towards hosting and new topics.
+                </p>
+                <SupportLink placement="lesson_end" />
+              </div>
+            )}
+            <p className="text-[15px] leading-relaxed text-[var(--ink-soft)]">
+              This lesson was written with AI assistance. Check formulas and figures against your textbook or exam
+              board&rsquo;s specification before relying on them in assessed work.
+            </p>
+          </div>
+        </div>
+      </div>
+    </article>
   );
 }

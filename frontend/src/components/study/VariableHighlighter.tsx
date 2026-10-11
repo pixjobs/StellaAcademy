@@ -282,7 +282,7 @@ function VariableInspector({ variable, allVariables }: InspectorProps) {
               <span className={`font-semibold ${variable.color}`}>
                 {variable.name}
               </span>
-              <span className="font-mono text-[11px] text-slate-500 uppercase tracking-wider">
+              <span className="text-sm text-slate-400">
                 {variable.unit}
               </span>
             </div>
@@ -293,8 +293,8 @@ function VariableInspector({ variable, allVariables }: InspectorProps) {
         </div>
       ) : (
         <div className="flex flex-col gap-3">
-          <p className="text-[10px] font-mono uppercase tracking-widest text-slate-500 select-none">
-            Hover over a variable in the formula above, or see glossary below:
+          <p className="text-sm text-slate-400">
+            Tap or point at a symbol in the formula to see what it means.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {allVariables.map((v) => (
@@ -314,7 +314,7 @@ function VariableInspector({ variable, allVariables }: InspectorProps) {
                   <div className={`font-semibold text-sm truncate ${v.color}`}>
                     {v.name}
                   </div>
-                  <div className="font-mono text-[10px] text-slate-500 uppercase tracking-wider truncate">
+                  <div className="text-xs text-slate-400 truncate">
                     {v.unit}
                   </div>
                 </div>

@@ -1,10 +1,5 @@
-/* 1) GLOBAL IMPORTS — Must be at the very top */
-@import url('https://fonts.googleapis.com/css2?family=Inclusive+Sans:ital@0;1&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..600&family=Hanken+Grotesk:wght@300;400;500;600;700&display=swap');
-@import url('https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css');
+/* 1) FONTS are loaded in app/layout.tsx with next/font and exposed as
+      --font-inclusive (reading) and --font-fraunces (display). */
 
 /* 2) TAILWIND DIRECTIVES */
 @tailwind base;
@@ -14,6 +9,9 @@
 /* 3) THEME & BASE STYLES */
 @layer base {
   :root {
+    --font-body: var(--font-inclusive), ui-sans-serif, system-ui, sans-serif;
+    --font-display: var(--font-fraunces), Georgia, Cambria, 'Times New Roman', serif;
+    --brand-gold: #f6c453;
     --custom-mint: 168 76% 66%;
     --custom-sky: 207 90% 60%;
     --custom-gold: 54 98% 63%;
@@ -50,11 +48,11 @@
   body {
     @apply min-h-screen bg-background text-foreground leading-relaxed;
     font-size: calc(1rem * var(--font-scale, 1));
-    font-family: var(--font-main, 'Inclusive Sans', 'Hanken Grotesk', ui-sans-serif, system-ui, sans-serif);
+    font-family: var(--font-main, var(--font-body));
+    font-variant-numeric: lining-nums;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
-    letter-spacing: -0.01em;
   }
 
   .reduce-transparency .backdrop-blur-md,
@@ -69,19 +67,31 @@
     background-color: #020617 !important; /* solid slate-950 */
   }
 
+  /* Display face for headings. Sizes come from utility classes where set. */
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-variant-numeric: lining-nums;
+    text-wrap: balance;
+  }
+
   h1 {
-    @apply text-3xl sm:text-4xl md:text-5xl font-bold leading-[1.08] tracking-[-0.03em];
-    font-family: 'Fraunces', serif;
+    @apply text-3xl sm:text-4xl md:text-5xl font-semibold leading-[1.08] tracking-[-0.025em];
   }
 
   h2 {
-    @apply text-2xl sm:text-3xl font-bold leading-tight tracking-[-0.02em];
-    font-family: 'Fraunces', serif;
+    @apply text-2xl sm:text-3xl font-semibold leading-tight tracking-[-0.02em];
   }
 
   h3 {
     @apply text-lg sm:text-xl font-semibold leading-snug tracking-[-0.01em];
-    font-family: 'Fraunces', serif;
+  }
+
+  p,
+  li {
+    text-wrap: pretty;
   }
 
   ::selection {
@@ -143,7 +153,7 @@
 /* 5) CUSTOM UTILITY & OVERRIDE STYLES */
 @layer utilities {
   .font-pixel {
-    font-family: 'Press Start 2P', cursive;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
     @apply text-sm sm:text-base; /* slightly larger pixel font */
   }
 
@@ -163,6 +173,10 @@
   .katex,
   .katex-display {
     color: hsl(var(--foreground));
+  }
+  /* KaTeX defaults to 1.21em, which towers over the reading face. */
+  .katex {
+    font-size: 1.1em;
   }
   .katex-display {
     overflow-x: auto;
@@ -237,48 +251,137 @@
   }
 }
 
-/* Font Family Accessibility Overrides */
-body[data-font-family="inclusive"] *,
-body[data-font-family="inclusive"] p,
-body[data-font-family="inclusive"] button,
-body[data-font-family="inclusive"] input,
-body[data-font-family="inclusive"] a {
-  font-family: 'Inclusive Sans', 'Hanken Grotesk', ui-sans-serif, system-ui, sans-serif;
-}
-
-body[data-font-family="system"] *,
-body[data-font-family="system"] h1,
-body[data-font-family="system"] h2,
-body[data-font-family="system"] h3,
-body[data-font-family="system"] p,
-body[data-font-family="system"] button,
-body[data-font-family="system"] input,
-body[data-font-family="system"] a {
+/* Font family choices from Display settings.
+   The default keeps the display face on headings. An explicit choice applies
+   to all text, but never to maths: formulas keep their own fonts. */
+body[data-font-family="system"] *:not(.katex, .katex *) {
   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif !important;
 }
 
-body[data-font-family="serif"] *,
-body[data-font-family="serif"] h1,
-body[data-font-family="serif"] h2,
-body[data-font-family="serif"] h3,
-body[data-font-family="serif"] p,
-body[data-font-family="serif"] button,
-body[data-font-family="serif"] input,
-body[data-font-family="serif"] a,
-body[data-font-family="serif"] .font-fraunces {
-  font-family: 'Fraunces', Georgia, Cambria, 'Times New Roman', serif !important;
+body[data-font-family="serif"] *:not(.katex, .katex *) {
+  font-family: var(--font-display) !important;
 }
 
-body[data-font-family="mono"] *,
-body[data-font-family="mono"] h1,
-body[data-font-family="mono"] h2,
-body[data-font-family="mono"] h3,
-body[data-font-family="mono"] p,
-body[data-font-family="mono"] button,
-body[data-font-family="mono"] input,
-body[data-font-family="mono"] a,
-body[data-font-family="mono"] .font-mono {
+body[data-font-family="mono"] *:not(.katex, .katex *) {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace !important;
 }
 
+/* The site's look: dark throughout.
+   Every page opens with a sky band; below it the page is deep navy with a faint
+   blueprint grid, lesson text sits on a slightly lighter sheet, and the
+   interactive models have their own panels. (The class keeps its first name,
+   from when the reading surface was light paper.) */
+.theme-paper {
+  --paper: #070b1d;
+  --paper-line: #0d1330;
+  --sheet: #111a3b;
+  --ink: #eef1fb;
+  --ink-soft: #aeb8d6;
+  --rule: #283260;
+  --night: #0b1026;
+  --action: #a5b4fc;
+  --action-hover: #c7d2fe;
+  --on-action: #0b1026;
+  /* the shared tokens that prose, borders and maths read */
+  --background: 229 61% 7%;
+  --foreground: 226 62% 96%;
+  --card: 227 55% 15%;
+  --card-foreground: 226 62% 96%;
+  --muted: 228 45% 14%;
+  --muted-foreground: 225 33% 76%;
+  --border: 229 41% 27%;
+  --custom-gold: 230 94% 82%;
+  color: var(--ink);
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(var(--paper-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--paper-line) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+/* The sky bands, model panels, footer and gallery keep the original dark tokens. */
+.theme-night,
+.night-window {
+  --background: 224 40% 8%;
+  --foreground: 0 0% 100%;
+  --card: 225 33% 11%;
+  --card-foreground: 0 0% 100%;
+  --muted: 222 47% 11%;
+  --muted-foreground: 224 15% 55%;
+  --border: 222 47% 11%;
+  --custom-gold: 54 98% 63%;
+  color: #e6eaf7;
+}
+.theme-night {
+  background-color: #05081a;
+}
+.theme-paper .katex,
+.theme-paper .katex-display {
+  color: inherit;
+}
+.theme-paper ::selection {
+  background-color: #a5b4fc;
+  color: #0b1026;
+}
+/* Models sit in a night panel with a few fixed stars. */
+.night-window {
+  background-color: #0b1026;
+  background-image:
+    radial-gradient(1.2px 1.2px at 12% 18%, rgba(255, 255, 255, 0.75) 50%, transparent 51%),
+    radial-gradient(1px 1px at 78% 12%, rgba(255, 255, 255, 0.6) 50%, transparent 51%),
+    radial-gradient(1.4px 1.4px at 63% 82%, rgba(255, 255, 255, 0.55) 50%, transparent 51%),
+    radial-gradient(1px 1px at 28% 71%, rgba(255, 255, 255, 0.5) 50%, transparent 51%),
+    radial-gradient(1px 1px at 91% 55%, rgba(255, 255, 255, 0.6) 50%, transparent 51%),
+    radial-gradient(1.2px 1.2px at 45% 9%, rgba(255, 255, 255, 0.5) 50%, transparent 51%),
+    radial-gradient(120% 90% at 80% 0%, rgba(79, 70, 229, 0.28), transparent 60%);
+  color: #e6eaf7;
+}
+.night-window .katex {
+  color: inherit;
+}
 
+/* The sky's motion: stars that twinkle and the occasional shooting star. */
+@keyframes star-twinkle {
+  0%,
+  100% {
+    opacity: var(--star-o, 0.8);
+  }
+  50% {
+    opacity: calc(var(--star-o, 0.8) * 0.2);
+  }
+}
+.star-twinkle {
+  animation: star-twinkle 4s ease-in-out infinite;
+}
+/* Visible for the first few percent of each cycle, then waits out of sight. The
+   shape is drawn pointing along its own x axis, so it travels the way it points. */
+@keyframes shooting-star {
+  0% {
+    transform: translateX(0);
+    opacity: 0;
+  }
+  1% {
+    opacity: 1;
+  }
+  5% {
+    transform: translateX(-330px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(-330px);
+    opacity: 0;
+  }
+}
+.shooting-star {
+  opacity: 0;
+  animation: shooting-star 20s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .star-twinkle,
+  .shooting-star {
+    animation: none;
+  }
+}
+.reduce-motion .star-twinkle,
+.reduce-motion .shooting-star {
+  animation: none !important;
+}

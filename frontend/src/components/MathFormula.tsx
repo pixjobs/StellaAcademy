@@ -46,9 +46,18 @@ export default function MathFormula({ math, block = false }: MathFormulaProps) {
   );
 }
 
+/** Render **bold** and *italic* markers; everything else passes through as text. */
+function emphasise(text: string) {
+  return text.split(/(\*\*[^*]+\*\*|\*[^*\s][^*]*\*)/g).map((part, i) => {
+    if (part.startsWith('**') && part.endsWith('**') && part.length > 4) return <strong key={i}>{part.slice(2, -2)}</strong>;
+    if (part.startsWith('*') && part.endsWith('*') && part.length > 2) return <em key={i}>{part.slice(1, -1)}</em>;
+    return part;
+  });
+}
+
 export function RichText({ text, className }: { text: string, className?: string }) {
-  // First split by math blocks: $math$
-  const mathParts = text.split('$');
+  // First split by math blocks: $math$. A backslash-escaped \$ is a literal currency sign.
+  const mathParts = text.split(/(?<!\\)\$/);
   
   return (
     <span className={className}>
@@ -58,6 +67,7 @@ export function RichText({ text, className }: { text: string, className?: string
         }
         
         // Then split the non-math text by markdown links: [text](href)
+        mathPart = mathPart.replace(/\\\$/g, '$');
         const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
         const elements = [];
         let lastIndex = 0;
@@ -66,7 +76,7 @@ export function RichText({ text, className }: { text: string, className?: string
         while ((match = linkRegex.exec(mathPart)) !== null) {
           // Push preceding text
           if (match.index > lastIndex) {
-            elements.push(<span key={`${i}-text-${lastIndex}`}>{mathPart.slice(lastIndex, match.index)}</span>);
+            elements.push(<span key={`${i}-text-${lastIndex}`}>{emphasise(mathPart.slice(lastIndex, match.index))}</span>);
           }
           // Push the link
           elements.push(
@@ -83,7 +93,7 @@ export function RichText({ text, className }: { text: string, className?: string
 
         // Push remaining text
         if (lastIndex < mathPart.length) {
-          elements.push(<span key={`${i}-text-${lastIndex}`}>{mathPart.slice(lastIndex)}</span>);
+          elements.push(<span key={`${i}-text-${lastIndex}`}>{emphasise(mathPart.slice(lastIndex))}</span>);
         }
 
         return <span key={i}>{elements}</span>;

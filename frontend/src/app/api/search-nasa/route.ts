@@ -20,48 +20,46 @@ type RequestPayload = {
  * It allows client components to fetch NASA image data without
  * ever accessing server-only code or secrets.
  */
+// Best-effort per-instance rate limit (Cloud Run instances each keep their own window).
+const WINDOW_MS = 60_000;
+const MAX_REQUESTS = 30;
+const hits = new Map<string, { count: number; reset: number }>();
+
+function rateLimited(ip: string): boolean {
+  const now = Date.now();
+  if (hits.size > 5000) {
+    for (const [k, v] of hits) if (v.reset < now) hits.delete(k);
+  }
+  const entry = hits.get(ip);
+  if (!entry || entry.reset < now) {
+    hits.set(ip, { count: 1, reset: now + WINDOW_MS });
+    return false;
+  }
+  entry.count += 1;
+  return entry.count > MAX_REQUESTS;
+}
+
 export async function POST(req: NextRequest) {
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+  if (rateLimited(ip)) {
+    return NextResponse.json({ error: 'Too many requests. Please slow down.' }, { status: 429 });
+  }
+
   try {
-    const { query, page = 1, limit = 16 } = (await req.json()) as RequestPayload;
+    const body = (await req.json()) as RequestPayload;
+    const query = typeof body.query === 'string' ? body.query.trim().slice(0, 200) : '';
+    const page = Math.min(Math.max(Math.floor(Number(body.page) || 1), 1), 50);
+    const limit = Math.min(Math.max(Math.floor(Number(body.limit) || 16), 1), 50);
 
     if (!query) {
       return NextResponse.json({ error: 'Search query is required' }, { status: 400 });
     }
 
-    // Call the server-only function from our server-side API route.
-    const items: NivlItem[] = await searchNIVL(query, {
-      expandAssets: true,
-      page,
-      limit
-    });
-
-    // Return the successful result to the client.
+    const items: NivlItem[] = await searchNIVL(query, { expandAssets: true, page, limit });
     return NextResponse.json(items);
-
-  } catch (error: unknown) { // Step 1: Catch the error as 'unknown' for type safety.
-    
-    // Step 2: Log the original, raw error to the server console for full debugging context.
-    // It is safe to log the 'unknown' type directly.
+  } catch (error: unknown) {
+    // Full detail goes to the server log only; clients get a generic message.
     console.error('[search-nasa] API Error:', error);
-
-    // Step 3: Safely determine the specific error message to send back to the client.
-    let errorMessage = 'An unexpected error occurred.'; // Provide a safe default message.
-
-    if (error instanceof Error) {
-      // If the caught value is a standard Error object, we can now safely access its `message` property.
-      errorMessage = error.message;
-    } else if (typeof error === 'string') {
-      // Handle the less common case where a plain string was thrown.
-      errorMessage = error;
-    }
-
-    // Step 4: Return a structured, type-safe JSON response to the client.
-    return NextResponse.json(
-      {
-        error: 'Failed to fetch data from NASA Image Library.',
-        details: errorMessage, // Use the safely-derived message.
-      },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to fetch data from NASA Image Library.' }, { status: 500 });
   }
 }

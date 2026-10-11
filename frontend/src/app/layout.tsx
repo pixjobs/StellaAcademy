@@ -1,67 +1,68 @@
 // app/layout.tsx
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
+import { Fraunces, Inclusive_Sans } from 'next/font/google';
 
+import 'katex/dist/katex.min.css';
 import './globals.css';
 
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import Analytics from '@/components/Analytics';
+import AccessibilityWrapper from '@/components/AccessibilityWrapper';
+import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from '@/lib/site';
 import Providers from './providers';
 
-export const metadata: Metadata = { title: 'Stella Academy' };
+// Self-hosted at build time: no font requests to Google from visitors' browsers.
+const inclusive = Inclusive_Sans({
+  subsets: ['latin'],
+  style: ['normal', 'italic'],
+  variable: '--font-inclusive',
+  display: 'swap',
+});
+const fraunces = Fraunces({
+  subsets: ['latin'],
+  axes: ['opsz'],
+  variable: '--font-fraunces',
+  display: 'swap',
+});
 
-/**
- * Keep this dynamic so Clerk reads env at runtime (no build-time key needed).
- */
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
+  title: { default: `${SITE_NAME} | Free interactive physics and maths lessons`, template: `%s | ${SITE_NAME}` },
+  description: SITE_DESCRIPTION,
+  applicationName: SITE_NAME,
+  alternates: { canonical: '/' },
+  openGraph: {
+    type: 'website',
+    siteName: SITE_NAME,
+    url: SITE_URL,
+    title: `${SITE_NAME} | Free interactive physics and maths lessons`,
+    description: SITE_DESCRIPTION,
+    locale: 'en_GB',
+  },
+  twitter: { card: 'summary_large_image', title: SITE_NAME, description: SITE_DESCRIPTION },
+  robots: { index: true, follow: true },
+};
+
+export const viewport: Viewport = { themeColor: '#020617' };
 
 type RootLayoutProps = { children: ReactNode };
 
-import AccessibilityWrapper from '@/components/AccessibilityWrapper';
-
-export default async function RootLayout({ children }: RootLayoutProps) {
-  let bgUrl = '/bg.jpg';
-  
-  try {
-    const res = await fetch('http://localhost:3000/api/apod', { cache: 'no-store' }).catch(() => null);
-    if (res && res.ok) {
-      const data = await res.json();
-      if (data && data.bgUrl) {
-        bgUrl = data.bgUrl;
-      }
-    }
-  } catch (err) {
-    // silently fallback
-  }
-
+export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body
-        className={[
-          'min-h-screen bg-slate-950 text-slate-100 antialiased',
-          'overflow-x-hidden',
-          'selection:bg-accent selection:text-accent-foreground',
-        ].join(' ')}
-      >
+    <html lang="en-GB" className={`${inclusive.variable} ${fraunces.variable}`} suppressHydrationWarning>
+      <body className="theme-paper min-h-screen overflow-x-hidden antialiased">
         <AccessibilityWrapper>
-          <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
-            <div 
-              className="absolute -inset-[10%] opacity-25 bg-cover bg-center bg-no-repeat mix-blend-screen animate-apod-slow"
-              style={{ backgroundImage: `url('${bgUrl}')` }}
-            />
-            <div className="absolute inset-0 bg-gradient-to-b from-slate-950/50 via-transparent to-slate-950/80 pointer-events-none" />
-          </div>
-          {/* Wrap the whole app in Providers if needed - currently just passes children */}
           <Providers>
-            <div className="relative z-20 flex min-h-screen flex-col">
+            <div className="flex min-h-screen flex-col">
               <Header />
-              <main className="flex-1">{children}</main>
+              <main className="flex-1 pb-20">{children}</main>
               <Footer />
             </div>
           </Providers>
         </AccessibilityWrapper>
+        <Analytics />
       </body>
     </html>
   );

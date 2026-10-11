@@ -108,6 +108,17 @@ type Props = {
 /* ---------------------------------------------------------------------------------------------- */
 /* Main renderer                                                                                  */
 /* ---------------------------------------------------------------------------------------------- */
+/**
+ * A line holding nothing but one formula is meant as a display equation, but
+ * remark-math only treats `$$` on its own lines that way. Rewrite such lines
+ * into that form so they render centred and full size.
+ */
+function promoteDisplayMaths(markdown: string): string {
+  return markdown
+    .replace(/^[ \t]*\$\$([^$\n]+)\$\$[ \t]*$/gm, (_, maths: string) => `\n$$\n${maths.trim()}\n$$\n`)
+    .replace(/^[ \t]*\$([^$\n]+)\$[ \t]*$/gm, (_, maths: string) => `\n$$\n${maths.trim()}\n$$\n`);
+}
+
 export default function MarkdownRenderer({ children, onCaptureFragment }: Props) {
   const CodeBlockWrapper = useCallback(
     ({ node, ...props }: ComponentProps<'pre'> & { node?: Element }) => {
@@ -223,7 +234,7 @@ export default function MarkdownRenderer({ children, onCaptureFragment }: Props)
           [
             rehypeAutolinkHeadings,
             {
-              behaviour: 'append',
+              behavior: 'append',
               properties: { className: ['no-underline', 'ml-1', 'opacity-60', 'hover:opacity-90'] },
              
               content: (): Element[] => [{
@@ -261,7 +272,7 @@ export default function MarkdownRenderer({ children, onCaptureFragment }: Props)
           h4: Heading('h4'),
         }}
       >
-        {children}
+        {promoteDisplayMaths(children)}
       </ReactMarkdown>
     </div>
   );

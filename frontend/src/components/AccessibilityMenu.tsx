@@ -12,9 +12,9 @@ const FONT_SIZE_OPTIONS: { id: FontSizePreset; label: string; rootPx: string }[]
 ];
 
 const TYPEFACE_OPTIONS: { id: FontPreset; label: string; sample: string; fontFamilyStyle: string }[] = [
-  { id: 'inclusive', label: 'Inclusive Sans', sample: 'Aa Bb Cc 123', fontFamilyStyle: "'Inclusive Sans', sans-serif" },
+  { id: 'inclusive', label: 'Inclusive Sans', sample: 'Aa Bb Cc 123', fontFamilyStyle: 'var(--font-body)' },
   { id: 'system', label: 'System', sample: 'Aa Bb Cc 123', fontFamilyStyle: 'ui-sans-serif, system-ui, sans-serif' },
-  { id: 'serif', label: 'Serif', sample: 'Aa Bb Cc 123', fontFamilyStyle: "'Fraunces', Georgia, serif" },
+  { id: 'serif', label: 'Serif', sample: 'Aa Bb Cc 123', fontFamilyStyle: 'var(--font-display)' },
   { id: 'mono', label: 'Mono', sample: 'Aa Bb Cc 123', fontFamilyStyle: 'ui-monospace, monospace' },
 ];
 

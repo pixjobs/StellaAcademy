@@ -20,6 +20,26 @@ interface GSAPSimulationProps {
   timeScale?: number;
 }
 
+/** Read "3/4", "0.75", "75%" or "-3" as a number; null if it is not one. */
+function toNumber(raw: string): number | null {
+  const text = raw.trim().toLowerCase().replace(/\s+/g, '').replace(/[£$%]/g, '').replace(/−/g, '-');
+  const fraction = text.match(/^(-?\d*\.?\d+)\/(-?\d*\.?\d+)$/);
+  if (fraction) {
+    const bottom = Number(fraction[2]);
+    return bottom === 0 ? null : Number(fraction[1]) / bottom;
+  }
+  if (/^-?\d*\.?\d+$/.test(text)) return Number(text);
+  return null;
+}
+
+/** Flashcard marking: equal values count as correct however they are written (1/2, 2/4, 0.5). */
+function sameAnswer(given: string, expected: string): boolean {
+  const a = toNumber(given);
+  const b = toNumber(expected);
+  if (a !== null && b !== null) return Math.abs(a - b) < 1e-9;
+  return given.trim().toLowerCase() === expected.trim().toLowerCase();
+}
+
 export default function GSAPSimulation({
   conceptId,
   mass = 1,
@@ -716,7 +736,7 @@ export default function GSAPSimulation({
           
           const title = document.createElement('div');
           title.className = 'absolute top-4 text-slate-500 text-[10px] md:text-xs uppercase tracking-[0.2em] font-mono';
-          title.innerText = 'Interactive Math Flashcards';
+          title.innerText = 'Maths flashcards';
           container.appendChild(title);
 
           let currIndex = 0;
@@ -756,8 +776,7 @@ export default function GSAPSimulation({
           card.appendChild(showBreakdownBtn);
 
           const handleCheck = () => {
-            const val = input.value.trim().toLowerCase();
-            if (val === problems[currIndex].ans.toLowerCase()) {
+            if (sameAnswer(input.value, problems[currIndex].ans)) {
               feedback.innerText = 'Correct! Great job.';
               feedback.className = 'text-xs h-4 transition-opacity opacity-100 text-emerald-400 font-mono';
               input.disabled = true;
@@ -822,7 +841,7 @@ export default function GSAPSimulation({
             { expr: '\\frac{x}{4} = \\frac{15}{20}', steps: ['20x = 4 \\times 15', '20x = 60', 'x = \\frac{60}{20}', '3'], ans: '3' },
             { expr: '2 : 5 = 6 : x', steps: ['\\frac{2}{5} = \\frac{6}{x}', '2x = 30', 'x = 15'], ans: '15' },
             { expr: '\\frac{8}{12} = \\frac{x}{3}', steps: ['12x = 24', 'x = 2'], ans: '2' },
-            { expr: '\\text{If } 3 \\text{ apples cost } \\$6, \\\\ \\text{cost of } 5 \\text{ apples?}', steps: ['\\frac{3}{6} = \\frac{5}{x}', '3x = 30', '10'], ans: '10' }
+            { expr: '\\text{If } 3 \\text{ apples cost } \\pounds 6, \\\\ \\text{cost of } 5 \\text{ apples (in } \\pounds \\text{)?}', steps: ['\\frac{3}{6} = \\frac{5}{x}', '3x = 30', '10'], ans: '10' }
           ]);
         } else if (conceptId === 'decimals-percentages') {
           createFlashcardApp([

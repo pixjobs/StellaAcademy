@@ -8,7 +8,7 @@
 
 ### What Works
 - Frontend framework (Next.js 15.5.2) - functional
-- Clerk authentication (judge@stella-academy.org / StellaRocks2025!)
+- Clerk authentication (legacy; no longer used by the app)
 - Basic role-based structure (Explorer/Cadet/Scholar)
 - NASA APOD integration permitted (NASA_API_KEY in GSM)
 

@@ -27,8 +27,8 @@ module.exports = {
         card: { DEFAULT: 'hsl(var(--card))', foreground: 'hsl(var(--card-foreground))' },
       },
       fontFamily: {
-        fraunces: ['Fraunces', 'serif'],
-        hanken: ['"Hanken Grotesk"', 'sans-serif'],
+        fraunces: ['var(--font-display)'],
+        hanken: ['var(--font-body)'],
       },
       borderRadius: {
         lg: 'var(--radius)',

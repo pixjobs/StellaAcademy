@@ -1,137 +1,114 @@
-'use client';
-
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { BrainCircuit, Telescope, Compass, Cpu } from 'lucide-react';
+import { SkyTitle } from '@/components/Sky';
+import SupportLink from '@/components/SupportLink';
+import { lessonSummaries } from '@/lib/lessons';
+import { LEVELS } from '@/lib/levels';
+import { supportEnabled } from '@/lib/site';
 
-interface ApodData {
-  bgUrl: string | null;
-  title?: string;
+const linkClass = 'font-semibold text-[var(--action)] underline decoration-2 underline-offset-4 hover:text-[var(--action-hover)]';
+
+function Block({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <section className="border-t border-[var(--rule)] pt-8">
+      <h2 className="font-fraunces text-3xl font-semibold tracking-[-0.02em] text-[var(--ink)]">{title}</h2>
+      <div className="mt-3 space-y-3 text-[1.0625rem] leading-[1.7] text-[var(--ink)]">{children}</div>
+    </section>
+  );
 }
 
 export default function AboutPage() {
-  const [mounted, setMounted] = useState(false);
-  const [systemTime, setSystemTime] = useState('');
-
-  useEffect(() => {
-    setMounted(true);
-    const updateTime = () => {
-      setSystemTime(new Date().toISOString().slice(11, 19));
-    };
-    updateTime();
-    const interval = setInterval(updateTime, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
   return (
-    <div
-      className="relative min-h-[calc(100vh-135px)] text-slate-100 font-hanken overflow-hidden bg-transparent flex flex-col pt-4 pb-12"
-    >
-      {/* Decorative Grid Scanlines */}
-      <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(18,24,38,0)_95%,rgba(168,85,247,0.015)_95%),linear-gradient(90deg,rgba(18,24,38,0)_95%,rgba(168,85,247,0.015)_95%)] bg-[size:30px_30px] z-0" />
+    <>
+      <SkyTitle title="About Stella Academy">
+        {lessonSummaries.length} free interactive physics and maths lessons, built on one idea: you understand a
+        formula faster when you can change a number and watch what happens.
+      </SkyTitle>
 
-      {/* Content Overlay */}
-      <div className="relative z-10 max-w-4xl mx-auto px-4 md:px-6 w-full space-y-6 mt-4">
-        
-        {/* HERO TITLE */}
-        <div className="text-center space-y-3">
-          <span className="text-[10px] text-cyan-400 font-mono tracking-widest uppercase block">
-            Academy Manual // Core Directives
-          </span>
-          <h1 className="text-4xl md:text-5xl font-bold tracking-wider font-fraunces text-white">
-            Academy Manual
-          </h1>
-          <p className="text-xs text-slate-400 max-w-lg mx-auto font-mono uppercase tracking-wide">
-            Interactive, high-fidelity space sciences and telemetry simulations.
-          </p>
-        </div>
-
-        {/* MISSION & VISION SECTIONS */}
-        <div className="grid md:grid-cols-2 gap-6">
-          
-          {/* Mission Card */}
-          <div className="bg-slate-900/30 backdrop-blur-md border border-slate-400/20 hover:border-slate-300/50 hover:bg-slate-800/40 rounded-xl p-6 transition-all shadow-[0_4px_24px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.1)] flex flex-col justify-between space-y-4">
-            <div className="space-y-3">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-indigo-500/10 border border-indigo-500/20 rounded shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)]">
-                  <Compass className="w-5 h-5 text-indigo-400" />
-                </div>
-                <h3 className="text-lg font-bold font-fraunces text-white">Our Mission</h3>
+      <div className="mx-auto max-w-3xl space-y-10 px-4 sm:px-6">
+        <div className="rounded-3xl border border-[var(--rule)] bg-[var(--sheet)] p-6 sm:p-9">
+          <div className="space-y-10">
+            <section>
+              <h2 className="font-fraunces text-3xl font-semibold tracking-[-0.02em] text-[var(--ink)]">Who it is for</h2>
+              <div className="mt-3 space-y-3 text-[1.0625rem] leading-[1.7] text-[var(--ink)]">
+                <p>
+                  Anyone curious about how the universe works, from about age 9 upwards. Stella is the Latin word for
+                  star, and the lessons lean on space wherever they can: orbits, rockets, light from distant stars.
+                </p>
+                <ul className="space-y-1.5">
+                  {LEVELS.map((level) => (
+                    <li key={level.id}>
+                      <strong>{level.label}</strong>, {level.ages}. {level.blurb}
+                    </li>
+                  ))}
+                </ul>
+                <p>
+                  The ages are a guide, not a rule. The levels are our own judgement of difficulty and are not matched
+                  to one exam board, so your own specification is the authority on what you need to know.
+                </p>
               </div>
-              <p className="text-xs text-slate-300 leading-relaxed font-sans">
-                Our objective is to deliver interactive, textbook-grade space science coursework. We replace black-box AI generators and chat interfaces with stable, verified physical formulas, solved calculation steps, and real-time simulator controls.
+            </section>
+
+            <Block title="What is in a lesson">
+              <p>
+                Every lesson has something to interact with (a model with controls, an animation, or a set of
+                flashcards), an explanation of the key formula with each symbol defined, one worked example, practice
+                questions with hints and answers, and longer notes for reference.
               </p>
-            </div>
-            <div className="text-[9px] text-slate-500 font-mono">STATUS: UPLINK_ACTIVE</div>
-          </div>
-
-          {/* Vision Card */}
-          <div className="bg-slate-900/30 backdrop-blur-md border border-slate-400/20 hover:border-slate-300/50 hover:bg-slate-800/40 rounded-xl p-6 transition-all shadow-[0_4px_24px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.1)] flex flex-col justify-between space-y-4">
-            <div className="space-y-3">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-purple-500/10 border border-purple-500/20 rounded shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)]">
-                  <Cpu className="w-5 h-5 text-purple-400" />
-                </div>
-                <h3 className="text-lg font-bold font-fraunces text-white">Our Method</h3>
-              </div>
-              <p className="text-xs text-slate-300 leading-relaxed font-sans">
-                We believe in visual, hands-on calibration. By providing direct parameter controls (like mass, refractive index, and resistor loop values) alongside dynamic GSAP visualisations, we allow students to test physical laws experimentally and observe the mathematical results instantly.
+              <p>
+                <Link href="/study" className={linkClass}>
+                  Browse all lessons
+                </Link>
               </p>
-            </div>
-            <div className="text-[9px] text-slate-500 font-mono">STATUS: CALIBRATION_ONLINE</div>
-          </div>
+            </Block>
 
-        </div>
-
-        {/* CORE PLATFORM ARCHITECTURE */}
-        <div className="bg-slate-900/30 backdrop-blur-md border border-slate-400/20 rounded-xl p-6 space-y-6 shadow-[0_4px_24px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.1)]">
-          <div className="border-b border-white/10 pb-3 flex justify-between items-center">
-            <span className="text-xs font-bold text-slate-200 uppercase tracking-wider font-mono">Astrometrics System Specifications</span>
-            <span className="text-[9px] text-slate-500 font-mono">Ver: 4.2.0</span>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-6">
-            
-            {/* Tech 1 */}
-            <div className="space-y-2">
-              <div className="flex items-center gap-2.5">
-                <BrainCircuit className="w-4 h-4 text-cyan-400" />
-                <h4 className="text-sm font-bold text-white font-fraunces">Math Typesetting</h4>
-              </div>
-              <p className="text-[11px] text-slate-400 leading-relaxed font-mono">
-                The platform integrates LaTeX formatting and KaTeX compilers to present textbook-accurate math models. All equations, calculations, and results are parsed locally, providing a clean, high-fidelity presentation.
+            <Block title="How the lessons are made">
+              <p>
+                Lesson text and the visual models are written with AI assistance. They are meant to help you build
+                understanding, not to replace your course materials. Check formulas and figures against your textbook
+                or exam board&rsquo;s specification before relying on them in assessed work.
               </p>
-            </div>
+            </Block>
 
-            {/* Tech 2 */}
-            <div className="space-y-2">
-              <div className="flex items-center gap-2.5">
-                <Telescope className="w-4 h-4 text-amber-400" />
-                <h4 className="text-sm font-bold text-white font-fraunces">Attributed NASA Vault</h4>
-              </div>
-              <p className="text-[11px] text-slate-400 leading-relaxed font-mono">
-                Direct connection to NASA's astronomical archives. The Space Gallery allows students to query NASA's public repositories, inspect high-res image data, and follow direct backlinks back to NASA's details portal.
+            <Block title="Space pictures">
+              <p>
+                The{' '}
+                <Link href="/gallery" className={linkClass}>
+                  gallery
+                </Link>{' '}
+                draws on NASA&rsquo;s Astronomy Picture of the Day and the NASA Image and Video Library. Each image
+                links back to its NASA source.
               </p>
-            </div>
+              <p>
+                The launch footage on the home page and in the gravity lesson is also NASA&rsquo;s: the lift-off of
+                Artemis I in November 2022 (NASA/Frank Michaux), and the view from the Orion spacecraft as Artemis II
+                climbed in April 2026. Both are trimmed and sped up. Stella Academy is not affiliated with NASA.
+              </p>
+            </Block>
 
+            <Block title="Reading comfort">
+              <p>
+                Use Display in the menu to change the text size and typeface, or to turn off motion and transparency.
+                Your choices are saved in this browser only.
+              </p>
+            </Block>
+
+            <Block title="Cost and privacy">
+              <p>
+                The lessons are free to use. We use Google Analytics to see which lessons are useful, and it only sets
+                cookies if you accept them in the banner.
+              </p>
+              {supportEnabled && (
+                <>
+                  <p>If the lessons help you, you can chip in towards hosting and new topics.</p>
+                  <p>
+                    <SupportLink placement="about" />
+                  </p>
+                </>
+              )}
+            </Block>
           </div>
         </div>
-
-        {/* RETURN BUTTON */}
-        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-slate-900/30 backdrop-blur-md border border-slate-400/20 rounded-xl p-5 shadow-[0_4px_24px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.1)]">
-          <div className="space-y-1 text-center sm:text-left font-mono text-[9px] text-slate-500 uppercase">
-            <h4 className="text-sm font-bold text-white font-fraunces normal-case">Calibration Complete?</h4>
-            <p>Return to the main console to explore active curriculum nodes.</p>
-          </div>
-          <Link
-            href="/"
-            className="px-5 py-2.5 bg-gradient-to-r from-purple-600 to-cyan-500 hover:scale-[1.02] active:scale-[0.98] text-white text-xs font-mono rounded tracking-wider transition-all shadow-md font-semibold"
-          >
-            Return to Dashboard
-          </Link>
-        </div>
-
       </div>
-    </div>
+    </>
   );
 }
