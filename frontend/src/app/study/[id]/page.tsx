@@ -7,11 +7,13 @@ import MarkdownRenderer from '@/components/MarkdownRenderer';
 import { LessonCard } from '@/components/paper/LevelCards';
 import { Rich, Tex } from '@/components/paper/maths';
 import { SkyBand } from '@/components/Sky';
+import LessonIntro from '@/components/study/LessonIntro';
 import LessonModel from '@/components/study/LessonModel';
 import TrackedDetails from '@/components/study/TrackedDetails';
 import SupportLink from '@/components/SupportLink';
 import { MarkDone } from '@/components/journey/MissionSteps';
 import { summaryOf } from '@/lib/lessons';
+import { INTROS } from '@/lib/intros';
 import { placeOf, stepAfter } from '@/lib/missions';
 import { levelAges, levelLabel, subjectOf, SUBJECT_LABEL } from '@/lib/levels';
 import { PAPER_SUBJECT } from '@/lib/paper';
@@ -61,6 +63,7 @@ export default async function LessonPage({ params }: Props) {
   const after = stepAfter(lesson.id);
   const next = after ? summaryOf(after.lesson) : null;
   const accent = { '--diagram-accent': subject.ink } as CSSProperties;
+  const intro = INTROS[lesson.id];
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -108,22 +111,25 @@ export default async function LessonPage({ params }: Props) {
             </>
           )}
         </nav>
-        <div className="mt-6 flex items-start gap-6">
-          <span
-            className="hidden h-28 w-28 shrink-0 place-items-center rounded-3xl sm:grid"
-            style={{ backgroundColor: subject.tint, color: '#eef1fb', ...accent }}
-          >
-            <LessonDiagram id={lesson.id} size={78} />
-          </span>
-          <div>
-            <p className="text-[15px] font-semibold text-[#f6c453]">
-              {level} {SUBJECT_LABEL[subjectOf(lesson.category)].toLowerCase()}, {levelAges(lesson.id)}, about {lesson.estimatedMinutes} minutes
-            </p>
-            <h1 className="mt-2 font-fraunces text-5xl font-semibold leading-[1.04] tracking-[-0.025em] text-white sm:text-6xl">
-              {lesson.title}
-            </h1>
-            <p className="mt-3 max-w-2xl text-xl leading-relaxed text-slate-200">{lesson.subtitle}</p>
+        <div className="mt-6 flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between lg:gap-10">
+          <div className="flex min-w-0 items-start gap-6">
+            <span
+              className="hidden h-28 w-28 shrink-0 place-items-center rounded-3xl sm:grid"
+              style={{ backgroundColor: subject.tint, color: '#eef1fb', ...accent }}
+            >
+              <LessonDiagram id={lesson.id} size={78} />
+            </span>
+            <div>
+              <p className="text-[15px] font-semibold text-[#f6c453]">
+                {level} {SUBJECT_LABEL[subjectOf(lesson.category)].toLowerCase()}, {levelAges(lesson.id)}, about {lesson.estimatedMinutes} minutes
+              </p>
+              <h1 className="mt-2 font-fraunces text-5xl font-semibold leading-[1.04] tracking-[-0.025em] text-white sm:text-6xl">
+                {lesson.title}
+              </h1>
+              <p className="mt-3 max-w-2xl text-xl leading-relaxed text-slate-200">{lesson.subtitle}</p>
+            </div>
           </div>
+          {intro && <LessonIntro id={lesson.id} intro={intro} />}
         </div>
       </SkyBand>
 

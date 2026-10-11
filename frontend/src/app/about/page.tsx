@@ -81,7 +81,9 @@ export default function AboutPage() {
               <p>
                 The launch footage on the home page and in the gravity lesson is also NASA&rsquo;s: the lift-off of
                 Artemis I in November 2022 (NASA/Frank Michaux), and the view from the Orion spacecraft as Artemis II
-                climbed in April 2026. Both are trimmed and sped up. Stella Academy is not affiliated with NASA.
+                climbed in April 2026. Six lessons also open with NASA footage, such as a Space Shuttle’s boosters
+                separating and a rover driving on Mars. All of it is trimmed, and most is sped up. Stella Academy is
+                not affiliated with NASA.
               </p>
             </Block>
 

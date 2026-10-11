@@ -23,24 +23,45 @@ type RequestPayload = {
 // Best-effort per-instance rate limit (Cloud Run instances each keep their own window).
 const WINDOW_MS = 60_000;
 const MAX_REQUESTS = 30;
+const MAX_TRACKED = 5000; // hard ceiling on remembered callers, so the table cannot grow without bound
 const hits = new Map<string, { count: number; reset: number }>();
+
+/**
+ * The caller's address as Google's front end saw it. Cloud Run appends that
+ * address to X-Forwarded-For, so only the LAST entry can be trusted; anything
+ * before it is whatever the caller chose to send. (If a load balancer is ever
+ * put in front, the last entry becomes the balancer's address and every caller
+ * shares one allowance: stricter, never looser. Revisit this then.)
+ */
+function clientAddress(req: NextRequest): string {
+  const forwarded = req.headers.get('x-forwarded-for');
+  const entries = forwarded ? forwarded.split(',').map((part) => part.trim()).filter(Boolean) : [];
+  return entries[entries.length - 1] || 'unknown';
+}
 
 function rateLimited(ip: string): boolean {
   const now = Date.now();
-  if (hits.size > 5000) {
-    for (const [k, v] of hits) if (v.reset < now) hits.delete(k);
-  }
   const entry = hits.get(ip);
-  if (!entry || entry.reset < now) {
-    hits.set(ip, { count: 1, reset: now + WINDOW_MS });
-    return false;
+  if (entry && entry.reset >= now) {
+    entry.count += 1;
+    return entry.count > MAX_REQUESTS;
   }
-  entry.count += 1;
-  return entry.count > MAX_REQUESTS;
+
+  if (hits.size >= MAX_TRACKED) {
+    for (const [key, value] of hits) if (value.reset < now) hits.delete(key);
+    // Still full of live entries: drop the oldest (a Map iterates in insertion order).
+    for (const key of hits.keys()) {
+      if (hits.size < MAX_TRACKED) break;
+      hits.delete(key);
+    }
+  }
+  hits.delete(ip); // re-insert so this caller counts as the newest entry
+  hits.set(ip, { count: 1, reset: now + WINDOW_MS });
+  return false;
 }
 
 export async function POST(req: NextRequest) {
-  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+  const ip = clientAddress(req);
   if (rateLimited(ip)) {
     return NextResponse.json({ error: 'Too many requests. Please slow down.' }, { status: 429 });
   }
