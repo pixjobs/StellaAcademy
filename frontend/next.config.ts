@@ -48,7 +48,16 @@ const nextConfig: NextConfig = {
   },
 
   async headers() {
-    return [{ source: "/:path*", headers: securityHeaders }];
+    // Footage and pictures in /public change rarely, so browsers may keep them for 30 days
+    // instead of asking the server about each one on every visit. (Not "immutable": a
+    // replaced file keeps its name.)
+    const keepForAMonth = [{ key: "Cache-Control", value: "public, max-age=2592000" }];
+    return [
+      { source: "/:path*", headers: securityHeaders },
+      { source: "/launch/:file*", headers: keepForAMonth },
+      { source: "/intros/:file*", headers: keepForAMonth },
+      { source: "/:file(.+\\.(?:png|jpg|jpeg|svg|webp|ico))", headers: keepForAMonth },
+    ];
   },
 };
 
