@@ -146,53 +146,100 @@ export const studyModules: StudyModule[] = [
     },
     practiceProblems: [
       {
-        question: 'If the distance between two masses is tripled, how does the gravitational force change?',
-        hint: 'Look at the r² term in the denominator.',
-        answer: 'The force becomes 1/9th as strong.'
+        question: "The distance between two masses is tripled. How does the gravitational force between them change?",
+        hint: "The force depends on 1 ÷ r².",
+        answer: "It falls to one ninth."
       },
       {
-        question: 'If the mass of the satellite is doubled, what happens to the gravitational force?',
-        hint: 'Look at the relationship between F_g and m.',
-        answer: 'The force is doubled.'
-      }
+        question: "The mass of a satellite is doubled, and it stays in the same orbit. What happens to the gravitational force on it?",
+        hint: "The force is proportional to each mass.",
+        answer: "It doubles."
+      },
+      {
+        question: "The gravitational field strength at Earth's surface is 9.81 N/kg. What is it at a height of one Earth radius above the surface?",
+        hint: "That point is twice as far from Earth's centre as the surface is.",
+        answer: "About 2.45 N/kg, a quarter of the surface value"
+      },
+      {
+        question: "On the International Space Station the field strength is about 8.7 N/kg. What is the weight of an 80 kg astronaut there?",
+        hint: "Weight = mass × gravitational field strength.",
+        answer: "About 700 N"
+      },
+      {
+        question: "Find the speed of a satellite in a circular orbit of radius $7.0 \\times 10^6$ m. Take $GM = 3.98 \\times 10^{14}$ m³ s⁻².",
+        hint: "Use $v = \\sqrt{GM \\div r}$.",
+        answer: "About 7,500 m/s, or 7.5 km/s"
+      },
+      {
+        question: "Gravity on the International Space Station is almost 90% as strong as on the ground. Why do the astronauts float?",
+        hint: "Think about what the station and the astronauts are both doing.",
+        answer: "The station and everyone in it are falling freely together around Earth. Nothing presses on them, so they feel weightless even though gravity still acts."
+      },
     ],
     realWorldConnection: 'Engineers use this exact law to calculate the precise trajectories of spacecraft, ensuring they can slingshot around planets or establish stable orbits without burning excess fuel.',
     textbookContent: `
-## Newton's Law of Universal Gravitation
+## Gravitational fields
 
-The law of universal gravitation, formulated by Sir Isaac Newton in 1687, states that every point mass in the universe attracts every other point mass with a force that is directly proportional to the product of their masses and inversely proportional to the square of the distance between them.
+### What a field is
 
-This relationship is expressed mathematically as:
-$F = G \\frac{m_1 m_2}{r^2}$
+A gravitational field is a region where a mass feels a force. The **gravitational field strength**, $g$, is the force on each kilogram:
 
-### Key Components
+$$g = \\frac{F}{m}$$
 
-*   **$F$ (Gravitational Force):** The magnitude of the attractive force between the two bodies, measured in Newtons (N). This force is mutual; body 1 attracts body 2 with the exact same force that body 2 attracts body 1 (Newton's Third Law).
-*   **$G$ (Gravitational Constant):** An empirical physical constant. Its value is approximately $6.674 \\times 10^{-11} \\text{ N}\\cdot\\text{m}^2/\\text{kg}^2$. This extremely small value explains why gravitational attraction is only noticeable when at least one mass is extraordinarily large (like a planet).
-*   **$m_1, m_2$ (Masses):** The masses of the two interacting objects, measured in kilograms (kg).
-*   **$r$ (Distance):** The straight-line distance between the centres of mass of the two objects, measured in metres (m).
+It is measured in newtons per kilogram (N/kg). At Earth's surface $g$ is 9.81 N/kg, so a mass $m$ has weight $W = mg$.
 
-### The Inverse-Square Law
+### Newton's law of gravitation
 
-The most defining characteristic of gravity is its $1/r^2$ decay. If you double the distance between two objects ($2r$), the gravitational force decreases to $(1/2)^2$, or one-quarter ($1/4$) of its original strength. If you triple the distance, the force becomes one-ninth ($1/9$). 
+Every mass attracts every other mass. For two point masses, or two spheres, the force is:
 
-### Vector Representation
+$$F = \\frac{GMm}{r^2}$$
 
-While the formula above calculates the *magnitude* of the force, force is fundamentally a vector quantity. The complete vector form of Newton's law is:
-$\\vec{F}_{12} = -G \\frac{m_1 m_2}{|\\vec{r}_{12}|^2} \\hat{r}_{12}$
+*   $M$ and $m$ are the two masses, in kilograms.
+*   $r$ is the distance between their **centres**, in metres.
+*   $G = 6.67 \\times 10^{-11}$ N m² kg⁻² is the gravitational constant.
 
-Where $\\vec{F}_{12}$ is the force exerted on mass 2 by mass 1, $\\vec{r}_{12}$ is the displacement vector from mass 1 to mass 2, and $\\hat{r}_{12}$ is the unit vector pointing from mass 1 to mass 2. The negative sign shows that the force is attractive: it pulls mass 2 back *towards* mass 1.
+The force is always attractive. It follows an **inverse square law**: double the distance and the force falls to a quarter; triple it and the force falls to a ninth.
 
-### Limitations
+### Field strength around a planet
 
-Newton's law is an excellent approximation for most engineering and orbital mechanics applications. However, it is fundamentally superseded by Albert Einstein's Theory of General Relativity (1915), which describes gravity not as a force, but as the curvature of spacetime caused by mass and energy. Newton's formulation breaks down under extreme conditions, such as near black holes or when describing the precise orbit of Mercury.
-    
+Dividing the force by $m$ gives the field strength at a distance $r$ from the centre of a mass $M$:
 
-### References
+$$g = \\frac{GM}{r^2}$$
 
-*   [The Feynman Lectures on Physics, Vol. I, Ch. 7: The Theory of Gravitation](https://www.feynmanlectures.caltech.edu/I_07.html) (Richard P. Feynman)
-*   [Philosophiæ Naturalis Principia Mathematica](https://en.wikipedia.org/wiki/Philosophi%C3%A6_Naturalis_Principia_Mathematica) (Isaac Newton, 1687)
-*   [NASA JPL: Basics of Space Flight - Gravity & Mechanics](https://solarsystem.nasa.gov/basics/)
+*Example:* at Earth's surface, with $M = 5.97 \\times 10^{24}$ kg and $r = 6.37 \\times 10^6$ m:
+
+$$g = \\frac{6.67 \\times 10^{-11} \\times 5.97 \\times 10^{24}}{(6.37 \\times 10^6)^2} = 9.81 \\text{ N/kg}$$
+
+At the height of the International Space Station, about 400 km up, $r = 6.77 \\times 10^6$ m and $g$ is still 8.7 N/kg. Gravity has hardly weakened. Astronauts float because they and the station are falling together, not because gravity has gone.
+
+### Why a satellite stays up
+
+A satellite in a circular orbit is always falling towards Earth, but it is moving sideways fast enough that the ground curves away beneath it. Gravity supplies exactly the force needed for circular motion:
+
+$$\\frac{GMm}{r^2} = \\frac{mv^2}{r} \\qquad \\text{so} \\qquad v = \\sqrt{\\frac{GM}{r}}$$
+
+The satellite's own mass cancels, so every satellite at the same height moves at the same speed. A higher orbit means a slower satellite.
+
+*Example:* at $r = 6.77 \\times 10^6$ m the speed is $\\sqrt{\\dfrac{3.98 \\times 10^{14}}{6.77 \\times 10^6}} = 7{,}670$ m/s. One lap takes about 92 minutes.
+
+### Gravitational potential
+
+The **gravitational potential** at a point is the potential energy of each kilogram placed there:
+
+$$V = -\\frac{GM}{r}$$
+
+It is negative because work has to be done to pull a mass away from the planet, and it is taken to be zero infinitely far away. Moving a mass $m$ through a potential difference $\\Delta V$ changes its potential energy by $m\\,\\Delta V$.
+
+### Comparing gravity with electric fields
+
+Both follow an inverse square law for point sources, and both have a field strength and a potential. The difference is that gravity only ever attracts, while electric forces can attract or repel.
+
+### Sources
+
+The topics in these notes follow the Department for Education documents below.
+
+*   [GCE AS and A level subject content for science](https://www.gov.uk/government/publications/gce-as-and-a-level-for-science) (Department for Education)
+*   [National curriculum in England: science programmes of study](https://www.gov.uk/government/publications/national-curriculum-in-england-science-programmes-of-study) (Department for Education)
 `
   },
   {
@@ -419,47 +466,92 @@ Snell's Law can be derived from Fermat's Principle, which states that the path t
     },
     practiceProblems: [
       {
-        question: 'If a driver gear has 20 teeth and the driven gear has 40 teeth, what is the gear ratio?',
-        hint: 'Divide driven teeth by driver teeth.',
-        answer: '2.0'
+        question: "A driver gear has 20 teeth and the gear it drives has 40 teeth. What is the gear ratio?",
+        hint: "Divide the teeth on the driven gear by the teeth on the driver.",
+        answer: "2 (often written 2 : 1)"
       },
       {
-        question: 'If the driver gear turns at 100 RPM, how fast does the driven gear turn in the previous example?',
-        hint: 'Divide the driver speed by the gear ratio.',
-        answer: '50 RPM'
-      }
+        question: "In question 1 the driver gear turns 100 times a minute. How fast does the driven gear turn?",
+        hint: "Divide the driver's speed by the gear ratio.",
+        answer: "50 turns per minute"
+      },
+      {
+        question: "A force of 10 N acts 0.2 m from a pivot, at right angles to the line from the pivot. What is its moment?",
+        hint: "Moment = force × distance.",
+        answer: "2 N m"
+      },
+      {
+        question: "A motor gives a moment of 3 N m to a 10-tooth gear, which drives a 50-tooth gear. What moment does the larger gear deliver?",
+        hint: "Find the gear ratio, then multiply the moment by it.",
+        answer: "15 N m (the gear ratio is 5)"
+      },
+      {
+        question: "A 30-tooth gear turning 60 times a minute drives a 10-tooth gear. How fast does the small gear turn, and what happens to the moment?",
+        hint: "The ratio is 10 ÷ 30, which is less than 1.",
+        answer: "180 turns per minute. The moment falls to one third."
+      },
+      {
+        question: "Two gears mesh. The driver turns clockwise. Which way does the driven gear turn?",
+        hint: "Picture the teeth pushing against each other where the gears touch.",
+        answer: "Anticlockwise. Meshing gears always turn in opposite directions."
+      },
     ],
     realWorldConnection: 'Rovers on Mars use highly geared motors to drive slowly over rocks while producing enormous amounts of torque to avoid getting stuck.',
     textbookContent: `
-## Kinematics of Gear Trains
+## Gears and turning forces
 
-A gear train is a mechanical system formed by mounting gears on a frame so the teeth of the gears engage. Gear trains are fundamental in mechanical engineering to transmit torque and adjust the rotational speed between an input power source and an output load.
+### The moment of a force
 
-### The Gear Ratio
+A force can make something turn. Its turning effect is called its **moment**:
 
-For two meshing gears (a driver and a driven gear), the fundamental kinematic relationship—assuming no slip between the teeth profiles—dictates that their pitch circles roll against each other without slipping. Therefore, their tangential velocities at the point of contact must be equal.
+$$\\text{moment} = \\text{force} \\times \\text{distance}$$
 
-The gear ratio $R$ is defined by the inverse relationship between the number of teeth $N$ and the angular velocity $\\omega$:
-$R = \\frac{\\omega_{\\text{in}}}{\\omega_{\\text{out}}} = \\frac{N_{\\text{out}}}{N_{\\text{in}}}$
+The distance is measured from the pivot to the line of the force, at right angles to the force. Force is in newtons (N), distance in metres (m), and the moment in newton metres (N m). Engineers often call the moment of a motor its torque.
 
-### Torque Multiplication
+The same force has a bigger turning effect when it acts further from the pivot. That is why a long spanner undoes a tight nut more easily than a short one.
 
-By the principle of conservation of energy (power $P = \\tau \\omega$), the input power must equal the output power in an ideal, frictionless gear system:
-$\\tau_{\\text{in}} \\omega_{\\text{in}} = \\tau_{\\text{out}} \\omega_{\\text{out}}$
+### How gears pass a turning effect on
 
-Substituting the gear ratio yields the torque multiplication equation:
-$\\tau_{\\text{out}} = \\tau_{\\text{in}} \\left( \\frac{\\omega_{\\text{in}}}{\\omega_{\\text{out}}} \\right) = \\tau_{\\text{in}} \\left( \\frac{N_{\\text{out}}}{N_{\\text{in}}} \\right)$
+Gears are wheels with teeth that fit together, or **mesh**. When one gear turns, its teeth push on the teeth of the next.
 
-If $N_{\\text{out}} > N_{\\text{in}}$, the system is a *speed reducer* and a *torque multiplier*. This is critical in robotics and spacecraft mechanisms where electric motors operate at high speeds with low torque, but actuators require low speeds and high torque.
+*   Where the teeth touch, each gear pushes on the other with the same size of force.
+*   On a larger gear that force acts further from the centre, so its moment is larger.
+*   Teeth pass the meeting point one at a time on both gears, so the gear with more teeth takes longer to go round once.
+*   Two meshing gears always turn in opposite directions.
 
-*Reference: Shigley, J. E., & Mischke, C. R. (2014). Mechanical Engineering Design (10th ed.). McGraw-Hill.*
-    
+### Gear ratio
 
-### References
+$$\\text{gear ratio} = \\frac{\\text{teeth on the driven gear}}{\\text{teeth on the driver gear}}$$
 
-*   [Shigley's Mechanical Engineering Design](https://www.mheducation.com/highered/product/shigley-s-mechanical-engineering-design-budynas-nisbett/M9781260128315.html) (Richard G. Budynas, J. Keith Nisbett)
-*   Machinery's Handbook, 31st Edition (Erik Oberg; Industrial Press)
-*   [MIT OCW: 2.007 Design and Manufacturing I](https://ocw.mit.edu/courses/2-007-design-and-manufacturing-i-spring-2009/)
+The **driver** is the gear being turned by the motor or the pedals. The **driven** gear is the one it turns.
+
+If there is no friction:
+
+*   speed of the driven gear = speed of the driver ÷ gear ratio
+*   moment on the driven gear = moment on the driver × gear ratio
+
+### You cannot get something for nothing
+
+A gear ratio bigger than 1 gives a larger moment but a slower turn. A ratio smaller than 1 gives a faster turn but a smaller moment. Gears never give more of both. A simple machine can make a force bigger only by making the movement smaller.
+
+### Worked example
+
+A motor turns a 12-tooth gear 90 times a minute with a moment of 5 N m. It drives a 36-tooth gear.
+
+1.  Gear ratio: $\\dfrac{36}{12} = 3$.
+2.  Speed of the driven gear: $90 \\div 3 = 30$ turns per minute.
+3.  Moment on the driven gear: $5 \\times 3 = 15$ N m.
+
+### Where gears matter
+
+A bicycle's low gear lets you climb a hill with less push on the pedals, in exchange for more turns of them. A rover on Mars does the same thing with its wheels: small electric motors that spin fast drive the wheels through gears, so the wheels turn slowly but with enough moment to climb over rocks.
+
+### Sources
+
+The topics in these notes follow the Department for Education documents below.
+
+*   [GCSE subject content for biology, chemistry and physics](https://www.gov.uk/government/publications/gcse-single-science) (Department for Education)
+*   [National curriculum in England: science programmes of study](https://www.gov.uk/government/publications/national-curriculum-in-england-science-programmes-of-study) (Department for Education)
 `
   },
   {
@@ -543,47 +635,97 @@ If $N_{\\text{out}} > N_{\\text{in}}$, the system is a *speed reducer* and a *to
     },
     practiceProblems: [
       {
-        question: 'What is the semi-major axis for a transfer from a 10,000 km orbit to a 20,000 km orbit?',
-        hint: 'Average the two distances.',
-        answer: '15,000 km'
+        question: "Which moves faster: a satellite in a circular orbit of radius 7,000 km, or one of radius 42,000 km?",
+        hint: "Look at $v = \\sqrt{GM \\div r}$.",
+        answer: "The one at 7,000 km. The lower the orbit, the faster the satellite."
       },
       {
-        question: 'How many engine burns are required for a standard Hohmann transfer?',
-        hint: 'Think about entering and exiting the transfer ellipse.',
-        answer: 'Two.'
-      }
+        question: "What is the semi-major axis of a transfer ellipse between circular orbits of radius 10,000 km and 20,000 km?",
+        hint: "It is the average of the two radii.",
+        answer: "15,000 km"
+      },
+      {
+        question: "How many engine burns does a Hohmann transfer need, and where?",
+        hint: "One to join the transfer ellipse and one to leave it.",
+        answer: "Two: one at the lowest point of the ellipse and one at the highest."
+      },
+      {
+        question: "Find the speed of a satellite in a circular orbit of radius 10,000 km. Take $GM = 3.986 \\times 10^5$ km³ s⁻².",
+        hint: "Use $v = \\sqrt{GM \\div r}$ with r in kilometres.",
+        answer: "About 6.3 km/s"
+      },
+      {
+        question: "A spacecraft is to move from a circular orbit of radius 7,000 km to one of radius 13,000 km. What is the semi-major axis of the transfer ellipse?",
+        hint: "Add the radii and halve the total.",
+        answer: "10,000 km"
+      },
+      {
+        question: "The radius of a circular orbit is made 4 times larger. How does the time for one orbit change?",
+        hint: "The period is proportional to r to the power 1.5.",
+        answer: "It becomes 8 times longer."
+      },
     ],
     realWorldConnection: 'This trajectory is used by satellites moving from Low Earth Orbit to Geostationary Orbit, as well as missions sending probes to Mars.',
     textbookContent: `
-## Orbital Manoeuvres: The Hohmann Transfer
+## Changing orbit
 
-In orbital mechanics, the Hohmann transfer orbit is an elliptical orbit used to transfer between two circular orbits of different radii around a central body in the same plane. It was first described by Walter Hohmann in 1925.
+### Speed in a circular orbit
 
-### The Vis-Viva Equation
+For a satellite in a circular orbit, gravity supplies the force for circular motion (see [Gravity and Newton's Law of Gravitation](/study/gravity)):
 
-The foundation for calculating required velocity changes ($\\Delta v$) is the vis-viva equation, derived from the conservation of specific mechanical energy:
-$v^2 = GM \\left( \\frac{2}{r} - \\frac{1}{a} \\right)$
-where $v$ is orbital velocity, $r$ is the current distance to the central body, $a$ is the semi-major axis, and $GM$ is the standard gravitational parameter ($\\mu$).
+$$\\frac{GMm}{r^2} = \\frac{mv^2}{r} \\qquad \\text{so} \\qquad v = \\sqrt{\\frac{GM}{r}}$$
 
-### Carrying Out the Manoeuvre
+The higher the orbit, the slower the satellite. For Earth, $GM = 3.986 \\times 10^{14}$ m³ s⁻², or $3.986 \\times 10^5$ km³ s⁻² if you work in kilometres.
 
-The Hohmann transfer requires two impulsive velocity changes (engine burns):
+The time for one orbit is the distance round divided by the speed:
 
-1.  **First Burn ($\\Delta v_1$):** Accelerates the spacecraft from the inner circular orbit (radius $r_1$) into an elliptical transfer orbit. The periapsis of this ellipse is $r_1$, and the apoapsis is $r_2$.
-    $\\Delta v_1 = \\sqrt{\\frac{\\mu}{r_1}} \\left( \\sqrt{\\frac{2r_2}{r_1 + r_2}} - 1 \\right)$
-2.  **Second Burn ($\\Delta v_2$):** Executed half an orbit later at apoapsis ($r_2$), accelerating the spacecraft again to circularise the orbit at the new altitude.
-    $\\Delta v_2 = \\sqrt{\\frac{\\mu}{r_2}} \\left( 1 - \\sqrt{\\frac{2r_1}{r_1 + r_2}} \\right)$
+$$T = \\frac{2\\pi r}{v} = 2\\pi\\sqrt{\\frac{r^3}{GM}}$$
 
-The total $\\Delta v$ budget for the mission is the sum of both impulses: $\\Delta v_{\\text{total}} = \\Delta v_1 + \\Delta v_2$. The Hohmann transfer is proven to be the most fuel-efficient two-impulse transfer between coplanar circular orbits when the ratio of the final to initial radius is less than roughly 11.94.
+### The problem
 
-*Reference: Bate, R. R., Mueller, D. D., & White, J. E. (1971). Fundamentals of Astrodynamics. Dover Publications.*
-    
+A spacecraft in a low orbit cannot simply point at a higher orbit and fire its engine. Whatever it does, it keeps orbiting. The most economical way to climb between two circular orbits is the **Hohmann transfer**, which uses two short engine burns.
 
-### References
+1.  **Burn 1.** The spacecraft speeds up. It is now moving too fast for its circular orbit, so it climbs away along an ellipse.
+2.  **Coast.** It travels half way round that ellipse, slowing down as it climbs, until it reaches the height of the target orbit.
+3.  **Burn 2.** At the top it is moving too slowly to stay there, so it speeds up again to match the circular speed of the new orbit.
 
-*   Fundamentals of Astrodynamics (Roger R. Bate, Donald D. Mueller, Jerry E. White; Dover Publications)
-*   [Orbital Mechanics for Engineering Students](https://www.elsevier.com/books/orbital-mechanics-for-engineering-students/curtis/978-0-08-102133-0) (Howard D. Curtis)
-*   [NASA: Orbital Mechanics Educational Material](https://science.nasa.gov/solar-system/orbits-and-keplers-laws/)
+### The transfer ellipse
+
+The ellipse just touches the inner orbit at its lowest point and the outer orbit at its highest. If the two orbits have radii $r_1$ and $r_2$, the ellipse is $r_1 + r_2$ long from end to end. Half of that is its **semi-major axis**:
+
+$$a = \\frac{r_1 + r_2}{2}$$
+
+### Worked example
+
+A spacecraft is to move from a low orbit of radius 6,700 km to geostationary orbit, of radius 42,000 km.
+
+1.  Add the radii: $6{,}700 + 42{,}000 = 48{,}700$ km.
+2.  Halve the total: $a = 24{,}350$ km.
+
+### Going further: speeds and timing
+
+These results are not in the required A-level content. They follow from the conservation of energy.
+
+The speed at a distance $r$ from Earth's centre, on an ellipse of semi-major axis $a$, is given by:
+
+$$v^2 = GM\\left(\\frac{2}{r} - \\frac{1}{a}\\right)$$
+
+The transfer takes half the period of the ellipse:
+
+$$t = \\pi\\sqrt{\\frac{a^3}{GM}}$$
+
+For a transfer from 300 km above the ground to geostationary orbit, burn 1 adds about 2.4 km/s, burn 2 adds about 1.5 km/s, and the coast takes about 5 hours 15 minutes.
+
+### Faster twice, yet slower
+
+The spacecraft speeds up at both burns, but ends up moving more slowly than when it started: about 3.1 km/s in geostationary orbit against 7.7 km/s in the low one. The energy from the engine has gone into raising the spacecraft against gravity, not into keeping it fast.
+
+### Sources
+
+The topics in these notes follow the Department for Education documents below.
+
+*   [GCE AS and A level subject content for science](https://www.gov.uk/government/publications/gce-as-and-a-level-for-science) (Department for Education)
+*   [GCSE subject content for biology, chemistry and physics](https://www.gov.uk/government/publications/gcse-single-science) (Department for Education)
 `
   },
   {
@@ -663,50 +805,105 @@ The total $\\Delta v$ budget for the mission is the sum of both impulses: $\\Del
     },
     practiceProblems: [
       {
-        question: 'If voltage is 5V and resistance is 100 Ω, what is the current?',
-        hint: 'I = 5 / 100.',
-        answer: '0.05 A (50 mA)'
+        question: "The potential difference across a resistor is 5 V and its resistance is 100 Ω. What is the current?",
+        hint: "Current = potential difference ÷ resistance.",
+        answer: "0.05 A (50 mA)"
       },
       {
-        question: 'If you want 20 mA (0.02 A) of current from a 10V source, what resistor should you use?',
-        hint: 'Work in amperes, not milliamperes (see [Converting Units](/study/units)), then rearrange to R = V / I.',
-        answer: '500 Ω'
-      }
+        question: "You want a current of 20 mA (0.02 A) from a 10 V supply. What resistance do you need?",
+        hint: "Work in amperes, not milliamperes (see [Converting Units](/study/units)), then use R = V ÷ I.",
+        answer: "500 Ω"
+      },
+      {
+        question: "A current of 2 A flows for 30 seconds. How much charge has passed?",
+        hint: "Charge flow = current × time.",
+        answer: "60 coulombs"
+      },
+      {
+        question: "A 4 Ω resistor and an 8 Ω resistor are connected in series to a 12 V battery. What is the current?",
+        hint: "In series the resistances add. Then use I = V ÷ R.",
+        answer: "1 A (the total resistance is 12 Ω)"
+      },
+      {
+        question: "In the circuit from question 4, what is the potential difference across the 8 Ω resistor?",
+        hint: "The same 1 A flows through both resistors. Use V = I × R for the 8 Ω one.",
+        answer: "8 V (the other 4 V is across the 4 Ω resistor)"
+      },
+      {
+        question: "A lamp is connected to a battery. A second identical lamp is added in parallel with it. What happens to the total resistance, and to the current from the battery?",
+        hint: "A parallel branch gives the charge another route to take.",
+        answer: "The total resistance goes down, so the current from the battery goes up."
+      },
     ],
     realWorldConnection: 'Spacecraft engineers use these calculations to ensure solar panels and batteries safely power onboard computers without burning them out.',
     textbookContent: `
-## Ohm's Law and Linear Circuits
+## Current, potential difference and resistance
 
-Ohm's law is a fundamental empirical relationship in electrical engineering and solid-state physics, stating that the current through a conductor between two points is directly proportional to the voltage across the two points.
+*   **Current, $I$,** is the rate at which electric charge flows, in amperes (A).
+*   **Potential difference, $V$,** often called voltage, is what drives the charge round the circuit, in volts (V).
+*   **Resistance, $R$,** is how hard it is for the current to flow, in ohms ($\\Omega$).
 
-Introduced by Georg Simon Ohm in 1827, it is defined mathematically as:
-$I = \\frac{V}{R}$
+Charge only flows if there is a source of potential difference, such as a battery, and a closed circuit with no gaps. In a single closed loop the current is the same at every point.
 
-### Phenomenological Basis
+The charge that passes in a given time is:
 
-At a microscopic level, Ohm's law is a consequence of the Drude model of electrical conduction. Electrons in a metal are treated as a gas of free particles that accelerate in an applied electric field, but frequently scatter off the vibrating atoms of the crystal lattice. This scattering creates a macroscopic drift velocity proportional to the applied electric field, yielding a constant resistance $R$.
+$$Q = I t$$
 
-### Key Components
+where $Q$ is the charge in coulombs (C) and $t$ is the time in seconds.
 
-*   **$V$ (Voltage/Potential Difference):** The work done per unit charge to move a charge between two points, measured in Volts (V).
-*   **$I$ (Current):** The rate of flow of electric charge, measured in Amperes (A).
-*   **$R$ (Resistance):** The opposition to the flow of electric current, measured in Ohms ($\\Omega$).
+### The relationship between $V$, $I$ and $R$
 
-### Power Dissipation (Joule Heating)
+$$V = IR$$
 
-In a purely resistive circuit, the electrical energy is converted entirely into heat. The rate of energy dissipation (power) is given by Joule's first law, combining Ohm's Law and the power equation $P = VI$:
-$P = I^2 R = \\frac{V^2}{R}$
+It rearranges to $I = \\dfrac{V}{R}$ and $R = \\dfrac{V}{I}$.
 
-This principle is crucial in spacecraft thermal management; resistive components deliberately (heaters) or inadvertently generate heat that must be dissipated via radiators into the vacuum of space.
+For a given resistance, a bigger potential difference drives a bigger current. For a given potential difference, a bigger resistance lets less current through.
 
-*Reference: Nilsson, J. W., & Riedel, S. A. (2014). Electric Circuits (10th ed.). Pearson.*
-    
+### Resistance does not always stay the same
 
-### References
+*   A **fixed resistor** at a steady temperature keeps the same resistance, so doubling the potential difference doubles the current.
+*   A **filament lamp** gets hotter as the current rises, and its resistance goes up.
+*   A **diode** lets current through in one direction only.
+*   A **thermistor** changes its resistance with temperature. The usual kind has less resistance when it is hotter.
+*   A **light-dependent resistor (LDR)** has less resistance in brighter light.
 
-*   [The Art of Electronics (3rd Edition)](https://artofelectronics.net/) (Paul Horowitz, Winfield Hill)
-*   [Fundamentals of Electric Circuits](https://www.mheducation.com/highered/product/fundamentals-electric-circuits-alexander-sadiku/M9781260226409.html) (Charles K. Alexander, Matthew Sadiku)
-*   [MIT OCW: 6.002 Circuits and Electronics](https://ocw.mit.edu/courses/6-002-circuits-and-electronics-spring-2007/)
+### Series and parallel circuits
+
+In a **series** circuit the components are in one loop, one after another.
+
+*   The same current flows through every component.
+*   The potential difference of the supply is shared between them.
+*   The resistances add: $R_{\\text{total}} = R_1 + R_2$.
+
+In a **parallel** circuit the components are on separate branches.
+
+*   Each branch has the full potential difference of the supply across it.
+*   The currents in the branches add up to the current from the supply.
+*   Adding a branch gives the charge another route, so the total resistance goes down.
+
+### Worked example
+
+A 100 $\\Omega$ resistor and a 200 $\\Omega$ resistor are in series with a 6 V battery.
+
+1.  Total resistance: $100 + 200 = 300 \\ \\Omega$.
+2.  Current: $I = \\dfrac{V}{R} = \\dfrac{6}{300} = 0.02$ A.
+3.  Potential difference across the 100 $\\Omega$ resistor: $V = IR = 0.02 \\times 100 = 2$ V.
+4.  Across the 200 $\\Omega$ resistor: $0.02 \\times 200 = 4$ V. The two add up to the 6 V of the battery.
+
+### Power
+
+The power a component transfers is:
+
+$$P = VI = I^2 R$$
+
+A spacecraft's heaters are resistors chosen to turn a known amount of electrical power into heat.
+
+### Sources
+
+The topics in these notes follow the Department for Education documents below.
+
+*   [GCSE subject content for biology, chemistry and physics](https://www.gov.uk/government/publications/gcse-single-science) (Department for Education)
+*   [National curriculum in England: science programmes of study](https://www.gov.uk/government/publications/national-curriculum-in-england-science-programmes-of-study) (Department for Education)
 `
   },
   {
@@ -787,45 +984,87 @@ This principle is crucial in spacecraft thermal management; resistive components
     },
     practiceProblems: [
       {
-        question: 'If a wave has a speed of 343 m/s (sound) and a frequency of 343 Hz, what is its wavelength?',
-        hint: 'Divide speed by frequency.',
-        answer: '1 metre'
+        question: "A sound wave travels at 343 m/s and has a frequency of 343 Hz. What is its wavelength?",
+        hint: "Divide the speed by the frequency.",
+        answer: "1 metre"
       },
       {
-        question: 'Which has a shorter wavelength: a 2 GHz Wi-Fi signal or a 5 GHz Wi-Fi signal?',
-        hint: 'Higher frequency means shorter wavelength.',
-        answer: 'The 5 GHz signal.'
-      }
+        question: "A wave has a frequency of 4 Hz. What is its period?",
+        hint: "The period is 1 divided by the frequency.",
+        answer: "0.25 seconds"
+      },
+      {
+        question: "Ripples on a pond have a wavelength of 1.5 m and a frequency of 2 Hz. How fast are they travelling?",
+        hint: "Wave speed = frequency × wavelength.",
+        answer: "3 m/s"
+      },
+      {
+        question: "Which has the shorter wavelength: a 2 GHz Wi-Fi signal or a 5 GHz Wi-Fi signal?",
+        hint: "Both travel at the same speed, so the higher frequency has the shorter wavelength.",
+        answer: "The 5 GHz signal."
+      },
+      {
+        question: "Is sound a transverse or a longitudinal wave, and why can it not travel through space?",
+        hint: "Think about which way the air particles move, and what there is to vibrate in a vacuum.",
+        answer: "Longitudinal: the particles vibrate back and forth along the direction of travel. Sound needs particles to pass the vibration on, and space is almost empty."
+      },
+      {
+        question: "A spacecraft sends a radio signal at 8.4 GHz. Radio waves travel at $3.0 \\times 10^8$ m/s. What is the wavelength?",
+        hint: "8.4 GHz is $8.4 \\times 10^9$ Hz (see [Converting Units](/study/units)). Divide the speed by the frequency.",
+        answer: "About 0.036 m, or 3.6 cm"
+      },
     ],
     realWorldConnection: 'Deep Space Network antennas must be precisely sized and shaped based on the wavelengths of the radio signals used to communicate with probes like Voyager.',
     textbookContent: `
-## Wave Kinematics and Electromagnetism
+## Describing a wave
 
-A wave is a propagating dynamic disturbance (change from equilibrium) of one or more quantities. For electromagnetic (EM) waves like light and radio signals, the disturbance is a self-propagating oscillation of coupled electric and magnetic fields.
+A wave carries energy and information from one place to another. The wave travels; the water, air or rope it passes through only moves about its resting position and stays where it is.
 
-The fundamental relationship governing periodic waves connects the wave speed $v$, the frequency $f$, and the spatial wavelength $\\lambda$:
-$v = f \\cdot \\lambda$
+Four quantities describe any wave:
 
-### Wave Parameters
+*   **Amplitude:** the greatest distance a point on the wave moves from its rest position, in metres (m).
+*   **Wavelength, $\\lambda$:** the distance from one point on a wave to the same point on the next one, for example from crest to crest, in metres (m).
+*   **Frequency, $f$:** the number of complete waves passing a point each second, in hertz (Hz).
+*   **Period, $T$:** the time one complete wave takes to pass, in seconds (s).
 
-*   **$\\lambda$ (Wavelength):** The spatial period of the wave—the distance over which the wave's shape repeats. In the SI system, it is measured in metres (m).
-*   **$f$ (Frequency):** The number of occurrences of a repeating event per unit of time, measured in Hertz (Hz), where 1 Hz = 1 cycle per second.
-*   **$v$ (Phase Velocity):** The rate at which the phase of the wave propagates in space. For EM waves in a perfect vacuum, $v = c$ (the speed of light, $\\approx 3 \\times 10^8$ m/s).
+Frequency and period are two ways of saying the same thing:
 
-### Implications for Antenna Design
+$$T = \\frac{1}{f}$$
 
-In radio astronomy and spacecraft communications, antenna design is strictly dictated by the wavelength of the carrier signal. For optimal resonance and maximum power transmission/reception, the physical length of a dipole antenna is typically constructed to be exactly one half-wavelength ($\\lambda/2$).
+### The wave equation
 
-For parabolic reflector antennas (like those used in the NASA Deep Space Network), the diameter of the dish determines the diffraction limit and gain of the antenna. The gain $G$ is proportional to $(D/\\lambda)^2$, meaning higher frequencies (shorter wavelengths) allow for much more tightly focused communication beams using the same physical hardware size.
+Wave speed, frequency and wavelength are linked by one equation:
 
-*Reference: Griffiths, D. J. (2017). Introduction to Electrodynamics (4th ed.). Cambridge University Press.*
-    
+$$v = f\\lambda$$
 
-### References
+It rearranges to $\\lambda = \\dfrac{v}{f}$ and $f = \\dfrac{v}{\\lambda}$.
 
-*   [Vibrations and Waves (MIT Introductory Physics Series)](https://wwnorton.com/books/Vibrations-and-Waves/) (A.P. French)
-*   [Fundamentals of Physics](https://www.wiley.com/en-us/Fundamentals+of+Physics%2C+12th+Edition-p-9781119801146) (David Halliday, Robert Resnick, Jearl Walker)
-*   [The Physics Classroom: Properties of Waves](https://www.physicsclassroom.com/class/waves)
+The speed is set by what the wave is travelling through. So for waves in the same material, a higher frequency always means a shorter wavelength.
+
+### Transverse and longitudinal waves
+
+*   In a **transverse** wave the vibrations are at right angles to the direction the wave travels. Ripples on water are transverse, and so are light and radio waves.
+*   In a **longitudinal** wave the vibrations are along the direction the wave travels. Sound in air is longitudinal: the air is squashed together and stretched apart as the wave passes.
+
+### Worked example
+
+A radio station broadcasts at 100 MHz. Radio waves travel at $3.0 \\times 10^8$ m/s. What is the wavelength?
+
+1.  Write the frequency in hertz: $100 \\text{ MHz} = 1.0 \\times 10^8 \\text{ Hz}$.
+2.  Use $\\lambda = \\dfrac{v}{f} = \\dfrac{3.0 \\times 10^8}{1.0 \\times 10^8}$.
+3.  $\\lambda = 3.0$ m.
+
+### Waves and spacecraft
+
+Radio waves and light are electromagnetic waves. They need nothing to travel through, which is why a spacecraft can send signals across empty space. Sound cannot make that journey, because it needs particles to pass the vibration along.
+
+Every radio wave travels at the same speed in space, so the frequency a spacecraft uses fixes the wavelength of its signal, and the wavelength decides how its antenna has to be built.
+
+### Sources
+
+The topics in these notes follow the Department for Education documents below.
+
+*   [GCSE subject content for biology, chemistry and physics](https://www.gov.uk/government/publications/gcse-single-science) (Department for Education)
 `
   },
   {
@@ -1096,51 +1335,102 @@ For example, $1101_2$:
     },
     practiceProblems: [
       {
-        question: 'If the angle to a star is 45° and the line-of-sight distance is 1.414 light-years, what is the vertical distance relative to the orbital plane? (sin(45°) ≈ 0.707)',
-        hint: 'O = H * sin(θ)',
-        answer: 'About 1.0 light-year'
+        question: "The hypotenuse of a right-angled triangle is 10 m and one angle is 30°. How long is the side opposite that angle? ($\\sin 30° = 0.5$)",
+        hint: "Opposite = hypotenuse × sin θ.",
+        answer: "5 m"
       },
       {
-        question: 'A rocket launches straight up and is 100 km away (hypotenuse) from an observer who looks directly up at a 90° angle. What is its altitude?',
-        hint: 'sin(90°) = 1.',
-        answer: '100 km'
-      }
+        question: "A 5 m ladder leans against a wall and makes an angle of 60° with the ground. How far is the foot of the ladder from the wall? ($\\cos 60° = 0.5$)",
+        hint: "The ladder is the hypotenuse and the distance along the ground is the adjacent side, so use cosine.",
+        answer: "2.5 m"
+      },
+      {
+        question: "You stand 4 km from a launch pad and see a rocket at an angle of 45° above the horizon. How high is it? ($\\tan 45° = 1$)",
+        hint: "The 4 km is the adjacent side and the height is the opposite side, so use tangent.",
+        answer: "4 km"
+      },
+      {
+        question: "The two shorter sides of a right-angled triangle are 6 cm and 8 cm. How long is the hypotenuse?",
+        hint: "Use Pythagoras' theorem: $a^2 + b^2 = c^2$.",
+        answer: "10 cm"
+      },
+      {
+        question: "In a right-angled triangle the side opposite an angle is 5 cm and the hypotenuse is 10 cm. What is the angle?",
+        hint: "Work out opposite ÷ hypotenuse, then use the inverse sine.",
+        answer: "30°"
+      },
+      {
+        question: "A star is 1.414 light-years away along your line of sight, at 45° to the plane of Earth's orbit. How far is it above that plane? ($\\sin 45° \\approx 0.707$)",
+        hint: "Opposite = hypotenuse × sin θ.",
+        answer: "About 1.0 light-year"
+      },
     ],
     realWorldConnection: 'Parallax measurement uses trigonometry to determine the distance to nearby stars by observing them from opposite sides of Earth\'s orbit.',
     textbookContent: `
-## Right-Triangle Trigonometry
+## Trigonometry in right-angled triangles
 
-Trigonometry is the branch of mathematics that studies relationships between side lengths and angles of triangles. It emerged in the Hellenistic world during the 3rd century BC from applications of geometry to astronomical studies.
+Trigonometry links the angles of a triangle to the lengths of its sides. In a right-angled triangle, pick one of the other two angles and call it $\\theta$. The sides then have names:
 
-For any right-angled triangle, the primary trigonometric functions (Sine, Cosine, and Tangent) map a given angle $\\theta$ to the ratio of two specific side lengths.
+*   The **hypotenuse** is the longest side, opposite the right angle.
+*   The **opposite** side is the one facing the angle $\\theta$.
+*   The **adjacent** side is next to the angle $\\theta$, and is not the hypotenuse.
 
-### The Tangent Function
+### The three ratios
 
-The tangent of an angle is defined as the ratio of the length of the opposite side to the length of the adjacent side:
-$\\tan(\\theta) = \\frac{\\text{Opposite}}{\\text{Adjacent}}$
+$$\\sin\\theta = \\frac{\\text{opposite}}{\\text{hypotenuse}} \\qquad \\cos\\theta = \\frac{\\text{adjacent}}{\\text{hypotenuse}} \\qquad \\tan\\theta = \\frac{\\text{opposite}}{\\text{adjacent}}$$
 
-### Astronomical Parallax
+Many people remember them as **SOH CAH TOA**.
 
-Trigonometry is the foundational mathematical tool used in astrophysics to measure interstellar distances. Stellar parallax is the apparent shift in position of a nearby star against the background of distant objects when viewed from opposite ends of Earth's orbit.
+### Finding a side
 
-By forming a right triangle where:
-1.  The **Adjacent** side is the unknown distance to the star ($d$).
-2.  The **Opposite** side is the baseline radius of Earth's orbit (1 Astronomical Unit, or AU).
-3.  $\\theta$ is the measured parallax angle ($p$).
+Choose the ratio that contains the side you know and the side you want.
 
-Astronomers can solve for the distance using the small-angle approximation of the tangent function:
-$d = \\frac{1 \\text{ AU}}{\\tan(p)} \\approx \\frac{1 \\text{ AU}}{p \\text{ (in radians)}}$
+*Example:* the hypotenuse is 10 m and the angle is 30°. Find the opposite side.
 
-This technique is responsible for defining the unit of the "parsec" (parallax second)—the distance at which a star exhibits a parallax of one arcsecond.
+1.  Opposite and hypotenuse are in the sine ratio: $\\sin 30° = \\dfrac{\\text{opposite}}{10}$.
+2.  Opposite $= 10 \\times \\sin 30° = 10 \\times 0.5 = 5$ m.
 
-*Reference: Carroll, B. W., & Ostlie, D. A. (2017). An Introduction to Modern Astrophysics (2nd ed.). Cambridge University Press.*
-    
+### Finding an angle
 
-### References
+Work out the ratio, then use the inverse function on a calculator.
 
-*   [Trigonometry](https://link.springer.com/book/10.1007/978-1-4612-4074-7) (I.M. Gelfand, Mark Saul)
-*   [Euler's Introductio in analysin infinitorum](https://en.wikipedia.org/wiki/Introductio_in_analysin_infinitorum) (Leonhard Euler, 1748)
-*   [MIT OCW: 18.01 Single Variable Calculus (Trig Review)](https://ocw.mit.edu/courses/18-01sc-single-variable-calculus-fall-2010/)
+*Example:* the opposite side is 3 cm and the adjacent side is 4 cm.
+
+1.  $\\tan\\theta = \\dfrac{3}{4} = 0.75$.
+2.  $\\theta = \\tan^{-1}(0.75) \\approx 36.9°$.
+
+### Pythagoras' theorem
+
+When you know two sides and want the third, you do not need an angle. If $c$ is the hypotenuse:
+
+$$a^2 + b^2 = c^2$$
+
+*Example:* the shorter sides are 3 cm and 4 cm, so $c^2 = 9 + 16 = 25$ and $c = 5$ cm.
+
+### Exact values worth knowing
+
+| Angle | $\\sin$ | $\\cos$ | $\\tan$ |
+|---|---|---|---|
+| 0° | $0$ | $1$ | $0$ |
+| 30° | $\\dfrac{1}{2}$ | $\\dfrac{\\sqrt{3}}{2}$ | $\\dfrac{1}{\\sqrt{3}}$ |
+| 45° | $\\dfrac{\\sqrt{2}}{2}$ | $\\dfrac{\\sqrt{2}}{2}$ | $1$ |
+| 60° | $\\dfrac{\\sqrt{3}}{2}$ | $\\dfrac{1}{2}$ | $\\sqrt{3}$ |
+| 90° | $1$ | $0$ | not defined |
+
+### Measuring the distance to a star
+
+As Earth goes round the Sun, a nearby star appears to shift slightly against the far more distant stars behind it. Half of that shift is the parallax angle, $p$. The Sun, Earth and the star make a long, thin right-angled triangle. The side opposite $p$ is the distance from Earth to the Sun, and the adjacent side is the distance $d$ to the star, so:
+
+$$\\tan p = \\frac{\\text{Earth to Sun}}{d}$$
+
+Measure the angle, and the distance follows.
+
+### Sources
+
+The topics in these notes follow the Department for Education documents below.
+
+*   [National curriculum in England: mathematics programmes of study](https://www.gov.uk/government/publications/national-curriculum-in-england-mathematics-programmes-of-study) (Department for Education)
+*   [GCSE mathematics: subject content and assessment objectives](https://www.gov.uk/government/publications/gcse-mathematics-subject-content-and-assessment-objectives) (Department for Education)
 `
   },
   {
@@ -2714,7 +3004,7 @@ $$|a| = \\begin{cases} a & \\text{if } a \\geq 0 \\\\ -a & \\text{if } a < 0 \\e
     id: 'exponents-roots',
     category: 'elementary-math',
     title: "Powers and Roots",
-    subtitle: "Work with powers and square roots, and write very large and very small numbers in scientific notation (standard form).",
+    subtitle: "Work with powers and square roots, and write very large and very small numbers in standard form.",
     icon: 'Sparkles',
     accentColor: 'cyan',
     difficulty: 2,
@@ -2766,40 +3056,105 @@ $$|a| = \\begin{cases} a & \\text{if } a \\geq 0 \\\\ -a & \\text{if } a < 0 \\e
       resultFormula: '2^3 \\times 2^4 = 2^7 = 128'
     },
     practiceProblems: [
-      { question: 'What is 3²?', hint: '3 × 3', answer: '9' },
-      { question: 'What is √144?', hint: 'What number times itself equals 144?', answer: '12' }
+      {
+        question: "What is $3^2$?",
+        hint: "3 × 3",
+        answer: "9"
+      },
+      {
+        question: "What is $2^5$?",
+        hint: "Multiply five 2s together: 2 × 2 × 2 × 2 × 2.",
+        answer: "32"
+      },
+      {
+        question: "What is $\\sqrt{144}$?",
+        hint: "Which number multiplied by itself makes 144?",
+        answer: "12"
+      },
+      {
+        question: "What is the cube root of 64?",
+        hint: "Which number, used three times in a multiplication, makes 64?",
+        answer: "4, because 4 × 4 × 4 = 64"
+      },
+      {
+        question: "The Sun is about 150,000,000 km from Earth. Write this in standard form.",
+        hint: "Move the decimal point until there is one digit in front of it, and count the places.",
+        answer: "$1.5 \\times 10^8$ km"
+      },
+      {
+        question: "Write 0.0031 in standard form.",
+        hint: "The number is less than 1, so the power of ten is negative.",
+        answer: "$3.1 \\times 10^{-3}$"
+      },
+      {
+        question: "Which is larger: $4.2 \\times 10^5$ or $9.8 \\times 10^4$?",
+        hint: "Compare the powers of ten first.",
+        answer: "$4.2 \\times 10^5$, which is 420,000. The other is 98,000."
+      },
     ],
-    realWorldConnection: 'Scientific notation uses powers of 10 to write huge numbers compactly — the distance to the Sun is $1.5 \\times 10^{11}$ metres.',
+    realWorldConnection: 'Standard form uses powers of 10 to write huge numbers compactly — the distance to the Sun is $1.5 \\times 10^{11}$ metres.',
     textbookContent: `
-## Exponents and Radicals
+## Powers and roots
 
-### Exponents (Powers)
+### Powers
 
-$$a^n = \\underbrace{a \\times a \\times \\cdots \\times a}_{n \\text{ factors}}$$
+A power is a short way to write repeated multiplication:
 
-### Laws of Exponents
+$$a^n = \\underbrace{a \\times a \\times \\cdots \\times a}_{n \\text{ times}}$$
 
-| Law | Formula | Example |
+In $2^5$, the 2 is the **base** and the 5 is the **index** (also called the power or exponent). So $2^5 = 2 \\times 2 \\times 2 \\times 2 \\times 2 = 32$.
+
+A number to the power 2 is **squared**. A number to the power 3 is **cubed**.
+
+It helps to recognise the first few powers of small numbers:
+
+| Base | Powers |
+|---|---|
+| 2 | 2, 4, 8, 16, 32, 64 |
+| 3 | 3, 9, 27, 81 |
+| 4 | 4, 16, 64 |
+| 5 | 5, 25, 125 |
+
+### Roots
+
+A root undoes a power.
+
+*   The **square root** of 49 is 7, because $7^2 = 49$. It is written $\\sqrt{49} = 7$.
+*   The **cube root** of 27 is 3, because $3^3 = 27$. It is written $\\sqrt[3]{27} = 3$.
+
+Most roots do not come out as whole numbers. $\\sqrt{2}$ is 1.41421... and its decimals never end, so $\\sqrt{2}$ is the exact value and 1.41 is only an approximation.
+
+### Rules for working with powers
+
+| Rule | In symbols | Example |
 |---|---|---|
-| Product Rule | $a^m \\cdot a^n = a^{m+n}$ | $2^3 \\cdot 2^4 = 2^7$ |
-| Quotient Rule | $\\dfrac{a^m}{a^n} = a^{m-n}$ | $\\dfrac{5^6}{5^2} = 5^4$ |
-| Power of a Power | $(a^m)^n = a^{mn}$ | $(3^2)^3 = 3^6$ |
-| Zero Exponent | $a^0 = 1$ | $7^0 = 1$ |
-| Negative Exponent | $a^{-n} = \\dfrac{1}{a^n}$ | $2^{-3} = \\dfrac{1}{8}$ |
+| Multiplying: add the indices | $a^m \\times a^n = a^{m+n}$ | $2^3 \\times 2^4 = 2^7$ |
+| Dividing: subtract the indices | $\\dfrac{a^m}{a^n} = a^{m-n}$ | $\\dfrac{5^6}{5^2} = 5^4$ |
+| Power of a power: multiply the indices | $(a^m)^n = a^{mn}$ | $(3^2)^3 = 3^6$ |
+| Power of zero | $a^0 = 1$ | $7^0 = 1$ |
+| Negative index | $a^{-n} = \\dfrac{1}{a^n}$ | $10^{-3} = \\dfrac{1}{1000}$ |
 
-### Radicals (Roots)
+### Standard form
 
-$$\\sqrt[n]{a} = a^{1/n}$$
+Very large and very small numbers are written in **standard form** (also called scientific notation):
 
-### Scientific Notation
+$$A \\times 10^n$$
 
-$$93{,}000{,}000 = 9.3 \\times 10^7$$
+where $A$ is at least 1 and less than 10, and $n$ is a whole number.
 
-### References
+*   A large number has a positive power of ten: $93{,}000{,}000 = 9.3 \\times 10^7$.
+*   A number smaller than 1 has a negative power of ten: $0.00056 = 5.6 \\times 10^{-4}$.
 
-*   [Khan Academy: Exponents](https://www.khanacademy.org/math/pre-algebra/pre-algebra-exponents-radicals)
-*   [Art of Problem Solving: Exponents](https://artofproblemsolving.com/wiki/index.php/Exponent)
-    `
+To compare two numbers in standard form, look at the power of ten first. $2 \\times 10^8$ is larger than $9 \\times 10^7$, even though 9 is larger than 2.
+
+Scientists use standard form all the time. The distance from Earth to the Sun is about $1.5 \\times 10^{11}$ metres.
+
+### Sources
+
+The topics in these notes follow the Department for Education document below.
+
+*   [National curriculum in England: mathematics programmes of study](https://www.gov.uk/government/publications/national-curriculum-in-england-mathematics-programmes-of-study) (Department for Education)
+`
   },
 
   // ─── THERMODYNAMICS ───────────────────────────────────────────────────────────
@@ -2896,65 +3251,122 @@ $$93{,}000{,}000 = 9.3 \\times 10^7$$
     },
     practiceProblems: [
       {
-        question: 'If the temperature of a fixed-volume gas doubles (in Kelvin), what happens to the pressure?',
-        hint: 'At constant V and n, P is proportional to T.',
-        answer: 'The pressure doubles.'
+        question: "Convert 27 °C to kelvin.",
+        hint: "Add 273 to the Celsius temperature.",
+        answer: "300 K"
       },
       {
-        question: 'A gas occupies 4 L at 2 atm. If pressure drops to 1 atm at constant temperature, what is the new volume?',
-        hint: 'Use Boyle\'s Law: P₁V₁ = P₂V₂.',
-        answer: '8 L'
+        question: "The temperature of a gas in a sealed, rigid container doubles (in kelvin). What happens to the pressure?",
+        hint: "With the volume and the amount of gas fixed, pressure is proportional to temperature.",
+        answer: "The pressure doubles."
       },
       {
-        question: 'Why must temperature be in Kelvin (not Celsius) for the ideal gas law?',
-        hint: 'Think about what happens if T = 0°C in the formula.',
-        answer: 'Celsius can be zero or negative, which would imply zero or negative pressure — physically impossible. Kelvin starts at absolute zero, ensuring T is always positive.'
-      }
+        question: "A gas has a volume of 4 litres at a pressure of 200 kPa. It expands at constant temperature until the pressure is 100 kPa. What is its new volume?",
+        hint: "At constant temperature, pressure × volume stays the same.",
+        answer: "8 litres"
+      },
+      {
+        question: "Find the pressure of 1 mol of an ideal gas at 300 K in a volume of 0.025 m³. ($R = 8.31$ J mol⁻¹ K⁻¹)",
+        hint: "Rearrange to p = nRT ÷ V.",
+        answer: "About 99,700 Pa, or 99.7 kPa, which is close to normal air pressure"
+      },
+      {
+        question: "A gas is heated from 300 K to 600 K. What happens to the average kinetic energy of its molecules?",
+        hint: "The average kinetic energy is proportional to the temperature in kelvin.",
+        answer: "It doubles."
+      },
+      {
+        question: "Why must the temperature be in kelvin, not degrees Celsius, in the ideal gas equation?",
+        hint: "Think about what the equation would give at 0 °C.",
+        answer: "The Celsius scale has an arbitrary zero and can be negative, which would give zero or negative pressures. The kelvin scale starts at absolute zero, so pressure is proportional to it."
+      },
     ],
     realWorldConnection: 'Spacecraft thermal control engineers apply thermodynamics daily — managing heat from the Sun, electronics, and the cold of deep space to keep instruments within safe operating temperatures.',
     textbookContent: `
-## The Ideal Gas Law and Thermodynamics
+## Ideal gases
 
-The **Ideal Gas Law** is the equation of state for a hypothetical ideal gas, a useful approximation for many real gases under standard conditions:
+### The model
 
-$$PV = nRT$$
+An ideal gas is a simple picture of a real gas:
 
-### State Variables
+*   It is made of a very large number of tiny particles moving at random.
+*   The particles take up almost no room compared with the container.
+*   They do not attract or repel each other. They only interact when they collide.
+*   No kinetic energy is lost in collisions.
 
-| Symbol | Quantity | SI Unit |
+The **pressure** of the gas comes from its particles hitting the walls of the container. More collisions each second, or harder ones, mean a higher pressure.
+
+### The ideal gas equation
+
+$$pV = nRT$$
+
+| Symbol | Quantity | Unit |
 |---|---|---|
-| $P$ | Pressure | Pascal (Pa) |
-| $V$ | Volume | Cubic metre (m³) |
-| $n$ | Amount of substance | Mole (mol) |
-| $R$ | Ideal gas constant | 8.314 J/(mol·K) |
-| $T$ | Temperature | Kelvin (K) |
+| $p$ | pressure | pascals (Pa) |
+| $V$ | volume | cubic metres (m³) |
+| $n$ | amount of gas | moles (mol) |
+| $R$ | molar gas constant | 8.31 J mol⁻¹ K⁻¹ |
+| $T$ | temperature | kelvin (K) |
 
-### The Four Laws it Unifies
+The same equation can be written for the number of molecules $N$ instead of the number of moles:
 
-*   **Boyle's Law (1662):** At constant temperature and amount, $PV = \\text{const}$, so $P \\propto 1/V$.
-*   **Charles's Law (1787):** At constant pressure and amount, $V/T = \\text{const}$, so $V \\propto T$.
-*   **Gay-Lussac's Law (1809):** At constant volume and amount, $P/T = \\text{const}$, so $P \\propto T$.
-*   **Avogadro's Law (1811):** At constant pressure and temperature, $V/n = \\text{const}$, so $V \\propto n$.
+$$pV = NkT$$
 
-### The Laws of Thermodynamics
+where $k = 1.38 \\times 10^{-23}$ J K⁻¹ is the Boltzmann constant. The two forms agree because $Nk = nR$.
 
-1. **Zeroth Law:** If system A is in thermal equilibrium with B, and B with C, then A is in equilibrium with C. (This defines temperature.)
-2. **First Law (Conservation of Energy):** The change in internal energy equals heat added minus work done: $\\Delta U = Q - W$.
-3. **Second Law:** The total entropy of an isolated system never decreases. Heat flows spontaneously from high to low temperature.
-4. **Third Law:** As temperature approaches absolute zero, the entropy of a perfect crystal approaches a constant minimum.
+### Kelvin and absolute zero
 
-### Entropy
+The temperature must be in kelvin:
 
-Entropy $S$ is a measure of the number of microscopic configurations $\\Omega$ consistent with a macroscopic state:
-$$S = k_B \\ln \\Omega$$
-where $k_B = 1.38 \\times 10^{-23}$ J/K is the Boltzmann constant.
+$$T \\text{ (K)} = \\theta \\text{ (°C)} + 273$$
 
-### References
+Zero kelvin is **absolute zero**, the lowest temperature there can be. It is the temperature at which the particles of an ideal gas would have no kinetic energy.
 
-*   [Thermal Physics](https://global.oup.com/academic/product/thermal-physics-9780198566434) (Blundell & Blundell, Oxford)
-*   [Feynman Lectures on Physics, Vol. I, Ch. 39–44](https://www.feynmanlectures.caltech.edu/I_39.html)
-*   [NIST: Thermophysical Properties](https://webbook.nist.gov/chemistry/fluid/)
-    `
+### Three special cases
+
+*   **Constant temperature:** $pV$ stays the same. Halve the volume and the pressure doubles.
+*   **Constant volume:** $p$ is proportional to $T$. Double the kelvin temperature and the pressure doubles.
+*   **Constant pressure:** $V$ is proportional to $T$.
+
+### Temperature and the energy of molecules
+
+The temperature of a gas tells you the average kinetic energy of its molecules:
+
+$$\\text{average kinetic energy} = \\frac{3}{2}kT$$
+
+*Example:* at 300 K the average is $\\frac{3}{2} \\times 1.38 \\times 10^{-23} \\times 300 = 6.21 \\times 10^{-21}$ J for each molecule.
+
+### Internal energy
+
+The **internal energy** of a substance is the total of the random kinetic and potential energies of its particles. For an ideal gas it is all kinetic. The energy needed to change the temperature of a mass $m$ by $\\Delta\\theta$ is:
+
+$$E = mc\\,\\Delta\\theta$$
+
+where $c$ is the specific heat capacity.
+
+### Worked example
+
+A sealed tank holds 2 mol of gas at 300 K in a volume of 0.05 m³. Find the pressure.
+
+1.  Rearrange: $p = \\dfrac{nRT}{V}$.
+2.  Substitute: $p = \\dfrac{2 \\times 8.31 \\times 300}{0.05}$.
+3.  $p = 99{,}720$ Pa, about 99.7 kPa.
+
+### In a rocket engine
+
+Burning fuel makes very hot gas in a small chamber. A high temperature in a fixed volume means a high pressure, and that pressure drives the gas out through the nozzle at great speed.
+
+### Going further: entropy
+
+Entropy is not in the required A-level content, but it explains why heat flows the way it does. It measures the number of ways the particles and their energy can be arranged. Left alone, a system moves towards arrangements with more entropy, which is why energy spreads from hot objects to cold ones and never the other way by itself.
+
+### Sources
+
+The topics in these notes follow the Department for Education documents below.
+
+*   [GCE AS and A level subject content for science](https://www.gov.uk/government/publications/gce-as-and-a-level-for-science) (Department for Education)
+*   [GCSE subject content for biology, chemistry and physics](https://www.gov.uk/government/publications/gcse-single-science) (Department for Education)
+`
   },
 
   // ─── MOMENTUM & COLLISIONS ────────────────────────────────────────────────────
@@ -3034,66 +3446,83 @@ where $k_B = 1.38 \\times 10^{-23}$ J/K is the Boltzmann constant.
     },
     practiceProblems: [
       {
-        question: 'A 70 kg astronaut floating in space throws a 2 kg tool at 10 m/s. How fast do they recoil?',
-        hint: 'Initial total momentum is zero. Use conservation of momentum.',
-        answer: '≈ 0.286 m/s in the opposite direction'
+        question: "A 1,200 kg car travels at 20 m/s. What is its momentum?",
+        hint: "Momentum = mass × velocity.",
+        answer: "24,000 kg m/s"
       },
       {
-        question: 'Two ice skaters (60 kg and 80 kg) push off each other from rest. The 60 kg skater moves at 4 m/s. How fast does the 80 kg skater move?',
-        hint: 'Total initial momentum = 0. So 60×4 = 80×v.',
-        answer: '3 m/s'
-      }
+        question: "A 3 kg trolley moving at 4 m/s hits a stationary 1 kg trolley and they stick together. How fast do they move afterwards?",
+        hint: "The momentum before is 3 × 4. Afterwards the combined mass is 4 kg.",
+        answer: "3 m/s"
+      },
+      {
+        question: "Two 0.5 kg balls roll towards each other, each at 6 m/s. What is their total momentum?",
+        hint: "Momentum has a direction. Call one direction positive and the other negative.",
+        answer: "Zero. The two momenta are equal in size and opposite in direction."
+      },
+      {
+        question: "Two ice skaters, 60 kg and 80 kg, push each other apart from rest. The 60 kg skater moves off at 4 m/s. How fast does the 80 kg skater move?",
+        hint: "The total momentum was zero before, so it is zero afterwards: 60 × 4 = 80 × v.",
+        answer: "3 m/s, in the opposite direction"
+      },
+      {
+        question: "A 70 kg astronaut floating at rest throws a 2 kg tool away at 10 m/s. How fast does the astronaut move, and which way?",
+        hint: "The total momentum stays at zero: 2 × 10 = 70 × v.",
+        answer: "About 0.29 m/s, in the opposite direction to the tool"
+      },
+      {
+        question: "A rocket in space has nothing to push against. How can it speed up?",
+        hint: "Think about the momentum of the exhaust gas.",
+        answer: "It throws exhaust gas out backwards at high speed. The gas gains momentum backwards, so the rocket gains the same amount of momentum forwards."
+      },
     ],
     realWorldConnection: 'Spacecraft navigation uses momentum conservation. When a rocket expels propellant backward at high speed, the spacecraft is propelled forward — just like an astronaut throwing a spanner.',
     textbookContent: `
-## Momentum, Impulse, and Conservation Laws
+## Momentum
 
-Linear momentum is a fundamental conserved quantity in classical mechanics. For a particle of mass $m$ moving with velocity $\\vec{v}$:
+Momentum measures how hard it is to stop something that is moving. It depends on mass and on velocity:
 
-$$\\vec{p} = m\\vec{v}$$
+$$p = mv$$
 
-### Newton's Second Law (Momentum Form)
+Mass $m$ is in kilograms (kg), velocity $v$ in metres per second (m/s), and momentum $p$ in kg m/s.
 
-Newton's original formulation of his second law:
-$$\\vec{F} = \\frac{d\\vec{p}}{dt}$$
+Momentum has a direction, the same as the velocity. In a problem along a line, choose one direction as positive. Anything moving the other way then has negative momentum.
 
-For constant mass, this reduces to $F = ma$. For variable mass systems (rockets burning fuel):
-$$F = m\\frac{dv}{dt} + v_e\\frac{dm}{dt}$$
-where $v_e$ is the exhaust velocity.
+### Conservation of momentum
 
-### Conservation of Linear Momentum
+When objects collide or push apart, and no outside force acts on them:
 
-In an isolated system (no net external force):
-$$\\vec{p}_{\\text{total}} = \\sum_i m_i \\vec{v}_i = \\text{constant}$$
+**total momentum before = total momentum after**
 
-### Types of Collisions
+This is the principle of conservation of momentum. It comes from Newton's third law. During a collision the two objects push on each other with equal and opposite forces for the same length of time, so whatever momentum one loses, the other gains.
 
-| Type | Kinetic Energy | Momentum |
-|---|---|---|
-| Elastic | Conserved | Conserved |
-| Inelastic | Not conserved | Conserved |
-| Perfectly Inelastic | Max KE lost | Conserved |
+### Collisions
 
-In a **perfectly inelastic** collision, objects stick together:
-$$m_1 v_1 + m_2 v_2 = (m_1 + m_2) v_f$$
+*Example:* a 2 kg trolley moving at 3 m/s hits a stationary 1 kg trolley, and they stick together.
 
-### Impulse–Momentum Theorem
+1.  Momentum before: $(2 \\times 3) + (1 \\times 0) = 6$ kg m/s.
+2.  Afterwards they move as one object of mass 3 kg at velocity $v$, so the momentum is $3v$.
+3.  $3v = 6$, so $v = 2$ m/s.
 
-$$J = \\int_{t_1}^{t_2} F\\,dt = \\Delta p$$
+Momentum is conserved whether the objects stick together or bounce apart. What differs is the kinetic energy: when objects stick together, some of it is transferred to other stores, such as heating and sound.
 
-For constant force: $J = F \\Delta t$.
+### Pushing apart
 
-### The Tsiolkovsky Rocket Equation
+If two objects start at rest, their total momentum is zero. When they push each other apart it must still be zero, so they move in opposite directions with equal amounts of momentum. The lighter one moves faster.
 
-From momentum conservation for variable mass systems:
-$$\\Delta v = v_e \\ln\\left(\\frac{m_0}{m_f}\\right)$$
+*Example:* a 60 kg skater and an 80 kg skater push apart. If the lighter one moves at 4 m/s, then $60 \\times 4 = 80 \\times v$, so the heavier one moves at 3 m/s the other way.
 
-### References
+### How a rocket works
 
-*   [Classical Mechanics](https://www.cambridge.org/us/universitypress/subjects/physics/classical-mechanics-and-fluid-mechanics/classical-mechanics) (John R. Taylor, University Science Books)
-*   [Feynman Lectures, Vol. I, Ch. 10: Conservation of Momentum](https://www.feynmanlectures.caltech.edu/I_10.html)
-*   [NASA: How Rockets Work](https://www.grc.nasa.gov/WWW/k-12/airplane/rktpow.html)
-    `
+A rocket is the same idea, kept going. The engine throws hot gas out of the back at very high speed. The gas gains momentum backwards, so the rocket gains an equal amount forwards. The rocket is not pushing against the ground or the air, which is why it works in empty space.
+
+### Sources
+
+The topics in these notes follow the Department for Education documents below.
+
+*   [GCSE subject content for biology, chemistry and physics](https://www.gov.uk/government/publications/gcse-single-science) (Department for Education)
+*   [GCE AS and A level subject content for science](https://www.gov.uk/government/publications/gce-as-and-a-level-for-science) (Department for Education)
+`
   },
 
   // ─── STATISTICS & DATA ────────────────────────────────────────────────────────

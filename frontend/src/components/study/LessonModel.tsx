@@ -2,6 +2,12 @@
 
 import { useState, type ReactNode } from 'react';
 import GSAPSimulation from '@/components/GSAPSimulation';
+import CircuitBoard from '@/components/models/CircuitBoard';
+import GasPiston from '@/components/models/GasPiston';
+import GearTrain from '@/components/models/GearTrain';
+import MomentumTrack from '@/components/models/MomentumTrack';
+import TransferOrbit from '@/components/models/TransferOrbit';
+import TrigTriangle from '@/components/models/TrigTriangle';
 import OrbitLauncher from '@/components/paper/OrbitLauncher';
 import WaveInstrument from '@/components/paper/WaveInstrument';
 import UnitConverter from '@/components/study/UnitConverter';
@@ -44,21 +50,15 @@ function Panel({ children }: { children: ReactNode }) {
 /** The animated models, with a control where the lesson has one to adjust. */
 function AnimatedModel({ id }: { id: ConceptId }) {
   const [refractiveIndex, setRefractiveIndex] = useState(1.5);
-  const [gearRatio, setGearRatio] = useState(2);
-  const [deltaV, setDeltaV] = useState(1);
-  const [resistance, setResistance] = useState(150);
 
   const controls: Partial<Record<ConceptId, ReactNode>> = {
     prism: <Slider label="Refractive index" display={`n = ${refractiveIndex.toFixed(2)}`} min={1} max={2.5} step={0.1} value={refractiveIndex} onChange={setRefractiveIndex} />,
-    gears: <Slider label="Gear ratio" display={`${gearRatio}:1`} min={1} max={3} step={1} value={gearRatio} onChange={setGearRatio} />,
-    trajectory: <Slider label="Transfer delta-v" display={`${deltaV.toFixed(2)} km/s`} min={1} max={2.5} step={0.1} value={deltaV} onChange={setDeltaV} />,
-    circuit: <Slider label="Resistance" display={`${resistance} Ω`} min={50} max={1000} step={50} value={resistance} onChange={setResistance} />,
   };
 
   return (
     <Panel>
       <div className="mt-3 h-[360px] w-full overflow-hidden rounded-2xl ring-1 ring-white/10 lg:h-[400px]">
-        <GSAPSimulation conceptId={id} refractiveIndex={refractiveIndex} gearRatio={gearRatio} deltaV={deltaV} resistance={resistance} />
+        <GSAPSimulation conceptId={id} refractiveIndex={refractiveIndex} />
       </div>
       {controls[id] && <div className="mt-4">{controls[id]}</div>}
     </Panel>
@@ -69,6 +69,12 @@ function AnimatedModel({ id }: { id: ConceptId }) {
 export default function LessonModel({ id }: { id: ConceptId }) {
   if (id === 'gravity') return <OrbitLauncher placement="lesson" />;
   if (id === 'waves') return <WaveInstrument placement="lesson" />;
+  if (id === 'circuit') return <CircuitBoard />;
+  if (id === 'trigonometry') return <TrigTriangle />;
+  if (id === 'gears') return <GearTrain />;
+  if (id === 'momentum') return <MomentumTrack />;
+  if (id === 'thermodynamics') return <GasPiston />;
+  if (id === 'trajectory') return <TransferOrbit />;
   if (id === 'units')
     return (
       <Panel>

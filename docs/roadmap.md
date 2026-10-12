@@ -121,7 +121,16 @@ answers the "written with AI" doubt directly.
   in one). They review the lessons, and the site says so. This is the biggest gap against competitors.
 - Done 12 October 2026: lesson titles and summaries renamed to what people search for ("Dynamic Systems" became
   "Differential Equations", and so on).
-- Simplify the wording of the Foundations lessons for ages 9 to 13.
+- Done 12 October 2026: every lesson matched to the Department for Education's national curriculum or GCSE and A-level
+  subject content, quoting the statements it covers (`frontend/src/lib/curriculum.ts`). The site's levels are now key
+  stage 2, key stage 3, GCSE and A-level.
+- In progress: rewrite each lesson's notes and practice to the level of those statements, citing official sources
+  only. Done so far (9 of 29): waves, Ohm's law, trigonometry, powers and roots, and the rest of "Get to orbit"
+  (gears, momentum, thermodynamics, gravity, orbits). The other 20 still have notes pitched too high and references
+  to textbooks and other sites. Next: key stage 2.
+- Done 12 October 2026: new interactive models for circuits, trigonometry, gears, momentum, gases and transfer orbits
+  (`frontend/src/components/models/`). Their labels are small on phones and need a pass.
+- Simplify the wording of the key stage 2 lessons for ages 9 to 11.
 - Publish a privacy policy (needs a named owner and a contact email).
 - Read the first month of Analytics.
 

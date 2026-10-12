@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 
 export const metadata: Metadata = {
-  title: 'All physics and maths lessons, from foundations to A-level',
-  description: 'Browse free interactive physics and maths lessons by level: foundations, GCSE and A-level. Each has a model to experiment with, a worked example and practice questions.',
+  title: 'Physics and maths lessons for KS2, KS3, GCSE and A-level',
+  description: 'Free interactive physics and maths lessons for key stage 2, key stage 3, GCSE and A-level, each matched to the national curriculum for England.',
   alternates: { canonical: '/study' },
 };
 

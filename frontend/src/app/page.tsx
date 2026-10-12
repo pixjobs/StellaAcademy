@@ -92,8 +92,8 @@ export default async function HomePage() {
             Or pick by level
           </h2>
           <p className="mt-3 max-w-2xl text-lg leading-relaxed text-[var(--ink-soft)]">
-            Pick the level that suits you, whatever your age. The levels are our guide to difficulty and are not
-            matched to one exam board, so check your own specification if you are revising for an exam.
+            Pick the stage that suits you, whatever your age. Each lesson is matched to the national curriculum
+            for England, not to one exam board, so check your own specification if you are revising for an exam.
           </p>
           <div className="mt-8">
             <LevelCards lessons={lessonSummaries} />

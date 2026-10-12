@@ -1,7 +1,7 @@
 export const SITE_URL = 'https://www.stella-academy.org';
 export const SITE_NAME = 'Stella Academy';
 export const SITE_DESCRIPTION =
-  'Free interactive physics and maths lessons for ages 9 to 18 and beyond, from number foundations to GCSE and A-level. Each has a model to experiment with, a worked example and practice questions with answers.';
+  'Free interactive physics and maths lessons for ages 9 to 18 and beyond, from key stage 2 to GCSE and A-level, matched to the national curriculum. Each has a model to experiment with, a worked example and practice questions with answers.';
 
 /**
  * Where "Support Stella" sends people: the Ko-fi page. Override with

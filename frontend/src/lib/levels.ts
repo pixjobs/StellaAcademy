@@ -1,50 +1,57 @@
 import type { CategoryId, ConceptId } from '@/lib/study-modules';
 
-export type LevelId = 'foundations' | 'gcse' | 'a-level';
+export type LevelId = 'ks2' | 'ks3' | 'gcse' | 'a-level';
 export type SubjectId = 'physics' | 'maths';
 
-/** Youngest first. Ages are a guide to who each level suits, not a rule about who may use it. */
+/**
+ * The stages of the curriculum for England, youngest first. Ages are the usual
+ * ages for each stage, not a rule about who may use a lesson.
+ */
 export const LEVELS: { id: LevelId; label: string; ages: string; blurb: string }[] = [
-  { id: 'foundations', label: 'Foundations', ages: 'ages 9 to 13', blurb: 'Number skills and first ideas in physics.' },
-  { id: 'gcse', label: 'GCSE', ages: 'ages 14 to 16', blurb: 'The core ideas of school physics and maths.' },
-  { id: 'a-level', label: 'A-level', ages: 'ages 16 and up', blurb: 'Sixth-form topics, including further maths.' },
+  { id: 'ks2', label: 'Key stage 2', ages: 'ages 9 to 11', blurb: 'Number skills from Years 5 and 6 of primary school.' },
+  { id: 'ks3', label: 'Key stage 3', ages: 'ages 11 to 14', blurb: 'The first years of secondary school.' },
+  { id: 'gcse', label: 'GCSE', ages: 'ages 14 to 16', blurb: 'Key stage 4: the core ideas of school physics and maths.' },
+  { id: 'a-level', label: 'A-level', ages: 'ages 16 to 18', blurb: 'Sixth-form topics, including further maths.' },
 ];
 
 /**
- * Levels are an editorial guide to difficulty, not a mapping to any exam
- * board's specification. Keep that caveat visible wherever they are shown.
+ * Each lesson's stage follows the Department for Education's national
+ * curriculum and subject content (see lib/curriculum.ts for the statements).
+ * That is the content every exam board must cover; it is not a match to one
+ * board's specification, and the site should keep saying so.
  */
 const LEVEL_BY_ID: Record<ConceptId, LevelId> = {
-  arithmetic: 'foundations',
-  'basic-geometry': 'foundations',
-  multiplication: 'foundations',
-  'negative-numbers': 'foundations',
-  'decimals-percentages': 'foundations',
-  'fraction-ops': 'foundations',
-  fractions: 'foundations',
-  proportions: 'foundations',
-  gears: 'foundations',
+  arithmetic: 'ks2',
+  multiplication: 'ks2',
+  fractions: 'ks2',
+  'fraction-ops': 'ks2',
+  'decimals-percentages': 'ks2',
+  'basic-geometry': 'ks2',
 
+  'negative-numbers': 'ks3',
+  proportions: 'ks3',
+  'exponents-roots': 'ks3',
+  binary: 'ks3',
+
+  gears: 'gcse',
+  units: 'gcse',
   circuit: 'gcse',
   waves: 'gcse',
   prism: 'gcse',
   momentum: 'gcse',
   trigonometry: 'gcse',
   probability: 'gcse',
-  statistics: 'gcse',
-  'exponents-roots': 'gcse',
   vectors: 'gcse',
-  binary: 'gcse',
-  units: 'gcse',
 
+  statistics: 'a-level',
   angles: 'a-level',
   gravity: 'a-level',
   trajectory: 'a-level',
   calculus: 'a-level',
   thermodynamics: 'a-level',
   electromagnetism: 'a-level',
-  matrices: 'a-level',
   quantum: 'a-level',
+  matrices: 'a-level',
   diffeq: 'a-level',
 };
 
@@ -98,6 +105,7 @@ export type LessonSummary = {
 export function searchLabel(id: ConceptId, category: CategoryId): string {
   const subject = SUBJECT_LABEL[subjectOf(category)].toLowerCase();
   const level = LEVEL_BY_ID[id];
-  if (level === 'foundations') return `${subject} lesson for ages 9 to 13`;
+  if (level === 'ks2') return `KS2 ${subject} lesson`;
+  if (level === 'ks3') return `KS3 ${subject} lesson`;
   return `${levelLabel(id)} ${subject} lesson`;
 }
