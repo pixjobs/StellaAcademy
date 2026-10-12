@@ -19,14 +19,24 @@ export default async function HomePage() {
   // getApod falls back to a local image when NASA has no real picture; only name the picture when it is real.
   const apodTitle = apod && apod.bgUrl !== '/bg.jpg' ? apod.title : null;
 
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'WebSite',
-    name: SITE_NAME,
-    url: SITE_URL,
-    description: SITE_DESCRIPTION,
-    inLanguage: 'en-GB',
-  };
+  const jsonLd = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: SITE_NAME,
+      url: SITE_URL,
+      description: SITE_DESCRIPTION,
+      inLanguage: 'en-GB',
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'EducationalOrganization',
+      name: SITE_NAME,
+      url: SITE_URL,
+      logo: `${SITE_URL}/apple-icon.png`,
+      description: SITE_DESCRIPTION,
+    },
+  ];
 
   return (
     <>

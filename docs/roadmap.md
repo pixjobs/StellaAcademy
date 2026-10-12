@@ -60,7 +60,8 @@ product goes out, and ask NASA where anything is unclear.
 | Grant through a host | A project grant applied for by a partner organisation, with Stella named as the delivery partner (see "Seed funding") | Apply in months 3 to 9 | An academic or school partner; evidence of reach |
 | School licences | Whole-school access | Months 6 to 12 | Plus running; a legal entity |
 
-Not planned: adverts. There is no charity, so support is never described as a charitable donation and Gift Aid is
+Not planned: adverts on the site. Paid search advertising is not planned either while there is nothing to sell;
+Google's Ad Grants (free search adverts for non-profits) would suit Stella but need registered charity status. There is no charity, so support is never described as a charitable donation and Gift Aid is
 never mentioned.
 
 ## Seed funding comes before any company
@@ -118,8 +119,8 @@ answers the "written with AI" doubt directly.
 
 - Find an academic or teacher partner (a university outreach team is ideal: reviewer, subject expert and grant host
   in one). They review the lessons, and the site says so. This is the biggest gap against competitors.
-- Rename themed lesson titles ("Dynamic Systems", "Orbital Transformations", "Mission Probability", "Circuit Flow
-  (Current)", "Angle Workshop", "Light & Spectrometry") to what people search for.
+- Done 12 October 2026: lesson titles and summaries renamed to what people search for ("Dynamic Systems" became
+  "Differential Equations", and so on).
 - Simplify the wording of the Foundations lessons for ages 9 to 13.
 - Publish a privacy policy (needs a named owner and a contact email).
 - Read the first month of Analytics.

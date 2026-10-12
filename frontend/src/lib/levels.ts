@@ -93,3 +93,11 @@ export type LessonSummary = {
   level: LevelId;
   subject: SubjectId;
 };
+
+/** How a lesson's level reads in a search result, e.g. "GCSE physics lesson". */
+export function searchLabel(id: ConceptId, category: CategoryId): string {
+  const subject = SUBJECT_LABEL[subjectOf(category)].toLowerCase();
+  const level = LEVEL_BY_ID[id];
+  if (level === 'foundations') return `${subject} lesson for ages 9 to 13`;
+  return `${levelLabel(id)} ${subject} lesson`;
+}

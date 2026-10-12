@@ -13,3 +13,6 @@ export const supportEnabled = Boolean(SUPPORT_URL);
 
 /** Google Analytics 4 measurement ID (public by design). Override with NEXT_PUBLIC_GA_ID. */
 export const GA_ID = process.env.NEXT_PUBLIC_GA_ID || 'G-2WZE7ZQE3C';
+
+/** When the lessons were last revised; shown to search engines in the sitemap. Update it when content changes. */
+export const CONTENT_UPDATED = '2026-10-12';

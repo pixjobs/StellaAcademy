@@ -15,7 +15,7 @@ import { MarkDone } from '@/components/journey/MissionSteps';
 import { summaryOf } from '@/lib/lessons';
 import { INTROS } from '@/lib/intros';
 import { placeOf, stepAfter } from '@/lib/missions';
-import { levelAges, levelLabel, subjectOf, SUBJECT_LABEL } from '@/lib/levels';
+import { levelAges, levelLabel, searchLabel, subjectOf, SUBJECT_LABEL } from '@/lib/levels';
 import { PAPER_SUBJECT } from '@/lib/paper';
 import { SITE_NAME, SITE_URL, supportEnabled } from '@/lib/site';
 import { studyModules, type ConceptId } from '@/lib/study-modules';
@@ -32,12 +32,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const mod = studyModules.find((m) => m.id === id);
   if (!mod) return {};
-  const description = `${mod.subtitle} Free ${levelLabel(mod.id as ConceptId)} lesson with an interactive model, a worked example and practice questions (about ${mod.estimatedMinutes} minutes).`;
+  // The topic and level people search for come first; the site name last.
+  const kind = searchLabel(mod.id as ConceptId, mod.category);
+  const title = `${mod.title} | ${kind.charAt(0).toUpperCase()}${kind.slice(1)}`;
+  const description = `${mod.subtitle} Free interactive ${kind}: a model to try, a worked example and practice questions.`;
+  // Search results cut titles at about 60 characters, so the site name goes on only where there is room.
+  const withSite = `${title} | ${SITE_NAME}`;
+  const image = { url: '/opengraph-image.png', width: 1200, height: 630, alt: SITE_NAME };
   return {
-    title: { absolute: `${mod.title} | ${SITE_NAME}` },
+    title: { absolute: withSite.length <= 62 ? withSite : title },
     description,
     alternates: { canonical: `/study/${mod.id}` },
-    openGraph: { title: `${mod.title} | ${SITE_NAME}`, description, url: `${SITE_URL}/study/${mod.id}`, type: 'article' },
+    openGraph: { title, description, url: `${SITE_URL}/study/${mod.id}`, type: 'article', siteName: SITE_NAME, locale: 'en_GB', images: [image] },
+    twitter: { card: 'summary_large_image', title, description, images: [image.url] },
   };
 }
 
@@ -77,6 +84,17 @@ export default async function LessonPage({ params }: Props) {
     educationalLevel: level,
     timeRequired: `PT${lesson.estimatedMinutes}M`,
     provider: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL },
+    teaches: lesson.title,
+    about: { '@type': 'Thing', name: SUBJECT_LABEL[subjectOf(lesson.category)] },
+    ...(place ? { isPartOf: { '@type': 'Course', name: `${place.mission.title} (Stella's journey)`, url: `${SITE_URL}/journey#${place.mission.id}`, provider: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL }, description: place.mission.goal } } : {}),
+  };
+  const breadcrumbLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Lessons', item: `${SITE_URL}/study` },
+      { '@type': 'ListItem', position: 2, name: lesson.title, item: `${SITE_URL}/study/${lesson.id}` },
+    ],
   };
 
   const jump = [
@@ -90,7 +108,7 @@ export default async function LessonPage({ params }: Props) {
     <article>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify([jsonLd, breadcrumbLd]).replace(/</g, '\\u003c') }}
       />
 
       <SkyBand>
