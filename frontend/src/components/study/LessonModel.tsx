@@ -2,12 +2,12 @@
 
 import { useState, type ReactNode } from 'react';
 import GSAPSimulation from '@/components/GSAPSimulation';
-import CircuitBoard from '@/components/models/CircuitBoard';
-import GasPiston from '@/components/models/GasPiston';
-import GearTrain from '@/components/models/GearTrain';
-import MomentumTrack from '@/components/models/MomentumTrack';
-import TransferOrbit from '@/components/models/TransferOrbit';
-import TrigTriangle from '@/components/models/TrigTriangle';
+import CircuitBoard from '@/components/lesson-models/CircuitBoard';
+import GasPiston from '@/components/lesson-models/GasPiston';
+import GearTrain from '@/components/lesson-models/GearTrain';
+import MomentumTrack from '@/components/lesson-models/MomentumTrack';
+import TransferOrbit from '@/components/lesson-models/TransferOrbit';
+import TrigTriangle from '@/components/lesson-models/TrigTriangle';
 import OrbitLauncher from '@/components/paper/OrbitLauncher';
 import WaveInstrument from '@/components/paper/WaveInstrument';
 import UnitConverter from '@/components/study/UnitConverter';

@@ -129,7 +129,7 @@ answers the "written with AI" doubt directly.
   (gears, momentum, thermodynamics, gravity, orbits). The other 20 still have notes pitched too high and references
   to textbooks and other sites. Next: key stage 2.
 - Done 12 October 2026: new interactive models for circuits, trigonometry, gears, momentum, gases and transfer orbits
-  (`frontend/src/components/models/`). Their labels are small on phones and need a pass.
+  (`frontend/src/components/lesson-models/`). Their labels are small on phones and need a pass.
 - Simplify the wording of the key stage 2 lessons for ages 9 to 11.
 - Publish a privacy policy (needs a named owner and a contact email).
 - Read the first month of Analytics.
