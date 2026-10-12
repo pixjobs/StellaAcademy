@@ -171,10 +171,11 @@ export default function GalleryPage() {
     setPage(nextPage);
   };
 
-  const search = (wanted: string) => {
+  // What people type is never sent to Analytics: only whether they typed or picked a suggestion.
+  const search = (wanted: string, source: 'typed' | 'suggestion') => {
     const cleaned = wanted.trim();
     if (!cleaned) return;
-    track('gallery_search', { query: cleaned.slice(0, 60) });
+    track('gallery_search', { source });
     show(cleaned, 1);
   };
 
@@ -194,7 +195,7 @@ export default function GalleryPage() {
           role="search"
           onSubmit={(e) => {
             e.preventDefault();
-            search(typed);
+            search(typed, 'typed');
           }}
           className="mt-8 flex max-w-2xl flex-col gap-3 sm:flex-row"
         >
@@ -224,7 +225,7 @@ export default function GalleryPage() {
                 aria-pressed={active}
                 onClick={() => {
                   setTyped('');
-                  search(s.query);
+                  search(s.query, 'suggestion');
                 }}
                 className={`rounded-full border px-4 py-1.5 text-[15px] font-semibold ${FOCUS_RING} ${
                   active ? 'border-white bg-white text-[#0b1026]' : 'border-white/30 text-white hover:border-white'
