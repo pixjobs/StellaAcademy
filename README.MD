@@ -17,7 +17,7 @@ space.
   lesson. Six other lessons have a short piece of real footage behind a "See it for real" button.
 - **NASA image gallery** (`/gallery`): a search of the NASA Image and Video Library.
 
-There are no accounts and no AI tutor at present. (`docs/roadmap.md` dates from the earlier build and is out of date.)
+There are no accounts and no AI tutor at present. Both are planned: see `docs/roadmap.md`.
 
 The lessons were drafted with AI and have been checked for arithmetic and for errors of explanation
 (`docs/content-audit.md`), but they have not yet been reviewed by a teacher.
