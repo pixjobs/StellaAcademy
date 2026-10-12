@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState, useSyncExternalStore } from 'react';
 import { LessonCard } from '@/components/paper/LevelCards';
 import { LEVELS, SUBJECT_LABEL, type LessonSummary, type LevelId, type SubjectId } from '@/lib/levels';
 
@@ -24,16 +24,20 @@ function Chip({ active, onClick, children }: { active: boolean; onClick: () => v
   );
 }
 
+const noSubscription = () => () => {};
+
+function levelFromUrl(): LevelId | null {
+  const wanted = new URLSearchParams(window.location.search).get('level');
+  return LEVELS.some((l) => l.id === wanted) ? (wanted as LevelId) : null;
+}
+
 export default function LessonIndex({ lessons }: { lessons: LessonSummary[] }) {
-  const [level, setLevel] = useState<LevelFilter>('all');
+  // Honour links like /study?level=gcse without making the page dynamic on the server.
+  const linked = useSyncExternalStore(noSubscription, levelFromUrl, () => null);
+  const [chosen, setLevel] = useState<LevelFilter | null>(null);
+  const level: LevelFilter = chosen ?? linked ?? 'all';
   const [subject, setSubject] = useState<SubjectFilter>('all');
   const [query, setQuery] = useState('');
-
-  // Honour links like /study?level=gcse without making the page dynamic on the server.
-  useEffect(() => {
-    const wanted = new URLSearchParams(window.location.search).get('level');
-    if (LEVELS.some((l) => l.id === wanted)) setLevel(wanted as LevelId);
-  }, []);
 
   const chooseLevel = (next: LevelFilter) => {
     setLevel(next);

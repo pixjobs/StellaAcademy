@@ -1,7 +1,7 @@
 'use client';
 
 import Script from 'next/script';
-import { useEffect, useState } from 'react';
+import { useEffect, useSyncExternalStore } from 'react';
 import { GA_ID } from '@/lib/site';
 
 const CONSENT_KEY = 'stella-analytics-consent';
@@ -15,7 +15,19 @@ declare global {
   }
 }
 
+// The visitor's choice lives in localStorage; `session` covers browsers where storage is unavailable.
+let session: Consent | null = null;
+const listeners = new Set<() => void>();
+
+function subscribe(listener: () => void) {
+  listeners.add(listener);
+  return () => {
+    listeners.delete(listener);
+  };
+}
+
 function readConsent(): Consent | null {
+  if (session) return session;
   try {
     const v = localStorage.getItem(CONSENT_KEY);
     return v === 'granted' || v === 'denied' ? v : null;
@@ -23,6 +35,8 @@ function readConsent(): Consent | null {
     return null;
   }
 }
+
+const unknownOnServer = () => undefined;
 
 function applyConsent(value: Consent) {
   window.gtag?.('consent', 'update', { analytics_storage: value });
@@ -33,22 +47,21 @@ function applyConsent(value: Consent) {
  * and only granted once the visitor accepts (UK PECR / GDPR).
  */
 export default function Analytics() {
-  const [choice, setChoice] = useState<Consent | null | undefined>(undefined);
+  // undefined until the browser has been asked, so the banner never flashes for someone who has already chosen.
+  const choice = useSyncExternalStore<Consent | null | undefined>(subscribe, readConsent, unknownOnServer);
 
   useEffect(() => {
-    const stored = readConsent();
-    setChoice(stored);
-    if (stored) applyConsent(stored);
-  }, []);
+    if (choice) applyConsent(choice);
+  }, [choice]);
 
   const decide = (value: Consent) => {
+    session = value;
     try {
       localStorage.setItem(CONSENT_KEY, value);
     } catch {
       /* storage unavailable: choice lasts for this page view only */
     }
-    applyConsent(value);
-    setChoice(value);
+    listeners.forEach((listener) => listener());
   };
 
   return (

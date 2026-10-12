@@ -10,10 +10,6 @@
 /*                                    Types                                   */
 /* -------------------------------------------------------------------------- */
 
-interface NextRequestInit extends RequestInit { 
-  next?: { revalidate: number };
-}
-
 // Types similar to the original but simplified
 export type Apod = {
   date: string;
@@ -52,10 +48,6 @@ const REVALIDATE_HOUR = 60 * 60;
 /* -------------------------------------------------------------------------- */
 /*                                   Helpers                                   */
 /* -------------------------------------------------------------------------- */
-
-function intEnv(name: string, fallback: number): number {
-  return Number(process.env[name]) || fallback;
-}
 
 /* -------------------------------------------------------------------------- */
 /*                     APOD (Astronomy Picture of the Day)                    */
@@ -227,11 +219,11 @@ async function cachedJson<T>(
   if (cached) {
     if (now >= cached.fetchedAt + cached.soft) {
       // Soft expired - make a background refresh
-      doFetch(url, revalidateSeconds).catch(() => {});
+      doFetch(url).catch(() => {});
     }
     if (now >= cached.fetchedAt + cached.hard) {
       jsonCache.delete(key as string);
-      const fresh = await doFetch<T>(url, revalidateSeconds);
+      const fresh = await doFetch<T>(url);
       if (fresh !== null) {
         jsonCache.set(key as string, {
           value: fresh,
@@ -246,7 +238,7 @@ async function cachedJson<T>(
   }
 
   // No cache, fetch and store
-  const fresh = await doFetch<T>(url, revalidateSeconds);
+  const fresh = await doFetch<T>(url);
   if (fresh !== null) {
     jsonCache.set(key as string, {
       value: fresh,
@@ -258,7 +250,7 @@ async function cachedJson<T>(
   return fresh;
 }
 
-async function doFetch<T>(url: string, revalidateSeconds: number): Promise<T | null> {
+async function doFetch<T>(url: string): Promise<T | null> {
   const timeoutMs = 15_000;
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);

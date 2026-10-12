@@ -2,7 +2,6 @@
 
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
-import * as math from 'mathjs';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 

@@ -175,15 +175,14 @@ export default function MarkdownRenderer({ children, onCaptureFragment }: Props)
     [onCaptureFragment]
   );
 
-  const Heading = (Tag: 'h1' | 'h2' | 'h3' | 'h4') => {
-    const Component = ({ node, ...props }: ComponentProps<typeof Tag> & { node?: Element }) => (
-      <Capturable node={node} onCapture={onCaptureFragment}>
-        <Tag {...props} />
-      </Capturable>
-    );
-    Component.displayName = `MarkdownHeading(${Tag})`;
-    return Component;
-  };
+  const Heading = (Tag: 'h1' | 'h2' | 'h3' | 'h4') =>
+    function MarkdownHeading({ node, ...props }: ComponentProps<typeof Tag> & { node?: Element }) {
+      return (
+        <Capturable node={node} onCapture={onCaptureFragment}>
+          <Tag {...props} />
+        </Capturable>
+      );
+    };
 
   // FIX for `_node` is defined but never used:
   // We explicitly destructure only the props we care about (`src` and `alt`)

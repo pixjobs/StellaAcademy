@@ -2285,11 +2285,11 @@ Perform long division, dividing the numerator by the denominator.
 *Example:* $\\frac{5}{8} = 5 \\div 8 = 0.625$
 
 **2. Decimal to Percentage:**
-Multiply the decimal by 100 (which moves the decimal point two places to the right) and append the $\%$ symbol.
+Multiply the decimal by 100 (which moves the decimal point two places to the right) and append the $\\%$ symbol.
 *Example:* $0.625 \\times 100 = 62.5\\%$
 
 **3. Percentage to Decimal:**
-Divide the percentage by 100 (which moves the decimal point two places to the left) and remove the $\%$ symbol.
+Divide the percentage by 100 (which moves the decimal point two places to the left) and remove the $\\%$ symbol.
 *Example:* $42\\% = 42 \\div 100 = 0.42$
 
 ### Calculating with Percentages
@@ -2820,7 +2820,7 @@ $$93{,}000{,}000 = 9.3 \\times 10^7$$
       { type: 'variable', symbol: 'n' },
       { type: 'variable', symbol: 'R' },
       { type: 'variable', symbol: 'T' },
-    ] as any,
+    ],
     variables: [
       {
         symbol: 'P',
@@ -2973,7 +2973,7 @@ where $k_B = 1.38 \\times 10^{-23}$ J/K is the Boltzmann constant.
       { type: 'operator', content: '=' },
       { type: 'variable', symbol: 'm' },
       { type: 'variable', symbol: 'v' },
-    ] as any,
+    ],
     variables: [
       {
         symbol: 'p',
@@ -3116,7 +3116,7 @@ $$\\Delta v = v_e \\ln\\left(\\frac{m_0}{m_f}\\right)$$
         numerator: [{ type: 'static', latex: '\\sum (x_i - \\mu)^2' }],
         denominator: [{ type: 'variable', symbol: 'N' }]
       }
-    ] as any,
+    ],
     variables: [
       {
         symbol: '\\sigma',
@@ -3262,7 +3262,7 @@ Two variables may be statistically correlated without one causing the other. Est
         numerator: [{ type: 'static', latex: 'd\\Phi_B' }],
         denominator: [{ type: 'static', latex: 'dt' }]
       }
-    ] as any,
+    ],
     variables: [
       {
         symbol: '\\mathcal{E}',
@@ -3393,7 +3393,7 @@ $$\\nabla \\times \\vec{E} = -\\frac{\\partial \\vec{B}}{\\partial t}$$
       { type: 'operator', content: '=' },
       { type: 'variable', symbol: 'h' },
       { type: 'variable', symbol: 'f' },
-    ] as any,
+    ],
     variables: [
       {
         symbol: 'E',

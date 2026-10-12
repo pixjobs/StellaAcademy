@@ -3,13 +3,13 @@
  * shooting star. Seeded, so the server and the browser draw the same sky.
  * All motion stops for anyone who has asked for reduced motion.
  */
-export default function Starfield({ count = 150, className = '' }: { count?: number; className?: string }) {
+function makeStars(count: number) {
   let seed = 20261011;
   const rand = () => {
     seed = (seed * 1664525 + 1013904223) % 4294967296;
     return seed / 4294967296;
   };
-  const stars = Array.from({ length: count }, () => {
+  return Array.from({ length: count }, () => {
     const big = rand() > 0.9;
     return {
       x: rand() * 1000,
@@ -22,6 +22,10 @@ export default function Starfield({ count = 150, className = '' }: { count?: num
       offset: rand() * 7,
     };
   });
+}
+
+export default function Starfield({ count = 150, className = '' }: { count?: number; className?: string }) {
+  const stars = makeStars(count);
   return (
     <svg viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid slice" aria-hidden="true" className={`pointer-events-none absolute inset-0 h-full w-full ${className}`}>
       <defs>

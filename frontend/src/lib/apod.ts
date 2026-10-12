@@ -1,6 +1,5 @@
 // Simplified APOD fetcher for educational purposes
 // No server-only directive needed since we're not using secrets
-import { NextResponse } from 'next/server';
 
 // Types
 export type Apod = {
