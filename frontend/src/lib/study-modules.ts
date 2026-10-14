@@ -3163,24 +3163,24 @@ The topics in these notes follow the Department for Education document below.
     variables: [
       {
         symbol: 's',
-        name: 'Arc Length',
-        unit: 'm',
+        name: 'Arc length',
+        unit: 'metres (m)',
         description: 'The distance along the curved edge of a sector.',
         color: 'text-cyan-400'
       },
       {
         symbol: 'r',
         name: 'Radius',
-        unit: 'm',
+        unit: 'metres (m)',
         description: 'The straight-line distance from the centre to the edge.',
         color: 'text-rose-400',
         range: { min: 1, max: 10, default: 5 }
       },
       {
         symbol: '\\theta',
-        name: 'Angle (Radians)',
-        unit: 'rad',
-        description: 'The measure of the central angle in radians.',
+        name: 'Angle at the centre',
+        unit: 'radians (rad)',
+        description: 'The angle between the two radii, measured in radians.',
         color: 'text-amber-400',
         range: { min: 0, max: 6.28, default: 1.57 }
       }
@@ -3188,34 +3188,35 @@ The topics in these notes follow the Department for Education document below.
     conceptSteps: [
       {
         stepNumber: 1,
-        title: 'Degrees vs Radians',
-        content: 'While degrees (360 in a circle) are common, mathematicians prefer radians. A radian is the angle created when the arc length equals the radius. A full circle is 2π radians.',
-        keyInsight: 'Radians directly relate the angle to the physical distance around the circle.',
+        title: 'Degrees and radians',
+        content: 'A full turn is 360 degrees. At A-level, angles are usually measured in radians instead. An angle of one radian cuts off an arc exactly as long as the radius. The circumference is $2\\pi$ times the radius, so a full turn is $2\\pi$ radians.',
+        keyInsight: 'A radian links an angle to the distance around the circle.',
         relatedVariables: ['\\theta']
       },
       {
         stepNumber: 2,
-        title: 'Arc Length',
-        content: 'If you know the radius of a circle and the central angle in radians, the arc length is simply their product.',
-        keyInsight: 'This formula only works if the angle is in radians!',
+        title: 'Arc length',
+        content: 'An arc is part of the edge of a circle. With the angle at the centre in radians, the arc length is the radius times the angle: $s = r\\theta$.',
+        keyInsight: 'This only works with the angle in radians. In degrees you need the fraction of 360 instead.',
         relatedVariables: ['s', 'r', '\\theta']
       },
       {
         stepNumber: 3,
-        title: 'Sector Area',
-        content: 'The area of the "slice of pie" (sector) is given by A = (1/2) * r² * θ. This is directly derived from the area of a full circle.',
-        keyInsight: 'Sector area scales quadratically with radius but linearly with the angle.',
+        title: 'Sector area',
+        content: 'A sector is a pie-slice shape cut out by two radii. With $\\theta$ in radians, its area is $A = \\dfrac{1}{2} r^2 \\theta$. This is the area of the whole circle, $\\pi r^2$, times the fraction of the turn, $\\dfrac{\\theta}{2\\pi}$.',
+        keyInsight: 'Double the radius and the area is four times as big. Double the angle and the area doubles.',
         relatedVariables: ['r', '\\theta']
       }
     ],
     solvedExample: {
-      problem: 'Find the arc length of a circular sector with radius $r = 4\\text{m}$ and angle $\\theta = \\frac{\\pi}{2}$ radians.',
+      problem: 'A sector has radius $r = 4$ m and angle $\\theta = \\dfrac{\\pi}{2}$ radians. Find its arc length and its area.',
       steps: [
-        'Use the arc length formula: $s = r \\cdot \\theta$.',
-        'Substitute the given values: $s = 4 \\cdot \\frac{\\pi}{2}$.',
-        'Simplify the expression: $s = 2\\pi \\approx 6.28\\text{m}$.'
+        'Arc length: $s = r\\theta = 4 \\times \\dfrac{\\pi}{2} = 2\\pi$ m.',
+        'As a decimal, $2\\pi \\approx 6.28$ m.',
+        'Area: $A = \\dfrac{1}{2} r^2 \\theta = \\dfrac{1}{2} \\times 16 \\times \\dfrac{\\pi}{2} = 4\\pi$ m².',
+        'As a decimal, $4\\pi \\approx 12.6$ m².'
       ],
-      resultFormula: 's = 2\\pi \\text{ m}'
+      resultFormula: 's = 2\\pi \\approx 6.28 \\text{ m}, \\quad A = 4\\pi \\approx 12.6 \\text{ m}^2'
     },
     practiceProblems: [
       {
@@ -3249,7 +3250,7 @@ The topics in these notes follow the Department for Education document below.
         answer: "About 11,000 km ($42{,}164 \\times \\frac{\\pi}{12} \\approx 11{,}040$ km)"
       },
     ],
-    realWorldConnection: 'Civil engineers use arc length and central angles to design safe curves in roads and railways. The radius must be large enough (and the curve gentle enough) to prevent derailments or slipping.',
+    realWorldConnection: 'Railway curves are often laid out as arcs of circles. The length of track around a curve follows from its radius and the angle it turns through.',
     textbookContent: `
 ## Radians, arcs and sectors
 
@@ -3265,33 +3266,30 @@ At A-level, angles are usually measured in **radians**. One radian is the angle 
 
 The whole circumference is $2\\pi r$, which is $2\\pi$ radius-lengths, so
 
-$$360° = 2\\pi \\text{ radians} \\qquad 180° = \\pi \\text{ radians}$$
+$$360° = 2\\pi \\text{ radians}$$
 
-*   Degrees to radians: multiply by $\\dfrac{\\pi}{180}$. So $60° = \\dfrac{\\pi}{3}$.
+*   Degrees to radians: multiply by $\\dfrac{\\pi}{180}$. So $90° = \\dfrac{\\pi}{2}$.
 *   Radians to degrees: multiply by $\\dfrac{180}{\\pi}$. So $2 \\text{ rad} \\approx 114.6°$.
 
 ### Arcs and sectors in radians
 
-With $\\theta$ in radians, the formulas become much simpler, because the $\\dfrac{\\theta}{2\\pi}$ fraction cancels:
+With $\\theta$ in radians, the fraction of the circle is $\\dfrac{\\theta}{2\\pi}$, and the formulas become much simpler:
 
 $$s = r\\theta \\qquad A = \\frac{1}{2} r^2 \\theta$$
 
 These formulas only work with the angle in radians.
 
-### Worked example
-
-Find the arc length and sector area for $r = 4$ m and $\\theta = \\dfrac{\\pi}{2}$.
-
-1.  $s = 4 \\times \\dfrac{\\pi}{2} = 2\\pi \\approx 6.28$ m
-2.  $A = \\dfrac{1}{2} \\times 16 \\times \\dfrac{\\pi}{2} = 4\\pi \\approx 12.6$ m²
-
 ### Why radians are used
 
-In radians, an angle is a ratio of two lengths, arc over radius, so it has no unit. That is why later results, such as $\\sin\\theta \\approx \\theta$ for small angles and the derivative of $\\sin x$ being $\\cos x$, only work in radians.
+In radians, an angle is a ratio of two lengths, arc over radius, so it is a pure number. Because of this, later results such as $\\sin\\theta \\approx \\theta$ for small angles, and the derivative of $\\sin x$ being $\\cos x$, only work in radians.
 
 ### Satellites going round
 
-A satellite in a circular orbit sweeps out equal angles in equal times. A geostationary satellite, 42,164 km from the centre of the Earth, turns $2\\pi$ radians a day, which is $\\dfrac{\\pi}{12}$ radians an hour. Each hour it travels $s = r\\theta = 42{,}164 \\times \\dfrac{\\pi}{12} \\approx 11{,}000$ km.
+A satellite in a circular orbit sweeps out equal angles in equal times. A geostationary satellite, 42,164 km from the centre of the Earth, turns $2\\pi$ radians in a day (strictly 23 hours 56 minutes, the time Earth takes to spin once), so you can work out how far it goes in any part of a day.
+
+### Next on the journey
+
+As a spacecraft turns, every direction it measures turns with it. How can one calculation turn every point at once? That is the next lesson, on matrices.
 
 ### Sources
 

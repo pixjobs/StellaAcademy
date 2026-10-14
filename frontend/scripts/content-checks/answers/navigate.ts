@@ -163,4 +163,90 @@ export const ENTRIES: Entry[] = [
       return { holds: gain < dv / 10, detail: `0.1 km/s sideways at 7.7 km/s turns it ${turn.toFixed(2)}° and adds only ${(gain * 1000).toFixed(2)} m/s of speed` };
     },
   },
+
+  // ======================================================================================== angles
+  {
+    lesson: 'angles', where: 'solvedExample.steps[0]', expectQuestionIncludes: 'A sector has radius $r = 4$ m and angle $\\theta = \\dfrac{\\pi}{2}$',
+    stated: '= 2\\pi$ m', note: 'The number before π.', compute: () => (4 * (Math.PI / 2)) / Math.PI, expected: 2, tolerance: 1e-9, unit: 'π m',
+  },
+  {
+    lesson: 'angles', where: 'solvedExample.steps[1]', expectQuestionIncludes: 'A sector has radius $r = 4$ m and angle $\\theta = \\dfrac{\\pi}{2}$',
+    stated: '\\approx 6.28', compute: () => 4 * (Math.PI / 2), expected: 6.2832, tolerance: 0.005, unit: 'm',
+  },
+  {
+    lesson: 'angles', where: 'solvedExample.steps[2] (r squared)', expectQuestionIncludes: 'A sector has radius $r = 4$ m and angle $\\theta = \\dfrac{\\pi}{2}$',
+    stated: '\\dfrac{1}{2} \\times 16 \\times', pick: 2, compute: () => 4 ** 2, expected: 16, tolerance: 0, unit: 'm²',
+  },
+  {
+    lesson: 'angles', where: 'solvedExample.steps[2] (area)', expectQuestionIncludes: 'A sector has radius $r = 4$ m and angle $\\theta = \\dfrac{\\pi}{2}$',
+    stated: '= 4\\pi$ m²', note: 'The number before π.', compute: () => (0.5 * 4 ** 2 * (Math.PI / 2)) / Math.PI, expected: 4, tolerance: 1e-9, unit: 'π m²',
+  },
+  {
+    lesson: 'angles', where: 'solvedExample.steps[3]', expectQuestionIncludes: 'A sector has radius $r = 4$ m and angle $\\theta = \\dfrac{\\pi}{2}$',
+    stated: '\\approx 12.6', compute: () => 0.5 * 4 ** 2 * (Math.PI / 2), expected: 12.566, tolerance: 0.05, unit: 'm²',
+  },
+  {
+    lesson: 'angles', where: 'solvedExample.resultFormula (arc)', expectQuestionIncludes: 'A sector has radius $r = 4$ m and angle $\\theta = \\dfrac{\\pi}{2}$',
+    stated: '\\approx 6.28', compute: () => 4 * (Math.PI / 2), expected: 6.2832, tolerance: 0.005, unit: 'm',
+  },
+  {
+    lesson: 'angles', where: 'solvedExample.resultFormula (area)', expectQuestionIncludes: 'A sector has radius $r = 4$ m and angle $\\theta = \\dfrac{\\pi}{2}$',
+    stated: '\\approx 12.6', compute: () => 0.5 * 4 ** 2 * (Math.PI / 2), expected: 12.566, tolerance: 0.05, unit: 'm²',
+  },
+  {
+    lesson: 'angles', where: 'practiceProblems[0]', kind: 'qualitative', expectQuestionIncludes: 'Convert 180° to radians',
+    expectAnswerIncludes: '$\\pi$ radians',
+    verify: () => ({ holds: near(180 * DEG, Math.PI), detail: '180 × π/180 = π' }),
+  },
+  {
+    lesson: 'angles', where: 'practiceProblems[1]', kind: 'qualitative', expectQuestionIncludes: 'Convert 60° to radians',
+    expectAnswerIncludes: '$\\frac{\\pi}{3}$ radians',
+    verify: () => ({ holds: near(60 * DEG, Math.PI / 3), detail: '60 × π/180 = π/3' }),
+  },
+  {
+    lesson: 'angles', where: 'practiceProblems[2]', expectQuestionIncludes: 'An arc has length 10 cm on a circle of radius 5 cm',
+    compute: () => 10 / 5, expected: 2, tolerance: 1e-9, unit: 'rad',
+  },
+  {
+    lesson: 'angles', where: 'practiceProblems[3] (exact)', expectQuestionIncludes: 'area of a sector of radius 6 cm with an angle of $\\frac{\\pi}{3}$',
+    stated: '$6\\pi', note: 'The number before π.', compute: () => (0.5 * 36 * (Math.PI / 3)) / Math.PI, expected: 6, tolerance: 1e-9, unit: 'π cm²',
+  },
+  {
+    lesson: 'angles', where: 'practiceProblems[3] (decimal)', expectQuestionIncludes: 'area of a sector of radius 6 cm with an angle of $\\frac{\\pi}{3}$',
+    stated: '\\approx 18.8', compute: () => 0.5 * 36 * (Math.PI / 3), expected: 18.850, tolerance: 0.05, unit: 'cm²',
+  },
+  {
+    lesson: 'angles', where: 'practiceProblems[4] (exact)', expectQuestionIncludes: 'arc of angle 72° on a circle of radius 10 cm',
+    stated: '$4\\pi', note: 'The number before π.', compute: () => ((72 / 360) * 2 * Math.PI * 10) / Math.PI, expected: 4, tolerance: 1e-9, unit: 'π cm',
+  },
+  {
+    lesson: 'angles', where: 'practiceProblems[4] (decimal)', expectQuestionIncludes: 'arc of angle 72° on a circle of radius 10 cm',
+    stated: '\\approx 12.6', compute: () => (72 / 360) * 2 * Math.PI * 10, expected: 12.566, tolerance: 0.05, unit: 'cm',
+  },
+  {
+    lesson: 'angles', where: 'practiceProblems[5] (worked)', expectQuestionIncludes: 'A geostationary satellite orbits 42,164 km from the centre of the Earth',
+    stated: '\\approx 11{,}040', compute: () => 42164 * (Math.PI / 12), expected: 11038.6, tolerance: 5, unit: 'km',
+  },
+  {
+    lesson: 'angles', where: 'practiceProblems[5] (rounded)', expectQuestionIncludes: 'A geostationary satellite orbits 42,164 km from the centre of the Earth',
+    stated: 'About 11,000 km', note: 'Also true with the sidereal day (23.93 h): 11,069 km.',
+    compute: () => (42164 * 2 * Math.PI) / 23.9345, expected: 11068.6, tolerance: 500, unit: 'km',
+  },
+  {
+    lesson: 'angles', where: 'textbookContent: degrees to radians', expectNotesIncludes: 'Degrees to radians: multiply by',
+    stated: 'So $90° = \\dfrac{\\pi}{2}$', pick: 1, note: 'The denominator under π.', compute: () => Math.PI / (90 * DEG), expected: 2, tolerance: 1e-9, unit: '',
+  },
+  {
+    lesson: 'angles', where: 'textbookContent: radians to degrees', expectNotesIncludes: 'Radians to degrees: multiply by',
+    stated: 'So $2 \\text{ rad} \\approx 114.6°$', pick: 1, compute: () => 2 / DEG, expected: 114.59, tolerance: 0.05, unit: '°',
+  },
+  {
+    lesson: 'angles', where: 'textbookContent: sidereal day', kind: 'claim', expectNotesIncludes: '### Satellites going round',
+    claimIncludes: 'strictly 23 hours 56 minutes',
+    verify: () => {
+      const sidereal = 86164.1; // s
+      const h = Math.floor(sidereal / 3600), m = Math.round((sidereal - h * 3600) / 60);
+      return { holds: h === 23 && m === 56, detail: `Earth spins once in ${sidereal} s = ${h} h ${m} min` };
+    },
+  },
 ];
