@@ -123,12 +123,12 @@ export const ENTRIES: Entry[] = [
     compute: () => 2 * 1.5, expected: 3, tolerance: 1e-9, unit: 'm/s',
   },
   {
-    lesson: 'waves', where: 'practiceProblems[3]', kind: 'qualitative', expectQuestionIncludes: 'a 2 GHz Wi-Fi signal or a 5 GHz Wi-Fi signal',
+    lesson: 'waves', where: 'practiceProblems[3]', kind: 'qualitative', expectQuestionIncludes: 'a 2.4 GHz Wi-Fi signal or a 5 GHz Wi-Fi signal',
     expectAnswerIncludes: 'The 5 GHz signal',
     verify: () => {
-      const l2 = C_LESSON / (2 * GIGA);
+      const l24 = C_LESSON / (2.4 * GIGA);
       const l5 = C_LESSON / (5 * GIGA);
-      return { holds: l5 < l2, detail: `${l5} m at 5 GHz against ${l2} m at 2 GHz` };
+      return { holds: l5 < l24, detail: `${l5} m at 5 GHz against ${l24} m at 2.4 GHz` };
     },
   },
   {

@@ -818,14 +818,14 @@ The topics in these notes follow the Department for Education documents below.
       {
         stepNumber: 1,
         title: 'Potential difference drives the current',
-        content: 'A battery provides a potential difference. It drives charge round the circuit, but only if the circuit is a complete loop with no gaps. Around a single loop, the current is the same everywhere.',
+        content: 'A battery provides a potential difference. It drives charge round the circuit, but only if the circuit is a complete loop with no gaps. Around a single loop, the current is the same everywhere. The charge that flows in a time $t$ is $Q = It$, measured in coulombs (C).',
         keyInsight: 'No potential difference, or a gap in the circuit, means no current.',
         relatedVariables: ['V', 'I']
       },
       {
         stepNumber: 2,
         title: 'Resistance limits the current',
-        content: 'Every component and wire has some resistance. With the same potential difference across it, a component with more resistance lets less current through. Resistors are often added to a circuit to keep the current low enough for a delicate component such as an LED.',
+        content: 'Every component and wire has some resistance. With the same potential difference across it, a component with more resistance lets less current through. Resistors are often added to a circuit to keep the current low enough for a delicate component such as an LED (light-emitting diode). Resistors in series add; adding a parallel branch lowers the total resistance.',
         keyInsight: 'More resistance means less current for the same potential difference.',
         relatedVariables: ['R', 'I']
       },
@@ -878,7 +878,7 @@ The topics in these notes follow the Department for Education documents below.
         answer: "The total resistance goes down, so the current from the battery goes up."
       },
     ],
-    realWorldConnection: 'A spacecraft runs on electricity from its solar panels and batteries. Engineers use these relationships to work out the current each part will draw, and to choose wires and fuses that can carry it.',
+    realWorldConnection: 'Most spacecraft run on electricity from solar panels and batteries. Engineers use these relationships to work out the current each part will draw, and to choose wires and fuses that can carry it.',
     textbookContent: `
 ## Current, potential difference and resistance
 
@@ -924,7 +924,7 @@ In a **parallel** circuit the components are on separate branches.
 *   The currents in the branches add up to the current from the supply.
 *   Adding a branch gives the charge another route, so the total resistance goes down.
 
-### Worked example
+### Example: two resistors in series
 
 A 100 $\\Omega$ resistor and a 200 $\\Omega$ resistor are in series with a 6 V battery.
 
@@ -935,11 +935,11 @@ A 100 $\\Omega$ resistor and a 200 $\\Omega$ resistor are in series with a 6 V b
 
 ### Power
 
-The power a component transfers is:
+Power is the rate at which energy is transferred, measured in watts (W). For a component:
 
 $$P = VI = I^2 R$$
 
-Power is measured in watts (W). A spacecraft's heaters are resistors chosen to transfer a known amount of electrical power to heating.
+A spacecraft's electric heaters are resistors chosen to transfer energy at a known rate.
 
 ### Next on the journey
 
@@ -983,7 +983,7 @@ The topics in these notes follow the Department for Education documents below.
       {
         symbol: 'v',
         name: 'Wave speed',
-        unit: 'm/s',
+        unit: 'metres per second (m/s)',
         description: 'How fast the wave travels. It is set by what the wave travels through. Radio waves and light travel at $3.0 \\times 10^8$ m/s in space.',
         color: 'text-teal-400'
       },
@@ -1000,7 +1000,7 @@ The topics in these notes follow the Department for Education documents below.
       {
         stepNumber: 1,
         title: 'What a wave is',
-        content: 'A wave carries energy and information from place to place. The water, air or rope it passes through only moves back and forth about where it started. Frequency counts how many waves pass each second; the period, $T = \\dfrac{1}{f}$, is how long one wave takes.',
+        content: 'A wave carries energy and information from place to place. The water, air or rope it passes through only moves about where it started. Frequency counts how many waves pass each second; the period, $T = \\dfrac{1}{f}$, is how long one wave takes.',
         keyInsight: 'The wave moves on, but the material it passes through stays where it is.',
         relatedVariables: ['f']
       },
@@ -1017,6 +1017,13 @@ The topics in these notes follow the Department for Education documents below.
         content: 'Radio waves of every frequency travel through space at the same speed. Sound of every pitch travels through air at the same speed. When the speed stays the same, doubling the frequency halves the wavelength.',
         keyInsight: 'At a fixed speed, high frequency means short wavelength and low frequency means long wavelength.',
         relatedVariables: ['\\lambda', 'f']
+      },
+      {
+        stepNumber: 4,
+        title: 'Transverse and longitudinal',
+        content: 'In a transverse wave the vibrations are at right angles to the way the wave moves, as in ripples on a pond and radio waves. In a longitudinal wave they go back and forth along the way the wave moves, as in sound.',
+        keyInsight: 'Transverse: vibrations across the direction of travel. Longitudinal: vibrations along it.',
+        relatedVariables: []
       }
     ],
     solvedExample: {
@@ -1045,8 +1052,8 @@ The topics in these notes follow the Department for Education documents below.
         answer: "3 m/s"
       },
       {
-        question: "Which has the shorter wavelength: a 2 GHz Wi-Fi signal or a 5 GHz Wi-Fi signal?",
-        hint: "Both travel at the same speed, so the higher frequency has the shorter wavelength.",
+        question: "Which has the shorter wavelength: a 2.4 GHz Wi-Fi signal or a 5 GHz Wi-Fi signal?",
+        hint: "Both travel at the same speed. Use $\\lambda = v \\div f$, or think about what a higher frequency does.",
         answer: "The 5 GHz signal."
       },
       {
@@ -1060,7 +1067,7 @@ The topics in these notes follow the Department for Education documents below.
         answer: "About 0.036 m, or 3.6 cm"
       },
     ],
-    realWorldConnection: "NASA's Deep Space Network keeps in touch with distant spacecraft, such as Voyager 1, using radio dishes up to 70 metres across in California, Spain and Australia. Radio waves need nothing to travel through, so the signals cross billions of kilometres of empty space.",
+    realWorldConnection: "NASA's Deep Space Network keeps in touch with distant spacecraft, such as Voyager 1, using radio dishes up to 70 metres across in California, Spain and Australia. Radio waves travel through a vacuum, so the signals cross billions of kilometres of space.",
     textbookContent: `
 ## Describing a wave
 
@@ -1298,8 +1305,15 @@ The topics in these notes follow the Department for Education document below.
         symbol: 'b_i',
         name: 'Bit (binary digit)',
         unit: '0 or 1',
-        description: 'One digit of a binary number. Counting from the right and starting at 0, the bit in place $i$ is worth $2^i$ if it is a 1, and nothing if it is a 0.',
+        description: 'One digit of a binary number. Counting from the right and starting at 0, the bit in place $i$ is worth $2^i$ (so the rightmost place is worth 1) if it is a 1, and nothing if it is a 0.',
         color: 'text-emerald-400'
+      },
+      {
+        symbol: 'n',
+        name: 'Place of the leftmost bit',
+        unit: 'a whole number',
+        description: 'The place of the leftmost bit, counting from 0 at the right. A 5-bit number has $n = 4$.',
+        color: 'text-teal-400'
       }
     ],
     conceptSteps: [
@@ -1313,8 +1327,15 @@ The topics in these notes follow the Department for Education document below.
       {
         stepNumber: 2,
         title: 'Place values double',
-        content: 'In our everyday denary numbers (base 10, also called decimal), each place is worth ten times the place to its right. In binary each place is worth two times the place to its right: 1, 2, 4, 8, 16 and so on, which are the powers of 2.',
+        content: 'In our everyday denary numbers (base 10, also called decimal), each place is worth ten times the place to its right. In binary each place is worth two times the place to its right: 1, 2, 4, 8, 16 and so on, which are the powers of 2. The sign Σ means add up: for every bit, multiply it by its place value and add the results.',
         keyInsight: 'Read a binary number by adding the place values that hold a 1.',
+        relatedVariables: ['b_i', 'n']
+      },
+      {
+        stepNumber: 3,
+        title: 'Adding in binary',
+        content: 'Work column by column from the right, just as in denary. In binary $1 + 1 = 10$, so put down 0 and carry 1 into the next column. With a carry, $1 + 1 + 1 = 11$, so put down 1 and carry 1.',
+        keyInsight: 'Two 1s in a column make 10 in binary, so a carry happens sooner than in denary.',
         relatedVariables: ['b_i']
       }
     ],
@@ -2161,7 +2182,7 @@ The topics in these notes follow the Department for Education document below.
       {
         stepNumber: 1,
         title: "From impossible to certain",
-        content: "A probability is a number from 0, for something impossible, to 1, for something certain. It can be a fraction, a decimal or a percentage (see [fractions](/study/fractions)). Something either happens or it does not, so $P(\\text{not } A) = 1 - P(A)$.",
+        content: "A probability is a number from 0, for something impossible, to 1, for something certain. It can be a fraction, a decimal or a percentage (see [fractions](/study/fractions)). When outcomes are equally likely, P = outcomes you want ÷ all outcomes. Something either happens or it does not, so $P(\\text{not } A) = 1 - P(A)$.",
         keyInsight: "Add up the probabilities of every possible outcome and you always get 1.",
         relatedVariables: ["p"]
       },
@@ -2206,7 +2227,7 @@ The topics in these notes follow the Department for Education document below.
         answer: "1/4"
       },
       {
-        question: "The probability a launch leaves on time is 0.8. Separately, the probability of good weather at the landing site is 0.9. What is the probability of both?",
+        question: "The probability a launch leaves on time is 0.8. Separately, the probability of good weather at the landing site is 0.9. Assume the two are independent. What is the probability of both?",
         hint: "The events are independent, so multiply.",
         answer: "0.72"
       },
@@ -2221,7 +2242,7 @@ The topics in these notes follow the Department for Education document below.
         answer: "3 valves (1 − 0.5³ = 0.875)"
       },
     ],
-    realWorldConnection: "The Space Shuttle flew with five flight computers. Four ran the same software and checked each other's results, and the fifth ran separately written backup software, so that one computer failing would not put the crew in danger.",
+    realWorldConnection: "The Space Shuttle flew with five flight computers. Four ran the same software and checked each other's results, and the fifth ran separately written backup software, in case a single fault in the main software affected all four at once.",
     textbookContent: `
 ## Probability
 
