@@ -3625,36 +3625,36 @@ The topics in these notes follow the Department for Education document below.
       { type: 'variable', symbol: 'a' }
     ],
     variables: [
-      { symbol: 'a', name: 'Positive Value', unit: 'Real Number', description: 'A value greater than zero.', color: 'text-rose-400' }
+      { symbol: 'a', name: 'A number', unit: 'no unit', description: 'Any number. If $a$ is 5, then $-a$ is $-5$, and $-(-a)$ is 5 again.', color: 'text-rose-400' }
     ],
     conceptSteps: [
       {
         stepNumber: 1,
-        title: 'The Number Line',
-        content: 'Negative numbers lie to the left of zero on the number line. Adding a positive number moves right; adding a negative number moves left.',
-        keyInsight: 'Subtracting is the same as adding a negative: $5 - 3 = 5 + (-3)$.',
+        title: 'The number line',
+        content: 'Negative numbers are numbers less than zero. On a number line they sit to the left of 0. A number further to the right is bigger, so $-2$ is bigger than $-5$.',
+        keyInsight: 'Adding a positive number moves you right. Subtracting a positive number moves you left.',
         relatedVariables: []
       },
       {
         stepNumber: 2,
-        title: 'Sign Rules for Multiplication',
-        content: 'Positive × Positive = Positive. Negative × Negative = Positive. Positive × Negative = Negative.',
-        keyInsight: 'Two negatives cancel out — mathematically and intuitively.',
-        relatedVariables: []
+        title: 'Adding and subtracting negatives',
+        content: 'A negative number turns the move around. Adding $-2$ moves you 2 to the left, just like subtracting 2. Subtracting $-2$ moves you 2 to the right, just like adding 2.',
+        keyInsight: 'Taking away a negative number makes the answer bigger.',
+        relatedVariables: ['a']
       },
       {
         stepNumber: 3,
-        title: 'Absolute Value',
-        content: 'The absolute value $|a|$ is the distance of $a$ from zero on the number line, always non-negative: $|-5| = 5$.',
-        keyInsight: 'Distance is never negative — that is what absolute value captures.',
-        relatedVariables: []
+        title: 'Multiplying and dividing',
+        content: 'First find the size of the answer, ignoring the signs. Then choose the sign. If the two numbers have the same sign, the answer is positive. If their signs are different, the answer is negative.',
+        keyInsight: 'A negative times a negative gives a positive. The same is true when you divide.',
+        relatedVariables: ['a']
       }
     ],
     solvedExample: {
-      problem: 'Calculate $(-3) \\times (-4) + (-2)$.',
+      problem: 'Work out $(-3) \\times (-4) + (-2)$.',
       steps: [
-        'Apply sign rule: $(-3) \\times (-4) = +12$ (negative × negative = positive).',
-        'Add $-2$: $12 + (-2) = 12 - 2 = 10$.'
+        'Multiply first: $(-3) \\times (-4) = 12$. The signs are the same, so the answer is positive.',
+        'Then add $-2$: $12 + (-2) = 12 - 2 = 10$.'
       ],
       resultFormula: '(-3)(-4) + (-2) = 10'
     },
@@ -3690,7 +3690,7 @@ The topics in these notes follow the Department for Education document below.
         answer: "250 °C"
       },
     ],
-    realWorldConnection: 'Negative numbers model temperature below zero, debt in finance, and downward forces in physics.',
+    realWorldConnection: 'Negative numbers are used for temperatures below 0 °C, for depths below sea level and for money that is owed.',
     textbookContent: `
 ## Negative numbers
 
@@ -3706,10 +3706,10 @@ A number further to the right is bigger. So $-2$ is bigger than $-5$, even thoug
 
 ### Adding and subtracting
 
-*   Adding a positive number moves you **right**: $-5 + 8 = 3$.
+*   Adding a positive number moves you **right**: $-4 + 6 = 2$.
 *   Subtracting a positive number moves you **left**: $4 - 9 = -5$.
 *   Adding a negative number is the same as subtracting: $6 + (-2) = 6 - 2 = 4$.
-*   Subtracting a negative number is the same as adding: $-3 - (-7) = -3 + 7 = 4$.
+*   Subtracting a negative number is the same as adding: $-2 - (-5) = -2 + 5 = 3$.
 
 ### Intervals across zero
 
@@ -3721,28 +3721,17 @@ Work out the size of the answer as normal, then decide the sign:
 
 | Signs | Answer | Example |
 | --- | --- | --- |
-| positive and positive | positive | $3 \\times 4 = 12$ |
-| negative and negative | positive | $(-3) \\times (-4) = 12$ |
-| positive and negative | negative | $3 \\times (-4) = -12$ |
+| positive and positive | positive | $2 \\times 6 = 12$ |
+| negative and negative | positive | $(-2) \\times (-6) = 12$ |
+| positive and negative | negative | $2 \\times (-6) = -12$ |
 
 Division follows the same rules: $(-12) \\div (-4) = 3$ and $12 \\div (-4) = -3$.
 
-The same rules apply to decimals and fractions: $-2.5 \\times 4 = -10$ and $-\\dfrac{1}{2} \\times -\\dfrac{2}{3} = \\dfrac{1}{3}$.
+The same rules apply to decimals and fractions: $-1.5 \\times 4 = -6$ and $\\left(-\\dfrac{1}{2}\\right) \\times \\left(-\\dfrac{2}{3}\\right) = \\dfrac{1}{3}$.
 
-### Worked example
+### Next on the journey
 
-Work out $(-3) \\times (-4) + (-2)$.
-
-1.  Multiply first: $(-3) \\times (-4) = 12$.
-2.  Then add: $12 + (-2) = 12 - 2 = 10$.
-
-### Hot and cold on the Moon
-
-The Moon has no air to hold heat. In sunlight its surface reaches about $120$ °C; at night it falls to about $-130$ °C. The change between them is
-
-$$120 - (-130) = 120 + 130 = 250 \\text{ °C}$$
-
-Spacecraft that land there must survive that whole range.
+You can now multiply small numbers, positive or negative. How do you multiply bigger numbers, such as $24 \\times 13$, without a calculator? That is the next lesson.
 
 ### Sources
 

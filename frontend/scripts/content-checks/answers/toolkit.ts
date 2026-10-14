@@ -136,4 +136,110 @@ const ARITHMETIC: Entry[] = [
   },
 ];
 
-export const ENTRIES: Entry[] = [...ARITHMETIC];
+/**
+ * The number reader ignores minus signs, so a negative stated value is read through `combine`, negating
+ * the number. The `stated` fragment always includes the minus sign, so the sign is pinned too.
+ */
+const neg = (i: number) => (n: number[]) => -n[i];
+
+const NEGATIVE_NUMBERS: Entry[] = [
+  {
+    lesson: 'negative-numbers', where: 'conceptSteps[0]', kind: 'claim', expectQuestionIncludes: 'A number further to the right is bigger',
+    claimIncludes: 'so $-2$ is bigger than $-5$',
+    verify: () => ({ holds: -2 > -5, detail: '-2 > -5' }),
+  },
+  // Worked example: (-3) × (-4) + (-2)
+  {
+    lesson: 'negative-numbers', where: 'solvedExample.steps[0]', expectQuestionIncludes: 'Work out $(-3) \\times (-4) + (-2)$.',
+    stated: '$(-3) \\times (-4) = 12$', pick: 2, compute: () => -3 * -4, expected: 12, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'negative-numbers', where: 'solvedExample.steps[1]', expectQuestionIncludes: 'Work out $(-3) \\times (-4) + (-2)$.',
+    stated: '$12 + (-2) = 12 - 2 = 10$', pick: 4, compute: () => 12 + -2, expected: 10, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'negative-numbers', where: 'solvedExample.resultFormula', expectQuestionIncludes: 'Work out $(-3) \\times (-4) + (-2)$.',
+    stated: '= 10', compute: () => -3 * -4 + -2, expected: 10, tolerance: 0, unit: '',
+  },
+  // Practice
+  {
+    lesson: 'negative-numbers', where: 'practiceProblems[0]', expectQuestionIncludes: 'Work out −5 + 8.',
+    compute: () => -5 + 8, expected: 3, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'negative-numbers', where: 'practiceProblems[1]', expectQuestionIncludes: 'Work out −3 − (−7).',
+    compute: () => -3 - -7, expected: 4, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'negative-numbers', where: 'practiceProblems[2]', expectQuestionIncludes: 'Work out −2.5 × 4.',
+    stated: '−10', combine: neg(0), compute: () => -2.5 * 4, expected: -10, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'negative-numbers', where: 'practiceProblems[3]', expectQuestionIncludes: 'Work out (−3) × (−7).',
+    compute: () => -3 * -7, expected: 21, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'negative-numbers', where: 'practiceProblems[4]', expectQuestionIncludes: 'Work out 36 ÷ (−4).',
+    stated: '−9', combine: neg(0), compute: () => 36 / -4, expected: -9, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'negative-numbers', where: 'practiceProblems[5]', expectQuestionIncludes: 'reaches about 120 °C in sunlight and falls to about −130 °C',
+    compute: () => 120 - -130, expected: 250, tolerance: 0, unit: '°C',
+  },
+  // Notes
+  {
+    lesson: 'negative-numbers', where: 'textbookContent: -4 + 6', expectNotesIncludes: 'Adding a positive number moves you **right**',
+    stated: '$-4 + 6 = 2$', pick: 2, compute: () => -4 + 6, expected: 2, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'negative-numbers', where: 'textbookContent: 4 - 9', expectNotesIncludes: 'Subtracting a positive number moves you **left**',
+    stated: '$4 - 9 = -5$', combine: neg(2), compute: () => 4 - 9, expected: -5, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'negative-numbers', where: 'textbookContent: 6 + (-2)', expectNotesIncludes: 'Adding a negative number is the same as subtracting',
+    stated: '$6 + (-2) = 6 - 2 = 4$', pick: 4, compute: () => 6 + -2, expected: 4, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'negative-numbers', where: 'textbookContent: -2 - (-5)', expectNotesIncludes: 'Subtracting a negative number is the same as adding',
+    stated: '$-2 - (-5) = -2 + 5 = 3$', pick: 4, compute: () => -2 - -5, expected: 3, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'negative-numbers', where: 'textbookContent: -8 °C to 5 °C', expectNotesIncludes: 'From $-8$ °C to $5$ °C is 8 degrees up to 0 and 5 more',
+    stated: 'a rise of 13 degrees', compute: () => 5 - -8, expected: 13, tolerance: 0, unit: '°C',
+  },
+  {
+    lesson: 'negative-numbers', where: 'textbookContent: 5 - (-8)', expectNotesIncludes: 'From $-8$ °C to $5$ °C is 8 degrees up to 0 and 5 more',
+    stated: '$5 - (-8) = 13$', pick: 2, compute: () => 5 - -8, expected: 13, tolerance: 0, unit: '°C',
+  },
+  {
+    lesson: 'negative-numbers', where: 'textbookContent: sign table, 2 × 6', expectNotesIncludes: '| positive and positive | positive |',
+    stated: '$2 \\times 6 = 12$', pick: 2, compute: () => 2 * 6, expected: 12, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'negative-numbers', where: 'textbookContent: sign table, (-2) × (-6)', expectNotesIncludes: '| negative and negative | positive |',
+    stated: '$(-2) \\times (-6) = 12$', pick: 2, compute: () => -2 * -6, expected: 12, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'negative-numbers', where: 'textbookContent: sign table, 2 × (-6)', expectNotesIncludes: '| positive and negative | negative |',
+    stated: '$2 \\times (-6) = -12$', combine: neg(2), compute: () => 2 * -6, expected: -12, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'negative-numbers', where: 'textbookContent: (-12) ÷ (-4)', expectNotesIncludes: 'Division follows the same rules',
+    stated: '$(-12) \\div (-4) = 3$', pick: 2, compute: () => -12 / -4, expected: 3, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'negative-numbers', where: 'textbookContent: 12 ÷ (-4)', expectNotesIncludes: 'Division follows the same rules',
+    stated: '$12 \\div (-4) = -3$', combine: neg(2), compute: () => 12 / -4, expected: -3, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'negative-numbers', where: 'textbookContent: -1.5 × 4', expectNotesIncludes: 'The same rules apply to decimals and fractions',
+    stated: '$-1.5 \\times 4 = -6$', combine: neg(2), compute: () => -1.5 * 4, expected: -6, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'negative-numbers', where: 'textbookContent: (-1/2) × (-2/3)', expectNotesIncludes: 'The same rules apply to decimals and fractions',
+    stated: '$\\left(-\\dfrac{1}{2}\\right) \\times \\left(-\\dfrac{2}{3}\\right) = \\dfrac{1}{3}$',
+    combine: (n) => n[4] / n[5], compute: () => (-1 / 2) * (-2 / 3), expected: 1 / 3, tolerance: 1e-9, unit: '',
+  },
+];
+
+export const ENTRIES: Entry[] = [...ARITHMETIC, ...NEGATIVE_NUMBERS];
