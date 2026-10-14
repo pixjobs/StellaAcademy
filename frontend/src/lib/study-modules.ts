@@ -313,7 +313,7 @@ The topics in these notes follow the Department for Education documents below.
         stepNumber: 3,
         title: 'Dispersion',
         content: 'Different colours of light have slightly different refractive indices in materials like glass. This causes white light to split into a rainbow spectrum when passing through a prism.',
-        keyInsight: 'Blue light bends more than red light because it has a shorter wavelength.',
+        keyInsight: 'Violet and blue light slow down slightly more in glass than red light, so they bend more.',
         relatedVariables: ['n_2', '\\theta_r']
       }
     ],
@@ -330,43 +330,92 @@ The topics in these notes follow the Department for Education documents below.
     },
     practiceProblems: [
       {
-        question: 'If light enters water (n = 1.33) from air (n = 1.0) at an angle of 45°, what is the angle of refraction?',
-        hint: 'Use Snell\'s law and solve for $\\theta_r$.',
-        answer: '$\\theta_r \\approx 32.1^\\circ$'
+        question: "What happens to the speed of light when it passes from air into glass?",
+        hint: "Glass is a denser material for light than air.",
+        answer: "It slows down."
       },
       {
-        question: 'Does light bend towards or away from the normal when moving from glass to air?',
-        hint: 'Consider the change in refractive index (high to low).',
-        answer: 'Away from the normal.'
-      }
+        question: "Light enters a glass block at an angle. Does it bend towards or away from the normal?",
+        hint: "Light that slows down bends towards the normal.",
+        answer: "Towards the normal."
+      },
+      {
+        question: "Light leaves a glass block into air at an angle. Does it bend towards or away from the normal?",
+        hint: "It speeds up as it leaves the glass.",
+        answer: "Away from the normal."
+      },
+      {
+        question: "A ray of light meets a glass block along the normal (at 90° to the surface). What happens to its direction?",
+        hint: "Think about which side of the ray reaches the glass first.",
+        answer: "It does not change direction, although it still slows down."
+      },
+      {
+        question: "Why does a prism split white light into colours?",
+        hint: "Different colours travel at slightly different speeds in glass.",
+        answer: "Each colour is refracted by a different amount: violet slows the most and bends the most, red the least. So the colours spread out into a spectrum."
+      },
+      {
+        question: "Going further: light passes from air (n = 1.0) into water (n = 1.33) at 45° to the normal. Find the angle of refraction.",
+        hint: "Use $n_1 \\sin \\theta_1 = n_2 \\sin \\theta_2$.",
+        answer: "About 32.1°"
+      },
     ],
     realWorldConnection: 'Spectrometers use prisms or diffraction gratings to analyse the light from distant stars, revealing their chemical composition.',
     textbookContent: `
-## Snell's Law and Refraction
+## Refraction
 
-Refraction is the change in direction of a wave passing from one medium to another or from a gradual change in the medium. Snell's Law (also known as the Snell-Descartes law) describes the relationship between the angles of incidence and refraction for light or other waves passing through a boundary between two different isotropic media.
+When light passes from one material into another, such as from air into glass or water, it can change direction. This is called **refraction**.
 
-Mathematically, Snell's Law is stated as:
-$n_1 \\sin(\\theta_1) = n_2 \\sin(\\theta_2)$
+### Why light bends
 
-### Core Principles
+Light travels at different speeds in different materials. It is fastest in a vacuum, almost as fast in air, slower in water and slower still in glass.
 
-*   **$n_1, n_2$ (Index of Refraction):** The refractive index is a dimensionless number that describes how fast light travels through the material. It is defined as $c/v$, where $c$ is the speed of light in a vacuum and $v$ is the phase velocity of light in the medium.
-*   **$\\theta_1$ (Angle of Incidence):** The angle between the incident ray and the normal (perpendicular line) to the surface interface.
-*   **$\\theta_2$ (Angle of Refraction):** The angle between the refracted ray and the normal to the surface interface.
+Picture a line of people walking side by side from a pavement onto sand at an angle. The people who reach the sand first slow down first, so the whole line swings round. Light does the same when one side of a beam reaches the slower material first.
 
-### Fermat's Principle of Least Time
+### Rays and the normal
 
-Snell's Law can be derived from Fermat's Principle, which states that the path taken by a ray between two given points is the path that can be traversed in the least time. When light enters a denser medium (higher index of refraction), its phase velocity decreases. To minimise the overall travel time, the light ray bends *towards* the normal to shorten its path length within the slower medium.
+We draw light as **rays**: straight lines with arrows. The **normal** is a line drawn at right angles to the surface where the ray meets it. Angles are measured from the normal.
 
-*Reference: Hecht, E. (2016). Optics (5th ed.). Pearson.*
-    
+*   Light that **slows down** (air into glass) bends **towards** the normal.
+*   Light that **speeds up** (glass into air) bends **away** from the normal.
+*   Light that meets the surface **along** the normal does not change direction, although it still changes speed.
 
-### References
+### Lenses
 
-*   [Optics (5th Edition)](https://www.pearson.com/en-us/subject-catalog/p/optics/P200000003284) (Eugene Hecht)
-*   [Principles of Optics](https://en.wikipedia.org/wiki/Principles_of_Optics) (Max Born & Emil Wolf)
-*   [Fermat's Principle of Least Time - Feynman Lectures](https://www.feynmanlectures.caltech.edu/I_26.html)
+A convex lens is thicker in the middle. Light passing through it is refracted towards the middle, so parallel rays are brought together at a point called the focus. The lens in your eye focuses light onto the back of the eye in this way, and so do the lenses in cameras and telescopes.
+
+### Colours and prisms
+
+White light is a mixture of colours. Each colour has a different frequency: red has the lowest frequency of visible light and violet the highest.
+
+In glass, violet light slows down slightly more than red light, so it is refracted slightly more. A triangular **prism** therefore spreads white light out into a band of colours called a **spectrum**: red, orange, yellow, green, blue, indigo and violet. This spreading is called **dispersion**.
+
+### Absorbed, transmitted, reflected
+
+Materials treat different wavelengths of light differently. They may absorb some, let some through (transmit) and reflect some. Glass transmits visible light but absorbs much of the ultraviolet. A red filter transmits red light and absorbs the other colours.
+
+### Going further: Snell's law
+
+The Department for Education content describes refraction in words. Some specifications also ask you to calculate angles using **Snell's law**:
+
+$$n_1 \\sin \\theta_1 = n_2 \\sin \\theta_2$$
+
+Here $n$ is the **refractive index** of each material (how many times slower light travels in it than in a vacuum) and $\\theta$ is the angle to the normal. Light entering glass ($n_2 = 1.5$) from air ($n_1 = 1.0$) at $30°$:
+
+1.  $1.0 \\times \\sin 30° = 1.5 \\times \\sin \\theta_2$
+2.  $\\sin \\theta_2 = \\dfrac{0.5}{1.5} = 0.333$
+3.  $\\theta_2 = \\sin^{-1}(0.333) \\approx 19.5°$
+
+### Reading starlight
+
+Astronomers pass starlight through a prism or a similar device to spread it into a spectrum. Dark lines in the spectrum show which colours the gases in a star have absorbed, and that tells us what the star is made of, without anyone ever going there.
+
+### Sources
+
+The topics in these notes follow the Department for Education documents below.
+
+*   [National curriculum in England: science programmes of study](https://www.gov.uk/government/publications/national-curriculum-in-england-science-programmes-of-study) (Department for Education)
+*   [GCSE subject content for biology, chemistry and physics](https://www.gov.uk/government/publications/gcse-single-science) (Department for Education)
 `
   },
   {
@@ -1280,31 +1329,94 @@ The topics in these notes follow the Department for Education document below.
     },
     practiceProblems: [
       {
-        question: 'What is the binary number $100_2$ in decimal?',
-        hint: 'The bits are 4, 2, and 1.',
-        answer: '4'
-      }
+        question: "What is the binary number 100 in denary?",
+        hint: "The place values from the right are 1, 2 and 4.",
+        answer: "4"
+      },
+      {
+        question: "What is the binary number 1011 in denary?",
+        hint: "Add the place values where there is a 1: 8, 2 and 1.",
+        answer: "11"
+      },
+      {
+        question: "Write 13 in binary.",
+        hint: "Take away the biggest powers of 2 that fit: 8, then 4, then 1.",
+        answer: "1101"
+      },
+      {
+        question: "Write 25 in binary.",
+        hint: "25 = 16 + 8 + 1.",
+        answer: "11001"
+      },
+      {
+        question: "Add the binary numbers 101 and 11.",
+        hint: "1 + 1 = 10 in binary: write 0 and carry 1.",
+        answer: "1000 (5 + 3 = 8)"
+      },
+      {
+        question: "Add the binary numbers 1101 and 111.",
+        hint: "Work from the right, carrying as you go. Check by converting to denary.",
+        answer: "10100 (13 + 7 = 20)"
+      },
     ],
     realWorldConnection: 'Every piece of data on your computer, from this text to images and videos, is stored as a massive sequence of binary 1s and 0s.',
     textbookContent: `
-## Binary Numeral System
+## Binary numbers
 
-The binary numeral system, or base-2 number system, represents numeric values using two different symbols: typically 0 (zero) and 1 (one).
+Computers store everything as **binary**: numbers written with only two digits, 0 and 1. A 0 or a 1 is called a **bit**. Inside a computer each bit is a tiny switch that is either off (0) or on (1).
 
-### Positional Notation
-In a positional numeral system, the base is the number of unique digits, including zero, used to represent numbers. In base-10, we use 0-9 and each position represents a power of 10 (1s, 10s, 100s). In binary (base-2), we use 0 and 1, and each position represents a power of 2 (1s, 2s, 4s, 8s, 16s, etc.).
+### Place values
 
-### Conversion to Decimal
-To convert a binary number to decimal, you sum the powers of 2 corresponding to each 1 bit.
-For example, $1101_2$:
-*   $1 \\times 2^3 = 8$
-*   $1 \\times 2^2 = 4$
-*   $0 \\times 2^1 = 0$
-*   $1 \\times 2^0 = 1$
-*   $8 + 4 + 0 + 1 = 13$
+Our everyday numbers are **denary** (base 10). Each place is worth ten times the place to its right: ones, tens, hundreds.
 
-### References
-*   [Digital Logic Design](https://en.wikipedia.org/wiki/Digital_logic) (Various authors)
+In binary each place is worth **two** times the place to its right:
+
+| 128 | 64 | 32 | 16 | 8 | 4 | 2 | 1 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+
+Eight bits make a **byte**, which can hold any whole number from 0 to 255.
+
+### Binary to denary
+
+Add up the place values where there is a 1. For $1011$:
+
+| 8 | 4 | 2 | 1 |
+| --- | --- | --- | --- |
+| 1 | 0 | 1 | 1 |
+
+$8 + 2 + 1 = 11$.
+
+### Denary to binary
+
+Take away the biggest place value that fits, write a 1 there, and repeat with what is left. For 13:
+
+1.  8 fits into 13: write 1 in the 8s place, leaving 5.
+2.  4 fits into 5: write 1 in the 4s place, leaving 1.
+3.  2 does not fit into 1: write 0 in the 2s place.
+4.  1 fits: write 1 in the 1s place, leaving 0.
+
+So $13 = 1101$ in binary.
+
+### Adding in binary
+
+Add column by column from the right, as in denary, but remember:
+
+*   $0 + 0 = 0$
+*   $0 + 1 = 1$
+*   $1 + 1 = 10$: write 0 and carry 1
+*   $1 + 1 + 1 = 11$: write 1 and carry 1
+
+For $101 + 11$: the right column is $1 + 1 = 10$ (write 0, carry 1); the middle column is $0 + 1 + 1 = 10$ (write 0, carry 1); the left column is $1 + 1 = 10$. The answer is $1000$. Check in denary: $5 + 3 = 8$.
+
+### Pictures from Mars
+
+Every photo a Mars rover takes is stored as numbers, one for the brightness of each colour in each tiny dot, and those numbers are sent to Earth as a long stream of 0s and 1s by radio. Back on Earth, computers turn the bits back into numbers and the numbers back into a picture.
+
+### Sources
+
+The topics in these notes follow the Department for Education document below.
+
+*   [National curriculum in England: computing programmes of study](https://www.gov.uk/government/publications/national-curriculum-in-england-computing-programmes-of-study) (Department for Education)
 `
   },
   {
@@ -1562,50 +1674,88 @@ The topics in these notes follow the Department for Education documents below.
     },
     practiceProblems: [
       {
-        question: 'If position is s(t) = 4t³, what is the velocity function v(t)?',
-        hint: 'Use the power rule: bring down the exponent and subtract one.',
-        answer: 'v(t) = 12t²'
+        question: "If position is $s = 4t^3$, find the velocity $v$.",
+        hint: "Differentiate: multiply by the power, then take 1 off the power.",
+        answer: "$v = 12t^2$"
       },
       {
-        question: 'If velocity is v(t) = 20t, what is the acceleration (derivative of velocity) at t = 5?',
-        hint: 'Take the derivative of 20t. It is constant.',
-        answer: '20 m/s²'
-      }
+        question: "If velocity is $v = 20t$, what is the acceleration?",
+        hint: "Differentiate the velocity.",
+        answer: "$20$ m/s², at every time"
+      },
+      {
+        question: "A probe's position is $s = 5t^2 + 10t$ metres. Find its acceleration.",
+        hint: "Differentiate twice.",
+        answer: "$10$ m/s²"
+      },
+      {
+        question: "Find the gradient of the curve $y = x^2$ at the point where $x = 3$.",
+        hint: "Differentiate, then substitute $x = 3$.",
+        answer: "6"
+      },
+      {
+        question: "Show that the chord of $y = x^2$ from $x = 3$ to $x = 3 + h$ has gradient $6 + h$, and say what happens as $h \\to 0$.",
+        hint: "Gradient = change in $y$ ÷ change in $x$, and $(3 + h)^2 = 9 + 6h + h^2$.",
+        answer: "$\\frac{9 + 6h + h^2 - 9}{h} = 6 + h$, which tends to 6: the gradient of the tangent."
+      },
+      {
+        question: "A rover's velocity is $v = 3t^2 + 2$ m/s. How far does it travel between $t = 0$ and $t = 2$ s?",
+        hint: "Integrate the velocity between the limits.",
+        answer: "12 m ($\\left[t^3 + 2t\\right]_0^2 = 8 + 4$)"
+      },
     ],
     realWorldConnection: 'Orbital mechanics heavily utilises differential equations (calculus) to predict the future positions of planets, moons, and artificial satellites over time.',
     textbookContent: `
-## Differential Calculus and Rates of Change
+## Differentiation and rates of change
 
-Calculus, independently developed by Isaac Newton and Gottfried Wilhelm Leibniz in the late 17th century, is the mathematical study of continuous change. Differential calculus focuses on the concept of the derivative, which measures the instantaneous rate of change of a quantity with respect to another.
+### Gradient of a curve
 
-### The Derivative
+The gradient of a straight line is the same everywhere. A curve's gradient changes as you move along it. The gradient at a point is the gradient of the **tangent** there: the straight line that just touches the curve at that point.
 
-If a function $s(t)$ represents the position of an object moving along a line at time $t$, the average velocity over a time interval $\\Delta t$ is $\\frac{\\Delta s}{\\Delta t}$. The instantaneous velocity $v(t)$ is defined as the limit of this average velocity as the time interval approaches zero:
-$v(t) = \\lim_{\\Delta t \\to 0} \\frac{s(t + \\Delta t) - s(t)}{\\Delta t} = \\frac{ds}{dt}$
+### The gradient as a limit
 
-### Higher-Order Derivatives
+To find the gradient of $y = x^2$ at $x = 3$, take a nearby point at $x = 3 + h$. The **chord** between them has gradient
 
-Derivatives can themselves be differentiated. Acceleration $a(t)$ is the rate of change of velocity, and therefore the second derivative of position:
-$a(t) = \\frac{dv}{dt} = \\frac{d^2s}{dt^2}$
+$$\\frac{(3 + h)^2 - 3^2}{h} = \\frac{6h + h^2}{h} = 6 + h$$
 
-### Numerical Integration (Euler's Method)
+As $h$ gets smaller, the chord gets closer to the tangent, and its gradient gets closer to 6. The gradient of the tangent is the **limit** of the chord's gradient as $h \\to 0$. Doing this for a general point is called **differentiation from first principles**.
 
-In computational physics, analytical solutions to complex differential equations (like chaotic multi-body gravitational systems) are often impossible. Instead, algorithms perform numerical integration to approximate the solution over small discrete time steps ($\\Delta t$).
+### The derivative
 
-Euler's method is the simplest first-order numerical procedure:
-$s(t_{n+1}) \\approx s(t_n) + v(t_n) \\Delta t$
-$v(t_{n+1}) \\approx v(t_n) + a(t_n) \\Delta t$
+The result is the **derivative**, written $\\dfrac{dy}{dx}$ or $f'(x)$. It gives the gradient at any point and tells you how fast $y$ is changing compared with $x$: a **rate of change**.
 
-While Euler's method provides the foundation for understanding computational integration, modern spacecraft simulators utilise more stable and accurate higher-order algorithms like Runge-Kutta (RK4) to minimise accumulated truncation errors over time.
+For powers of $x$:
 
-*Reference: Stewart, J. (2015). Calculus: Early Transcendentals (8th ed.). Cengage Learning.*
-    
+$$y = x^n \\quad \\Rightarrow \\quad \\frac{dy}{dx} = nx^{n-1}$$
 
-### References
+Multiply by the power, then take one off the power. Constants multiply through, and terms are differentiated one at a time: if $y = 5x^2 + 10x$, then $\\dfrac{dy}{dx} = 10x + 10$.
 
-*   [Calculus (4th Edition)](https://www.amazon.com/Calculus-4th-Michael-Spivak/dp/0914098918) (Michael Spivak)
-*   [Calculus: Early Transcendentals](https://www.cengage.com/c/calculus-early-transcendentals-9e-stewart/9781337613927/) (James Stewart)
-*   [MIT OCW: 18.01 Single Variable Calculus](https://ocw.mit.edu/courses/18-01-single-variable-calculus-fall-2006/)
+### Motion in a straight line
+
+For an object moving along a line with displacement $s$ at time $t$:
+
+*   velocity is the rate of change of displacement: $v = \\dfrac{ds}{dt}$
+*   acceleration is the rate of change of velocity: $a = \\dfrac{dv}{dt}$
+
+Going the other way, **integrate**: displacement is the integral of velocity, and velocity is the integral of acceleration.
+
+### Worked example
+
+A probe's distance from a moon is $s = 5t^2 + 10t$ metres. Find its velocity at $t = 3$ s.
+
+1.  $v = \\dfrac{ds}{dt} = 10t + 10$
+2.  $v(3) = 10 \\times 3 + 10 = 40$ m/s
+3.  The acceleration is $a = \\dfrac{dv}{dt} = 10$ m/s², the same at every moment.
+
+### Rockets and changing motion
+
+A rocket's speed changes every instant as it burns fuel. Flight computers do not use one average speed. They track the rate of change of position and velocity moment by moment, which is exactly what derivatives describe.
+
+### Sources
+
+The topics in these notes follow the Department for Education document below.
+
+*   [GCE AS and A level subject content for mathematics](https://www.gov.uk/government/publications/gce-as-and-a-level-mathematics) (Department for Education)
 `
   },
   {
@@ -1675,16 +1825,16 @@ While Euler's method provides the foundation for understanding computational int
       },
       {
         stepNumber: 4,
-        title: "Vector Multiplication (Dot Product)",
-        content: "What happens when you multiply two vectors? The Dot Product multiplies the parts of two vectors that are pointing in the same direction. It outputs a single normal number (a scalar). In physics, pushing a spacecraft (Force vector) in the direction it's moving (Displacement vector) gives us Work (Energy).",
-        keyInsight: "Dot Product = How much do these two arrows align with each other?",
+        title: "Adding Vectors",
+        content: "To add two vectors, draw them tip to tail: the second starts where the first ends. The resultant goes from the start of the first to the end of the second. In column form, add the top numbers together and the bottom numbers together.",
+        keyInsight: "Adding vectors means following one journey and then the other.",
         relatedVariables: []
       },
       {
         stepNumber: 5,
-        title: "Vector Multiplication (Cross Product)",
-        content: "The Cross Product is the opposite: it multiplies the parts of two vectors that are perpendicular to each other, and it creates a brand new 3D vector pointing straight out of the surface (like a screw turning). This is used to calculate orbital Torque and Angular Momentum.",
-        keyInsight: "Cross Product = How perpendicular are these two arrows, and what is the resulting 3D twist?",
+        title: "Multiplying by a Number",
+        content: "Multiplying a vector by a number stretches it without turning it: 2a is twice as long as a and points the same way, while -a points the opposite way. Vectors that are multiples of each other are parallel.",
+        keyInsight: "If one vector is a multiple of another, they are parallel.",
         relatedVariables: []
       },
       {
@@ -1707,40 +1857,102 @@ While Euler's method provides the foundation for understanding computational int
     },
     practiceProblems: [
       {
-        question: "If a probe has an x-velocity of 6 km/s and a y-velocity of 8 km/s, what is its speed?",
-        hint: "Square both, add them, and take the square root. (Think of the 3-4-5 triangle rule).",
+        question: "$\\mathbf{a} = \\begin{pmatrix} 3 \\\\ 2 \\end{pmatrix}$ and $\\mathbf{b} = \\begin{pmatrix} 1 \\\\ -4 \\end{pmatrix}$. Work out $\\mathbf{a} + \\mathbf{b}$.",
+        hint: "Add the top numbers, then add the bottom numbers.",
+        answer: "$\\begin{pmatrix} 4 \\\\ -2 \\end{pmatrix}$"
+      },
+      {
+        question: "Using the same vectors, work out $\\mathbf{a} - \\mathbf{b}$.",
+        hint: "Subtract the top numbers, then the bottom numbers.",
+        answer: "$\\begin{pmatrix} 2 \\\\ 6 \\end{pmatrix}$"
+      },
+      {
+        question: "Work out $3\\mathbf{a}$.",
+        hint: "Multiply both numbers by 3.",
+        answer: "$\\begin{pmatrix} 9 \\\\ 6 \\end{pmatrix}$"
+      },
+      {
+        question: "A probe moves at 6 km/s in the x direction and 8 km/s in the y direction. What is its speed?",
+        hint: "Use Pythagoras: square both, add, then take the square root.",
         answer: "10 km/s"
       },
       {
-        question: "Does a vector with components (5, 0) have the same magnitude as a vector with components (0, 5)?",
-        hint: "Calculate the magnitude for both.",
-        answer: "Yes, both have a magnitude of 5."
-      }
+        question: "Find the magnitude of $\\begin{pmatrix} -5 \\\\ 12 \\end{pmatrix}$.",
+        hint: "Squaring a negative number gives a positive.",
+        answer: "13"
+      },
+      {
+        question: "A spacecraft moves at 4 km/s east and 3 km/s north. Find its speed and its direction, as an angle north of east.",
+        hint: "Speed by Pythagoras; angle using tan θ = north ÷ east.",
+        answer: "5 km/s, about 36.9° north of east"
+      },
     ],
     realWorldConnection: "Navigation computers on the Apollo missions continuously calculated state vectors (position and velocity in 3D space) to ensure astronauts remained on the correct trajectory to the Moon.",
     textbookContent: `
-## Vector Algebra and State Vectors
+## Vectors
 
-A vector is a mathematical object that has both a magnitude (length) and a direction. In classical mechanics, physical quantities like position, velocity, and force must be described as vectors, as opposed to scalars (which have only magnitude, like mass or temperature).
+A **scalar** has size only, such as a mass of 5 kg or a time of 10 s. A **vector** has size **and** direction, such as a velocity of 5 m/s north or a force of 20 N downwards. The size of a vector is called its **magnitude**.
 
-### Vector Notation and Components
+### Writing vectors
 
-In three-dimensional Cartesian space, a vector $\\vec{v}$ can be represented by its orthogonal components along the x, y, and z axes:
-$$\\vec{v} = \\begin{bmatrix} x \\\\ y \\\\ z \\end{bmatrix} = x\\hat{i} + y\\hat{j} + z\\hat{k}$$
+A vector can be drawn as an arrow: its length shows the magnitude and it points in the direction. In print, vectors are written in bold, $\\mathbf{a}$, or with an arrow, $\\overrightarrow{AB}$ for the journey from A to B.
 
-The magnitude of the vector is given by the Euclidean norm:
-$$|\\vec{v}| = \\sqrt{x^2 + y^2 + z^2}$$
+A **column vector** gives the steps across and up:
 
-### The Orbital State Vector
+$$\\mathbf{a} = \\begin{pmatrix} 3 \\\\ 2 \\end{pmatrix}$$
 
-In astrodynamics, the orbital state vector is the absolute foundation of spacecraft navigation. It consists of two 3-dimensional vectors grouped together:
-1.  **Position Vector ($\\vec{r}$):** Determines the exact 3D coordinate of the spacecraft relative to the central body.
-2.  **Velocity Vector ($\\vec{v}$):** Determines the 3D speed and heading of the spacecraft.
+means 3 to the right and 2 up. Negative numbers mean left or down.
 
-Combined, these six variables $[x, y, z, v_x, v_y, v_z]$ completely and deterministically define the spacecraft's current orbit. From a single accurate state vector reading at a known time $t$, Kepler's laws can be mathematically applied to project the spacecraft's exact position infinitely into the future (assuming no perturbing forces).
+### Adding and subtracting
 
-*Reference: Anton, H., & Rorres, C. (2013). Elementary Linear Algebra (11th ed.). Wiley.*
-    `
+To add vectors, draw them **tip to tail**: the second starts where the first ends. The sum, called the **resultant**, goes from the start of the first to the end of the second. In columns, add the matching numbers:
+
+$$\\begin{pmatrix} 3 \\\\ 2 \\end{pmatrix} + \\begin{pmatrix} 1 \\\\ -4 \\end{pmatrix} = \\begin{pmatrix} 4 \\\\ -2 \\end{pmatrix}$$
+
+Subtracting $\\mathbf{b}$ is the same as adding $-\\mathbf{b}$, the vector of the same size pointing the opposite way.
+
+### Multiplying by a number
+
+Multiplying a vector by a number (a **scalar**) stretches it: $2\\mathbf{a}$ is twice as long as $\\mathbf{a}$ and points the same way; $-\\mathbf{a}$ points the opposite way. Vectors that are multiples of each other are **parallel**.
+
+### Proving things with vectors
+
+Vectors let you prove facts about shapes. If $\\overrightarrow{AB} = 2\\overrightarrow{CD}$, the lines AB and CD are parallel and AB is twice as long. If $\\overrightarrow{PQ} = k\\overrightarrow{QR}$, then P, Q and R lie on one straight line.
+
+### Magnitude and direction
+
+The steps across and up form a right-angled triangle, so Pythagoras gives the magnitude:
+
+$$|\\mathbf{a}| = \\sqrt{x^2 + y^2}$$
+
+and trigonometry gives the direction, as an angle $\\theta$ above the x direction:
+
+$$\\tan \\theta = \\frac{y}{x}$$
+
+### Splitting a vector into parts
+
+In A-level physics you also go the other way: you **resolve** a vector into two parts at right angles. A velocity $v$ at angle $\\theta$ to the horizontal has a horizontal part $v \\cos \\theta$ and a vertical part $v \\sin \\theta$.
+
+### Worked example
+
+A spacecraft has a horizontal velocity of 3000 m/s and a vertical velocity of 4000 m/s. Its speed is
+
+$$\\sqrt{3000^2 + 4000^2} = \\sqrt{25\\,000\\,000} = 5000 \\text{ m/s}$$
+
+and it is climbing at $\\tan^{-1}\\!\\left(\\dfrac{4000}{3000}\\right) \\approx 53°$ above the horizontal.
+
+### Steering with thrusters
+
+When a spacecraft fires a thruster, it adds a new velocity to the one it already has. Firing straight ahead adds to its speed. Firing sideways changes its direction. Mission planners add these vectors to work out exactly which way to point the engine and for how long.
+
+### Sources
+
+The topics in these notes follow the Department for Education documents below.
+
+*   [GCSE mathematics: subject content and assessment objectives](https://www.gov.uk/government/publications/gcse-mathematics-subject-content-and-assessment-objectives) (Department for Education)
+*   [GCE AS and A level subject content for mathematics](https://www.gov.uk/government/publications/gce-as-and-a-level-mathematics) (Department for Education)
+*   [GCE AS and A level subject content for science](https://www.gov.uk/government/publications/gce-as-and-a-level-for-science) (Department for Education)
+`
   },
   {
     id: "matrices",
@@ -1817,38 +2029,91 @@ Combined, these six variables $[x, y, z, v_x, v_y, v_z]$ completely and determin
     },
     practiceProblems: [
       {
-        question: "What happens if you multiply a vector by an identity matrix (a rotation of 0 degrees)?",
-        hint: "The identity matrix has 1s on the diagonal and 0s elsewhere.",
-        answer: "The vector remains exactly the same."
+        question: "$\\mathbf{A} = \\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix}$ and $\\mathbf{B} = \\begin{pmatrix} 0 & 1 \\\\ 1 & 0 \\end{pmatrix}$. Find $\\mathbf{A} + \\mathbf{B}$.",
+        hint: "Add the numbers in matching positions.",
+        answer: "$\\begin{pmatrix} 1 & 3 \\\\ 4 & 4 \\end{pmatrix}$"
       },
       {
-        question: "If you rotate the vector (0, 1) by 90 degrees clockwise, what is the new vector?",
-        hint: "Clockwise rotation points it to the right on a standard grid.",
-        answer: "(1, 0)"
-      }
+        question: "Find $2\\mathbf{A}$.",
+        hint: "Multiply every number by 2.",
+        answer: "$\\begin{pmatrix} 2 & 4 \\\\ 6 & 8 \\end{pmatrix}$"
+      },
+      {
+        question: "Find $\\mathbf{AB}$.",
+        hint: "Each entry is a row of $\\mathbf{A}$ times a column of $\\mathbf{B}$: multiply in pairs and add.",
+        answer: "$\\begin{pmatrix} 2 & 1 \\\\ 4 & 3 \\end{pmatrix}$"
+      },
+      {
+        question: "What does multiplying a vector by the identity matrix $\\begin{pmatrix} 1 & 0 \\\\ 0 & 1 \\end{pmatrix}$ do?",
+        hint: "Try it on $\\begin{pmatrix} x \\\\ y \\end{pmatrix}$.",
+        answer: "Nothing: the vector is unchanged."
+      },
+      {
+        question: "Rotate the vector $\\begin{pmatrix} 0 \\\\ 1 \\end{pmatrix}$ by 90° clockwise.",
+        hint: "The clockwise matrix is $\\begin{pmatrix} 0 & 1 \\\\ -1 & 0 \\end{pmatrix}$.",
+        answer: "$\\begin{pmatrix} 1 \\\\ 0 \\end{pmatrix}$"
+      },
+      {
+        question: "Find the single matrix for a reflection in the x-axis followed by a rotation of 90° anticlockwise. What transformation is it?",
+        hint: "The first transformation goes on the right: work out $\\mathbf{RM}$ with $\\mathbf{M} = \\begin{pmatrix} 1 & 0 \\\\ 0 & -1 \\end{pmatrix}$ and $\\mathbf{R} = \\begin{pmatrix} 0 & -1 \\\\ 1 & 0 \\end{pmatrix}$.",
+        answer: "$\\begin{pmatrix} 0 & 1 \\\\ 1 & 0 \\end{pmatrix}$, a reflection in the line $y = x$."
+      },
     ],
     realWorldConnection: "Attitude Control Systems (ACS) use 3D rotation matrices and quaternions to continuously track and adjust a satellite's orientation in space, ensuring solar panels point at the Sun and antennas at Earth.",
     textbookContent: `
-## Linear Transformations and Matrices
+## Matrices
 
-A matrix is a rectangular array of numbers arranged in rows and columns. In linear algebra, matrices are fundamentally used to represent linear transformations between vector spaces.
+A **matrix** is a rectangular grid of numbers. A matrix with 2 rows and 3 columns is a $2 \\times 3$ matrix.
 
-### The Rotation Matrix
+### Adding, subtracting and multiplying by a number
 
-A rotation matrix $R$ is a transformation matrix that performs a rotation in Euclidean space. For a two-dimensional anticlockwise rotation by an angle $\\theta$ about the origin, the standard rotation matrix is defined as:
-$$R(\\theta) = \\begin{bmatrix} \\cos\\theta & -\\sin\\theta \\\\ \\sin\\theta & \\cos\\theta \\end{bmatrix}$$
+Matrices of the same size are added or subtracted by combining the numbers in matching positions:
 
-To rotate a column vector $\\vec{v} = [x, y]^T$, the matrix is multiplied by the vector using the dot product rule (rows of the matrix multiplied by the column of the vector):
-$$\\vec{v}' = R(\\theta) \\cdot \\vec{v} = \\begin{bmatrix} \\cos\\theta & -\\sin\\theta \\\\ \\sin\\theta & \\cos\\theta \\end{bmatrix} \\begin{bmatrix} x \\\\ y \\end{bmatrix} = \\begin{bmatrix} x\\cos\\theta - y\\sin\\theta \\\\ x\\sin\\theta + y\\cos\\theta \\end{bmatrix}$$
+$$\\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix} + \\begin{pmatrix} 0 & 1 \\\\ 1 & 0 \\end{pmatrix} = \\begin{pmatrix} 1 & 3 \\\\ 4 & 4 \\end{pmatrix}$$
 
-### Orthogonality and 3D Rotation
+To multiply by a number (a **scalar**), multiply every entry: $2\\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix} = \\begin{pmatrix} 2 & 4 \\\\ 6 & 8 \\end{pmatrix}$.
 
-Rotation matrices are orthogonal matrices with a determinant of 1 ($R^T R = I$). This property ensures that rotations are rigid-body transformations: they preserve the length of the vector ($|\\vec{v}'| = |\\vec{v}|$) and the relative angles between multiple vectors.
+### Multiplying matrices
 
-In three-dimensional aerospace applications (Attitude Determination and Control), a spacecraft's orientation is described using three sequential matrices corresponding to roll, pitch, and yaw (Euler angles). Because matrix multiplication is non-commutative ($AB \\neq BA$), the order of these rotations strictly matters. To avoid mathematical singularities known as "gimbal lock" inherent in Euler angle sequences, modern flight software predominantly utilises 4-dimensional Quaternions instead of 3x3 matrices.
+Two matrices can be multiplied when the first has as many columns as the second has rows: they are **conformable**. Each entry of the answer is a row of the first times a column of the second, multiplied in pairs and added:
 
-*Reference: Strang, G. (2016). Introduction to Linear Algebra (5th ed.). Wellesley-Cambridge Press.*
-    `
+$$\\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}\\begin{pmatrix} e & f \\\\ g & h \\end{pmatrix} = \\begin{pmatrix} ae + bg & af + bh \\\\ ce + dg & cf + dh \\end{pmatrix}$$
+
+Order matters: in general $\\mathbf{AB}$ is not the same as $\\mathbf{BA}$.
+
+The **identity matrix** $\\mathbf{I} = \\begin{pmatrix} 1 & 0 \\\\ 0 & 1 \\end{pmatrix}$ leaves anything it multiplies unchanged, like multiplying by 1.
+
+### Matrices as transformations
+
+A $2 \\times 2$ matrix moves every point of the plane: multiply the matrix by the point's position vector. Some to know:
+
+| Transformation | Matrix |
+| --- | --- |
+| Rotation by $\\theta$ anticlockwise about the origin | $\\begin{pmatrix} \\cos\\theta & -\\sin\\theta \\\\ \\sin\\theta & \\cos\\theta \\end{pmatrix}$ |
+| Reflection in the x-axis | $\\begin{pmatrix} 1 & 0 \\\\ 0 & -1 \\end{pmatrix}$ |
+| Reflection in $y = x$ | $\\begin{pmatrix} 0 & 1 \\\\ 1 & 0 \\end{pmatrix}$ |
+| Enlargement, scale factor $k$, centre the origin | $\\begin{pmatrix} k & 0 \\\\ 0 & k \\end{pmatrix}$ |
+
+A quick way to find a matrix: its first column is where $\\begin{pmatrix} 1 \\\\ 0 \\end{pmatrix}$ goes, and its second column is where $\\begin{pmatrix} 0 \\\\ 1 \\end{pmatrix}$ goes.
+
+### One transformation after another
+
+To do $\\mathbf{M}$ first and then $\\mathbf{R}$, multiply $\\mathbf{RM}$: the first transformation is on the **right**, next to the vector it acts on. Reflecting in the x-axis and then rotating 90° anticlockwise gives
+
+$$\\begin{pmatrix} 0 & -1 \\\\ 1 & 0 \\end{pmatrix}\\begin{pmatrix} 1 & 0 \\\\ 0 & -1 \\end{pmatrix} = \\begin{pmatrix} 0 & 1 \\\\ 1 & 0 \\end{pmatrix}$$
+
+which is a reflection in the line $y = x$.
+
+### Turning a spacecraft
+
+A spacecraft keeps track of which way it faces using matrices. A star tracker measures the directions of known stars in the spacecraft's own frame; a rotation matrix converts between that frame and a fixed one. Rotations do not change lengths, so the stars stay the same distance apart, just as a rotation matrix keeps every vector the same length.
+
+### Sources
+
+The topics in these notes follow the Department for Education document below.
+
+*   [GCE AS and A level subject content for further mathematics](https://www.gov.uk/government/publications/gce-as-and-a-level-further-mathematics) (Department for Education)
+`
   },
   {
     id: "probability",
@@ -1927,57 +2192,108 @@ In three-dimensional aerospace applications (Attitude Determination and Control)
     },
     practiceProblems: [
       {
-        question: "If a valve has a 50% chance of working (p = 0.5), how many valves do you need in parallel to achieve a system reliability of 87.5%?",
-        hint: "Calculate 1 - (0.5)^n and see which n gives 0.875.",
-        answer: "3 valves"
+        question: "The probability that it rains tomorrow is 0.3. What is the probability that it does not rain?",
+        hint: "The probabilities of all the outcomes add up to 1.",
+        answer: "0.7"
       },
       {
-        question: "What is the failure probability of a dual-redundant system (n=2) if each component has a 99% success rate?",
-        hint: "Calculate the failure rate (0.01) and square it.",
-        answer: "0.0001 (or 0.01%)"
-      }
+        question: "A bag holds 3 red counters and 5 blue counters. One is picked at random. What is the probability it is red?",
+        hint: "Count the red counters and the total number of counters.",
+        answer: "3/8"
+      },
+      {
+        question: "Two fair coins are tossed. What is the probability of two heads?",
+        hint: "The coins are independent, so multiply.",
+        answer: "1/4"
+      },
+      {
+        question: "The probability a launch leaves on time is 0.8. Separately, the probability of good weather at the landing site is 0.9. What is the probability of both?",
+        hint: "The events are independent, so multiply.",
+        answer: "0.72"
+      },
+      {
+        question: "From the bag in question 2, two counters are taken without putting the first back. What is the probability both are red?",
+        hint: "After one red is taken, there are 2 red counters left out of 7.",
+        answer: "3/28 (3/8 × 2/7 = 6/56)"
+      },
+      {
+        question: "Each valve on a spacecraft works with probability 0.5, independently. How many valves in parallel are needed for the system to work with probability 0.875?",
+        hint: "The system fails only if every valve fails. Try 1 − 0.5ⁿ for n = 1, 2, 3.",
+        answer: "3 valves (1 − 0.5³ = 0.875)"
+      },
     ],
     realWorldConnection: "The Space Shuttle flew with four redundant flight computers processing the same data, plus a fifth backup computer running independently written software, so that no single computer failure could endanger the vehicle.",
     textbookContent: `
-## Independent Events and Redundancy
+## Probability
 
-Probability measures how likely an event is, on a scale from 0 (impossible) to 1 (certain). It can be written as a fraction, a decimal or a percentage: $\\frac{9}{10} = 0.9 = 90\\%$.
+Probability measures how likely something is, on a scale from 0 (impossible) to 1 (certain). It can be written as a fraction, a decimal or a percentage: $\\dfrac{9}{10} = 0.9 = 90\\%$.
 
-### The Complement Rule
+### Equally likely outcomes
 
-An event either happens or it does not, so the two probabilities add up to 1:
+When all the outcomes are equally likely:
+
+$$P(\\text{event}) = \\frac{\\text{number of outcomes in the event}}{\\text{total number of outcomes}}$$
+
+A bag holds 3 red and 5 blue counters. $P(\\text{red}) = \\dfrac{3}{8}$.
+
+### All the outcomes add up to 1
+
+The probabilities of all the possible outcomes add up to 1. So the probability that something does **not** happen is
+
 $$P(\\text{not } A) = 1 - P(A)$$
 
-If a component works with probability $p$, it fails with probability $1 - p$.
+If the chance of rain is 0.3, the chance of no rain is 0.7.
 
-### Independent Events (the AND rule)
+### Either one or the other: add
 
-Two events are **independent** if one happening does not change the probability of the other. For independent events, multiply the probabilities:
+Two events are **mutually exclusive** if they cannot both happen. For these, add the probabilities:
+
+$$P(A \\text{ or } B) = P(A) + P(B)$$
+
+### Both: multiply, if independent
+
+Two events are **independent** if one happening does not change the probability of the other, like two coin tosses. For independent events, multiply:
+
 $$P(A \\text{ and } B) = P(A) \\times P(B)$$
 
-So the probability that $n$ independent components **all** fail is $(1 - p)^n$.
+### Tree diagrams
 
-### At Least One
+A tree diagram shows two or more events one after another. Each event branches into its outcomes, with the probability written on each branch.
 
-"At least one works" is the complement of "all of them fail":
-$$P(\\text{at least one works}) = 1 - (1 - p)^n$$
+*   Multiply **along** the branches to find the probability of a path.
+*   Add the results of different paths when more than one path gives what you want.
+*   The probabilities on the branches leaving any one point add up to 1.
 
-For components that each work with probability $p = 0.9$:
+### Dependent events
 
-| Components ($n$) | All fail | At least one works |
-|---|---|---|
-| 1 | $0.1$ | $0.9$ |
-| 2 | $0.01$ | $0.99$ |
-| 3 | $0.001$ | $0.999$ |
+If you take a counter and do not put it back, the second pick depends on the first. These events are **dependent**: the probabilities on the second branches change.
 
-### When the Model Breaks Down
+With 3 red and 5 blue counters, taking two without replacement:
 
-The formula only holds if failures are independent. Real backups often share a power supply, a location or the same software, so one cause can knock out several at once. This is called a common-cause failure. It is why the Space Shuttle's fifth backup computer ran software written separately from the other four.
+$$P(\\text{red, then red}) = \\frac{3}{8} \\times \\frac{2}{7} = \\frac{6}{56} = \\frac{3}{28}$$
 
-### References
+After the first red there are 2 reds left out of 7 counters.
 
-*   [BBC Bitesize: GCSE Maths](https://www.bbc.co.uk/bitesize/subjects/z38pycw)
-    `
+### Assumptions
+
+Calculations like these assume things: that a coin is fair, that picks are random, that events really are independent. If the assumption is wrong, so is the answer. Two parts made in the same factory batch may fail together, so they are not truly independent.
+
+### Backups in spacecraft
+
+Engineers make spacecraft reliable by adding backups that work in parallel. The system fails only if **every** copy fails. If one flight computer fails with probability 0.1, and three independent computers are fitted:
+
+1.  $P(\\text{all three fail}) = 0.1 \\times 0.1 \\times 0.1 = 0.001$
+2.  $P(\\text{the system works}) = 1 - 0.001 = 0.999$
+
+Three computers that are each 90% reliable together give a system that is 99.9% reliable, as long as their failures are independent.
+
+### Sources
+
+The topics in these notes follow the Department for Education documents below.
+
+*   [National curriculum in England: mathematics programmes of study](https://www.gov.uk/government/publications/national-curriculum-in-england-mathematics-programmes-of-study) (Department for Education)
+*   [GCSE mathematics: subject content and assessment objectives](https://www.gov.uk/government/publications/gcse-mathematics-subject-content-and-assessment-objectives) (Department for Education)
+`
   },
   {
     id: "diffeq",
@@ -2065,44 +2381,85 @@ The formula only holds if failures are independent. Real backups often share a p
     },
     practiceProblems: [
       {
-        question: "If a spacecraft's velocity triples, by what factor does its deceleration due to drag increase?",
-        hint: "Look at the exponent on the velocity variable.",
-        answer: "It increases by a factor of 9."
+        question: "Drag on a capsule is modelled by $\\frac{dv}{dt} = -kv^2$. If its speed triples, what happens to the deceleration?",
+        hint: "Look at the power on $v$.",
+        answer: "It is 9 times as large."
       },
       {
-        question: "What happens to the rate of deceleration as the spacecraft slows down?",
-        hint: "Consider what happens to v^2 as v gets smaller.",
-        answer: "The deceleration rate decreases."
-      }
+        question: "In the same model, what happens to the deceleration as the capsule slows down?",
+        hint: "What happens to $v^2$ as $v$ gets smaller?",
+        answer: "It gets smaller, so the capsule slows more and more gently."
+      },
+      {
+        question: "Solve $\\frac{dy}{dx} = 2x$, given that $y = 3$ when $x = 0$.",
+        hint: "Integrate, then use the condition to find the constant.",
+        answer: "$y = x^2 + 3$"
+      },
+      {
+        question: "Solve $\\frac{dy}{dx} = y$, given that $y = 5$ when $x = 0$.",
+        hint: "Separate the variables: $\\int \\frac{1}{y}\\,dy = \\int 1\\,dx$.",
+        answer: "$y = 5e^x$"
+      },
+      {
+        question: "A population $P$ grows at a rate proportional to its size. Write a differential equation for this.",
+        hint: "'Proportional to' means 'equals a constant times'.",
+        answer: "$\\frac{dP}{dt} = kP$, with $k > 0$"
+      },
+      {
+        question: "A capsule enters the atmosphere at $v_0 = 5000$ m/s, with $\\frac{dv}{dt} = -kv^2$ and $k = 2 \\times 10^{-6}$ per metre. Use $v = \\frac{v_0}{1 + kv_0 t}$ to find its speed after 10 s.",
+        hint: "Work out $kv_0 t$ first.",
+        answer: "About 4,545 m/s ($5000 \\div 1.1$)"
+      },
     ],
     realWorldConnection: "Mission control uses complex sets of differential equations, factoring in variable atmospheric density and gravity, to predict exactly where a returning capsule will splash down in the ocean.",
     textbookContent: `
-## Ordinary Differential Equations (ODEs)
+## Differential equations
 
-A differential equation is a mathematical equation that relates one or more unknown functions and their derivatives. In physics, the function usually represents a physical quantity, the derivatives represent their rates of change, and the equation defines a physical law linking the two.
+A **differential equation** links a quantity to its rate of change. It describes how something changes, and solving it tells you what the quantity is at any time.
 
-### The Drag Equation ODE
+### Building one
 
-When a spacecraft enters an atmosphere, it experiences aerodynamic drag. The magnitude of the drag force is modelled by the equation:
-$$F_D = \\frac{1}{2} \\rho v^2 C_D A$$
+Many models start from a sentence about a rate:
 
-According to Newton's Second Law ($F = m a$), and knowing that acceleration is the derivative of velocity ($a = dv/dt$), we can express the deceleration of the spacecraft as a non-linear first-order Ordinary Differential Equation:
-$$\\frac{dv}{dt} = -\\left( \\frac{\\rho C_D A}{2m} \\right) v^2$$
+*   "The population grows at a rate proportional to its size": $\\dfrac{dP}{dt} = kP$.
+*   "The body cools at a rate proportional to the difference between its temperature and the room's": $\\dfrac{dT}{dt} = -k(T - T_{\\text{room}})$.
+*   "Drag slows the capsule at a rate proportional to the square of its speed": $\\dfrac{dv}{dt} = -kv^2$.
 
-### Analytical vs. Numerical Solutions
+"Proportional to" means "equals a constant times". A minus sign shows the quantity is decreasing.
 
-If atmospheric density ($\\rho$) were constant, this ODE could be solved analytically by separating the variables. Writing $k = \\frac{\\rho C_D A}{2m}$:
+### Separating the variables
 
-$$\\frac{dv}{v^2} = -k \\, dt \\quad\\Rightarrow\\quad \\int_{v_0}^{v} \\frac{dv}{v^2} = -k\\int_0^t dt \\quad\\Rightarrow\\quad \\frac{1}{v} - \\frac{1}{v_0} = kt$$
+A **first-order** equation where the right-hand side is a function of $x$ times a function of $y$ can be solved by **separating the variables**: get all the $y$ terms on one side and all the $x$ terms on the other, then integrate both sides.
 
-$$v(t) = \\frac{v_0}{1 + k v_0 t}$$
+$$\\frac{dy}{dx} = y \\quad \\Rightarrow \\quad \\int \\frac{1}{y}\\,dy = \\int 1\\,dx \\quad \\Rightarrow \\quad \\ln|y| = x + c$$
 
-The speed falls as $1/t$ for large $t$, which is slower than an exponential. However, in reality, atmospheric density changes exponentially with altitude, and gravity continues to accelerate the capsule downwards. 
+So $y = Ae^x$. This **general solution** has an unknown constant.
 
-This results in a coupled system of ODEs that has no closed-form analytical solution. Aerospace engineers must use numerical integration computers to simulate the reentry trajectory, dynamically calculating the updated velocity and position frame-by-frame until touchdown.
+### Particular solutions
 
-*Reference: Boyce, W. E., & DiPrima, R. C. (2012). Elementary Differential Equations and Boundary Value Problems (10th ed.). Wiley.*
-    `
+A **particular solution** uses a known value, such as the starting value, to find the constant. If $y = 5$ when $x = 0$, then $A = 5$ and $y = 5e^x$.
+
+### Worked example: drag on a capsule
+
+$\\dfrac{dv}{dt} = -kv^2$, with speed $v_0$ at $t = 0$.
+
+1.  Separate: $\\displaystyle\\int v^{-2}\\,dv = \\int -k\\,dt$
+2.  Integrate: $-\\dfrac{1}{v} = -kt + c$
+3.  At $t = 0$: $c = -\\dfrac{1}{v_0}$, so $\\dfrac{1}{v} = kt + \\dfrac{1}{v_0}$
+4.  Rearrange: $v = \\dfrac{v_0}{1 + kv_0 t}$
+
+The speed falls steeply at first, while drag is large, then more and more gently.
+
+### Coming home from space
+
+A capsule returning from orbit hits the top of the atmosphere at nearly 8 km/s. Drag, which grows with the square of speed, does most of the braking. Real re-entry models add gravity, the thinning of the air with height and the capsule's angle, giving equations that computers solve step by step. The simple model above shows the same shape: hard braking early, gentler later.
+
+### Sources
+
+The topics in these notes follow the Department for Education document below.
+
+*   [GCE AS and A level subject content for mathematics](https://www.gov.uk/government/publications/gce-as-and-a-level-mathematics) (Department for Education)
+`
   },
   {
     id: 'arithmetic',
@@ -2561,55 +2918,92 @@ The topics in these notes follow the Department for Education document below.
     },
     practiceProblems: [
       {
-        question: 'If 3 apples cost £2, how much do 9 apples cost?',
-        hint: 'Set up the ratio 3/2 = 9/x and cross-multiply.',
-        answer: '£6'
+        question: "Write the ratio 12 : 18 in its simplest form.",
+        hint: "Divide both parts by the biggest number that goes into each.",
+        answer: "2 : 3"
       },
       {
-        question: 'A map has a scale of 1 cm = 10 km. How many centimetres represent 45 km?',
-        hint: 'Set up the ratio 1/10 = x/45.',
-        answer: '4.5 cm'
-      }
+        question: "Share £60 in the ratio 2 : 3.",
+        hint: "There are 2 + 3 = 5 parts. Find one part first.",
+        answer: "£24 and £36"
+      },
+      {
+        question: "3 apples cost £2. How much do 9 apples cost?",
+        hint: "The number of apples has been multiplied by 3.",
+        answer: "£6"
+      },
+      {
+        question: "A map uses 1 cm for every 10 km. How many centimetres show 45 km?",
+        hint: "Divide the real distance by 10.",
+        answer: "4.5 cm"
+      },
+      {
+        question: "Food for 4 astronauts lasts 30 days. How long would the same food last 6 astronauts?",
+        hint: "More astronauts means fewer days: this is inverse proportion. Work out the number of astronaut-days first.",
+        answer: "20 days (4 × 30 = 120 astronaut-days, and 120 ÷ 6 = 20)"
+      },
+      {
+        question: "Weight on Mars is 0.38 times weight on Earth. A rover weighs 9,000 N on Earth. What does it weigh on Mars?",
+        hint: "Weight on Mars is directly proportional to weight on Earth.",
+        answer: "3,420 N"
+      },
     ],
     realWorldConnection: 'Chefs use proportions constantly to scale recipes up or down depending on the number of guests. Mapmakers use ratios (scales) to accurately represent large geographic areas on small pieces of paper.',
     textbookContent: `
-## Proportions and Ratios
+## Ratio and proportion
 
-Ratios and proportions are fundamental mathematical concepts used to describe relationships between quantities. They form the basis for understanding percentages, probability, trigonometry, and advanced algebra.
+### Ratios
 
-### Understanding Ratios
+A **ratio** compares two or more quantities. If a mixture has 2 parts fuel to 3 parts oxidiser, the ratio of fuel to oxidiser is $2 : 3$. Order matters: oxidiser to fuel is $3 : 2$.
 
-A **ratio** compares the size of two or more quantities. It tells us how much of one thing there is compared to another.
-Ratios can be written in three main ways:
-1.  Using a colon: $a : b$
-2.  Using the word "to": $a \\text{ to } b$
-3.  As a fraction: $\\frac{a}{b}$
+To write a ratio in its **simplest form**, divide every part by the same number, as you would simplify a fraction:
 
-For example, if a bowl contains 3 red marbles and 5 blue marbles, the ratio of red to blue marbles is $3:5$. The ratio of red marbles to *total* marbles is $3:8$.
+$$12 : 18 = 2 : 3 \\quad \\text{(dividing both by 6)}$$
 
-### Equivalent Ratios and Proportions
+### Ratios and fractions
 
-Two ratios that represent the same relationship are called **equivalent ratios**. A **proportion** is an equation stating that two ratios are equal:
-$\\frac{a}{b} = \\frac{c}{d}$
+A ratio can also be written as fractions of the whole. In $2 : 3$ there are $2 + 3 = 5$ parts, so the first quantity is $\\dfrac{2}{5}$ of the total and the second is $\\dfrac{3}{5}$. The first is $\\dfrac{2}{3}$ of the second.
 
-You can generate equivalent ratios by multiplying or dividing both terms of the ratio by the same non-zero number, similar to finding equivalent fractions.
+To share £60 in the ratio $2 : 3$: one part is $60 \\div 5 = 12$, so the shares are $2 \\times 12 = £24$ and $3 \\times 12 = £36$.
 
-### Cross-Multiplication
+### Direct proportion
 
-The most reliable method for solving proportional equations involving an unknown value is **cross-multiplication**. In any true proportion $\\frac{a}{b} = \\frac{c}{d}$, the product of the extremes equals the product of the means:
-$a \\times d = b \\times c$
+Two quantities are in **direct proportion** when doubling one doubles the other. Their ratio stays the same, so
 
-**Example:**
-If $\\frac{4}{7} = \\frac{x}{21}$, then:
-$4 \\times 21 = 7 \\times x$
-$84 = 7x$
-$x = 12$
+$$\\frac{a}{b} = \\frac{c}{d}$$
 
-### References
+If you know three of the values, you can find the fourth. A car goes 150 miles on 15 litres of fuel. On 24 litres it goes
 
-*   [Khan Academy: Ratios, rates, & percentages](https://www.khanacademy.org/math/cc-sixth-grade-math/cc-6th-ratios-prop-topic)
-*   [National curriculum in England: mathematics programmes of study](https://www.gov.uk/government/publications/national-curriculum-in-england-mathematics-programmes-of-study)
-    `
+$$\\frac{150}{15} = \\frac{x}{24} \\quad \\Rightarrow \\quad x = 10 \\times 24 = 240 \\text{ miles}$$
+
+Algebraically, $y = kx$ for some fixed number $k$. On a graph, direct proportion is a straight line through the origin.
+
+### Inverse proportion
+
+Two quantities are in **inverse proportion** when doubling one halves the other. Their product stays the same:
+
+$$xy = k \\quad \\text{or} \\quad y = \\frac{k}{x}$$
+
+At 50 km/h a journey takes 6 hours; at 100 km/h it takes 3 hours. Speed × time is 300 each time. On a graph, inverse proportion is a curve that gets closer and closer to the axes without touching them.
+
+### Worked example
+
+Food for 4 astronauts lasts 30 days. How long does it last 6 astronauts?
+
+1.  More astronauts means fewer days, so this is inverse proportion.
+2.  The fixed product is $4 \\times 30 = 120$ astronaut-days of food.
+3.  For 6 astronauts: $120 \\div 6 = 20$ days.
+
+### Weight on other worlds
+
+Your weight on Mars is directly proportional to your weight on Earth: it is about $0.38$ times as much, because Mars pulls more weakly. A rover that weighs 9,000 N on Earth weighs $0.38 \\times 9{,}000 = 3{,}420$ N on Mars. Its mass is the same on both planets.
+
+### Sources
+
+The topics in these notes follow the Department for Education document below.
+
+*   [National curriculum in England: mathematics programmes of study](https://www.gov.uk/government/publications/national-curriculum-in-england-mathematics-programmes-of-study) (Department for Education)
+`
   },
   {
     id: 'decimals-percentages',
@@ -2838,50 +3232,87 @@ The topics in these notes follow the Department for Education document below.
     },
     practiceProblems: [
       {
-        question: 'Convert 180 degrees to radians.',
-        hint: 'A full circle (360 degrees) is 2π radians.',
-        answer: 'π radians'
+        question: "Convert 180° to radians.",
+        hint: "A full turn, 360°, is $2\\pi$ radians.",
+        answer: "$\\pi$ radians"
       },
       {
-        question: 'If s = 10 and r = 5, what is θ in radians?',
-        hint: 'Solve s = rθ for θ.',
-        answer: '2 radians'
-      }
+        question: "Convert 60° to radians.",
+        hint: "Multiply by $\\frac{\\pi}{180}$.",
+        answer: "$\\frac{\\pi}{3}$ radians"
+      },
+      {
+        question: "An arc has length 10 cm on a circle of radius 5 cm. What angle does it make at the centre, in radians?",
+        hint: "Rearrange $s = r\\theta$.",
+        answer: "2 radians"
+      },
+      {
+        question: "Find the area of a sector of radius 6 cm with an angle of $\\frac{\\pi}{3}$ radians.",
+        hint: "Use $A = \\frac{1}{2} r^2 \\theta$.",
+        answer: "$6\\pi \\approx 18.8$ cm²"
+      },
+      {
+        question: "Using degrees: find the length of an arc of angle 72° on a circle of radius 10 cm.",
+        hint: "72° is $\\frac{72}{360}$ of the full circle.",
+        answer: "$4\\pi \\approx 12.6$ cm"
+      },
+      {
+        question: "A geostationary satellite orbits 42,164 km from the centre of the Earth and goes round once a day. How far does it travel in one hour?",
+        hint: "In one hour it turns $\\frac{2\\pi}{24}$ radians. Then use $s = r\\theta$.",
+        answer: "About 11,000 km ($42{,}164 \\times \\frac{\\pi}{12} \\approx 11{,}040$ km)"
+      },
     ],
     realWorldConnection: 'Civil engineers use arc length and central angles to design safe curves in roads and railways. The radius must be large enough (and the curve gentle enough) to prevent derailments or slipping.',
     textbookContent: `
-## Angles and Circular Measurement
+## Radians, arcs and sectors
 
-Angles measure the amount of rotation between two intersecting lines. While everyday applications use degrees, advanced mathematics and physics rely heavily on **radians**.
+### Arcs and sectors in degrees
+
+An **arc** is part of the circumference of a circle. A **sector** is the slice between two radii, like a slice of pie. If the angle at the centre is $\\theta$ degrees, the arc and sector are that fraction of the whole circle:
+
+$$\\text{arc length} = \\frac{\\theta}{360} \\times 2\\pi r \\qquad \\text{sector area} = \\frac{\\theta}{360} \\times \\pi r^2$$
 
 ### Radians
 
-A **radian** is defined as the angle subtended at the centre of a circle by an arc whose length is equal to the circle's radius. 
-Because the total circumference of a circle is $C = 2\\pi r$, there are exactly $2\\pi$ radians in a full $360^\\circ$ rotation.
+At A-level, angles are usually measured in **radians**. One radian is the angle at the centre of a circle made by an arc as long as the radius.
 
-To convert between them:
-$\\text{Radians} = \\text{Degrees} \\times \\frac{\\pi}{180^\\circ}$
-$\\text{Degrees} = \\text{Radians} \\times \\frac{180^\\circ}{\\pi}$
+The whole circumference is $2\\pi r$, which is $2\\pi$ radius-lengths, so
 
-### Arc Length
+$$360° = 2\\pi \\text{ radians} \\qquad 180° = \\pi \\text{ radians}$$
 
-The **arc length** ($s$) is the distance along the curved edge of a circle. When the angle $\\theta$ is measured in radians, the formula is elegantly simple:
-$$s = r \\cdot \\theta$$
+*   Degrees to radians: multiply by $\\dfrac{\\pi}{180}$. So $60° = \\dfrac{\\pi}{3}$.
+*   Radians to degrees: multiply by $\\dfrac{180}{\\pi}$. So $2 \\text{ rad} \\approx 114.6°$.
 
-*Why?* If $\\theta = 2\\pi$ (a full circle), the formula gives $s = r(2\\pi) = 2\\pi r$, which is the circumference.
+### Arcs and sectors in radians
 
-### Sector Area
+With $\\theta$ in radians, the formulas become much simpler, because the $\\dfrac{\\theta}{2\\pi}$ fraction cancels:
 
-A **sector** is a portion of a circle enclosed by two radii and an arc (like a slice of pizza). The area of a sector is proportional to its central angle.
-$$A = \\frac{1}{2} r^2 \\theta$$
+$$s = r\\theta \\qquad A = \\frac{1}{2} r^2 \\theta$$
 
-*Why?* If $\\theta = 2\\pi$, the formula gives $A = \\frac{1}{2} r^2 (2\\pi) = \\pi r^2$, the area of the full circle.
+These formulas only work with the angle in radians.
 
-### References
+### Worked example
 
-*   [Khan Academy: Radians & Arc Length](https://www.khanacademy.org/math/algebra2/x2ec2f6f830c9fb89:trig/x2ec2f6f830c9fb89:radians/v/introduction-to-radians)
-*   [Stewart Calculus (Early Transcendentals)](https://www.cengage.com/c/calculus-early-transcendentals-9e-stewart/9781337613927/)
-    `
+Find the arc length and sector area for $r = 4$ m and $\\theta = \\dfrac{\\pi}{2}$.
+
+1.  $s = 4 \\times \\dfrac{\\pi}{2} = 2\\pi \\approx 6.28$ m
+2.  $A = \\dfrac{1}{2} \\times 16 \\times \\dfrac{\\pi}{2} = 4\\pi \\approx 12.6$ m²
+
+### Why radians are used
+
+In radians, an angle is a ratio of two lengths, arc over radius, so it has no unit. That is why later results, such as $\\sin\\theta \\approx \\theta$ for small angles and the derivative of $\\sin x$ being $\\cos x$, only work in radians.
+
+### Satellites going round
+
+A satellite in a circular orbit sweeps out equal angles in equal times. A geostationary satellite, 42,164 km from the centre of the Earth, turns $2\\pi$ radians a day, which is $\\dfrac{\\pi}{12}$ radians an hour. Each hour it travels $s = r\\theta = 42{,}164 \\times \\dfrac{\\pi}{12} \\approx 11{,}000$ km.
+
+### Sources
+
+The topics in these notes follow the Department for Education documents below.
+
+*   [GCSE mathematics: subject content and assessment objectives](https://www.gov.uk/government/publications/gcse-mathematics-subject-content-and-assessment-objectives) (Department for Education)
+*   [GCE AS and A level subject content for mathematics](https://www.gov.uk/government/publications/gce-as-and-a-level-mathematics) (Department for Education)
+`
   },
   {
     id: 'multiplication',
@@ -3244,44 +3675,97 @@ The topics in these notes follow the Department for Education document below.
       resultFormula: '(-3)(-4) + (-2) = 10'
     },
     practiceProblems: [
-      { question: 'What is (-5) + 8?', hint: 'Move 8 places right from -5.', answer: '3' },
-      { question: 'What is (-3) × (-7)?', hint: 'Negative × negative = positive.', answer: '21' }
+      {
+        question: "Work out −5 + 8.",
+        hint: "Start at −5 on the number line and move 8 to the right.",
+        answer: "3"
+      },
+      {
+        question: "Work out −3 − (−7).",
+        hint: "Subtracting a negative is the same as adding: −3 + 7.",
+        answer: "4"
+      },
+      {
+        question: "Work out −2.5 × 4.",
+        hint: "Work out 2.5 × 4, then decide the sign: one negative.",
+        answer: "−10"
+      },
+      {
+        question: "Work out (−3) × (−7).",
+        hint: "Two negatives multiplied give a positive.",
+        answer: "21"
+      },
+      {
+        question: "Work out 36 ÷ (−4).",
+        hint: "Signs that differ give a negative answer.",
+        answer: "−9"
+      },
+      {
+        question: "The Moon's surface reaches about 120 °C in sunlight and falls to about −130 °C at night. What is the difference?",
+        hint: "Find the interval across 0: from −130 up to 0, then from 0 up to 120.",
+        answer: "250 °C"
+      },
     ],
     realWorldConnection: 'Negative numbers model temperature below zero, debt in finance, and downward forces in physics.',
     textbookContent: `
-## Negative Numbers and Signed Arithmetic
+## Negative numbers
 
-Negative numbers extend the counting numbers into values less than zero. They are fundamental to algebra, physics, finance, and computing.
+Negative numbers are numbers less than zero. You meet them as temperatures below freezing, as depths below sea level and as money owed.
 
-### The Number Line
+### The number line
 
-$$\\cdots -3, -2, -1, 0, +1, +2, +3 \\cdots$$
+On a number line the negative numbers sit to the left of zero:
 
-### Addition and Subtraction Rules
+$$\\cdots,\\ -3,\\ -2,\\ -1,\\ 0,\\ 1,\\ 2,\\ 3,\\ \\cdots$$
 
-| Operation | Interpretation |
-|---|---|
-| $a + b$ | Move $b$ units right |
-| $a + (-b)$ | Move $b$ units left (same as $a - b$) |
-| $a - (-b)$ | Move $b$ units right (same as $a + b$) |
+A number further to the right is bigger. So $-2$ is bigger than $-5$, even though 5 is bigger than 2.
 
-### Multiplication Sign Rules
+### Adding and subtracting
 
-| Signs | Product |
-|---|---|
-| $(+)(+)$ | Positive |
-| $(-)(-) $ | Positive |
-| $(+)(-)$ | Negative |
+*   Adding a positive number moves you **right**: $-5 + 8 = 3$.
+*   Subtracting a positive number moves you **left**: $4 - 9 = -5$.
+*   Adding a negative number is the same as subtracting: $6 + (-2) = 6 - 2 = 4$.
+*   Subtracting a negative number is the same as adding: $-3 - (-7) = -3 + 7 = 4$.
 
-### Absolute Value
+### Intervals across zero
 
-$$|a| = \\begin{cases} a & \\text{if } a \\geq 0 \\\\ -a & \\text{if } a < 0 \\end{cases}$$
+To find the difference between a positive and a negative number, count the steps to zero and then on from zero. From $-8$ °C to $5$ °C is 8 degrees up to 0 and 5 more, a rise of 13 degrees. As a calculation: $5 - (-8) = 13$.
 
-### References
+### Multiplying and dividing
 
-*   [Khan Academy: Negative Numbers](https://www.khanacademy.org/math/cc-sixth-grade-math/cc-6th-factors-and-multiples/cc-6th-negative-numbers/v/negative-numbers-introduction)
-*   [Art of Problem Solving: Integers](https://artofproblemsolving.com/wiki/index.php/Integer)
-    `
+Work out the size of the answer as normal, then decide the sign:
+
+| Signs | Answer | Example |
+| --- | --- | --- |
+| positive and positive | positive | $3 \\times 4 = 12$ |
+| negative and negative | positive | $(-3) \\times (-4) = 12$ |
+| positive and negative | negative | $3 \\times (-4) = -12$ |
+
+Division follows the same rules: $(-12) \\div (-4) = 3$ and $12 \\div (-4) = -3$.
+
+The same rules apply to decimals and fractions: $-2.5 \\times 4 = -10$ and $-\\dfrac{1}{2} \\times -\\dfrac{2}{3} = \\dfrac{1}{3}$.
+
+### Worked example
+
+Work out $(-3) \\times (-4) + (-2)$.
+
+1.  Multiply first: $(-3) \\times (-4) = 12$.
+2.  Then add: $12 + (-2) = 12 - 2 = 10$.
+
+### Hot and cold on the Moon
+
+The Moon has no air to hold heat. In sunlight its surface reaches about $120$ °C; at night it falls to about $-130$ °C. The change between them is
+
+$$120 - (-130) = 120 + 130 = 250 \\text{ °C}$$
+
+Spacecraft that land there must survive that whole range.
+
+### Sources
+
+The topics in these notes follow the Department for Education document below.
+
+*   [National curriculum in England: mathematics programmes of study](https://www.gov.uk/government/publications/national-curriculum-in-england-mathematics-programmes-of-study) (Department for Education)
+`
   },
   {
     id: 'exponents-roots',
@@ -3894,63 +4378,93 @@ The topics in these notes follow the Department for Education documents below.
     },
     practiceProblems: [
       {
-        question: 'A satellite sensor records temperatures: {-20, -18, -22, -19, -21}°C. What is the mean?',
-        hint: 'Sum all values and divide by 5.',
-        answer: '-20°C'
+        question: "A satellite sensor records temperatures of −20, −18, −22, −19 and −21 °C. What is the mean?",
+        hint: "Add the values and divide by 5.",
+        answer: "−20 °C"
       },
       {
-        question: 'Dataset A has σ = 0.1 and Dataset B has σ = 5. Which is more precise (consistent)?',
-        hint: 'Lower standard deviation means tighter clustering around the mean.',
-        answer: 'Dataset A — its values are much more consistent.'
+        question: "Find the median and the range of 3, 7, 7, 9, 12, 15.",
+        hint: "With six values, the median is halfway between the 3rd and 4th.",
+        answer: "Median 8, range 12"
       },
       {
-        question: 'If the mean of 5 test scores is 80, and four scores are 75, 85, 90, 70, what is the fifth score?',
-        hint: 'Total must be 5 × 80 = 400.',
-        answer: '80'
-      }
+        question: "The mean of five test scores is 80. Four of them are 75, 85, 90 and 70. What is the fifth?",
+        hint: "The five scores must total 5 × 80 = 400.",
+        answer: "80"
+      },
+      {
+        question: "Find the standard deviation of 4, 8, 6 and 2.",
+        hint: "The mean is 5. Square each distance from the mean, find the mean of those squares, then take the square root.",
+        answer: "$\\sqrt{5} \\approx 2.24$"
+      },
+      {
+        question: "For 10 readings, $\\sum x = 50$ and $\\sum x^2 = 290$. Find the mean and the standard deviation.",
+        hint: "Use $\\sigma^2 = \\frac{\\sum x^2}{n} - \\bar{x}^2$.",
+        answer: "Mean 5, standard deviation 2 (variance 29 − 25 = 4)"
+      },
+      {
+        question: "Two thermometers are tested. Readings from A have a standard deviation of 0.1 °C, readings from B 0.5 °C, about the same mean. Which is more precise?",
+        hint: "Precise means the readings agree closely with each other.",
+        answer: "A: its readings are spread out less."
+      },
     ],
     realWorldConnection: 'Engineers use statistics to separate real signals from sensor noise. A reading several standard deviations from the mean is unlikely to be chance, so it is flagged for a closer look.',
     textbookContent: `
-## Descriptive Statistics and Distributions
+## Averages and spread
 
-Statistics is the science of collecting, analysing, interpreting, and presenting data. In engineering and science, it is essential for understanding measurement uncertainty, signal processing, and model validation.
+A set of data is usually summarised by two numbers: one for its centre, and one for how spread out it is.
 
-### Measures of Central Tendency
+### Averages
 
-*   **Mean:** $\\mu = \\frac{1}{N} \\sum_{i=1}^{N} x_i$
-*   **Median:** The middle value when data is sorted in ascending order.
-*   **Mode:** The most frequently occurring value.
+*   The **mean** is the total divided by the number of values: $\\bar{x} = \\dfrac{\\sum x}{n}$.
+*   The **median** is the middle value when the data is in order. With an even number of values, it is halfway between the middle two.
+*   The **mode** is the value that occurs most often.
 
-### Measures of Spread
+The mean uses every value, but one extreme value can pull it a long way. The median is not affected by extreme values, so it is often better for skewed data, such as incomes.
 
-*   **Variance:** $\\sigma^2 = \\frac{1}{N} \\sum_{i=1}^{N} (x_i - \\mu)^2$
-*   **Standard Deviation:** $\\sigma = \\sqrt{\\sigma^2}$
-*   **Range:** $x_{\\max} - x_{\\min}$
+### Spread
 
-> **Note:** Population variance uses $1/N$. Sample variance uses $1/(N-1)$ (Bessel's correction).
+*   The **range** is the largest value minus the smallest. It depends only on the two extremes.
+*   The **interquartile range** is the upper quartile minus the lower quartile: the spread of the middle half of the data.
+*   The **standard deviation** measures how far values typically are from the mean, using every value.
 
-### The Normal Distribution
+### Standard deviation
 
-$$f(x) = \\frac{1}{\\sigma\\sqrt{2\\pi}} e^{-\\frac{1}{2}\\left(\\frac{x-\\mu}{\\sigma}\\right)^2}$$
+The **variance** is the mean of the squared distances from the mean, and the standard deviation $\\sigma$ is its square root:
 
-**The Empirical Rule (68-95-99.7):**
+$$\\sigma^2 = \\frac{\\sum (x - \\bar{x})^2}{n}$$
 
-| Interval | % of Data |
-|---|---|
-| $\\mu \\pm 1\\sigma$ | ≈ 68.27% |
-| $\\mu \\pm 2\\sigma$ | ≈ 95.45% |
-| $\\mu \\pm 3\\sigma$ | ≈ 99.73% |
+An equivalent form is easier with **summary statistics**, when you are given $n$, $\\sum x$ and $\\sum x^2$ rather than the data:
 
-### Correlation vs. Causation
+$$\\sigma^2 = \\frac{\\sum x^2}{n} - \\bar{x}^2$$
 
-Two variables may be statistically correlated without one causing the other. Establishing causation requires controlled experiments.
+Some calculators and textbooks divide by $n - 1$ instead of $n$ when estimating from a sample. Use the form your specification asks for.
 
-### References
+### Worked example
 
-*   [The Art of Statistics](https://www.penguin.co.uk/books/294857/the-art-of-statistics-by-spiegelhalter-david/9780241258767) (David Spiegelhalter, Pelican)
-*   [Statistics](https://www.amazon.co.uk/Statistics-4th-David-Freedman/dp/0393929728) (Freedman, Pisani & Purves, 4th ed.)
-*   [Khan Academy: Statistics and Probability](https://www.khanacademy.org/math/statistics-probability)
-    `
+Find the mean and standard deviation of 2, 4, 4, 4, 5, 5, 7, 9.
+
+1.  Mean: $\\bar{x} = \\dfrac{40}{8} = 5$.
+2.  Squared distances from 5: $9, 1, 1, 1, 0, 0, 4, 16$, which total 32.
+3.  Variance: $\\dfrac{32}{8} = 4$, so $\\sigma = 2$.
+
+Check with summary statistics: $\\sum x^2 = 232$, and $\\dfrac{232}{8} - 5^2 = 29 - 25 = 4$.
+
+### Outliers
+
+An **outlier** is a value far from the rest. Two common rules mark a value as an outlier if it is more than 2 standard deviations from the mean, or more than 1.5 interquartile ranges beyond a quartile. A question will tell you which to use. Check an outlier before removing it: it may be an error, or it may be the most interesting result.
+
+### Sensor readings in space
+
+A spacecraft's sensors are never perfectly steady. Engineers work out the usual mean and standard deviation of each reading. A reading many standard deviations from the mean is very unlikely to be chance, so the software flags it for a closer look.
+
+### Sources
+
+The topics in these notes follow the Department for Education documents below.
+
+*   [National curriculum in England: mathematics programmes of study](https://www.gov.uk/government/publications/national-curriculum-in-england-mathematics-programmes-of-study) (Department for Education)
+*   [GCE AS and A level subject content for mathematics](https://www.gov.uk/government/publications/gce-as-and-a-level-mathematics) (Department for Education)
+`
   },
 
   // ─── ELECTROMAGNETISM ─────────────────────────────────────────────────────────
@@ -4033,60 +4547,95 @@ Two variables may be statistically correlated without one causing the other. Est
     },
     practiceProblems: [
       {
-        question: 'If the number of turns N doubles but dΦ/dt stays constant, how does the induced EMF change?',
-        hint: 'EMF is directly proportional to N.',
-        answer: 'The EMF doubles.'
+        question: "The number of turns on a coil is doubled, and the flux through it changes at the same rate. What happens to the induced emf?",
+        hint: "The emf is proportional to the number of turns.",
+        answer: "It doubles."
       },
       {
-        question: 'A stationary magnet near a stationary coil: is any voltage induced?',
-        hint: "Think about what Faraday's law requires.",
-        answer: "No. Faraday's law requires a *changing* flux. Static fields produce no EMF."
-      }
+        question: "A magnet rests next to a coil, and neither moves. Is a voltage induced?",
+        hint: "Induction needs a change in the field through the coil.",
+        answer: "No. The flux through the coil is not changing."
+      },
+      {
+        question: "A magnetic field of 0.2 T passes straight through a loop of area 0.05 m². What is the flux through the loop?",
+        hint: "$\\Phi = BA$.",
+        answer: "0.01 Wb"
+      },
+      {
+        question: "The flux through a 200-turn coil falls from 0.5 Wb to 0.1 Wb in 0.2 s. What is the size of the induced emf?",
+        hint: "emf = number of turns × change in flux ÷ time taken.",
+        answer: "400 V"
+      },
+      {
+        question: "A 100-turn coil of area 0.02 m² sits in a field that rises from 0 to 0.3 T in 0.1 s, at right angles to the coil. Find the induced emf.",
+        hint: "Find the change in flux, $\\Delta\\Phi = A \\Delta B$, first.",
+        answer: "6 V ($100 \\times 0.006 \\div 0.1$)"
+      },
+      {
+        question: "The north pole of a magnet is pushed into a coil. Which pole forms at the end of the coil facing the magnet, and why?",
+        hint: "The induced current opposes the change that causes it.",
+        answer: "A north pole, which repels the magnet and opposes its approach (Lenz's law)."
+      },
     ],
     realWorldConnection: "Every power station generator and every transformer on the electricity grid works by Faraday's law. So do wireless phone chargers, induction hobs and the pickups on an electric guitar.",
     textbookContent: `
-## Faraday's Law of Electromagnetic Induction
+## Electromagnetic induction
 
-Electromagnetic induction is the production of an electromotive force across an electrical conductor in a changing magnetic field. Independently discovered by Michael Faraday (1831) and Joseph Henry (1832).
+When the magnetic field through a coil changes, a voltage is produced across the coil. This is **electromagnetic induction**. If the coil is part of a complete circuit, the voltage drives a current.
 
-### Magnetic Flux
+### What makes it happen
 
-$$\\Phi_B = \\iint_S \\vec{B} \\cdot d\\vec{A}$$
+A voltage is induced when:
 
-For a uniform field $B$ through flat area $A$ at angle $\\theta$ to the surface normal:
-$$\\Phi_B = BA\\cos\\theta$$
+*   a magnet moves into or out of a coil,
+*   a coil moves or turns in a magnetic field, or
+*   the current in a nearby electromagnet changes.
 
-The SI unit is the **Weber (Wb)**: $1 \\text{ Wb} = 1 \\text{ V}\\cdot\\text{s} = 1 \\text{ T}\\cdot\\text{m}^2$.
+The key is **change**. A magnet sitting still next to a coil induces nothing.
 
-### Faraday's Law
+### Magnetic flux
 
-For a single loop:
-$$\\mathcal{E} = -\\frac{d\\Phi_B}{dt}$$
+**Magnetic flux** $\\Phi$ measures how much magnetic field passes through an area. For a field $B$ at right angles to an area $A$:
 
-For a coil of $N$ turns:
-$$\\mathcal{E} = -N \\frac{d\\Phi_B}{dt}$$
+$$\\Phi = BA$$
 
-### Lenz's Law
+Flux is measured in webers (Wb). For a coil of $N$ turns, the **flux linkage** is $N\\Phi$.
 
-The negative sign encodes **Lenz's Law**: the induced emf drives a current whose magnetic field opposes the change in flux. This is a direct consequence of energy conservation.
+### Faraday's law
 
-### Maxwell's Equations
+The induced emf equals the rate of change of flux linkage:
 
-Faraday's Law in differential form (one of Maxwell's four equations):
-$$\\nabla \\times \\vec{E} = -\\frac{\\partial \\vec{B}}{\\partial t}$$
+$$\\mathcal{E} = -N\\frac{\\Delta \\Phi}{\\Delta t}$$
 
-### Applications
+More turns, a stronger field, or a faster change all give a larger emf.
 
-*   **Generators:** Rotating a coil in a magnetic field continuously changes flux, generating AC power.
-*   **Transformers:** Two coils share a core; changing flux in one induces emf in the other.
-*   **Induction Charging:** Wireless charging pads use alternating magnetic fields to induce current.
+### Lenz's law
 
-### References
+The minus sign is **Lenz's law**: the induced current flows in the direction that **opposes** the change causing it. Push the north pole of a magnet into a coil and the coil's near end becomes a north pole, pushing back. You have to do work to move the magnet, and that work becomes electrical energy. Lenz's law is the conservation of energy at work.
 
-*   [Introduction to Electrodynamics, 4th ed.](https://www.cambridge.org/gb/universitypress/subjects/physics/electromagnetism-and-electrodynamics/introduction-electrodynamics-4th-edition) (David J. Griffiths, Cambridge)
-*   [Feynman Lectures, Vol. II, Ch. 17: The Laws of Induction](https://www.feynmanlectures.caltech.edu/II_17.html)
-*   [MIT OCW 8.02: Physics II — Electricity and Magnetism](https://ocw.mit.edu/courses/8-02-physics-ii-electricity-and-magnetism-spring-2007/)
-    `
+### Worked example
+
+A 200-turn coil has the flux through it fall from 0.5 Wb to 0.1 Wb in 0.2 s.
+
+1.  Change in flux: $0.1 - 0.5 = -0.4$ Wb.
+2.  Rate of change: $-0.4 \\div 0.2 = -2$ Wb/s.
+3.  $\\mathcal{E} = -200 \\times (-2) = 400$ V.
+
+### Where it is used
+
+Generators in power stations turn coils in magnetic fields. Transformers change voltages using a changing current in one coil to induce a voltage in another. Wireless chargers and induction hobs work the same way.
+
+### A tether in orbit
+
+In 1996 the Space Shuttle unreeled a conducting cable about 20 km long. Moving at orbital speed through the Earth's magnetic field, the cable had an emf of about 3,500 volts induced along it, just as Faraday's law predicts for a conductor cutting through a field.
+
+### Sources
+
+The topics in these notes follow the Department for Education documents below.
+
+*   [GCSE subject content for biology, chemistry and physics](https://www.gov.uk/government/publications/gcse-single-science) (Department for Education)
+*   [GCE AS and A level subject content for science](https://www.gov.uk/government/publications/gce-as-and-a-level-for-science) (Department for Education)
+`
   },
 
   // ─── QUANTUM BASICS ───────────────────────────────────────────────────────────
@@ -4147,9 +4696,9 @@ $$\\nabla \\times \\vec{E} = -\\frac{\\partial \\vec{B}}{\\partial t}$$
       },
       {
         stepNumber: 3,
-        title: "Heisenberg's Uncertainty Principle",
-        content: 'Werner Heisenberg showed that it is fundamentally impossible to simultaneously know both the exact position $x$ and exact momentum $p$ of a particle: $\\Delta x \\cdot \\Delta p \\geq \\frac{\\hbar}{2}$. This is not a limitation of instruments — it is a fundamental property of the universe.',
-        keyInsight: 'The more precisely you know position, the less precisely you can know momentum — and vice versa.',
+        title: 'Electron Diffraction',
+        content: 'Electrons fired through a thin layer of graphite spread into rings, a diffraction pattern, just as light does through a grating. Diffraction is a wave effect, so this shows that particles can behave as waves, with a wavelength $\\lambda = \\frac{h}{p}$.',
+        keyInsight: 'Faster electrons have more momentum and so a shorter wavelength, which makes smaller diffraction rings.',
         relatedVariables: ['h']
       }
     ],
@@ -4164,65 +4713,96 @@ $$\\nabla \\times \\vec{E} = -\\frac{\\partial \\vec{B}}{\\partial t}$$
     },
     practiceProblems: [
       {
-        question: 'A UV photon has twice the frequency of a green photon. How do their energies compare?',
-        hint: 'E = hf. If f doubles, what happens to E?',
-        answer: 'The UV photon has twice the energy.'
+        question: "An ultraviolet photon has twice the frequency of a green photon. How do their energies compare?",
+        hint: "$E = hf$.",
+        answer: "The ultraviolet photon has twice the energy."
       },
       {
-        question: 'Radio waves have frequencies around 10⁸ Hz. X-rays have frequencies around 10¹⁸ Hz. Which photons are more energetic, and by what factor?',
-        hint: 'Compare the frequencies using E = hf.',
-        answer: 'X-ray photons are 10¹⁰ (10 billion) times more energetic.'
+        question: "Radio waves have frequencies around $10^8$ Hz and X-rays around $10^{18}$ Hz. Which photons carry more energy, and by what factor?",
+        hint: "Compare the frequencies.",
+        answer: "X-ray photons, by a factor of about $10^{10}$."
       },
       {
-        question: 'Why can UV light cause sunburn but visible light cannot, even at the same intensity?',
-        hint: 'Think about individual photon energies, not total beam power.',
-        answer: 'UV photons have higher individual energies (higher frequency) and can break chemical bonds in DNA molecules. Visible photons lack sufficient energy per quantum to do this, regardless of total beam intensity.'
-      }
+        question: "Find the energy of a photon of frequency $5.0 \\times 10^{14}$ Hz. Use $h = 6.63 \\times 10^{-34}$ J s.",
+        hint: "Multiply $h$ by $f$.",
+        answer: "About $3.3 \\times 10^{-19}$ J"
+      },
+      {
+        question: "Light with photons of 3.0 eV falls on a metal whose work function is 2.3 eV. What is the greatest kinetic energy of the electrons released?",
+        hint: "Each photon gives all its energy to one electron, which must pay the work function to escape.",
+        answer: "0.7 eV"
+      },
+      {
+        question: "Bright red light releases no electrons from a metal, but dim blue light does. Why?",
+        hint: "Think about the energy of one photon, not the brightness of the beam.",
+        answer: "Each red photon has too little energy to release an electron, however many there are. Each blue photon has enough."
+      },
+      {
+        question: "An electron has momentum $1.0 \\times 10^{-24}$ kg m/s. Find its de Broglie wavelength, using $h = 6.63 \\times 10^{-34}$ J s.",
+        hint: "$\\lambda = \\frac{h}{p}$.",
+        answer: "About $6.6 \\times 10^{-10}$ m, similar to the spacing of atoms in a crystal, so the electrons can be diffracted."
+      },
     ],
     realWorldConnection: 'Quantum mechanics underpins every semiconductor in your phone, spacecraft solar cells, GPS atomic clocks, and MRI scanners. Understanding quantisation is essential to all modern technology.',
     textbookContent: `
-## Quantum Mechanics: Foundations
+## Photons
 
-Quantum mechanics governs the behaviour of matter and energy at atomic and subatomic scales. It replaces deterministic classical mechanics with a probabilistic description.
+### Light as packets of energy
 
-### Planck's Quantum Hypothesis (1900)
+Light is a wave: it shows diffraction and interference. But when light gives up its energy, it does so in separate packets called **photons**. The energy of one photon depends only on its frequency:
 
-Max Planck explained the spectrum of hot objects by postulating that electromagnetic oscillators emit or absorb energy only in discrete amounts:
-$$E_n = nhf \\quad (n = 0, 1, 2, \\ldots)$$
+$$E = hf$$
 
-where $h \\approx 6.626 \\times 10^{-34}$ J·s is **Planck's constant**.
+where $h = 6.63 \\times 10^{-34}$ J s is the **Planck constant**. Using $c = f\\lambda$, this is also $E = \\dfrac{hc}{\\lambda}$. A brighter beam has more photons, not more energetic ones.
 
-### The Photoelectric Effect (Einstein, 1905)
+Photon energies are tiny, so they are often given in **electronvolts**: $1 \\text{ eV} = 1.60 \\times 10^{-19}$ J.
 
-Einstein proposed that light consists of discrete quanta (photons), each carrying energy $E = hf$. Above a threshold frequency $f_0$, electron kinetic energy scales linearly with frequency:
-$$K_{\\max} = hf - \\phi$$
-where $\\phi$ is the work function. Einstein won the 1921 Nobel Prize for this work.
+### Evidence: the photoelectric effect
 
-### de Broglie Wavelength
+Shining light on a clean metal can release electrons. Experiments show that:
 
-All matter has an associated wavelength (de Broglie, 1924):
-$$\\lambda = \\frac{h}{p} = \\frac{h}{mv}$$
+*   below a certain **threshold frequency**, no electrons are released, however bright the light;
+*   above it, electrons are released straight away, even in very dim light;
+*   the greatest energy of the electrons depends on the frequency, not the brightness.
 
-Confirmed by the Davisson-Germer electron diffraction experiment (1927).
+A wave model cannot explain this. The photon model can: each electron absorbs one photon. If $hf$ is less than the **work function** $\\phi$, the energy needed to escape, the electron stays put. Otherwise
 
-### The Heisenberg Uncertainty Principle
+$$hf = \\phi + E_{k(\\text{max})}$$
 
-$$\\Delta x \\cdot \\Delta p \\geq \\frac{\\hbar}{2}$$
+### Evidence: line spectra
 
-where $\\hbar = h / (2\\pi)$ is the reduced Planck constant. Similarly: $\\Delta E \\cdot \\Delta t \\geq \\hbar / 2$.
+A hot gas gives out light at only certain sharp frequencies. Electrons in atoms can only have certain energy levels. When an electron drops between two levels it gives out one photon, whose energy $hf$ equals the difference between the levels. Each element has its own set of levels, so its own set of lines.
 
-### The Schrödinger Equation
+### Wave-particle duality
 
-$$i\\hbar \\frac{\\partial \\Psi}{\\partial t} = \\hat{H} \\Psi$$
+Light behaves as a wave when it travels and as a particle when it is absorbed. Matter does the same in reverse: particles such as electrons can behave as waves. Their **de Broglie wavelength** is
 
-The wavefunction $\\Psi$ gives the probability amplitude for finding the particle in a given state. The probability density is $|\\Psi|^2$.
+$$\\lambda = \\frac{h}{p}$$
 
-### References
+where $p$ is the momentum.
 
-*   [Quantum Mechanics: The Theoretical Minimum](https://theoreticalminimum.com/courses/quantum-mechanics) (Leonard Susskind & Art Friedman)
-*   [Feynman Lectures, Vol. III: Quantum Mechanics](https://www.feynmanlectures.caltech.edu/III_toc.html)
-*   [Introduction to Quantum Mechanics, 3rd ed.](https://www.cambridge.org/core/books/introduction-to-quantum-mechanics/990799CA07A83FC5312402AF6860311E) (David J. Griffiths)
-    `
+### Evidence: electron diffraction
+
+A beam of electrons fired through a thin layer of graphite makes rings on a screen, a diffraction pattern, just like light through a grating. Diffraction is a wave effect, and it only shows up clearly when the wavelength is about the size of the gaps, here the spacing between atoms. Faster electrons have shorter wavelengths and make smaller rings, as $\\lambda = \\dfrac{h}{p}$ predicts.
+
+### Worked example
+
+Find the energy of a photon of green light, $f = 6.0 \\times 10^{14}$ Hz.
+
+1.  $E = hf = 6.63 \\times 10^{-34} \\times 6.0 \\times 10^{14}$
+2.  $E \\approx 3.98 \\times 10^{-19}$ J
+3.  In electronvolts: $\\dfrac{3.98 \\times 10^{-19}}{1.60 \\times 10^{-19}} \\approx 2.5$ eV
+
+### Reading the light of stars
+
+The dark and bright lines in a star's spectrum are photons absorbed or given out as electrons jump between energy levels. Because each element has its own pattern of lines, astronomers can tell what a star is made of from its light alone.
+
+### Sources
+
+The topics in these notes follow the Department for Education document below.
+
+*   [GCE AS and A level subject content for science](https://www.gov.uk/government/publications/gce-as-and-a-level-for-science) (Department for Education)
+`
   },
   {
     id: 'units',
@@ -4306,46 +4886,51 @@ The wavefunction $\\Psi$ gives the probability amplitude for finding the particl
     },
     practiceProblems: [
       {
-        question: 'Convert 450 mA to amperes.',
-        hint: 'Milli means $10^{-3}$, so divide by 1000.',
-        answer: '0.45 A'
+        question: "Convert 450 mA to amperes.",
+        hint: "Milli means $10^{-3}$, so divide by 1000.",
+        answer: "0.45 A"
       },
       {
-        question: 'Convert 3.2 km to metres.',
-        hint: 'Kilo means $10^3$, so multiply by 1000.',
-        answer: '3200 m'
+        question: "Convert 3.2 km to metres.",
+        hint: "Kilo means $10^3$, so multiply by 1000.",
+        answer: "3200 m"
       },
       {
-        question: 'A car travels at 90 km/h. What is its speed in m/s?',
-        hint: 'Divide by 3.6, or convert 90 km to metres and 1 hour to seconds.',
-        answer: '25 m/s'
+        question: "A car travels at 90 km/h. What is its speed in m/s?",
+        hint: "Divide by 3.6, or convert 90 km to metres and 1 hour to seconds.",
+        answer: "25 m/s"
       },
       {
-        question: 'A cyclist travels at 15 m/s. What is this in km/h?',
-        hint: 'Going from m/s to km/h, multiply by 3.6.',
-        answer: '54 km/h'
+        question: "A cyclist travels at 15 m/s. What is this in km/h?",
+        hint: "Going from m/s to km/h, multiply by 3.6.",
+        answer: "54 km/h"
       },
       {
-        question: 'A tabletop has an area of 2 m². What is this in cm²?',
-        hint: 'One square metre is $100 \\times 100$ square centimetres.',
-        answer: '20 000 cm²'
+        question: "A tabletop has an area of 2 m². What is this in cm²?",
+        hint: "One square metre is $100 \\times 100$ square centimetres.",
+        answer: "20 000 cm²"
       },
       {
-        question: 'Red light has a wavelength of 650 nm. Write this in metres, in standard form.',
-        hint: 'Nano means $10^{-9}$. Then move the decimal point so the number is between 1 and 10.',
-        answer: '$6.5 \\times 10^{-7}$ m'
-      }
+        question: "Red light has a wavelength of 650 nm. Write this in metres, in standard form.",
+        hint: "Nano means $10^{-9}$. Then move the decimal point so the number is between 1 and 10.",
+        answer: "$6.5 \\times 10^{-7}$ m"
+      },
     ],
     realWorldConnection: 'In 1999 NASA lost the Mars Climate Orbiter because of a unit mix-up. One team\'s software reported thruster impulse in pound-force seconds, and the navigation software expected newton seconds. Nobody converted, the spacecraft approached Mars far too low, and it was lost.',
     textbookContent: `
-## Converting Units
+## Converting units
 
-Physics formulas only give the right answer if every quantity is in a consistent set of units, normally the SI base units. Converting first, then substituting, avoids most errors.
+A physics formula only gives the right answer if every quantity is in units that fit together, normally the SI units: metres, kilograms, seconds, amperes and so on. Convert first, then put the numbers into the formula.
 
-### SI Prefixes
+Converting never changes the quantity itself. A smaller unit needs a bigger number: 2 km and 2000 m are the same distance.
+
+### Prefixes
+
+A prefix in front of a unit stands for a power of ten:
 
 | Prefix | Symbol | Factor | Example |
-|---|---|---|---|
+| --- | --- | --- | --- |
+| tera | T | $10^{12}$ | 1 TW = 1 000 000 000 000 W |
 | giga | G | $10^{9}$ | 1 GW = 1 000 000 000 W |
 | mega | M | $10^{6}$ | 1 MHz = 1 000 000 Hz |
 | kilo | k | $10^{3}$ | 1 km = 1000 m |
@@ -4354,46 +4939,43 @@ Physics formulas only give the right answer if every quantity is in a consistent
 | micro | μ | $10^{-6}$ | 1 μm = 0.000 001 m |
 | nano | n | $10^{-9}$ | 1 nm = 0.000 000 001 m |
 
-Take care with capital letters: m is milli but M is mega, a difference of a billion.
+To reach the base unit, replace the prefix with its factor: $20 \\text{ mA} = 20 \\times 10^{-3} \\text{ A} = 0.02 \\text{ A}$. Take care with capitals: m is milli but M is mega.
 
-### Conversion Factors
+### Units made of two units
 
-A conversion factor is a fraction equal to 1, because its top and bottom are the same quantity in different units. Multiplying by it changes the units but not the quantity. Choose the fraction that cancels the unit you want to remove:
+For a unit such as km/h, convert each part separately. For 72 km/h:
 
-$$72\\ \\frac{\\text{km}}{\\text{h}} \\times \\frac{1000\\ \\text{m}}{1\\ \\text{km}} \\times \\frac{1\\ \\text{h}}{3600\\ \\text{s}} = 20\\ \\frac{\\text{m}}{\\text{s}}$$
+1.  $72 \\text{ km} = 72\\,000 \\text{ m}$
+2.  $1 \\text{ h} = 3600 \\text{ s}$
+3.  $72\\,000 \\div 3600 = 20$ m/s
 
-The kilometres cancel, the hours cancel, and metres per second are left.
+The shortcut: divide km/h by 3.6 to get m/s, and multiply m/s by 3.6 to get km/h.
 
-### Time
+### Areas and volumes
 
-*   1 minute = 60 s
-*   1 hour = 60 minutes = 3600 s
-*   1 day = 24 hours = 86 400 s
+Because $1 \\text{ m} = 100 \\text{ cm}$:
 
-### Area and Volume
+*   $1 \\text{ m}^2 = 100 \\times 100 = 10\\,000 \\text{ cm}^2$
+*   $1 \\text{ m}^3 = 100 \\times 100 \\times 100 = 1\\,000\\,000 \\text{ cm}^3$
 
-Square the length factor for area and cube it for volume:
+Square the length factor for an area and cube it for a volume. Using 100 for all three is a common mistake. Volumes of liquid are often in litres: $1 \\text{ litre} = 1000 \\text{ cm}^3$, and $1 \\text{ m}^3 = 1000$ litres.
 
-*   $1\\text{ m}^2 = 10^4\\text{ cm}^2$
-*   $1\\text{ m}^3 = 10^6\\text{ cm}^3$
-*   $1\\text{ litre} = 1000\\text{ cm}^3 = 10^{-3}\\text{ m}^3$
+### Standard form
 
-### Conversions That Are Not a Simple Multiplication
+Very large and very small answers are written in standard form. A radio station at $97.5$ MHz broadcasts at
 
-Temperature is the usual exception. To go from degrees Celsius to kelvin you add, you do not multiply:
+$$97.5 \\times 10^6 \\text{ Hz} = 9.75 \\times 10^7 \\text{ Hz}$$
 
-$$T(\\text{K}) = T(^\\circ\\text{C}) + 273$$
+### A spacecraft lost to units
 
-### Useful Energy Conversions
+In 1999 NASA lost the Mars Climate Orbiter. One team's software reported thruster readings in pound-force seconds; the navigation software expected newton seconds. Nobody converted, the spacecraft came in far too low over Mars, and it was lost. Writing the unit with every number, every time, is how engineers avoid this.
 
-*   $1\\text{ kWh} = 3.6 \\times 10^{6}\\text{ J}$, because 1 kW for 1 hour is 1000 W for 3600 s.
-*   $1\\text{ eV} = 1.60 \\times 10^{-19}\\text{ J}$ (A-level).
+### Sources
 
-### References
+The topics in these notes follow the Department for Education documents below.
 
-*   [BIPM: SI prefixes](https://www.bipm.org/en/measurement-units/si-prefixes)
-*   [BBC Bitesize: GCSE Physics](https://www.bbc.co.uk/bitesize/subjects/zpm6fg8)
-*   [NASA: Mars Climate Orbiter](https://science.nasa.gov/mission/mars-climate-orbiter/)
-    `
+*   [National curriculum in England: mathematics programmes of study](https://www.gov.uk/government/publications/national-curriculum-in-england-mathematics-programmes-of-study) (Department for Education)
+*   [GCSE subject content for biology, chemistry and physics](https://www.gov.uk/government/publications/gcse-single-science) (Department for Education)
+`
   }
 ];

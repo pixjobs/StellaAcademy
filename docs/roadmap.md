@@ -125,10 +125,10 @@ answers the "written with AI" doubt directly.
 - Done 12 October 2026: every lesson matched to the Department for Education's national curriculum or GCSE and A-level
   subject content, quoting the statements it covers (`frontend/src/lib/curriculum.ts`). The site's levels are now key
   stage 2, key stage 3, GCSE and A-level.
-- In progress: rewrite each lesson's notes and practice to the level of those statements, citing official sources
-  only. Done so far (15 of 29): waves, Ohm's law, trigonometry, powers and roots, the rest of "Get to orbit"
-  (gears, momentum, thermodynamics, gravity, orbits) and, on 14 October 2026, the six key stage 2 lessons. The other
-  14 still have notes pitched too high and references to textbooks and other sites. Next: key stage 3 and GCSE.
+- Rewrite each lesson's notes and practice to the level of those statements, citing official sources
+  only. Done 14 October 2026: all 29 lessons. Every lesson's notes now cite only Department for Education documents,
+  each has at least six practice questions, and content beyond the cited stage is either removed or marked "going
+  further" (for example Snell's law). Next: teacher review, which needs the partner search (parked).
 - Done 12 October 2026: new interactive models for circuits, trigonometry, gears, momentum, gases and transfer orbits
   (`frontend/src/components/lesson-models/`). Their labels are small on phones and need a pass.
 - Done 14 October 2026: key stage 2 notes and practice rewritten in wording for ages 9 to 11.
