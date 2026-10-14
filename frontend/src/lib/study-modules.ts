@@ -1143,43 +1143,94 @@ The topics in these notes follow the Department for Education documents below.
     },
     practiceProblems: [
       {
-        question: 'If a satellite is 1/5 scientific instruments and weighs 500 kg total, how heavy are the instruments?',
-        hint: 'Multiply the total mass by the fraction.',
-        answer: '100 kg'
+        question: "Write two fractions that are equivalent to 2/3.",
+        hint: "Multiply the top and the bottom by the same number.",
+        answer: "For example 4/6 and 6/9 (any fraction where the bottom is 1½ times the top)"
       },
       {
-        question: 'A lander has 200 kg of fuel and 800 kg total mass. What fraction is fuel?',
-        hint: 'Divide 200 by 800 and simplify.',
-        answer: '1/4'
-      }
+        question: "Write 3/10 as a number of hundredths.",
+        hint: "Multiply the top and bottom by 10.",
+        answer: "30/100"
+      },
+      {
+        question: "Write 12/16 in its simplest form.",
+        hint: "Find the biggest number that divides into both 12 and 16.",
+        answer: "3/4 (divide both by 4)"
+      },
+      {
+        question: "A satellite has a mass of 500 kg. One fifth of it is scientific instruments. What is the mass of the instruments?",
+        hint: "Divide 500 into 5 equal parts.",
+        answer: "100 kg"
+      },
+      {
+        question: "A lander has a mass of 800 kg, and 200 kg of that is fuel. What fraction of the lander is fuel?",
+        hint: "Write the part over the whole, then simplify.",
+        answer: "200/800 = 1/4"
+      },
+      {
+        question: "What is 3/4 of 60?",
+        hint: "Find 1/4 of 60 first, then multiply by 3.",
+        answer: "45"
+      },
     ],
-    realWorldConnection: 'The Tsiolkovsky rocket equation relies heavily on mass fractions to determine how fast a rocket can go in the vacuum of space.',
+    realWorldConnection: 'Rocket engineers describe a rocket in fractions of its mass: how much is fuel, how much is the rocket itself and how much is the spacecraft it carries.',
     textbookContent: `
-## Mass Fractions and Rocket Performance
+## What a fraction means
 
-In orbital mechanics and aerospace engineering, absolute mass is less critical to a vehicle's performance than the ratio of its constituent masses. A mass fraction is a dimensionless ratio comparing the mass of a specific component (usually propellant) to the total mass of the system.
+A fraction describes part of a whole that has been split into **equal** parts.
 
-### Propellant Mass Fraction ($\\zeta$)
+$\\dfrac{3}{4}$
 
-The propellant mass fraction represents the percentage of a rocket's total launch mass that consists solely of fuel and oxidiser:
-$\\zeta = \\frac{m_{\\text{propellant}}}{m_{\\text{initial}}} = \\frac{m_{\\text{initial}} - m_{\\text{final}}}{m_{\\text{initial}}}$
+*   The bottom number, the **denominator**, says how many equal parts the whole is split into: 4.
+*   The top number, the **numerator**, says how many of those parts you have: 3.
 
-### The Tsiolkovsky Rocket Equation
+### Equivalent fractions
 
-Formulated by Konstantin Tsiolkovsky in 1903, the ideal rocket equation dictates the maximum change in velocity ($\\Delta v$) a rocket can achieve in the absence of gravity and aerodynamic drag:
-$\\Delta v = v_e \\ln \\left( \\frac{m_{\\text{initial}}}{m_{\\text{final}}} \\right)$
-where $v_e$ is the effective exhaust velocity.
+Different fractions can describe the same amount. Half a pizza is the same as two quarters or four eighths:
 
-This logarithmic relationship is the "tyranny of the rocket equation." To linearly double the $\\Delta v$ capability of a spacecraft, the initial mass ratio must be squared. Because the structural mass of tanks, engines, and payloads limits how close $m_{\\text{final}}$ can get to zero, achieving orbital velocity requires extreme engineering to maximise the propellant mass fraction—often exceeding 85% for orbital launch vehicles.
+$\\dfrac{1}{2} = \\dfrac{2}{4} = \\dfrac{4}{8} = \\dfrac{50}{100}$
 
-*Reference: Sutton, G. P., & Biblarz, O. (2016). Rocket Propulsion Elements (9th ed.). Wiley.*
-    
+These are **equivalent fractions**. To make one, multiply or divide the top and the bottom by the same number. The size of the fraction does not change.
 
-### References
+### Tenths and hundredths
 
-*   [Euclid's Elements, Book VII (Proportions & Divisibility)](https://mathcs.clarku.edu/~djoyce/java/elements/bookVII/bookVII.html) (Euclid)
-*   [The Art of Problem Solving: Prealgebra](https://artofproblemsolving.com/wiki/index.php/Prealgebra) (Richard Rusczyk, David Patrick, Ravi Boppana)
-*   [Khan Academy: Fractions Mastery](https://www.khanacademy.org/math/arithmetic/fraction-arithmetic)
+Tenths and hundredths link fractions to decimals and percentages. Multiply the top and bottom by 10 to turn tenths into hundredths:
+
+*   $\\dfrac{3}{10} = \\dfrac{30}{100}$
+*   $\\dfrac{7}{10} = \\dfrac{70}{100}$
+
+Some other fractions can be turned into hundredths too: $\\dfrac{1}{4} = \\dfrac{25}{100}$ and $\\dfrac{1}{5} = \\dfrac{20}{100}$.
+
+### Simplest form
+
+A fraction is in its **simplest form** when no number except 1 divides into both the top and the bottom. To simplify, divide both by the biggest number that goes into each:
+
+$\\dfrac{12}{16} = \\dfrac{3}{4}$ (dividing both by 4)
+
+### One amount as a fraction of another
+
+To say what fraction one amount is of another, put the part over the whole and simplify. A lander of 800 kg carrying 200 kg of fuel is
+
+$\\dfrac{200}{800} = \\dfrac{1}{4}$ fuel.
+
+In key stage 3 you will also write fractions bigger than 1 this way. A 15 m rocket next to a 10 m one is $\\dfrac{15}{10} = \\dfrac{3}{2}$ times as tall.
+
+### A fraction of an amount
+
+To find a fraction of an amount, divide by the bottom number, then multiply by the top number. For $\\dfrac{3}{5}$ of 500 kg:
+
+1.  $500 \\div 5 = 100$, so one fifth is 100 kg.
+2.  $100 \\times 3 = 300$, so three fifths is 300 kg.
+
+### Rockets are mostly fuel
+
+A large rocket on the launch pad is mostly fuel. Often more than four fifths of its mass is fuel, and only a small fraction is the spacecraft it is launching. Engineers talk about rockets in fractions like this all the time.
+
+### Sources
+
+The topics in these notes follow the Department for Education document below.
+
+*   [National curriculum in England: mathematics programmes of study](https://www.gov.uk/government/publications/national-curriculum-in-england-mathematics-programmes-of-study) (Department for Education)
 `
   },
   {
@@ -2151,52 +2202,98 @@ This results in a coupled system of ODEs that has no closed-form analytical solu
     },
     practiceProblems: [
       {
-        question: 'Evaluate $10 - 2 \\times 3$.',
-        hint: 'Remember to multiply before you subtract.',
-        answer: '4'
+        question: "Work out 6 + 4 × 5.",
+        hint: "Multiply before you add.",
+        answer: "26"
       },
       {
-        question: 'Evaluate $12 \\div 3 \\times 2$.',
-        hint: 'Division and multiplication are worked from left to right.',
-        answer: '8'
-      }
+        question: "Work out (6 + 4) × 5.",
+        hint: "Brackets come first.",
+        answer: "50"
+      },
+      {
+        question: "Work out 18 ÷ 3 × 2.",
+        hint: "Division and multiplication have the same rank, so work from left to right.",
+        answer: "12 (18 ÷ 3 = 6, then 6 × 2 = 12)"
+      },
+      {
+        question: "Work out 3² + 4 × 2.",
+        hint: "3² means 3 × 3. Do that, then the multiplication, then the addition.",
+        answer: "17 (9 + 8)"
+      },
+      {
+        question: "Put one pair of brackets into 2 + 3 × 4 so that the answer is 20.",
+        hint: "Which part has to happen first to make 20?",
+        answer: "(2 + 3) × 4 = 20"
+      },
+      {
+        question: "A rover makes 4 trips of 3 km, then drives 2 km back to its lander. Write this as one calculation and work it out.",
+        hint: "The trips are a multiplication; the drive back is added on.",
+        answer: "4 × 3 + 2 = 14 km"
+      },
     ],
     realWorldConnection: 'Computer programming relies heavily on the order of operations. Programmers add brackets to make sure a computer carries out a calculation in the order they intend.',
     textbookContent: `
-## Arithmetic and Order of Operations
+## Doing a calculation in the right order
 
-The order of operations is a collection of rules that dictate which procedures to perform first in order to evaluate a given mathematical expression. Without a standard order of operations, a single expression could yield multiple different, yet seemingly valid, results.
+What is $2 + 3 \\times 4$? If you add first you get 20. If you multiply first you get 14. Both cannot be right, so mathematicians agreed a rule that everyone follows. The answer is **14**.
 
-### The BIDMAS Rule
+### BIDMAS
 
-In UK schools the order of operations is remembered with the acronym **BIDMAS**. Some schools say **BODMAS**, where the O stands for "orders" (another word for powers).
+The rule says which part of a calculation to do first. In the UK it is remembered as **BIDMAS**:
+
 1.  **B**rackets: work out anything inside brackets first.
-2.  **I**ndices: work out powers and roots.
-3.  **D**ivision and **M**ultiplication: work through these from left to right.
-4.  **A**ddition and **S**ubtraction: work through these from left to right.
+2.  **I**ndices: squared and cubed numbers, such as $3^2 = 3 \\times 3 = 9$.
+3.  **D**ivision and **M**ultiplication.
+4.  **A**ddition and **S**ubtraction.
 
-In the United States the same rule is taught as PEMDAS (parentheses, exponents, multiplication, division, addition, subtraction). The order is identical; only the names differ.
+Some schools say BODMAS. The O stands for "orders", which is another word for indices. The rule is the same.
 
-### The Left-to-Right Convention
+### Multiply and divide in the order you read them
 
-A common misconception is that multiplication always precedes division, or that addition always precedes subtraction. In reality, Multiplication and Division are on the same "level" of priority. When both appear in an expression, you simply evaluate them from **left to right**. The same applies to Addition and Subtraction.
+Division and multiplication have the same rank. When both appear, work from **left to right**:
 
-Consider the expression: $16 \\div 4 \\times 2$
-*   **Incorrect (Multiply first):** $16 \\div 8 = 2$
-*   **Correct (Left to right):** $4 \\times 2 = 8$
+$16 \\div 4 \\times 2 = 4 \\times 2 = 8$
 
-### Brackets Inside Brackets
+It is not $16 \\div 8 = 2$. The D coming before the M in BIDMAS does not mean "divide first".
 
-When an expression has brackets inside brackets, such as $[ 2 + (3 \\times 4) ]$, always start with the innermost set and work outwards.
+### Add and subtract in the order you read them
 
-*   $[ 2 + (12) ]$
-*   $14$
+Addition and subtraction also share a rank, so they are worked from left to right too:
 
-### References
+$10 - 4 + 3 = 6 + 3 = 9$
 
-*   [Khan Academy: Order of Operations](https://www.khanacademy.org/math/pre-algebra/pre-algebra-arith-prop/pre-algebra-order-of-operations/v/introduction-to-order-of-operations)
-*   [National curriculum in England: mathematics programmes of study](https://www.gov.uk/government/publications/national-curriculum-in-england-mathematics-programmes-of-study)
-    `
+### Brackets change the order
+
+Brackets let you choose what happens first:
+
+*   $2 + 3 \\times 4 = 2 + 12 = 14$
+*   $(2 + 3) \\times 4 = 5 \\times 4 = 20$
+
+### Worked example
+
+Work out $20 - 3 \\times (2 + 4)$.
+
+1.  Brackets first: $2 + 4 = 6$. Now it is $20 - 3 \\times 6$.
+2.  Multiply: $3 \\times 6 = 18$. Now it is $20 - 18$.
+3.  Subtract: $20 - 18 = 2$.
+
+### Packing food for a space mission
+
+Three astronauts each eat 2 packed meals a day on a 5-day trip, and the crew takes 4 spare meals. The number of meals is
+
+$3 \\times 2 \\times 5 + 4 = 30 + 4 = 34$
+
+If you added $5 + 4$ first you would pack 54 meals, far more than the spacecraft has room for. The order matters.
+
+In key stage 3 you will use the same order with powers, roots and other operations.
+
+### Sources
+
+The topics in these notes follow the Department for Education document below.
+
+*   [National curriculum in England: mathematics programmes of study](https://www.gov.uk/government/publications/national-curriculum-in-england-mathematics-programmes-of-study) (Department for Education)
+`
   },
   {
     id: 'basic-geometry',
@@ -2266,8 +2363,8 @@ When an expression has brackets inside brackets, such as $[ 2 + (3 \\times 4) ]$
       {
         stepNumber: 2,
         title: 'What is Perimeter?',
-        content: 'Perimeter is the continuous line forming the boundary of a closed geometric figure. You can calculate it by simply adding up the lengths of all the outer sides.',
-        keyInsight: 'Perimeter is a linear measurement (1D), like a piece of string wrapped around the shape.',
+        content: 'Perimeter is the distance all the way round the edge of a shape. Find it by adding up the lengths of all the sides.',
+        keyInsight: 'Perimeter is a length, like a piece of string laid round the edge of the shape.',
         relatedVariables: ['P']
       },
       {
@@ -2290,49 +2387,91 @@ When an expression has brackets inside brackets, such as $[ 2 + (3 \\times 4) ]$
     },
     practiceProblems: [
       {
-        question: 'A square has a side length of 4 cm. What is its area?',
-        hint: 'A square is a special rectangle where length equals width.',
-        answer: '16 square centimetres (16 cm²)'
+        question: "A square has sides 4 cm long. What is its area?",
+        hint: "A square is a rectangle whose length and width are the same.",
+        answer: "16 cm²"
       },
       {
-        question: 'A rectangle has a perimeter of 20 m and a length of 6 m. What is its width?',
-        hint: 'Subtract the two lengths from the perimeter, then divide the remainder by 2.',
-        answer: '4 m'
-      }
+        question: "A rectangle has a perimeter of 20 m and a length of 6 m. What is its width?",
+        hint: "Take the two lengths away from the perimeter, then halve what is left.",
+        answer: "4 m"
+      },
+      {
+        question: "A rectangle is 7 cm long and 5 cm wide. Find its area and its perimeter.",
+        hint: "Area is length × width. Perimeter is all four sides added.",
+        answer: "Area 35 cm², perimeter 24 cm"
+      },
+      {
+        question: "A rectangle 10 m by 6 m has a 4 m by 2 m rectangle cut from one corner, making an L shape. Find the area and perimeter of the L shape.",
+        hint: "Take the small area from the big one. For the perimeter, the cut-out corner's sides add up to the same as the corner they replace.",
+        answer: "Area 52 m² (60 − 8), perimeter 32 m"
+      },
+      {
+        question: "Draw or describe two rectangles that each have an area of 24 cm² but different perimeters.",
+        hint: "Find pairs of numbers that multiply to make 24.",
+        answer: "For example 4 cm by 6 cm (perimeter 20 cm) and 3 cm by 8 cm (perimeter 22 cm)"
+      },
+      {
+        question: "Each solar panel on a space station is 3 m by 2 m. How many panels are needed to cover 30 m²?",
+        hint: "Find the area of one panel first.",
+        answer: "5 panels (each is 6 m²)"
+      },
     ],
     realWorldConnection: 'Architects and builders use area to determine how much carpet or tile is needed for a floor, and perimeter to determine how much fencing is needed to enclose a garden.',
     textbookContent: `
-## Basic Geometry: Area and Perimeter
+## Area and perimeter
 
-Understanding area and perimeter is fundamental to geometry and has countless real-world applications. These concepts are first taught in primary school, bridging the gap between basic counting and abstract geometric formulas.
+### Perimeter
 
-### Perimeter: The Outer Boundary
+The **perimeter** is the distance all the way round the edge of a flat shape. To find it, add up the lengths of all the sides.
 
-**Perimeter** is a linear measurement of the distance around a two-dimensional shape. It is a one-dimensional property.
+A rectangle has two lengths ($l$) and two widths ($w$), so
 
-For any polygon, the perimeter is found by summing the lengths of all its sides.
-*   **Rectangle:** $P = l + w + l + w$ which simplifies to $P = 2l + 2w$ or $P = 2(l + w)$.
-*   **Square:** Since all four sides ($s$) are equal, $P = s + s + s + s$ or $P = 4s$.
+$P = l + w + l + w = 2l + 2w$
 
-### Area: The Inside Space
+Perimeter is a length, so it is measured in centimetres (cm) or metres (m).
 
-**Area** measures the amount of surface space contained within a two-dimensional boundary. It is measured in square units (e.g., $\\text{cm}^2$, $\\text{m}^2$, $\\text{km}^2$).
+### Area
 
-Conceptually, finding the area of a rectangle is like covering it with a grid of unit squares and counting them. 
-*   **Rectangle:** The formula $A = l \\times w$ represents multiplying the number of squares in one row (length) by the number of rows (width).
-*   **Square:** $A = s \\times s$ or $A = s^2$.
+The **area** is the amount of flat space inside a shape. Imagine covering the shape with squares 1 cm along each side and counting them. Area is measured in **square centimetres** (cm²) or **square metres** (m²).
 
-### The Relationship Between Area and Perimeter
+A rectangle 5 squares long and 3 squares wide has 3 rows of 5 squares, so
 
-A common source of confusion is the relationship (or lack thereof) between area and perimeter. It is important to realise that:
-1.  Shapes with the **same perimeter** can have **different areas**. For example, a rectangle with perimeter 20 can have dimensions $1 \\times 9$ (Area = 9) or $4 \\times 6$ (Area = 24).
-2.  Shapes with the **same area** can have **different perimeters**. For example, a rectangle with area 16 can have dimensions $4 \\times 4$ (Perimeter = 16) or $2 \\times 8$ (Perimeter = 20).
+$A = l \\times w = 5 \\times 3 = 15$ cm²
 
-### References
+### Shapes made of rectangles
 
-*   [Khan Academy: Area and Perimeter](https://www.khanacademy.org/math/basic-geo/basic-geo-area-and-perimeter)
-*   [National curriculum in England: mathematics programmes of study](https://www.gov.uk/government/publications/national-curriculum-in-england-mathematics-programmes-of-study)
-    `
+An L shape can be split into rectangles, or seen as a big rectangle with a corner cut out. Take a rectangle 8 m by 6 m with a 3 m by 2 m corner removed:
+
+*   **Area:** $8 \\times 6 = 48$, take away $3 \\times 2 = 6$. The area is 42 m².
+*   **Perimeter:** the two sides of the cut-out add up to the same as the corner they replaced, so the perimeter is still $2 \\times 8 + 2 \\times 6 = 28$ m. You can check by adding all six sides.
+
+### Estimating the area of an irregular shape
+
+Draw the shape on squared paper. Count every whole square inside it. Then count each square that is half or more inside as one more, and ignore any that are less than half inside. The total is a good estimate of the area.
+
+### Same area, different perimeter
+
+Shapes with the same area can have different perimeters. These rectangles all have an area of 16 cm²:
+
+| Rectangle | Area | Perimeter |
+| --- | --- | --- |
+| 4 cm by 4 cm | 16 cm² | 16 cm |
+| 2 cm by 8 cm | 16 cm² | 20 cm |
+| 1 cm by 16 cm | 16 cm² | 34 cm |
+
+It works the other way too: shapes with the same perimeter can have different areas.
+
+### Solar panels in space
+
+Spacecraft make their electricity from sunlight with solar panels. The more area the panels have, the more sunlight they catch. A panel 3 m long and 2 m wide has an area of 6 m², so five of them cover 30 m².
+
+### Sources
+
+The topics in these notes follow the Department for Education document below.
+
+*   [National curriculum in England: mathematics programmes of study](https://www.gov.uk/government/publications/national-curriculum-in-england-mathematics-programmes-of-study) (Department for Education)
+`
   },
   {
     id: 'proportions',
@@ -2538,65 +2677,90 @@ $x = 12$
     },
     practiceProblems: [
       {
-        question: 'Write 4/5 as a percentage.',
-        hint: 'First divide 4 by 5 to get a decimal, then multiply by 100.',
-        answer: '80%'
+        question: "Write 4/5 as a percentage.",
+        hint: "Change 4/5 into hundredths.",
+        answer: "80% (4/5 = 80/100)"
       },
       {
-        question: 'What is 15% of 200?',
-        hint: 'Convert 15% to 0.15 and multiply by 200.',
-        answer: '30'
-      }
+        question: "Write 0.35 as a percentage and as a fraction in its simplest form.",
+        hint: "0.35 is 35 hundredths.",
+        answer: "35% and 7/20"
+      },
+      {
+        question: "What is 15% of 200?",
+        hint: "Find 10% and 5%, then add them.",
+        answer: "30 (20 + 10)"
+      },
+      {
+        question: "Which is largest: 0.6, 5/8 or 62%?",
+        hint: "Change them all into percentages. 5/8 = 0.625.",
+        answer: "5/8, which is 62.5%"
+      },
+      {
+        question: "A fuel tank holds 800 litres and is 25% full. How many litres are in it?",
+        hint: "25% is the same as 1/4.",
+        answer: "200 litres"
+      },
+      {
+        question: "A probe sends 20 pictures and 9 of them show clouds. What percentage show clouds?",
+        hint: "Change 9/20 into hundredths.",
+        answer: "45% (9/20 = 45/100)"
+      },
     ],
     realWorldConnection: 'Financial literacy relies heavily on percentages. Interest rates on loans, tax rates on purchases, and discounts during sales are all calculated using percentages and decimals.',
     textbookContent: `
-## Decimals and Percentages
+## Fractions, decimals and percentages
 
-Fractions, decimals, and percentages are three different mathematical languages used to describe the exact same concept: a part of a whole. Fluently translating between these three forms is a core skill in school mathematics.
+Fractions, decimals and percentages are three ways of writing the same amount. Half can be written as $\\dfrac{1}{2}$, as 0.5 or as 50%.
 
-### The Base-10 Decimal System
+### Per cent means "out of 100"
 
-Our number system is based on powers of 10. Just as the places to the left of the decimal point represent ones, tens, hundreds, and so on, the places to the right of the decimal point represent fractions with denominators that are powers of 10:
-*   The first place to the right is the **tenths** place ($\\frac{1}{10}$).
-*   The second place is the **hundredths** place ($\\frac{1}{100}$).
-*   The third place is the **thousandths** place ($\\frac{1}{1000}$).
+The sign % means **per cent**, or "parts per 100". So 37% means 37 out of every 100:
 
-Therefore, the decimal $0.45$ can be read as "forty-five hundredths," which immediately translates to the fraction $\\frac{45}{100}$.
+$37\\% = \\dfrac{37}{100} = 0.37$
 
-### Understanding Percentages
+### Ones worth knowing by heart
 
-The word **percent** literally translates from Latin *per centum* as "by the hundred" or "for every 100". 
-Therefore, $X\\%$ is exactly equal to the fraction $\\frac{X}{100}$.
+| Fraction | Decimal | Percentage |
+| --- | --- | --- |
+| $\\dfrac{1}{2}$ | 0.5 | 50% |
+| $\\dfrac{1}{4}$ | 0.25 | 25% |
+| $\\dfrac{3}{4}$ | 0.75 | 75% |
+| $\\dfrac{1}{5}$ | 0.2 | 20% |
+| $\\dfrac{1}{10}$ | 0.1 | 10% |
+| $\\dfrac{1}{100}$ | 0.01 | 1% |
 
-### Translations
+### Changing from one to another
 
-**1. Fraction to Decimal:**
-Perform long division, dividing the numerator by the denominator.
-*Example:* $\\frac{5}{8} = 5 \\div 8 = 0.625$
+*   **Fraction to percentage:** make the denominator 100. $\\dfrac{3}{5} = \\dfrac{60}{100} = 60\\%$
+*   **Fraction to decimal:** divide the top by the bottom. $\\dfrac{3}{8} = 3 \\div 8 = 0.375$
+*   **Decimal to percentage:** multiply by 100. $0.45 \\times 100 = 45\\%$
+*   **Percentage to decimal:** divide by 100. $42\\% = 42 \\div 100 = 0.42$
 
-**2. Decimal to Percentage:**
-Multiply the decimal by 100 (which moves the decimal point two places to the right) and append the $\\%$ symbol.
-*Example:* $0.625 \\times 100 = 62.5\\%$
+### A percentage of an amount
 
-**3. Percentage to Decimal:**
-Divide the percentage by 100 (which moves the decimal point two places to the left) and remove the $\\%$ symbol.
-*Example:* $42\\% = 42 \\div 100 = 0.42$
+Build it up from percentages that are easy to find:
 
-### Calculating with Percentages
+*   10% is a tenth: divide by 10.
+*   50% is a half and 25% is a quarter.
+*   1% is a hundredth: divide by 100.
 
-When solving real-world problems involving percentages (like calculating tax, tips, or discounts), the most reliable method is to first convert the percentage into its decimal form, and then perform the arithmetic. 
-When asked to find a percentage *of* a number, the operation is multiplication.
+For 15% of 200: 10% is 20 and 5% is 10, so 15% is $20 + 10 = 30$.
 
-*Example: Find a 15% tip on a £30 bill.*
-$15\\% = 0.15$
-$0.15 \\times 30 = 4.5$
-The tip is £4.50.
+### Comparing amounts
 
-### References
+To compare amounts written in different ways, change them all into the same form. Which is biggest: 0.3, $\\dfrac{1}{4}$ or 28%? As percentages they are 30%, 25% and 28%, so 0.3 is the biggest.
 
-*   [Khan Academy: Decimals, fractions, and percentages](https://www.khanacademy.org/math/cc-sixth-grade-math/cc-6th-ratios-prop-topic/cc-6th-percent-decimals/v/representing-a-number-as-a-decimal-percent-and-fraction)
-*   [National curriculum in England: mathematics programmes of study](https://www.gov.uk/government/publications/national-curriculum-in-england-mathematics-programmes-of-study)
-    `
+### Reading a fuel gauge
+
+Mission control shows how full a rocket's tanks are as a percentage. A tank showing 75% is $\\dfrac{3}{4}$ full. If the full tank holds 800 litres, 75% is $800 \\div 4 \\times 3 = 600$ litres.
+
+### Sources
+
+The topics in these notes follow the Department for Education document below.
+
+*   [National curriculum in England: mathematics programmes of study](https://www.gov.uk/government/publications/national-curriculum-in-england-mathematics-programmes-of-study) (Department for Education)
+`
   },
   {
     id: 'angles',
@@ -2754,14 +2918,14 @@ $$A = \\frac{1}{2} r^2 \\theta$$
       {
         stepNumber: 1,
         title: 'Multiply Each Digit',
-        content: 'Start from the rightmost digit of the multiplier. Multiply it by each digit of the multiplicand, right to left, carrying any tens digit.',
+        content: 'Start from the ones digit of the bottom number. Multiply it by each digit of the top number, right to left, carrying any tens digit.',
         keyInsight: 'Multiplication is repeated addition — 4 × 3 means 4 added together 3 times.',
         relatedVariables: ['a', 'b']
       },
       {
         stepNumber: 2,
         title: 'Shift & Add Partial Products',
-        content: 'For each digit in the multiplier, write the partial product on a new row, shifted one place to the left. Then add all partial products together.',
+        content: 'For each digit in the bottom number, write the partial product on a new row, shifted one place to the left. Then add all partial products together.',
         keyInsight: 'Each digit position represents a power of 10 — that is why you shift left.',
         relatedVariables: []
       }
@@ -2776,36 +2940,91 @@ $$A = \\frac{1}{2} r^2 \\theta$$
       resultFormula: '24 \\times 13 = 312'
     },
     practiceProblems: [
-      { question: 'Calculate 15 × 12.', hint: 'Partial products: 15×2=30, 15×10=150.', answer: '180' },
-      { question: 'Calculate 23 × 11.', hint: 'Partial products: 23×1=23, 23×10=230.', answer: '253' }
+      {
+        question: "Work out 15 × 12.",
+        hint: "Find 15 × 10 and 15 × 2, then add them.",
+        answer: "180"
+      },
+      {
+        question: "Work out 23 × 14.",
+        hint: "Find 23 × 4 and 23 × 10, then add them.",
+        answer: "322 (92 + 230)"
+      },
+      {
+        question: "Work out 47 × 36.",
+        hint: "Find 47 × 6 and 47 × 30. Remember to carry.",
+        answer: "1,692 (282 + 1,410)"
+      },
+      {
+        question: "Work out 325 × 18.",
+        hint: "Find 325 × 8 and 325 × 10, then add them.",
+        answer: "5,850 (2,600 + 3,250)"
+      },
+      {
+        question: "Work out 2,406 × 15.",
+        hint: "Find 2,406 × 5 and 2,406 × 10, then add them.",
+        answer: "36,090 (12,030 + 24,060)"
+      },
+      {
+        question: "A rocket's engines burn 1,250 kg of fuel every second. How much fuel do they burn in 24 seconds?",
+        hint: "Find 1,250 × 4 and 1,250 × 20, then add them.",
+        answer: "30,000 kg (5,000 + 25,000)"
+      },
     ],
     realWorldConnection: 'Computers multiply in a very similar way: a processor works through the digits of a binary number, shifting and adding partial products, just as you do in long multiplication.',
     textbookContent: `
-## Long Multiplication
+## Long multiplication
 
-Long multiplication is a method of multiplying two numbers by breaking the problem into smaller, simpler steps using the distributive property of multiplication.
+Times tables take you up to $12 \\times 12$. For bigger numbers, such as $24 \\times 13$, you split the problem into smaller multiplications you already know how to do.
 
-### The Distributive Property
+### Why it works
 
-Every multi-digit number can be broken into its place values:
-$$24 \\times 13 = 24 \\times (10 + 3) = (24 \\times 10) + (24 \\times 3)$$
+Split the second number into tens and ones: $13 = 10 + 3$. Then multiply by each part and add the answers:
 
-### Standard Algorithm
+$24 \\times 13 = (24 \\times 10) + (24 \\times 3) = 240 + 72 = 312$
 
-1. Write the two numbers vertically, larger on top.
-2. Multiply the top number by the **ones digit** of the bottom — this is the first partial product.
-3. Multiply the top number by the **tens digit** of the bottom, placing a zero placeholder in the ones column — this is the second partial product.
-4. Add the partial products together.
+Each answer on the way is called a **partial product**.
+
+### The written method
+
+Write the bigger number on top and the smaller one underneath, lining up the ones.
+
+1.  Multiply the top number by the **ones** digit of the bottom number. Write the answer on the first row: $24 \\times 3 = 72$.
+2.  Multiply the top number by the **tens** digit. Because it is really tens, write a 0 in the ones column first, then the answer: $24 \\times 10 = 240$.
+3.  Add the rows: $72 + 240 = 312$.
 
 ### Carrying
 
-When a multiplication produces a two-digit result (e.g. $7 \\times 8 = 56$), write down the ones digit and **carry** the tens digit to the next column to be added.
+When one digit times another gives a two-digit answer, write down the ones digit and carry the tens to the next column. For $47 \\times 6$:
 
-### References
+*   $7 \\times 6 = 42$. Write 2 and carry 4.
+*   $4 \\times 6 = 24$, plus the 4 carried, is 28.
+*   The answer is 282.
 
-*   [Khan Academy: Multi-digit Multiplication](https://www.khanacademy.org/math/arithmetic/x18ca194a:multiply-1-and-2-digit-numbers)
-*   [Art of Problem Solving: Multiplication](https://artofproblemsolving.com/wiki/index.php/Multiplication)
-    `
+### Bigger numbers
+
+The method works the same way for a four-digit number times a two-digit number. For $1{,}234 \\times 25$:
+
+1.  $1{,}234 \\times 5 = 6{,}170$
+2.  $1{,}234 \\times 20 = 24{,}680$
+3.  $6{,}170 + 24{,}680 = 30{,}850$
+
+### Check with an estimate
+
+Round the numbers and multiply in your head. $1{,}234$ is about $1{,}200$, and $1{,}200 \\times 25 = 30{,}000$. The answer $30{,}850$ is close, so it is probably right. An answer of $3{,}085$ would be wrong by a whole place value.
+
+### Orbits in a year
+
+The International Space Station goes round the Earth about 16 times a day. In a year of 365 days that is
+
+$365 \\times 16 = (365 \\times 10) + (365 \\times 6) = 3{,}650 + 2{,}190 = 5{,}840$ orbits.
+
+### Sources
+
+The topics in these notes follow the Department for Education document below.
+
+*   [National curriculum in England: mathematics programmes of study](https://www.gov.uk/government/publications/national-curriculum-in-england-mathematics-programmes-of-study) (Department for Education)
+`
   },
   {
     id: 'fraction-ops',
@@ -2850,7 +3069,7 @@ When a multiplication produces a two-digit result (e.g. $7 \\times 8 = 56$), wri
       {
         stepNumber: 1,
         title: 'Adding & Subtracting',
-        content: 'To add or subtract fractions, they must share a common denominator. Find the LCM (Lowest Common Multiple) of the denominators, convert both fractions, then add or subtract the numerators.',
+        content: 'To add or subtract fractions, they must share a common denominator. Find a common multiple of the denominators, convert both fractions, then add or subtract the numerators.',
         keyInsight: 'You can only add like parts — you cannot add thirds and quarters directly.',
         relatedVariables: ['a', 'b', 'c', 'd']
       },
@@ -2863,51 +3082,115 @@ When a multiplication produces a two-digit result (e.g. $7 \\times 8 = 56$), wri
       },
       {
         stepNumber: 3,
-        title: 'Dividing (Keep-Change-Flip)',
-        content: 'To divide by a fraction, multiply by its reciprocal: $\\frac{a}{b} \\div \\frac{c}{d} = \\frac{a}{b} \\times \\frac{d}{c} = \\frac{ad}{bc}$.',
-        keyInsight: 'Dividing by $\\frac{1}{2}$ is the same as multiplying by 2.',
+        title: 'Dividing by a Whole Number',
+        content: 'To divide a fraction by a whole number, keep the numerator and multiply the denominator by the whole number: $\\frac{1}{2} \\div 3 = \\frac{1}{6}$. Dividing by another fraction comes in key stage 3.',
+        keyInsight: 'Dividing by 3 shares the fraction into 3 equal parts, so each part is smaller.',
         relatedVariables: []
       }
     ],
     solvedExample: {
       problem: 'Calculate $\\frac{1}{3} + \\frac{1}{4}$.',
       steps: [
-        'Find the LCM of 3 and 4, which is 12.',
+        'Find a number that 3 and 4 both divide into: 12.',
         'Convert: $\\frac{1}{3} = \\frac{4}{12}$ and $\\frac{1}{4} = \\frac{3}{12}$.',
         'Add the numerators: $\\frac{4}{12} + \\frac{3}{12} = \\frac{7}{12}$.'
       ],
       resultFormula: '\\frac{1}{3} + \\frac{1}{4} = \\frac{7}{12}'
     },
     practiceProblems: [
-      { question: 'Calculate 1/2 + 1/3.', hint: 'LCM of 2 and 3 is 6.', answer: '5/6' },
-      { question: 'Calculate (2/3) × (3/4).', hint: 'Multiply tops and bottoms.', answer: '1/2' }
+      {
+        question: "Work out 1/2 + 1/3.",
+        hint: "Change both into sixths.",
+        answer: "5/6"
+      },
+      {
+        question: "Work out 5/6 − 1/4.",
+        hint: "Change both into twelfths.",
+        answer: "7/12 (10/12 − 3/12)"
+      },
+      {
+        question: "Work out 2 1/4 + 1 2/3.",
+        hint: "Add the whole numbers, then add the fractions using twelfths.",
+        answer: "3 11/12"
+      },
+      {
+        question: "Work out 2/3 × 3/4 and give the answer in its simplest form.",
+        hint: "Multiply the tops, multiply the bottoms, then simplify.",
+        answer: "1/2 (6/12 simplified)"
+      },
+      {
+        question: "Work out 3/5 × 1/2.",
+        hint: "Multiply the tops and the bottoms.",
+        answer: "3/10"
+      },
+      {
+        question: "Two thirds of a water supply is shared equally between 4 astronauts. What fraction of the supply does each get?",
+        hint: "Work out 2/3 ÷ 4 by multiplying the denominator by 4, then simplify.",
+        answer: "1/6 (2/12 simplified)"
+      },
     ],
     realWorldConnection: 'Engineers use fraction arithmetic constantly when scaling recipes, mixing materials in ratios, or dividing resources across teams.',
     textbookContent: `
-## Operations with Fractions
+## Calculating with fractions
 
-A **fraction** $\\frac{a}{b}$ represents $a$ equal parts of a whole that is divided into $b$ parts.
+### Adding and subtracting
 
-### Addition and Subtraction
+When the denominators are the same, add or subtract the numerators and keep the denominator:
 
-Fractions can only be added or subtracted when they share a common denominator:
-$$\\frac{1}{3} + \\frac{1}{4} = \\frac{4}{12} + \\frac{3}{12} = \\frac{7}{12}$$
+$\\dfrac{2}{7} + \\dfrac{3}{7} = \\dfrac{5}{7}$
 
-### Multiplication
+When the denominators are different, first change the fractions into **equivalent fractions** with the same denominator. Use a number that both denominators divide into, called a **common multiple**:
 
-Multiply numerator by numerator, denominator by denominator:
-$$\\frac{a}{b} \\times \\frac{c}{d} = \\frac{a \\cdot c}{b \\cdot d}$$
+$\\dfrac{1}{3} + \\dfrac{1}{4} = \\dfrac{4}{12} + \\dfrac{3}{12} = \\dfrac{7}{12}$
 
-### Division (Keep-Change-Flip)
+Subtracting works the same way:
 
-To divide by a fraction, multiply by its **reciprocal**:
-$$\\frac{a}{b} \\div \\frac{c}{d} = \\frac{a}{b} \\times \\frac{d}{c}$$
+$\\dfrac{3}{4} - \\dfrac{1}{6} = \\dfrac{9}{12} - \\dfrac{2}{12} = \\dfrac{7}{12}$
 
-### References
+### Mixed numbers
 
-*   [Khan Academy: Fractions](https://www.khanacademy.org/math/arithmetic/fraction-arithmetic)
-*   [BBC Bitesize: KS3 Maths](https://www.bbc.co.uk/bitesize/subjects/zqhs34j)
-    `
+A **mixed number** has a whole number and a fraction, such as $1\\tfrac{1}{2}$. To add mixed numbers, add the whole numbers, then add the fractions:
+
+$1\\tfrac{1}{2} + 2\\tfrac{1}{3} = 3 + \\dfrac{3}{6} + \\dfrac{2}{6} = 3\\tfrac{5}{6}$
+
+For subtraction it is often easier to turn each mixed number into an **improper fraction** first, where the top is bigger than the bottom:
+
+$3\\tfrac{1}{4} - 1\\tfrac{1}{2} = \\dfrac{13}{4} - \\dfrac{6}{4} = \\dfrac{7}{4} = 1\\tfrac{3}{4}$
+
+### Multiplying
+
+To multiply two fractions, multiply the numerators together and the denominators together, then simplify:
+
+$\\dfrac{2}{3} \\times \\dfrac{3}{4} = \\dfrac{6}{12} = \\dfrac{1}{2}$
+
+Multiplying by a fraction is like finding a fraction **of** something. Half of a quarter is $\\dfrac{1}{2} \\times \\dfrac{1}{4} = \\dfrac{1}{8}$.
+
+### Dividing by a whole number
+
+Dividing a fraction by a whole number shares it into that many equal parts. Half a bar shared between 3 people gives each of them a sixth:
+
+$\\dfrac{1}{2} \\div 3 = \\dfrac{1}{6}$
+
+Keep the numerator and multiply the denominator by the whole number:
+
+$\\dfrac{3}{4} \\div 2 = \\dfrac{3}{8}$
+
+Dividing one fraction by another fraction comes later, in key stage 3.
+
+### A rover's battery
+
+A Mars rover's battery is $\\dfrac{3}{4}$ full. Each drive uses $\\dfrac{1}{8}$ of a full battery. After two drives the battery holds
+
+$\\dfrac{3}{4} - \\dfrac{2}{8} = \\dfrac{6}{8} - \\dfrac{2}{8} = \\dfrac{4}{8} = \\dfrac{1}{2}$
+
+so it is half full.
+
+### Sources
+
+The topics in these notes follow the Department for Education document below.
+
+*   [National curriculum in England: mathematics programmes of study](https://www.gov.uk/government/publications/national-curriculum-in-england-mathematics-programmes-of-study) (Department for Education)
+`
   },
   {
     id: 'negative-numbers',

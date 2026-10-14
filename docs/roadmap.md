@@ -112,7 +112,8 @@ answers the "written with AI" doubt directly.
   a short checklist (correct, pitched right, matches how it is taught, what is missing). About 20 minutes a lesson.
 - A lesson shows "Reviewed by" with the teacher's name and subject only once it has been reviewed, and only with
   their permission. Unreviewed lessons keep the current AI notice.
-- Every lesson gets a "Report a problem" link so any teacher can flag an error.
+- Done 14 October 2026: every lesson has a "Report a problem" form so any teacher can flag an error. It asks for no
+  name or email; reports go to Cloud Logging (see DEPLOYMENT.md) and are copied into Jira project KAN.
 - What teachers get while there is no budget: a named credit, free packs, a say in what is built next, and a share
   of sales on any pack they co-write. A fee for review time goes into the first grant bid.
 - Agree in writing, before anyone contributes, that Stella Academy may use and adapt what they suggest.
@@ -125,12 +126,12 @@ answers the "written with AI" doubt directly.
   subject content, quoting the statements it covers (`frontend/src/lib/curriculum.ts`). The site's levels are now key
   stage 2, key stage 3, GCSE and A-level.
 - In progress: rewrite each lesson's notes and practice to the level of those statements, citing official sources
-  only. Done so far (9 of 29): waves, Ohm's law, trigonometry, powers and roots, and the rest of "Get to orbit"
-  (gears, momentum, thermodynamics, gravity, orbits). The other 20 still have notes pitched too high and references
-  to textbooks and other sites. Next: key stage 2.
+  only. Done so far (15 of 29): waves, Ohm's law, trigonometry, powers and roots, the rest of "Get to orbit"
+  (gears, momentum, thermodynamics, gravity, orbits) and, on 14 October 2026, the six key stage 2 lessons. The other
+  14 still have notes pitched too high and references to textbooks and other sites. Next: key stage 3 and GCSE.
 - Done 12 October 2026: new interactive models for circuits, trigonometry, gears, momentum, gases and transfer orbits
   (`frontend/src/components/lesson-models/`). Their labels are small on phones and need a pass.
-- Simplify the wording of the key stage 2 lessons for ages 9 to 11.
+- Done 14 October 2026: key stage 2 notes and practice rewritten in wording for ages 9 to 11.
 - Publish a privacy policy (needs a named owner and a contact email).
 - Read the first month of Analytics.
 

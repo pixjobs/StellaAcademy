@@ -15,4 +15,4 @@ export const supportEnabled = Boolean(SUPPORT_URL);
 export const GA_ID = process.env.NEXT_PUBLIC_GA_ID || 'G-2WZE7ZQE3C';
 
 /** When the lessons were last revised; shown to search engines in the sitemap. Update it when content changes. */
-export const CONTENT_UPDATED = '2026-10-12';
+export const CONTENT_UPDATED = '2026-10-14';

@@ -38,6 +38,19 @@ gcloud run services describe stella-web --project=stella-academy --region=europe
 curl -s https://www.stella-academy.org/api/health
 ```
 
+## Read problem reports
+
+The "Report a problem" form on each lesson writes one log line per report to Cloud Logging (`/api/report`). Nothing
+else stores them. List the last 30 days:
+
+```bash
+gcloud logging read 'resource.labels.service_name="stella-web" AND jsonPayload.type="lesson_report"' \
+  --project=stella-academy --freshness=30d \
+  --format='table(timestamp, jsonPayload.lesson, jsonPayload.kind, jsonPayload.text)'
+```
+
+Logs are kept for 30 days, so copy anything worth keeping into Jira (project KAN).
+
 ## Roll back
 
 ```bash

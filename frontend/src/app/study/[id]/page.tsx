@@ -9,6 +9,7 @@ import { Rich, Tex } from '@/components/paper/maths';
 import { SkyBand } from '@/components/Sky';
 import LessonIntro from '@/components/study/LessonIntro';
 import LessonModel from '@/components/study/LessonModel';
+import ReportProblem from '@/components/study/ReportProblem';
 import TrackedDetails from '@/components/study/TrackedDetails';
 import SupportLink from '@/components/SupportLink';
 import { MarkDone } from '@/components/journey/MissionSteps';
@@ -354,6 +355,7 @@ export default async function LessonPage({ params }: Props) {
               This lesson was written with AI assistance. Check formulas and figures against your textbook or exam
               board&rsquo;s specification before relying on them in assessed work.
             </p>
+            <ReportProblem lesson={lesson.id} />
           </div>
         </div>
       </div>
