@@ -40,22 +40,17 @@ curl -s https://www.stella-academy.org/api/health
 
 ## Read problem reports
 
-The "Report a problem" form on each lesson writes one log line per report to Cloud Logging (`/api/report`). Nothing
-else stores them. List the last 30 days:
-
-```bash
-gcloud logging read 'resource.labels.service_name="stella-web" AND jsonPayload.type="lesson_report"' \
-  --project=stella-academy --freshness=30d \
-  --format='table(timestamp, jsonPayload.lesson, jsonPayload.kind, jsonPayload.text)'
-```
+The "Report a problem" form on each lesson writes one log line per report to Cloud Logging (`/api/report`), routed
+to the `stella-reports` bucket in europe-west1 (see "Privacy set-up for reports" below). Nothing else stores them.
+List the last 30 days with the command at the end of that section.
 
 Logs are kept for 30 days, so copy anything worth keeping into Jira (project KAN), without any personal details a
 reader may have typed.
 
-### Privacy set-up for reports (not yet applied)
+### Privacy set-up for reports (applied 14 October 2026)
 
-`docs/privacy/dpia-report-form.md` asks for two changes to logging before the form goes live. Run them once, after the
-owner approves:
+`docs/privacy/dpia-report-form.md` asks for these two changes to logging. They were applied on 14 October 2026; they
+are kept here so they can be re-created:
 
 ```bash
 # 1. Keep Cloud Run's request log (IP address, browser) for /api/report out of Cloud Logging,

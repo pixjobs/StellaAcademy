@@ -35,5 +35,5 @@ contains anything personal. Analytics is told only that a report was sent, with 
 
 ## Outcome
 
-The form can go live once open actions 2 and 3 are done, and ideally 5. Residual risk is low. Review this
-assessment if the form ever asks for contact details, stores reports anywhere else, or is shown to signed-in users.
+Open actions 2 and 3 were done on 14 October 2026, so the form can go live. Action 5 (the privacy page) is still to
+do. Residual risk is low. Review this assessment if the form ever asks for contact details, stores reports anywhere else, or is shown to signed-in users.

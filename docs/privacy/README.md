@@ -16,8 +16,8 @@ example against the ICO's guidance for small organisations.
 | # | Action | Who | Status |
 | --- | --- | --- | --- |
 | 1 | Choose the name and contact email the policy gives as data controller | Owner | Open; blocks publishing the policy |
-| 2 | Keep Cloud Run request logs for `/api/report` out of Cloud Logging, so a report cannot be matched to an IP address (commands in DEPLOYMENT.md) | Owner approves; then run | Open |
-| 3 | Store problem reports in a log bucket in Europe with 30-day retention (commands in DEPLOYMENT.md) | Owner approves; then run | Open |
+| 2 | Keep Cloud Run request logs for `/api/report` out of Cloud Logging, so a report cannot be matched to an IP address (commands in DEPLOYMENT.md) | Owner approves; then run | Done 14 Oct 2026 |
+| 3 | Store problem reports in a log bucket in Europe with 30-day retention (commands in DEPLOYMENT.md) | Owner approves; then run | Done 14 Oct 2026 |
 | 4 | Decide how Google Analytics behaves before consent (see `processing.md`, "Analytics before consent") | Owner | Open |
 | 5 | Publish `/privacy` and link it from the footer, the cookie banner and the report form | After 1 | Open |
 | 6 | Check the GA4 property's data retention setting is the shortest (2 months) and Google signals is off | Owner, in GA admin | Open |
