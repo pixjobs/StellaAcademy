@@ -134,6 +134,13 @@ answers the "written with AI" doubt directly.
 - Done 14 October 2026: key stage 2 notes and practice rewritten in wording for ages 9 to 11.
 - Publish a privacy policy (needs a named owner and a contact email). Drafted 14 October 2026 with a record of
   processing and a DPIA for the report form: `docs/privacy/`, which lists the open actions.
+- Done 14 October 2026: a "Help test Stella" page (`/help`, linked from About) where adults register interest in
+  testing. Sign-ups are kept in Firestore for 12 months and listed every Monday in a Jira KAN item, so there is no
+  inbox to watch (see DEPLOYMENT.md). It stays low-key until the site is ready to promote.
+- Outreach routes for reviewers and testers (all parked, nothing sent): university physics and astronomy teams (the
+  owner is an Imperial College MBA alumnus, so Imperial's alumni network and Physics department are a warm route;
+  Cambridge's Institute of Astronomy is another), space-education bodies, STEM Ambassadors, and independent schools
+  such as Littlegarth and Woodbridge as testers, not funders. Shortlist and drafts: `~/stella-work/outreach/`.
 - Read the first month of Analytics.
 
 **Test:** we know baseline traffic and which lessons people finish.
@@ -144,6 +151,11 @@ answers the "written with AI" doubt directly.
 - Take it to home-education groups, STEM ambassadors and British Science Week (March).
 - Fill the gaps in the missions (forces, energy) and add a closing simulator to each mission, as "Get to orbit" has.
 - Put later packs on sale.
+- Corporate sponsors (parked, Jira KAN-52), only after a named reviewer and a month of visitor numbers. A "Supported
+  by" credit on a mission, never adverts, data or a say over content. Order of fit: space, chip and civil engineering
+  firms (UK and European), then engineering firms with some defence work (approach their space side), then banks for a
+  maths mission, and mainly-defence firms only after a teacher reviewer has said how a school would see it. List:
+  `~/stella-work/outreach/sponsors.md`. Imperial alumni at these firms can make introductions.
 - Run a small pilot with one school or club, and draft a grant bid with the partner as host.
 
 **Test:** 5,000 monthly visitors and 200 adult email addresses.
