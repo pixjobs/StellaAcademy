@@ -358,4 +358,121 @@ const MULTIPLICATION: Entry[] = [
   },
 ];
 
-export const ENTRIES: Entry[] = [...ARITHMETIC, ...NEGATIVE_NUMBERS, ...MULTIPLICATION];
+/** Read "a/b" or \dfrac{a}{b} as a value: the i-th and (i+1)-th numbers of the stated text. */
+const frac = (i: number) => (n: number[]) => n[i] / n[i + 1];
+const gcd = (x: number, y: number): number => (y === 0 ? x : gcd(y, x % y));
+
+// Approximate published masses, tonnes (propellant, gross at lift-off).
+const SATURN_V = { propellant: 2630, gross: 2950 }; // Apollo-era Saturn V, about 89% propellant
+const FALCON_9 = { propellant: 518, gross: 549 }; // Falcon 9 Full Thrust, about 94% propellant
+
+const FRACTIONS: Entry[] = [
+  // Worked example: 7500 kg of fuel in a 10 000 kg rocket
+  {
+    lesson: 'fractions', where: 'solvedExample.steps[1]', expectQuestionIncludes: 'total mass of $10\\,000$ kg, and $7500$ kg of it is fuel',
+    stated: '$P = \\dfrac{7500}{10\\,000}$', combine: frac(0), compute: () => 7500 / 10000, expected: 0.75, tolerance: 1e-9, unit: '',
+  },
+  {
+    lesson: 'fractions', where: 'solvedExample.steps[2] (top)', expectQuestionIncludes: 'total mass of $10\\,000$ kg, and $7500$ kg of it is fuel',
+    stated: '$7500 \\div 2500 = 3$', pick: 2, compute: () => 7500 / 2500, expected: 3, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'fractions', where: 'solvedExample.steps[2] (bottom)', expectQuestionIncludes: 'total mass of $10\\,000$ kg, and $7500$ kg of it is fuel',
+    stated: '$10\\,000 \\div 2500 = 4$', pick: 2, compute: () => 10000 / 2500, expected: 4, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'fractions', where: 'solvedExample.steps[2] (2500 is the biggest common factor)', expectQuestionIncludes: 'total mass of $10\\,000$ kg, and $7500$ kg of it is fuel',
+    stated: 'dividing the top and the bottom by 2500', compute: () => gcd(7500, 10000), expected: 2500, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'fractions', where: 'solvedExample.resultFormula', expectQuestionIncludes: 'total mass of $10\\,000$ kg, and $7500$ kg of it is fuel',
+    combine: frac(0), compute: () => 7500 / 10000, expected: 0.75, tolerance: 1e-9, unit: '',
+  },
+  // Practice
+  {
+    lesson: 'fractions', where: 'practiceProblems[0] (4/6)', expectQuestionIncludes: 'Write two fractions that are equivalent to 2/3.',
+    stated: '4/6', combine: frac(0), compute: () => 2 / 3, expected: 2 / 3, tolerance: 1e-9, unit: '',
+  },
+  {
+    lesson: 'fractions', where: 'practiceProblems[0] (6/9)', expectQuestionIncludes: 'Write two fractions that are equivalent to 2/3.',
+    stated: '6/9', combine: frac(0), compute: () => 2 / 3, expected: 2 / 3, tolerance: 1e-9, unit: '',
+  },
+  {
+    lesson: 'fractions', where: 'practiceProblems[0] (rule)', kind: 'claim', expectQuestionIncludes: 'Write two fractions that are equivalent to 2/3.',
+    claimIncludes: 'the bottom is 1½ times the top',
+    verify: () => ({ holds: 3 / 2 === 1.5, detail: 'in 2/3 the bottom is 3 ÷ 2 = 1.5 times the top, and scaling keeps that' }),
+  },
+  {
+    lesson: 'fractions', where: 'practiceProblems[1]', expectQuestionIncludes: 'Write 3/10 as a number of hundredths.',
+    stated: '30/100', pick: 0, compute: () => (3 / 10) * 100, expected: 30, tolerance: 1e-9, unit: 'hundredths',
+  },
+  {
+    lesson: 'fractions', where: 'practiceProblems[2]', expectQuestionIncludes: 'Write 12/16 in its simplest form.',
+    stated: '3/4', combine: frac(0), compute: () => 12 / 16, expected: 0.75, tolerance: 1e-9, unit: '',
+  },
+  {
+    lesson: 'fractions', where: 'practiceProblems[2] (divide by)', expectQuestionIncludes: 'Write 12/16 in its simplest form.',
+    stated: '(divide both by 4)', compute: () => gcd(12, 16), expected: 4, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'fractions', where: 'practiceProblems[3]', expectQuestionIncludes: 'A satellite has a mass of 500 kg. One fifth of it',
+    compute: () => 500 / 5, expected: 100, tolerance: 0, unit: 'kg',
+  },
+  {
+    lesson: 'fractions', where: 'practiceProblems[4]', expectQuestionIncludes: 'A lander has a mass of 800 kg, and 200 kg of that is fuel.',
+    stated: '= 1/4', combine: frac(0), compute: () => 200 / 800, expected: 0.25, tolerance: 1e-9, unit: '',
+  },
+  {
+    lesson: 'fractions', where: 'practiceProblems[5]', expectQuestionIncludes: 'What is 3/4 of 60?',
+    compute: () => (60 / 4) * 3, expected: 45, tolerance: 0, unit: '',
+  },
+  // Notes
+  ...(
+    [
+      ['equivalent, 2/4', '\\dfrac{2}{4}', 1 / 2],
+      ['equivalent, 4/8', '\\dfrac{4}{8}', 1 / 2],
+      ['equivalent, 50/100', '\\dfrac{50}{100}', 1 / 2],
+      ['tenths, 70/100', '$\\dfrac{7}{10} = \\dfrac{70}{100}$', 7 / 10],
+      ['tenths, 90/100', '$\\dfrac{9}{10} = \\dfrac{90}{100}$', 9 / 10],
+      ['hundredths, 25/100', '$\\dfrac{1}{4} = \\dfrac{25}{100}$', 1 / 4],
+      ['hundredths, 20/100', '$\\dfrac{1}{5} = \\dfrac{20}{100}$', 1 / 5],
+      ['simplest form, 2/3', '$\\dfrac{10}{15} = \\dfrac{2}{3}$', 10 / 15],
+      ['fraction of another, 1/3', '$\\dfrac{300}{900} = \\dfrac{1}{3}$', 300 / 900],
+      ['bigger than 1, 3/2', '$\\dfrac{15}{10} = \\dfrac{3}{2}$', 15 / 10],
+    ] as const
+  ).map(([label, stated, value]): Entry => {
+    const twoFractions = stated.split('dfrac').length - 1 === 2;
+    return {
+      lesson: 'fractions', where: `textbookContent: ${label}`, expectNotesIncludes: stated,
+      // Where a line equates two fractions, compare the second with the value of the first.
+      stated, combine: twoFractions ? frac(2) : frac(0), compute: () => value, expected: value, tolerance: 1e-9, unit: '',
+    };
+  }),
+  {
+    lesson: 'fractions', where: 'textbookContent: simplest form, divide by', expectNotesIncludes: '$\\dfrac{10}{15} = \\dfrac{2}{3}$ (dividing both by 5)',
+    stated: '(dividing both by 5)', compute: () => gcd(10, 15), expected: 5, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'fractions', where: 'textbookContent: 900 kg satellite', expectNotesIncludes: 'A satellite of 900 kg carrying 300 kg of fuel is',
+    stated: '$\\dfrac{300}{900} = \\dfrac{1}{3}$', combine: frac(0), compute: () => 300 / 900, expected: 1 / 3, tolerance: 1e-9, unit: '',
+  },
+  {
+    lesson: 'fractions', where: 'textbookContent: 2/3 of 90, one third', expectNotesIncludes: 'For $\\dfrac{2}{3}$ of 90 kg:',
+    stated: '$90 \\div 3 = 30$, so one third is 30 kg.', pick: 2, compute: () => 90 / 3, expected: 30, tolerance: 0, unit: 'kg',
+  },
+  {
+    lesson: 'fractions', where: 'textbookContent: 2/3 of 90, two thirds', expectNotesIncludes: 'For $\\dfrac{2}{3}$ of 90 kg:',
+    stated: '$30 \\times 2 = 60$, so two thirds is 60 kg.', pick: 2, compute: () => (90 / 3) * 2, expected: 60, tolerance: 0, unit: 'kg',
+  },
+  {
+    lesson: 'fractions', where: 'textbookContent: rockets are mostly fuel', kind: 'claim', expectNotesIncludes: 'A large rocket on the launch pad is mostly fuel.',
+    claimIncludes: 'more than four fifths of the mass at launch is fuel',
+    verify: () => {
+      const s = SATURN_V.propellant / SATURN_V.gross;
+      const f = FALCON_9.propellant / FALCON_9.gross;
+      return { holds: s > 0.8 && f > 0.8, detail: `Saturn V about ${(s * 100).toFixed(0)}%, Falcon 9 about ${(f * 100).toFixed(0)}% propellant at lift-off` };
+    },
+  },
+];
+
+export const ENTRIES: Entry[] = [...ARITHMETIC, ...NEGATIVE_NUMBERS, ...MULTIPLICATION, ...FRACTIONS];

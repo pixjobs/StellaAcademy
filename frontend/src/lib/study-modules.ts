@@ -1110,7 +1110,7 @@ The topics in these notes follow the Department for Education documents below.
     id: 'fractions',
     category: 'mathematics',
     title: "Fractions and Proportions",
-    subtitle: "What a fraction means, using the share of a rocket's mass that is payload or fuel.",
+    subtitle: "What a fraction means, using the share of a rocket's mass that is fuel.",
     icon: 'Activity',
     accentColor: 'indigo',
     difficulty: 1,
@@ -1128,57 +1128,57 @@ The topics in these notes follow the Department for Education documents below.
     variables: [
       {
         symbol: 'P',
-        name: 'Proportion',
-        unit: 'Unitless',
-        description: 'The fraction of the total mass that is payload or fuel.',
+        name: 'Fraction of the whole',
+        unit: 'no unit',
+        description: 'What fraction of the total mass one part makes up.',
         color: 'text-indigo-400'
       },
       {
         symbol: 'm_p',
-        name: 'Part Mass',
-        unit: 'kg',
-        description: 'The mass of the specific part (e.g., fuel or payload).',
+        name: 'Mass of the part',
+        unit: 'kilograms (kg)',
+        description: 'The mass of one part, for example the fuel.',
         color: 'text-cyan-400'
       },
       {
         symbol: 'm_t',
-        name: 'Total Mass',
-        unit: 'kg',
-        description: 'The total mass of the rocket.',
+        name: 'Total mass',
+        unit: 'kilograms (kg)',
+        description: 'The mass of the whole thing, for example the whole rocket.',
         color: 'text-sky-400'
       }
     ],
     conceptSteps: [
       {
         stepNumber: 1,
-        title: "The Whole and the Parts",
-        content: "A rocket consists of payload, structure, and fuel. A fraction represents how much of the whole is made up of one specific part. We need this basic understanding before moving to more advanced topics like [Probability](/study/probability).",
-        keyInsight: "The denominator is the total mass, and the numerator is the part mass.",
-        relatedVariables: ["m_p", "m_t"]
+        title: 'What a fraction means',
+        content: 'A fraction is part of a whole that has been split into equal parts. The denominator, the bottom number, tells you how many equal parts there are. The numerator, the top number, tells you how many of them you have.',
+        keyInsight: 'The parts must all be the same size.',
+        relatedVariables: []
       },
       {
         stepNumber: 2,
-        title: "Ratios in Space",
-        content: "Understanding what fraction of a spacecraft is fuel is critical. If 3/4 of a rocket is fuel, only 1/4 remains for the structure and payload!",
-        keyInsight: "High fuel fractions are necessary to reach orbit.",
-        relatedVariables: ["P"]
+        title: 'Equivalent fractions',
+        content: 'If you multiply or divide the top and the bottom of a fraction by the same number, you get an equivalent fraction. It looks different, but it is the same amount.',
+        keyInsight: 'Two quarters is the same amount as one half.',
+        relatedVariables: []
       },
       {
         stepNumber: 3,
-        title: "Equivalent Fractions",
-        content: "Scaling up a small satellite to a massive rocket often requires keeping these proportions equivalent (e.g., 2/4 is the same ratio as 1/2).",
-        keyInsight: "Proportions remain constant even if the scale changes.",
-        relatedVariables: []
+        title: 'Part over whole',
+        content: 'To say what fraction one amount is of another, put the part on top and the whole underneath, then simplify. For a rocket, the part might be its fuel and the whole its total mass.',
+        keyInsight: 'Fraction of the whole $=$ part $\\div$ whole, or $P = \\dfrac{m_p}{m_t}$.',
+        relatedVariables: ['P', 'm_p', 'm_t']
       }
     ],
     solvedExample: {
-      problem: 'A rocket has a total mass of $10000$ kg. If the fuel mass is $7500$ kg, what fraction of the total mass is fuel?',
+      problem: 'A rocket has a total mass of $10\\,000$ kg, and $7500$ kg of it is fuel. What fraction of the total mass is fuel?',
       steps: [
-        'Identify the part ($m_p = 7500$) and the whole ($m_t = 10000$).',
-        'Write the fraction: $P = \\frac{7500}{10000}$.',
-        'Divide both numerator and denominator by 2500 to simplify.'
+        'The part is the fuel, $m_p = 7500$ kg. The whole is the total mass, $m_t = 10\\,000$ kg.',
+        'Put the part over the whole: $P = \\dfrac{7500}{10\\,000}$.',
+        'Simplify by dividing the top and the bottom by 2500: $7500 \\div 2500 = 3$ and $10\\,000 \\div 2500 = 4$.'
       ],
-      resultFormula: 'P = \\frac{3}{4}'
+      resultFormula: 'P = \\dfrac{3}{4}'
     },
     practiceProblems: [
       {
@@ -1235,8 +1235,8 @@ These are **equivalent fractions**. To make one, multiply or divide the top and 
 
 Tenths and hundredths link fractions to decimals and percentages. Multiply the top and bottom by 10 to turn tenths into hundredths:
 
-*   $\\dfrac{3}{10} = \\dfrac{30}{100}$
 *   $\\dfrac{7}{10} = \\dfrac{70}{100}$
+*   $\\dfrac{9}{10} = \\dfrac{90}{100}$
 
 Some other fractions can be turned into hundredths too: $\\dfrac{1}{4} = \\dfrac{25}{100}$ and $\\dfrac{1}{5} = \\dfrac{20}{100}$.
 
@@ -1244,26 +1244,30 @@ Some other fractions can be turned into hundredths too: $\\dfrac{1}{4} = \\dfrac
 
 A fraction is in its **simplest form** when no number except 1 divides into both the top and the bottom. To simplify, divide both by the biggest number that goes into each:
 
-$\\dfrac{12}{16} = \\dfrac{3}{4}$ (dividing both by 4)
+$\\dfrac{10}{15} = \\dfrac{2}{3}$ (dividing both by 5)
 
 ### One amount as a fraction of another
 
-To say what fraction one amount is of another, put the part over the whole and simplify. A lander of 800 kg carrying 200 kg of fuel is
+To say what fraction one amount is of another, put the part over the whole and simplify. A satellite of 900 kg carrying 300 kg of fuel is
 
-$\\dfrac{200}{800} = \\dfrac{1}{4}$ fuel.
+$\\dfrac{300}{900} = \\dfrac{1}{3}$ fuel.
 
 In key stage 3 you will also write fractions bigger than 1 this way. A 15 m rocket next to a 10 m one is $\\dfrac{15}{10} = \\dfrac{3}{2}$ times as tall.
 
 ### A fraction of an amount
 
-To find a fraction of an amount, divide by the bottom number, then multiply by the top number. For $\\dfrac{3}{5}$ of 500 kg:
+To find a fraction of an amount, divide by the bottom number, then multiply by the top number. For $\\dfrac{2}{3}$ of 90 kg:
 
-1.  $500 \\div 5 = 100$, so one fifth is 100 kg.
-2.  $100 \\times 3 = 300$, so three fifths is 300 kg.
+1.  $90 \\div 3 = 30$, so one third is 30 kg.
+2.  $30 \\times 2 = 60$, so two thirds is 60 kg.
 
 ### Rockets are mostly fuel
 
-A large rocket on the launch pad is mostly fuel. Often more than four fifths of its mass is fuel, and only a small fraction is the spacecraft it is launching. Engineers talk about rockets in fractions like this all the time.
+A large rocket on the launch pad is mostly fuel. Here "fuel" means everything its engines burn, including the liquid oxygen. For many large rockets more than four fifths of the mass at launch is fuel, and only a small fraction is the spacecraft being launched.
+
+### Next on the journey
+
+You know what one fraction means. What happens when you put two together? What is $\\dfrac{1}{3} + \\dfrac{1}{4}$? The next lesson shows how to add, subtract, multiply and divide fractions.
 
 ### Sources
 
