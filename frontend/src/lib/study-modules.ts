@@ -1961,58 +1961,65 @@ The topics in these notes follow the Department for Education documents below.
     variables: [
       {
         symbol: "\\vec{v}'",
-        name: "Rotated Vector",
-        unit: "Coordinates",
-        description: "The new heading or position of the spacecraft after rotation.",
+        name: "Rotated vector",
+        unit: "a column vector",
+        description: "Where the vector ends up after the rotation.",
         color: "text-amber-400"
       },
       {
         symbol: "R(\\theta)",
-        name: "Rotation Matrix",
-        unit: "Matrix",
-        description: "A matrix containing trigonometric functions (sine and cosine) that rotates a vector by a specific angle.",
+        name: "Rotation matrix",
+        unit: "a 2 × 2 matrix",
+        description: "The matrix that turns every vector by the angle $\\theta$ anticlockwise about the origin. Its entries are sines and cosines of $\\theta$.",
         color: "text-orange-400"
       },
       {
         symbol: "\\vec{v}",
-        name: "Original Vector",
-        unit: "Coordinates",
-        description: "The initial heading or position of the spacecraft.",
+        name: "Original vector",
+        unit: "a column vector",
+        description: "The position vector of the point before the rotation.",
         color: "text-yellow-400"
       }
     ],
     conceptSteps: [
       {
         stepNumber: 1,
-        title: "Coordinate Systems",
-        content: "Imagine looking at a [Vector](/study/vectors) arrow pointing 'Up'. Now tilt your head sideways. The arrow is still pointing to the same physical place, but to your eyes, it's now pointing 'Right'. Spacecraft do this constantly, rotating their frames of reference from pointing at the Sun, to pointing at Earth.",
-        keyInsight: "To translate data between these systems without physically moving, we mathematically rotate the vectors.",
-        relatedVariables: ["\\vec{v}", "\\vec{v}'"]
+        title: "Grids of numbers",
+        content: "A matrix is a grid of numbers set out in rows and columns. You add two matrices of the same size by adding the numbers in matching positions, and multiply a matrix by a number by multiplying every entry.",
+        keyInsight: "A matrix with 2 rows and 2 columns is called a 2 × 2 matrix.",
+        relatedVariables: []
       },
       {
         stepNumber: 2,
-        title: "The Rotation Matrix",
-        content: "A rotation matrix is like a mathematical machine. You feed it your original X and Y coordinates, and it multiplies them by [Trigonometric functions](/study/trigonometry) (sines and cosines) to spit out the brand new rotated coordinates.",
-        keyInsight: "Matrix multiplication smoothly combines the old coordinates to form the new ones.",
-        relatedVariables: ["R(\\theta)"]
+        title: "Multiplying matrices",
+        content: "To multiply two matrices, take a row of the first and a column of the second, multiply them in pairs and add. That gives one entry of the answer. Repeat for every row and column.",
+        keyInsight: "Swapping the order of two matrices usually changes the product.",
+        relatedVariables: []
       },
       {
         stepNumber: 3,
-        title: "Preserving Magnitude",
-        content: "A pure rotation matrix changes the direction of a vector but preserves its magnitude (length). The spacecraft's speed or distance remains the exact same, we've just pivoted the camera.",
-        keyInsight: "Rotation matrices are orthogonal, meaning they do not stretch or squish the vector.",
-        relatedVariables: []
+        title: "Matrices move points",
+        content: "Multiply a 2 × 2 matrix by a point's position vector and you get a new point. Doing this to every point moves the whole plane. The rotation matrix $R(\\theta)$ turns every point through the angle $\\theta$ anticlockwise about the origin.",
+        keyInsight: "A rotation turns vectors without changing their length.",
+        relatedVariables: ["\\vec{v}", "R(\\theta)", "\\vec{v}'"]
+      },
+      {
+        stepNumber: 4,
+        title: "One transformation after another",
+        content: "To do one transformation and then another, multiply their matrices. The matrix written on the right acts first, because it is the one next to the vector.",
+        keyInsight: "Two transformations can be combined into a single matrix.",
+        relatedVariables: ["R(\\theta)"]
       }
     ],
     solvedExample: {
-      problem: "Rotate a position vector $\\vec{v} = (1, 0)$ by $90^\\circ$ ($\\pi/2$ radians) anticlockwise.",
+      problem: "Rotate the vector $\\vec{v} = \\begin{pmatrix} 2 \\\\ 0 \\end{pmatrix}$ by $30^\\circ$ anticlockwise about the origin.",
       steps: [
-        "Set up the rotation matrix for $90^\\circ$: $R(90^\\circ) = \\begin{bmatrix} 0 & -1 \\\\ 1 & 0 \\end{bmatrix}$.",
-        "Multiply the matrix by the vector: $\\begin{bmatrix} 0 & -1 \\\\ 1 & 0 \\end{bmatrix} \\begin{bmatrix} 1 \\\\ 0 \\end{bmatrix}$.",
-        "Calculate the new x: $0 \\cdot 1 + (-1) \\cdot 0 = 0$.",
-        "Calculate the new y: $1 \\cdot 1 + 0 \\cdot 0 = 1$."
+        "Write down the rotation matrix: $R(30^\\circ) = \\begin{pmatrix} \\cos 30^\\circ & -\\sin 30^\\circ \\\\ \\sin 30^\\circ & \\cos 30^\\circ \\end{pmatrix} = \\begin{pmatrix} 0.866 & -0.5 \\\\ 0.5 & 0.866 \\end{pmatrix}$.",
+        "Top row times the vector: $0.866 \\times 2 + (-0.5) \\times 0 = 1.732$.",
+        "Bottom row times the vector: $0.5 \\times 2 + 0.866 \\times 0 = 1$.",
+        "Check the length: $\\sqrt{1.732^2 + 1^2} = 2$, the same as before. A rotation does not stretch."
       ],
-      resultFormula: "\\vec{v}' = (0, 1)"
+      resultFormula: "\\vec{v}' \\approx \\begin{pmatrix} 1.73 \\\\ 1 \\end{pmatrix}"
     },
     practiceProblems: [
       {
@@ -2046,7 +2053,7 @@ The topics in these notes follow the Department for Education documents below.
         answer: "$\\begin{pmatrix} 0 & 1 \\\\ 1 & 0 \\end{pmatrix}$, a reflection in the line $y = x$."
       },
     ],
-    realWorldConnection: "Attitude Control Systems (ACS) use 3D rotation matrices and quaternions to continuously track and adjust a satellite's orientation in space, ensuring solar panels point at the Sun and antennas at Earth.",
+    realWorldConnection: "A satellite's control system keeps track of which way the satellite is facing, a rotation in three dimensions, so that it can keep its solar panels turned towards the Sun and its antenna towards Earth.",
     textbookContent: `
 ## Matrices
 
@@ -2056,9 +2063,9 @@ A **matrix** is a rectangular grid of numbers. A matrix with 2 rows and 3 column
 
 Matrices of the same size are added or subtracted by combining the numbers in matching positions:
 
-$$\\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix} + \\begin{pmatrix} 0 & 1 \\\\ 1 & 0 \\end{pmatrix} = \\begin{pmatrix} 1 & 3 \\\\ 4 & 4 \\end{pmatrix}$$
+$$\\begin{pmatrix} 2 & 1 \\\\ 0 & 3 \\end{pmatrix} + \\begin{pmatrix} 1 & -1 \\\\ 4 & 2 \\end{pmatrix} = \\begin{pmatrix} 3 & 0 \\\\ 4 & 5 \\end{pmatrix}$$
 
-To multiply by a number (a **scalar**), multiply every entry: $2\\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix} = \\begin{pmatrix} 2 & 4 \\\\ 6 & 8 \\end{pmatrix}$.
+To multiply by a number (a **scalar**), multiply every entry: $3\\begin{pmatrix} 1 & 0 \\\\ 2 & -1 \\end{pmatrix} = \\begin{pmatrix} 3 & 0 \\\\ 6 & -3 \\end{pmatrix}$.
 
 ### Multiplying matrices
 
@@ -2085,15 +2092,19 @@ A quick way to find a matrix: its first column is where $\\begin{pmatrix} 1 \\\\
 
 ### One transformation after another
 
-To do $\\mathbf{M}$ first and then $\\mathbf{R}$, multiply $\\mathbf{RM}$: the first transformation is on the **right**, next to the vector it acts on. Reflecting in the x-axis and then rotating 90° anticlockwise gives
+To do $\\mathbf{M}$ first and then $\\mathbf{R}$, multiply $\\mathbf{RM}$: the first transformation is on the **right**, next to the vector it acts on. Rotating 90° anticlockwise and then reflecting in the x-axis gives
 
-$$\\begin{pmatrix} 0 & -1 \\\\ 1 & 0 \\end{pmatrix}\\begin{pmatrix} 1 & 0 \\\\ 0 & -1 \\end{pmatrix} = \\begin{pmatrix} 0 & 1 \\\\ 1 & 0 \\end{pmatrix}$$
+$$\\begin{pmatrix} 1 & 0 \\\\ 0 & -1 \\end{pmatrix}\\begin{pmatrix} 0 & -1 \\\\ 1 & 0 \\end{pmatrix} = \\begin{pmatrix} 0 & -1 \\\\ -1 & 0 \\end{pmatrix}$$
 
-which is a reflection in the line $y = x$.
+which is a reflection in the line $y = -x$. Do the same two steps the other way round and you get a different matrix.
 
 ### Turning a spacecraft
 
-A spacecraft keeps track of which way it faces using matrices. A star tracker measures the directions of known stars in the spacecraft's own frame; a rotation matrix converts between that frame and a fixed one. Rotations do not change lengths, so the stars stay the same distance apart, just as a rotation matrix keeps every vector the same length.
+A spacecraft keeps track of which way it faces using matrices. A star tracker, a camera that recognises patterns of stars, measures the directions of known stars along the spacecraft's own x, y and z directions. A rotation matrix converts those directions into fixed ones. Rotations do not change lengths or angles, so the angles between the stars come out the same either way.
+
+### Next on the journey
+
+A rotation describes where a spacecraft points at one moment. But its position and speed change all the time. How do you find how fast something is changing at a single instant? That is the next lesson, on calculus.
 
 ### Sources
 

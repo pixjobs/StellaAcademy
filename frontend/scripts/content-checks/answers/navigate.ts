@@ -14,6 +14,17 @@ const R_EARTH_KM = 6371; // mean radius, used only to check the "treat the groun
 const near = (a: number, b: number, tol = 1e-9) => Math.abs(a - b) <= tol;
 /** A 2 × 1 column vector as the lessons write it in LaTeX. */
 const col = (top: number, bottom: number) => `\\begin{pmatrix} ${top} \\\\ ${bottom} \\end{pmatrix}`;
+/** 2 × 2 matrices as [a, b, c, d] for (a b; c d), and 2 × 1 vectors. */
+type M2 = [number, number, number, number];
+type V2 = [number, number];
+const pm = ([a, b, c, d]: M2) => `\\begin{pmatrix} ${a} & ${b} \\\\ ${c} & ${d} \\end{pmatrix}`;
+const add = (p: M2, q: M2): M2 => [p[0] + q[0], p[1] + q[1], p[2] + q[2], p[3] + q[3]];
+const scale = (k: number, p: M2): M2 => [k * p[0], k * p[1], k * p[2], k * p[3]];
+const mul = (p: M2, q: M2): M2 => [
+  p[0] * q[0] + p[1] * q[2], p[0] * q[1] + p[1] * q[3],
+  p[2] * q[0] + p[3] * q[2], p[2] * q[1] + p[3] * q[3],
+];
+const mulV = (p: M2, v: V2): V2 => [p[0] * v[0] + p[1] * v[1], p[2] * v[0] + p[3] * v[1]];
 
 export const ENTRIES: Entry[] = [
   // ======================================================================================== trigonometry
@@ -249,4 +260,110 @@ export const ENTRIES: Entry[] = [
       return { holds: h === 23 && m === 56, detail: `Earth spins once in ${sidereal} s = ${h} h ${m} min` };
     },
   },
+
+  // ======================================================================================== matrices
+  {
+    lesson: 'matrices', where: 'solvedExample.steps[0] (cos 30)', expectQuestionIncludes: 'by $30^\\circ$ anticlockwise about the origin',
+    stated: '\\begin{pmatrix} 0.866 & -0.5', pick: 0, compute: () => cosD(30), expected: 0.86603, tolerance: 0.0005, unit: '',
+  },
+  {
+    lesson: 'matrices', where: 'solvedExample.steps[0] (sin 30)', expectQuestionIncludes: 'by $30^\\circ$ anticlockwise about the origin',
+    stated: '\\\\ 0.5 & 0.866 \\end{pmatrix}', pick: 0, compute: () => sinD(30), expected: 0.5, tolerance: 1e-9, unit: '',
+  },
+  {
+    lesson: 'matrices', where: 'solvedExample.steps[1]', expectQuestionIncludes: 'by $30^\\circ$ anticlockwise about the origin',
+    stated: '= 1.732', compute: () => cosD(30) * 2 - sinD(30) * 0, expected: 1.7321, tolerance: 0.0005, unit: '',
+  },
+  {
+    lesson: 'matrices', where: 'solvedExample.steps[2]', expectQuestionIncludes: 'by $30^\\circ$ anticlockwise about the origin',
+    stated: '= 1$', compute: () => sinD(30) * 2 + cosD(30) * 0, expected: 1, tolerance: 1e-9, unit: '',
+  },
+  {
+    lesson: 'matrices', where: 'solvedExample.steps[3]', expectQuestionIncludes: 'by $30^\\circ$ anticlockwise about the origin',
+    stated: '= 2$, the same', note: 'Length after the rotation, from the rounded 1.732.',
+    compute: () => Math.hypot(1.732, 1), expected: 2.0, tolerance: 0.001, unit: '',
+  },
+  {
+    lesson: 'matrices', where: 'solvedExample.resultFormula (x)', expectQuestionIncludes: 'by $30^\\circ$ anticlockwise about the origin',
+    stated: '\\begin{pmatrix} 1.73', compute: () => 2 * cosD(30), expected: 1.7321, tolerance: 0.005, unit: '',
+  },
+  {
+    lesson: 'matrices', where: 'solvedExample.resultFormula (y)', expectQuestionIncludes: 'by $30^\\circ$ anticlockwise about the origin',
+    stated: '\\\\ 1 \\end{pmatrix}', compute: () => 2 * sinD(30), expected: 1, tolerance: 1e-9, unit: '',
+  },
+  // Matrix answers are checked as text built from the computed entries (the number reader drops minus signs).
+  ...((): Entry[] => {
+    const A: M2 = [1, 2, 3, 4], B: M2 = [0, 1, 1, 0];
+    const R90: M2 = [0, -1, 1, 0], MX: M2 = [1, 0, 0, -1], YX: M2 = [0, 1, 1, 0], CW90: M2 = [0, 1, -1, 0];
+    const rm = mul(R90, MX);
+    const mr = mul(MX, R90);
+    const cw = mulV(CW90, [0, 1]);
+    return [
+      {
+        lesson: 'matrices', where: 'practiceProblems[0]', kind: 'qualitative', expectQuestionIncludes: 'Find $\\mathbf{A} + \\mathbf{B}$',
+        expectAnswerIncludes: pm(add(A, B)), verify: () => ({ holds: true, detail: `A + B = (${add(A, B).join(', ')})` }),
+      },
+      {
+        lesson: 'matrices', where: 'practiceProblems[1]', kind: 'qualitative', expectQuestionIncludes: 'Find $2\\mathbf{A}$',
+        expectAnswerIncludes: pm(scale(2, A)), verify: () => ({ holds: true, detail: `2A = (${scale(2, A).join(', ')})` }),
+      },
+      {
+        lesson: 'matrices', where: 'practiceProblems[2]', kind: 'qualitative', expectQuestionIncludes: 'Find $\\mathbf{AB}$',
+        expectAnswerIncludes: pm(mul(A, B)), verify: () => ({ holds: true, detail: `AB = (${mul(A, B).join(', ')})` }),
+      },
+      {
+        lesson: 'matrices', where: 'practiceProblems[3]', kind: 'qualitative', expectQuestionIncludes: 'multiplying a vector by the identity matrix',
+        expectAnswerIncludes: 'the vector is unchanged',
+        verify: () => {
+          const out = mulV([1, 0, 0, 1], [3, -7]);
+          return { holds: out[0] === 3 && out[1] === -7, detail: 'I × (3, −7) = (3, −7)' };
+        },
+      },
+      {
+        lesson: 'matrices', where: 'practiceProblems[4]', kind: 'qualitative', expectQuestionIncludes: 'by 90° clockwise',
+        expectAnswerIncludes: col(cw[0], cw[1]),
+        verify: () => {
+          const f = mulV([cosD(-90), -sinD(-90), sinD(-90), cosD(-90)], [0, 1]);
+          return { holds: near(f[0], cw[0]) && near(f[1], cw[1]), detail: `the hint's matrix is R(−90°); (0, 1) goes to (${cw.join(', ')})` };
+        },
+      },
+      {
+        lesson: 'matrices', where: 'practiceProblems[5] (matrix)', kind: 'qualitative', expectQuestionIncludes: 'a reflection in the x-axis followed by a rotation of 90° anticlockwise',
+        expectAnswerIncludes: pm(rm), verify: () => ({ holds: true, detail: `RM = (${rm.join(', ')})` }),
+      },
+      {
+        lesson: 'matrices', where: 'practiceProblems[5] (name)', kind: 'qualitative', expectQuestionIncludes: 'a reflection in the x-axis followed by a rotation of 90° anticlockwise',
+        expectAnswerIncludes: 'a reflection in the line $y = x$',
+        verify: () => ({ holds: rm.every((x, i) => x === YX[i]), detail: 'RM is the matrix that swaps x and y' }),
+      },
+      {
+        lesson: 'matrices', where: 'textbookContent: adding', kind: 'qualitative', expectNotesIncludes: 'combining the numbers in matching positions',
+        expectAnswerIncludes: `${pm([2, 1, 0, 3])} + ${pm([1, -1, 4, 2])} = ${pm(add([2, 1, 0, 3], [1, -1, 4, 2]))}`,
+        verify: () => ({ holds: true, detail: 'a different sum from practice question 1' }),
+      },
+      {
+        lesson: 'matrices', where: 'textbookContent: scalar', kind: 'qualitative', expectNotesIncludes: 'multiply every entry',
+        expectAnswerIncludes: `$3${pm([1, 0, 2, -1])} = ${pm(scale(3, [1, 0, 2, -1]))}$`,
+        verify: () => ({ holds: true, detail: 'a different product from practice question 2' }),
+      },
+      {
+        lesson: 'matrices', where: 'textbookContent: rotate then reflect', kind: 'qualitative', expectNotesIncludes: 'Rotating 90° anticlockwise and then reflecting in the x-axis gives',
+        expectAnswerIncludes: `${pm(MX)}${pm(R90)} = ${pm(mr)}`,
+        verify: () => ({ holds: true, detail: `MR = (${mr.join(', ')})` }),
+      },
+      {
+        lesson: 'matrices', where: 'textbookContent: rotate then reflect (name)', kind: 'qualitative', expectNotesIncludes: 'Rotating 90° anticlockwise and then reflecting in the x-axis gives',
+        expectAnswerIncludes: 'which is a reflection in the line $y = -x$',
+        verify: () => {
+          const on = mulV(mr, [1, -1]), off = mulV(mr, [1, 1]);
+          return { holds: on[0] === 1 && on[1] === -1 && off[0] === -1 && off[1] === -1, detail: 'points on y = −x stay put; (1, 1) goes to its mirror image (−1, −1)' };
+        },
+      },
+      {
+        lesson: 'matrices', where: 'textbookContent: order matters', kind: 'claim', expectNotesIncludes: 'Order matters',
+        claimIncludes: 'the other way round and you get a different matrix',
+        verify: () => ({ holds: !rm.every((x, i) => x === mr[i]), detail: `RM = (${rm.join(', ')}), MR = (${mr.join(', ')})` }),
+      },
+    ];
+  })(),
 ];
