@@ -155,6 +155,25 @@ answers the "written with AI" doubt directly.
 - Progress saved to the account, auto-marked practice questions, mission certificates.
 - Launch Plus to the email list first.
 
+**How people join (decided 14 October 2026).** The model follows UK school maths sites such as Dr Frost, where
+schools create the accounts, rather than Khan Academy's, which is built around US law (COPPA) and parental consent.
+Under UK GDPR a school can rely on its own job of educating pupils instead of asking every parent for consent, and
+EU countries set the age a child can consent for themselves anywhere from 13 to 16, so consent-led sign-up does
+not travel. Individuals can still join.
+
+| Who | How they join | What it needs |
+| --- | --- | --- |
+| Anyone, any age | No account: lessons stay open and progress is kept in the browser, as now | Nothing new |
+| Pupils through school | Teacher's class link. The school is the data controller; Stella is its processor | A data processing agreement with the school |
+| 13 and over (UK) | Signs up themselves | Plain sign-up explanation, privacy on by default (Children's Code) |
+| Under 13 | A parent or carer makes a parent account and adds the child to it | Confirm the parent's email; the parent can see, change and delete the child's data |
+
+Build order: school class accounts first; then self sign-up for 13 and over and parent accounts; other EU countries
+only when there is demand, because their age limits differ. Children get a username and password only, with no
+email address; the adult's email holds the account. Data stays in Europe: Firestore is already in eur3, but Clerk
+stores data in the US by default, so check its EU options before building, and use Firebase Authentication if they
+fall short. Before any of it goes live, write a DPIA for accounts and review `docs/privacy/` (action 8 there).
+
 **Test:** 50 paying subscribers.
 
 ### 4. Scale (months 6 to 12)
@@ -171,4 +190,5 @@ answers the "written with AI" doubt directly.
 1. Teachers or parents first? (This plan assumes teachers.)
 2. Who will be the academic or teacher partner?
 3. Hours a week available.
-4. Sign-in provider, and the owner and contact email for the privacy policy.
+4. Sign-in provider (Clerk or Firebase Authentication; see "How people join"). The privacy policy's owner and
+   contact email were settled on 14 October 2026.

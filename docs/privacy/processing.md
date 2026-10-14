@@ -3,7 +3,7 @@
 Stella Academy, https://www.stella-academy.org. Checked against the code on 14 October 2026.
 
 **Controller:** the site owner, as an individual (there is no company): Y. Pei t/a Pixjobs, hello@pixjobs.com.
-**Processors:** Google (Cloud Run, Cloud Logging, Google Analytics), under Google's standard data processing terms.
+**Processors:** Google (Cloud Run, Cloud Logging, Firestore, Google Analytics), under Google's standard data processing terms; Atlassian (Jira) for the weekly list of people who offer to help test.
 
 The site has no accounts, no sign-up, no email list and no payments of its own. Most of what it remembers stays in the
 visitor's own browser.
@@ -17,6 +17,7 @@ visitor's own browser.
 | IP address for rate limits on search and reports | Visitors who search the gallery or send a report | Server memory only; never written down | Preventing abuse (legitimate interests) | At most 10 minutes |
 | Gallery searches: the words typed | Visitors who search the gallery | Passed to NASA's image library API to get results. Not sent to Analytics | Providing the search the visitor asked for | Not kept by Stella |
 | Usage statistics: pages viewed, lesson events (for example "answer shown", "report sent"), device type, approximate location | Visitors who press Accept | Google Analytics 4 (loaded only after Accept) | Learning which lessons are useful (consent) | GA4 retention setting (check: action 6) |
+| Offers to help test: name, email, role, subject, optional note | Adults who use the form on `/help` (it requires confirming 18 or over) | Firestore `(default)`, eur3, collection `volunteers`; copied weekly into a Jira KAN work item labelled `volunteers` by `/api/volunteer/digest` | Contacting them about testing (consent; withdrawn by emailing) | 12 months: Firestore TTL on `expireAt`; the digest deletes Jira items older than that |
 | Choices kept in the browser: cookie choice, journey progress, display settings, notes | Each visitor, on their own device | The visitor's browser (localStorage). Never sent to Stella | Providing what the visitor asked for (strictly necessary under PECR) | Until the visitor clears it |
 
 ## Things loaded from other sites
