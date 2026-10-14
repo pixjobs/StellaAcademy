@@ -2482,7 +2482,7 @@ The topics in these notes follow the Department for Education document below.
         symbol: 'I',
         name: 'Indices',
         unit: 'x²',
-        description: 'Indices (powers and roots) are worked out second.',
+        description: 'Powers, such as squared and cubed numbers, are worked out second.',
         color: 'text-cyan-400'
       },
       {
@@ -2518,32 +2518,32 @@ The topics in these notes follow the Department for Education document below.
       {
         stepNumber: 1,
         title: 'Brackets',
-        content: 'Anything inside brackets must be worked out before anything outside them. If brackets sit inside other brackets, work from the inside out.',
-        keyInsight: 'Brackets act as a VIP pass, moving the operation to the front of the queue.',
+        content: 'Work out anything inside brackets first. If there are brackets inside other brackets, start with the inside ones.',
+        keyInsight: 'Brackets let you choose which part of a calculation happens first.',
         relatedVariables: ['B']
       },
       {
         stepNumber: 2,
-        title: 'Indices (Powers)',
-        content: 'After brackets, work out any indices: powers and roots. A power is repeated multiplication, so it comes before ordinary multiplication.',
-        keyInsight: 'Indices are worked out before multiplying, dividing, adding or subtracting.',
+        title: 'Indices (powers)',
+        content: 'Next come indices. An index is the small raised number in a power such as $3^2$, which means $3 \\times 3 = 9$. Squared and cubed numbers are worked out before any multiplying, dividing, adding or subtracting.',
+        keyInsight: 'Work out powers straight after brackets.',
         relatedVariables: ['I']
       },
       {
         stepNumber: 3,
-        title: 'Left-to-Right Operations',
-        content: 'Division and Multiplication share the same priority, so work through them from left to right. Then Addition and Subtraction share the lowest priority, and are also worked from left to right.',
-        keyInsight: 'The D before the M in BIDMAS does not mean divide first. Do whichever comes first reading left to right.',
+        title: 'Same rank, left to right',
+        content: 'Division and multiplication have the same rank, so do them in the order you read them, from left to right. Addition and subtraction come last. They share a rank too, so they are also done from left to right.',
+        keyInsight: 'The D before the M in BIDMAS does not mean "divide first". Do whichever comes first, reading from left to right.',
         relatedVariables: ['D', 'M', 'A', 'S']
       }
     ],
     solvedExample: {
-      problem: 'Evaluate the expression: $8 - 4 \\div 2 + (1 + 1)^2$',
+      problem: 'Work out $8 - 4 \\div 2 + (1 + 1)^2$.',
       steps: [
-        'First, work out the brackets: $(1 + 1) = 2$. The expression is now $8 - 4 \\div 2 + 2^2$.',
-        'Next, work out the index: $2^2 = 4$. The expression is now $8 - 4 \\div 2 + 4$.',
-        'Then do the division: $4 \\div 2 = 2$. The expression is now $8 - 2 + 4$.',
-        'Finally, add and subtract from left to right: $8 - 2 = 6$, then $6 + 4 = 10$.'
+        'Brackets first: $1 + 1 = 2$. The calculation is now $8 - 4 \\div 2 + 2^2$.',
+        'Then the power: $2^2 = 2 \\times 2 = 4$. The calculation is now $8 - 4 \\div 2 + 4$.',
+        'Then the division: $4 \\div 2 = 2$. The calculation is now $8 - 2 + 4$.',
+        'Last, subtract and add from left to right: $8 - 2 = 6$, then $6 + 4 = 10$.'
       ],
       resultFormula: '= 10'
     },
@@ -2579,18 +2579,18 @@ The topics in these notes follow the Department for Education document below.
         answer: "4 × 3 + 2 = 14 km"
       },
     ],
-    realWorldConnection: 'Computer programming relies heavily on the order of operations. Programmers add brackets to make sure a computer carries out a calculation in the order they intend.',
+    realWorldConnection: 'Most programming languages, such as Python, use the same order of operations. Programmers add brackets when they want a computer to do a calculation in a different order.',
     textbookContent: `
 ## Doing a calculation in the right order
 
-What is $2 + 3 \\times 4$? If you add first you get 20. If you multiply first you get 14. Both cannot be right, so mathematicians agreed a rule that everyone follows. The answer is **14**.
+What is $5 + 2 \\times 3$? If you add first you get 21. If you multiply first you get 11. Both cannot be right, so mathematicians agreed a rule that everyone follows. The answer is **11**.
 
 ### BIDMAS
 
 The rule says which part of a calculation to do first. In the UK it is remembered as **BIDMAS**:
 
 1.  **B**rackets: work out anything inside brackets first.
-2.  **I**ndices: squared and cubed numbers, such as $3^2 = 3 \\times 3 = 9$.
+2.  **I**ndices: powers, such as squared and cubed numbers. For example, $3^2 = 3 \\times 3 = 9$.
 3.  **D**ivision and **M**ultiplication.
 4.  **A**ddition and **S**ubtraction.
 
@@ -2614,16 +2614,8 @@ $10 - 4 + 3 = 6 + 3 = 9$
 
 Brackets let you choose what happens first:
 
-*   $2 + 3 \\times 4 = 2 + 12 = 14$
-*   $(2 + 3) \\times 4 = 5 \\times 4 = 20$
-
-### Worked example
-
-Work out $20 - 3 \\times (2 + 4)$.
-
-1.  Brackets first: $2 + 4 = 6$. Now it is $20 - 3 \\times 6$.
-2.  Multiply: $3 \\times 6 = 18$. Now it is $20 - 18$.
-3.  Subtract: $20 - 18 = 2$.
+*   $5 + 2 \\times 3 = 5 + 6 = 11$
+*   $(5 + 2) \\times 3 = 7 \\times 3 = 21$
 
 ### Packing food for a space mission
 
@@ -2631,9 +2623,11 @@ Three astronauts each eat 2 packed meals a day on a 5-day trip, and the crew tak
 
 $3 \\times 2 \\times 5 + 4 = 30 + 4 = 34$
 
-If you added $5 + 4$ first you would pack 54 meals, far more than the spacecraft has room for. The order matters.
+If you added $5 + 4$ first you would get $3 \\times 2 \\times 9 = 54$ meals, 20 more than the crew needs. The order matters.
 
-In key stage 3 you will use the same order with powers, roots and other operations.
+### Next on the journey
+
+What is $3 - 5$? The answer is less than zero. The next lesson is about negative numbers, the numbers below zero.
 
 ### Sources
 
