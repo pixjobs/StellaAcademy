@@ -16,6 +16,10 @@
 
 import { studyModules, type StudyModule } from '../../src/lib/study-modules';
 import { MISSIONS } from '../../src/lib/missions';
+import { ENTRIES as TOOLKIT } from './answers/toolkit';
+import { ENTRIES as NAVIGATE } from './answers/navigate';
+import { ENTRIES as SIGNAL } from './answers/signal';
+import { ENTRIES as STARLIGHT } from './answers/starlight';
 
 export type Finding = {
   check: string;
@@ -85,7 +89,7 @@ type Base = {
   note?: string;
 };
 
-type NumericEntry = Base & {
+export type NumericEntry = Base & {
   kind?: 'numeric';
   compute: () => number;
   /** Hand-worked value, a self-check on compute(). */
@@ -105,23 +109,23 @@ type NumericEntry = Base & {
   combine?: (nums: number[]) => number;
 };
 
-type QualitativeEntry = Base & {
+export type QualitativeEntry = Base & {
   kind: 'qualitative';
   expectAnswerIncludes: string;
   /** Optional: a computation that confirms the qualitative answer. */
   verify?: () => { holds: boolean; detail: string };
 };
 
-type ClaimEntry = Base & {
+export type ClaimEntry = Base & {
   kind: 'claim';
   /** Verbatim fragment of the claim. While it is present, the claim is checked. */
   claimIncludes: string;
   verify: () => { holds: boolean; detail: string };
 };
 
-type Entry = NumericEntry | QualitativeEntry | ClaimEntry;
+export type Entry = NumericEntry | QualitativeEntry | ClaimEntry;
 
-const TABLE: Entry[] = [
+const MISSION_2_TABLE: Entry[] = [
   // ======================================================================================== units
   {
     lesson: 'units', where: 'conceptSteps[1]', expectQuestionIncludes: '20\\text{ mA} = 20 \\times 10^{-3}',
@@ -855,6 +859,9 @@ function checkConsistency(c: Consistency, mod: StudyModule): Finding[] {
     },
   ];
 }
+
+/** Every mission's entries. Missions other than 2 keep theirs in ./answers/<mission>.ts. */
+const TABLE: Entry[] = [...MISSION_2_TABLE, ...TOOLKIT, ...NAVIGATE, ...SIGNAL, ...STARLIGHT];
 
 export const MISSION_2_LESSONS: string[] = MISSIONS.find((m) => m.id === 'orbit')?.lessons.slice() ?? [];
 

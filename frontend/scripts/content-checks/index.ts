@@ -2,7 +2,7 @@
  * `npm run check:content`: the automatic content checks from docs/content-workflow.md,
  * run together. Default: the lessons of Mission 2 ("Get to orbit"). Options:
  *   --lessons=a,b   check only these lessons
- *   --all           check every lesson (the answers check covers Mission 2 only)
+ *   --all           check every lesson
  * Exits 1 if any check fails. Warnings and info do not fail the run.
  */
 import { MISSIONS } from '../../src/lib/missions';
@@ -25,7 +25,7 @@ if (unknown.length) {
 }
 
 const groups: Array<[string, Finding[]]> = [
-  ['answers', runAnswerChecks(lessons.filter((id) => orbit.includes(id)))],
+  ['answers', runAnswerChecks(lessons)],
   ['style', runStyleChecks(lessons)],
   ['curriculum', runCurriculumChecks(lessons)],
 ];
