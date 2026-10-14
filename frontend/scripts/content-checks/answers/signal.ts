@@ -223,4 +223,85 @@ export const ENTRIES: Entry[] = [
     stated: 'Check in denary: $6 + 3 = 9$', combine: (n) => (n[0] === fromBin('110') && n[1] === fromBin('11') ? n[2] : NaN),
     compute: () => fromBin('110') + fromBin('11'), expected: 9, tolerance: 0, unit: '',
   },
+
+  // ======================================================================================== probability
+  {
+    lesson: 'probability', where: 'solvedExample.steps[0]', expectQuestionIncludes: 'Each of a spacecraft\'s flight computers works with probability $0.9$',
+    stated: '$1 - 0.9 = 0.1$', pick: 2, compute: () => 1 - 0.9, expected: 0.1, tolerance: 1e-9, unit: '',
+  },
+  {
+    lesson: 'probability', where: 'solvedExample.steps[1]', expectQuestionIncludes: 'The spacecraft carries $n = 3$ of them',
+    stated: '= 0.001$', compute: () => (1 - 0.9) ** 3, expected: 0.001, tolerance: 1e-9, unit: '',
+  },
+  {
+    lesson: 'probability', where: 'solvedExample.resultFormula', expectQuestionIncludes: 'The spacecraft carries $n = 3$ of them',
+    stated: 'P_{sys} = 0.999', compute: () => 1 - (1 - 0.9) ** 3, expected: 0.999, tolerance: 1e-9, unit: '',
+  },
+  {
+    lesson: 'probability', where: 'solvedExample.resultFormula (%)', expectQuestionIncludes: 'The spacecraft carries $n = 3$ of them',
+    stated: '99.9\\%', compute: () => (1 - (1 - 0.9) ** 3) * 100, expected: 99.9, tolerance: 1e-9, unit: '%',
+  },
+  {
+    lesson: 'probability', where: 'practiceProblems[0]', expectQuestionIncludes: 'The probability that it rains tomorrow is 0.3',
+    compute: () => 1 - 0.3, expected: 0.7, tolerance: 1e-9, unit: '',
+  },
+  {
+    lesson: 'probability', where: 'practiceProblems[1]', expectQuestionIncludes: 'A bag holds 3 red counters and 5 blue counters',
+    combine: (n) => n[0] / n[1], compute: () => 3 / (3 + 5), expected: 0.375, tolerance: 1e-9, unit: '',
+  },
+  {
+    lesson: 'probability', where: 'practiceProblems[2]', expectQuestionIncludes: 'Two fair coins are tossed',
+    combine: (n) => n[0] / n[1], compute: () => 0.5 * 0.5, expected: 0.25, tolerance: 1e-9, unit: '',
+  },
+  {
+    lesson: 'probability', where: 'practiceProblems[3]', expectQuestionIncludes: 'The probability a launch leaves on time is 0.8',
+    compute: () => 0.8 * 0.9, expected: 0.72, tolerance: 1e-9, unit: '',
+  },
+  {
+    lesson: 'probability', where: 'practiceProblems[4] (answer)', expectQuestionIncludes: 'two counters are taken without putting the first back',
+    stated: '3/28', combine: (n) => n[0] / n[1], compute: () => (3 / 8) * (2 / 7), expected: 3 / 28, tolerance: 1e-9, unit: '',
+  },
+  {
+    lesson: 'probability', where: 'practiceProblems[4] (working)', expectQuestionIncludes: 'two counters are taken without putting the first back',
+    stated: '6/56', combine: (n) => n[0] / n[1], compute: () => (3 * 2) / (8 * 7), expected: 6 / 56, tolerance: 1e-9, unit: '',
+  },
+  {
+    lesson: 'probability', where: 'practiceProblems[5] (valves)', expectQuestionIncludes: 'Each valve on a spacecraft works with probability 0.5',
+    stated: '3 valves', note: 'The smallest n with 1 - 0.5^n >= 0.875.',
+    compute: () => {
+      let n = 1;
+      while (1 - 0.5 ** n < 0.875) n++;
+      return n;
+    },
+    expected: 3, tolerance: 0, unit: 'valves',
+  },
+  {
+    lesson: 'probability', where: 'practiceProblems[5] (check)', expectQuestionIncludes: 'Each valve on a spacecraft works with probability 0.5',
+    stated: '= 0.875', compute: () => 1 - 0.5 ** 3, expected: 0.875, tolerance: 1e-9, unit: '',
+  },
+  {
+    lesson: 'probability', where: 'textbookContent: 9/10', expectNotesIncludes: 'It can be written as a fraction, a decimal or a percentage',
+    stated: '= 0.9 = 90\\%', pick: [0, 1], combine: (n) => (Math.abs(n[0] - 0.9) < 1e-9 ? n[1] : NaN),
+    compute: () => (9 / 10) * 100, expected: 90, tolerance: 1e-9, unit: '%',
+  },
+  {
+    lesson: 'probability', where: 'textbookContent: P(green)', expectNotesIncludes: 'A bag holds 2 green and 7 yellow counters',
+    stated: '\\dfrac{2}{9}', combine: (n) => n[0] / n[1], compute: () => 2 / (2 + 7), expected: 2 / 9, tolerance: 1e-9, unit: '',
+  },
+  {
+    lesson: 'probability', where: 'textbookContent: not lost', expectNotesIncludes: 'If the chance that a radio message is lost is 0.05',
+    stated: 'the chance that it gets through is 0.95', compute: () => 1 - 0.05, expected: 0.95, tolerance: 1e-9, unit: '',
+  },
+  {
+    lesson: 'probability', where: 'textbookContent: green then green', expectNotesIncludes: 'P(\\text{green, then green})',
+    stated: '= \\frac{1}{36}', combine: (n) => n[0] / n[1], compute: () => (2 / 9) * (1 / 8), expected: 1 / 36, tolerance: 1e-9, unit: '',
+  },
+  {
+    lesson: 'probability', where: 'textbookContent: green then green (2/72)', expectNotesIncludes: 'P(\\text{green, then green})',
+    stated: '= \\frac{2}{72}', combine: (n) => n[0] / n[1], compute: () => (2 * 1) / (9 * 8), expected: 2 / 72, tolerance: 1e-9, unit: '',
+  },
+  {
+    lesson: 'probability', where: 'textbookContent: green left', expectNotesIncludes: 'After the first green there is 1 green left out of 8 counters',
+    stated: 'there is 1 green left out of 8', pick: [0, 1], combine: (n) => n[0] * 100 + n[1], compute: () => (2 - 1) * 100 + (9 - 1), expected: 108, tolerance: 0, unit: '(left, total)',
+  },
 ];

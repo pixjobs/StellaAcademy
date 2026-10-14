@@ -2133,57 +2133,57 @@ The topics in these notes follow the Department for Education document below.
     variables: [
       {
         symbol: "P_{sys}",
-        name: "System Reliability",
-        unit: "Probability (0 to 1)",
-        description: "The overall probability that the redundant system will function successfully.",
+        name: "Probability the system works",
+        unit: "no unit (0 to 1)",
+        description: "The probability that at least one of the copies works, so the system keeps going.",
         color: "text-emerald-400"
       },
       {
         symbol: "p",
-        name: "Component Reliability",
-        unit: "Probability (0 to 1)",
-        description: "The probability that a single independent component functions successfully.",
+        name: "Probability one copy works",
+        unit: "no unit (0 to 1)",
+        description: "The probability that a single copy, such as one flight computer, works. Its chance of failing is $1 - p$.",
         color: "text-teal-400"
       },
       {
         symbol: "n",
-        name: "Redundant Components",
-        unit: "Count",
-        description: "The total number of parallel, independent backup components.",
+        name: "Number of copies",
+        unit: "a whole number",
+        description: "How many copies work side by side as backups for each other. Their failures are assumed to be independent.",
         color: "text-lime-400"
       }
     ],
     conceptSteps: [
       {
         stepNumber: 1,
-        title: "The Risk of Failure",
-        content: "In spaceflight, components fail. If a critical system relies on a single component with a 90% success rate, there is a 10% chance of complete mission failure. We express these chances as [Fractions](/study/fractions) or decimals (e.g. 0.10).",
-        keyInsight: "For single-point failures, the system reliability equals the component reliability.",
+        title: "From impossible to certain",
+        content: "A probability is a number from 0, for something impossible, to 1, for something certain. It can be a fraction, a decimal or a percentage (see [fractions](/study/fractions)). Something either happens or it does not, so $P(\\text{not } A) = 1 - P(A)$.",
+        keyInsight: "Add up the probabilities of every possible outcome and you always get 1.",
         relatedVariables: ["p"]
       },
       {
         stepNumber: 2,
-        title: "Adding Redundancy",
-        content: "To increase reliability, engineers add backup components in parallel. The system only fails if ALL of the redundant components fail at the exact same time.",
-        keyInsight: "The probability of all n components failing is the failure probability of one component raised to the power n.",
-        relatedVariables: ["n"]
+        title: "Both events: multiply",
+        content: "If one event does not change the chance of the other, the two are independent, and the probability that both happen is $P(A) \\times P(B)$. If the first event does change the chances, as when a counter is taken from a bag and not put back, the events are dependent and the second probability must be worked out again.",
+        keyInsight: "Multiply for both, but only use the plain product when the events are independent.",
+        relatedVariables: ["p"]
       },
       {
         stepNumber: 3,
-        title: "Calculating System Success",
-        content: "First, calculate the probability of a single failure (1 - p). Then, calculate the probability that all n components fail: (1 - p)^n. Finally, subtract that from 1 to find the probability of at least one success.",
-        keyInsight: "Even with low-reliability parts, high redundancy can create an ultra-reliable system.",
+        title: "Backups make a system reliable",
+        content: "A system with $n$ copies working side by side fails only if every copy fails. If each copy fails with probability $1 - p$, independently, all $n$ fail with probability $(1 - p)^n$. So the system works with probability $P_{sys} = 1 - (1 - p)^n$.",
+        keyInsight: "A few backups can make a system far more reliable than any one part, as long as the parts fail independently.",
         relatedVariables: ["P_{sys}", "p", "n"]
       }
     ],
     solvedExample: {
-      problem: "A spacecraft's primary flight computer has a reliability of $0.90$ (90%). If the spacecraft has $n = 3$ identical, independent computers, what is the overall system reliability ($P_{sys}$)?",
+      problem: "Each of a spacecraft's flight computers works with probability $0.9$ (90%). The spacecraft carries $n = 3$ of them, and their failures are independent. What is the probability $P_{sys}$ that at least one works?",
       steps: [
-        "Find the failure rate of one computer: $1 - 0.90 = 0.10$.",
-        "Calculate the probability that ALL three fail: $0.10^3 = 0.10 \\times 0.10 \\times 0.10 = 0.001$.",
-        "Subtract the total failure probability from 1 to find the success probability: $1 - 0.001$."
+        "The probability that one computer fails: $1 - 0.9 = 0.1$.",
+        "The probability that all three fail: $0.1 \\times 0.1 \\times 0.1 = 0.001$.",
+        "The probability that the system works: $P_{sys} = 1 - 0.001$."
       ],
-      resultFormula: "P_{sys} = 0.999 \\text{ (99.9\\%)}"
+      resultFormula: "P_{sys} = 0.999 \\text{, or } 99.9\\%"
     },
     practiceProblems: [
       {
@@ -2217,7 +2217,7 @@ The topics in these notes follow the Department for Education document below.
         answer: "3 valves (1 − 0.5³ = 0.875)"
       },
     ],
-    realWorldConnection: "The Space Shuttle flew with four redundant flight computers processing the same data, plus a fifth backup computer running independently written software, so that no single computer failure could endanger the vehicle.",
+    realWorldConnection: "The Space Shuttle flew with five flight computers. Four ran the same software and checked each other's results, and the fifth ran separately written backup software, so that one computer failing would not put the crew in danger.",
     textbookContent: `
 ## Probability
 
@@ -2229,7 +2229,7 @@ When all the outcomes are equally likely:
 
 $$P(\\text{event}) = \\frac{\\text{number of outcomes in the event}}{\\text{total number of outcomes}}$$
 
-A bag holds 3 red and 5 blue counters. $P(\\text{red}) = \\dfrac{3}{8}$.
+A bag holds 2 green and 7 yellow counters. $P(\\text{green}) = \\dfrac{2}{9}$.
 
 ### All the outcomes add up to 1
 
@@ -2237,7 +2237,7 @@ The probabilities of all the possible outcomes add up to 1. So the probability t
 
 $$P(\\text{not } A) = 1 - P(A)$$
 
-If the chance of rain is 0.3, the chance of no rain is 0.7.
+If the chance that a radio message is lost is 0.05, the chance that it gets through is 0.95.
 
 ### Either one or the other: add
 
@@ -2263,11 +2263,11 @@ A tree diagram shows two or more events one after another. Each event branches i
 
 If you take a counter and do not put it back, the second pick depends on the first. These events are **dependent**: the probabilities on the second branches change.
 
-With 3 red and 5 blue counters, taking two without replacement:
+With 2 green and 7 yellow counters, taking two without replacement:
 
-$$P(\\text{red, then red}) = \\frac{3}{8} \\times \\frac{2}{7} = \\frac{6}{56} = \\frac{3}{28}$$
+$$P(\\text{green, then green}) = \\frac{2}{9} \\times \\frac{1}{8} = \\frac{2}{72} = \\frac{1}{36}$$
 
-After the first red there are 2 reds left out of 7 counters.
+After the first green there is 1 green left out of 8 counters.
 
 ### Assumptions
 
@@ -2275,12 +2275,15 @@ Calculations like these assume things: that a coin is fair, that picks are rando
 
 ### Backups in spacecraft
 
-Engineers make spacecraft reliable by adding backups that work in parallel. The system fails only if **every** copy fails. If one flight computer fails with probability 0.1, and three independent computers are fitted:
+Engineers make spacecraft reliable by fitting backups that work side by side (in parallel). The system fails only if every copy fails. With $n$ copies that each work with probability $p$, and fail independently:
 
-1.  $P(\\text{all three fail}) = 0.1 \\times 0.1 \\times 0.1 = 0.001$
-2.  $P(\\text{the system works}) = 1 - 0.001 = 0.999$
+$$P_{sys} = 1 - (1 - p)^n$$
 
-Three computers that are each 90% reliable together give a system that is 99.9% reliable, as long as their failures are independent.
+The worked example shows three computers that are each 90% reliable giving a system that is 99.9% reliable. That only holds if their failures really are independent. Copies that share a power supply, or the same fault in their software, can fail together.
+
+### Next on the journey
+
+The spacecraft now has power, can send its data home, and is built to keep working. Next it looks outwards. What can the light from a distant star tell us? The next mission begins by splitting light with a prism.
 
 ### Sources
 
