@@ -2604,7 +2604,7 @@ The topics in these notes follow the Department for Education document below.
       },
       {
         question: "Work out 18 ÷ 3 × 2.",
-        hint: "Division and multiplication have the same rank, so work from left to right.",
+        hint: "Division and multiplication are equally important, so work from left to right.",
         answer: "12 (18 ÷ 3 = 6, then 6 × 2 = 12)"
       },
       {
@@ -3648,7 +3648,7 @@ Keep the numerator and multiply the denominator by the whole number:
 
 $\\dfrac{3}{4} \\div 2 = \\dfrac{3}{8}$
 
-Dividing one fraction by another fraction comes later, in key stage 3.
+Dividing one fraction by another fraction comes later.
 
 ### A rover's battery
 
