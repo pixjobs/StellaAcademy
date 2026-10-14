@@ -259,82 +259,79 @@ The topics in these notes follow the Department for Education documents below.
     accentColor: 'indigo',
     difficulty: 2,
     estimatedMinutes: 15,
-    formula: 'n_1 \\sin(\\theta_i) = n_2 \\sin(\\theta_r)',
+    formula: 'n_1 \\sin \\theta_1 = n_2 \\sin \\theta_2',
     formulaLayout: [
       { type: 'variable', symbol: 'n_1' },
-      { type: 'static', latex: '\\sin(' },
-      { type: 'variable', symbol: '\\theta_i' },
-      { type: 'static', latex: ')' },
+      { type: 'static', latex: '\\sin' },
+      { type: 'variable', symbol: '\\theta_1' },
       { type: 'operator', content: '=' },
       { type: 'variable', symbol: 'n_2' },
-      { type: 'static', latex: '\\sin(' },
-      { type: 'variable', symbol: '\\theta_r' },
-      { type: 'static', latex: ')' }
+      { type: 'static', latex: '\\sin' },
+      { type: 'variable', symbol: '\\theta_2' }
     ],
     variables: [
       {
         symbol: 'n_1',
-        name: 'Initial Refractive Index',
-        unit: 'Unitless',
-        description: 'A measure of how much light slows down in the first medium (e.g., air).',
+        name: 'Refractive index of the first material',
+        unit: 'no unit (it is a ratio)',
+        description: 'How many times slower light travels in the first material than in a vacuum. For air it is about 1.0.',
         color: 'text-indigo-400'
       },
       {
-        symbol: '\\theta_i',
-        name: 'Angle of Incidence',
-        unit: 'Degrees or Radians',
-        description: 'The angle at which the incoming light ray strikes the boundary, measured from the normal (perpendicular) line.',
+        symbol: '\\theta_1',
+        name: 'Angle of incidence',
+        unit: 'degrees (°)',
+        description: 'The angle between the incoming ray and the normal, a line drawn at right angles to the surface.',
         color: 'text-sky-400'
       },
       {
         symbol: 'n_2',
-        name: 'Final Refractive Index',
-        unit: 'Unitless',
-        description: 'A measure of how much light slows down in the second medium (e.g., glass or water).',
+        name: 'Refractive index of the second material',
+        unit: 'no unit (it is a ratio)',
+        description: 'The same measure for the second material: about 1.33 for water and about 1.5 for glass.',
         color: 'text-cyan-400',
         range: { min: 1, max: 2.5, default: 1.5 }
       },
       {
-        symbol: '\\theta_r',
-        name: 'Angle of Refraction',
-        unit: 'Degrees or Radians',
-        description: 'The angle at which the light ray travels through the second medium, measured from the normal line.',
+        symbol: '\\theta_2',
+        name: 'Angle of refraction',
+        unit: 'degrees (°)',
+        description: 'The angle between the ray in the second material and the normal.',
         color: 'text-rose-400'
       }
     ],
     conceptSteps: [
       {
         stepNumber: 1,
-        title: 'Speed of Light in a Medium',
-        content: 'Light travels slower in materials like glass or water than it does in a vacuum. The refractive index (n) is the ratio of the speed of light in a vacuum to its speed in the medium.',
-        keyInsight: 'A higher refractive index means light travels slower in that material.',
+        title: 'Light changes speed in a material',
+        content: 'Light is fastest in a vacuum, almost as fast in air, slower in water and slower still in glass. The **refractive index**, $n$, says how many times slower: in glass $n$ is about 1.5, so light travels at about two thirds of its speed in a vacuum.',
+        keyInsight: 'A higher refractive index means light travels more slowly in that material.',
         relatedVariables: ['n_1', 'n_2']
       },
       {
         stepNumber: 2,
-        title: 'Bending of Light',
-        content: 'When light enters a new medium at an angle, the change in speed causes the ray to bend. This is called refraction.',
-        keyInsight: 'Light bends towards the normal when slowing down, and away when speeding up.',
-        relatedVariables: ['\\theta_i', '\\theta_r']
+        title: 'Light bends at a boundary',
+        content: 'When a beam of light meets a new material at an angle, one side of the beam reaches it first and changes speed first, so the beam swings round. This is **refraction**. Angles are measured from the **normal**, a line drawn at right angles to the surface.',
+        keyInsight: 'Slowing down bends light towards the normal. Speeding up bends it away from the normal.',
+        relatedVariables: ['\\theta_1', '\\theta_2']
       },
       {
         stepNumber: 3,
-        title: 'Dispersion',
-        content: 'Different colours of light have slightly different refractive indices in materials like glass. This causes white light to split into a rainbow spectrum when passing through a prism.',
-        keyInsight: 'Violet and blue light slow down slightly more in glass than red light, so they bend more.',
-        relatedVariables: ['n_2', '\\theta_r']
+        title: 'Each colour bends by a different amount',
+        content: 'White light is a mixture of colours, each with a different frequency. Glass slows violet light a little more than red light, so violet is bent a little more. A prism therefore spreads white light out into a band of colours called a **spectrum**. This spreading is called **dispersion**.',
+        keyInsight: 'Violet light bends the most and red light the least.',
+        relatedVariables: ['n_2', '\\theta_2']
       }
     ],
     solvedExample: {
-      problem: 'Find the angle of refraction ($\\theta_r$) from air ($n_1 = 1.0$) to glass ($n_2 = 1.5$) at $\\theta_i = 30^\\circ$.',
+      problem: 'Light passes from air ($n_1 = 1.0$) into glass ($n_2 = 1.5$) at $30^\\circ$ to the normal. Find the angle of refraction, $\\theta_2$.',
       steps: [
-        'Apply Snell\'s Law: $1.0 \\cdot \\sin(30^\\circ) = 1.5 \\cdot \\sin(\\theta_r)$.',
-        '$\\sin(30^\\circ)$ is exactly $0.5$.',
-        'Substitute the value: $0.5 = 1.5 \\cdot \\sin(\\theta_r)$.',
-        'Solve for the sine of the angle: $\\sin(\\theta_r) = \\frac{0.5}{1.5} = 0.333$.',
-        'Calculate the inverse sine: $\\theta_r = \\arcsin(0.333)$.'
+        'Write down Snell\'s law: $n_1 \\sin \\theta_1 = n_2 \\sin \\theta_2$.',
+        'Substitute the values: $1.0 \\times \\sin 30^\\circ = 1.5 \\times \\sin \\theta_2$, and $\\sin 30^\\circ = 0.5$.',
+        'Divide both sides by 1.5: $\\sin \\theta_2 = \\dfrac{0.5}{1.5} = 0.333$.',
+        'Use the inverse sine on your calculator: $\\theta_2 = \\sin^{-1}(0.333)$.'
       ],
-      resultFormula: '\\theta_r \\approx 19.47^\\circ'
+      resultFormula: '\\theta_2 \\approx 19.5^\\circ'
     },
     practiceProblems: [
       {
@@ -348,7 +345,7 @@ The topics in these notes follow the Department for Education documents below.
         answer: "Towards the normal."
       },
       {
-        question: "Light leaves a glass block into air at an angle. Does it bend towards or away from the normal?",
+        question: "Light leaves a glass block into air at an angle. Which way does it bend: towards the normal or away from it?",
         hint: "It speeds up as it leaves the glass.",
         answer: "Away from the normal."
       },
@@ -368,7 +365,7 @@ The topics in these notes follow the Department for Education documents below.
         answer: "About 32.1°"
       },
     ],
-    realWorldConnection: 'Spectrometers use prisms or diffraction gratings to analyse the light from distant stars, revealing their chemical composition.',
+    realWorldConnection: 'Helium was found in the Sun before it was found on Earth. In 1868 astronomers saw a yellow line in the Sun\'s spectrum that matched no element known at the time. Helium was first collected on Earth in 1895.',
     textbookContent: `
 ## Refraction
 
@@ -390,7 +387,7 @@ We draw light as **rays**: straight lines with arrows. The **normal** is a line 
 
 ### Lenses
 
-A convex lens is thicker in the middle. Light passing through it is refracted towards the middle, so parallel rays are brought together at a point called the focus. The lens in your eye focuses light onto the back of the eye in this way, and so do the lenses in cameras and telescopes.
+A convex lens is thicker in the middle. Light passing through it is refracted towards the middle, so parallel rays are brought together at a point called the focus. Your eye focuses light onto the back of the eye in this way: the curved, clear front of the eye (the cornea) and the lens behind it both refract the light. Cameras and telescopes use lenses in the same way.
 
 ### Colours and prisms
 
@@ -400,7 +397,7 @@ In glass, violet light slows down slightly more than red light, so it is refract
 
 ### Absorbed, transmitted, reflected
 
-Materials treat different wavelengths of light differently. They may absorb some, let some through (transmit) and reflect some. Glass transmits visible light but absorbs much of the ultraviolet. A red filter transmits red light and absorbs the other colours.
+Materials treat different wavelengths of light differently. They may absorb some, let some through (transmit) and reflect some. Window glass transmits visible light but absorbs some ultraviolet. A red filter transmits red light and absorbs the other colours.
 
 ### Going further: Snell's law
 
@@ -408,15 +405,15 @@ The Department for Education content describes refraction in words. Some specifi
 
 $$n_1 \\sin \\theta_1 = n_2 \\sin \\theta_2$$
 
-Here $n$ is the **refractive index** of each material (how many times slower light travels in it than in a vacuum) and $\\theta$ is the angle to the normal. Light entering glass ($n_2 = 1.5$) from air ($n_1 = 1.0$) at $30°$:
-
-1.  $1.0 \\times \\sin 30° = 1.5 \\times \\sin \\theta_2$
-2.  $\\sin \\theta_2 = \\dfrac{0.5}{1.5} = 0.333$
-3.  $\\theta_2 = \\sin^{-1}(0.333) \\approx 19.5°$
+Here $n$ is the **refractive index** of each material (how many times slower light travels in it than in a vacuum) and $\\theta$ is the angle to the normal. The worked example shows how to use it. Notice that the angle in the glass comes out smaller than the angle in the air: the ray has bent towards the normal, just as the rule in words says.
 
 ### Reading starlight
 
-Astronomers pass starlight through a prism or a similar device to spread it into a spectrum. Dark lines in the spectrum show which colours the gases in a star have absorbed, and that tells us what the star is made of, without anyone ever going there.
+Astronomers pass starlight through a prism or a similar device to spread it into a spectrum. Dark lines in the spectrum show which colours the gases in a star's outer layers have absorbed, and that tells us what the star is made of, without anyone ever going there.
+
+### Next on the journey
+
+A spectrum is a set of measurements, and real measurements never agree perfectly. How do scientists sum up a pile of readings and say how spread out they are? That is the next lesson.
 
 ### Sources
 
@@ -4305,79 +4302,80 @@ The topics in these notes follow the Department for Education documents below.
     accentColor: 'cyan',
     difficulty: 2,
     estimatedMinutes: 15,
-    formula: '\\sigma = \\sqrt{\\frac{\\sum(x_i - \\mu)^2}{N}}',
+    formula: '\\sigma^2 = \\frac{\\sum (x - \\bar{x})^2}{n}',
     formulaLayout: [
       { type: 'variable', symbol: '\\sigma' },
       { type: 'static', latex: '^2' },
       { type: 'operator', content: '=' },
       {
         type: 'fraction',
-        numerator: [{ type: 'static', latex: '\\sum (x_i - \\mu)^2' }],
-        denominator: [{ type: 'variable', symbol: 'N' }]
+        numerator: [{ type: 'static', latex: '\\sum (x - \\bar{x})^2' }],
+        denominator: [{ type: 'variable', symbol: 'n' }]
       }
     ],
     variables: [
       {
         symbol: '\\sigma',
-        name: 'Standard Deviation',
-        unit: 'Same unit as data',
-        description: 'A measure of how spread out data values are around the mean. Small σ means data is tightly clustered; large σ means widely spread.',
+        name: 'Standard deviation',
+        unit: 'the same unit as the data',
+        description: 'How far the values typically are from the mean. Its square, $\\sigma^2$, is the variance.',
         color: 'text-cyan-400'
       },
       {
-        symbol: '\\mu',
-        name: 'Mean (Average)',
-        unit: 'Same unit as data',
-        description: 'The arithmetic average of all data points: sum of all values divided by count.',
+        symbol: '\\bar{x}',
+        name: 'Mean',
+        unit: 'the same unit as the data',
+        description: 'The total of the values divided by how many there are. Say it "x bar".',
         color: 'text-teal-400'
       },
       {
-        symbol: 'x_i',
-        name: 'Individual Data Point',
-        unit: 'Same unit as data',
-        description: 'Each single measurement or value in the dataset.',
+        symbol: 'x',
+        name: 'A data value',
+        unit: 'the same unit as the data',
+        description: 'Each single measurement in the data set. $\\sum$ (the Greek capital letter sigma) means "add up for every value".',
         color: 'text-sky-400'
       },
       {
-        symbol: 'N',
-        name: 'Number of Data Points',
-        unit: 'Count',
-        description: 'The total number of values in the dataset.',
+        symbol: 'n',
+        name: 'Number of values',
+        unit: 'no unit (a count)',
+        description: 'How many values there are in the data set.',
         color: 'text-blue-400'
       }
     ],
     conceptSteps: [
       {
         stepNumber: 1,
-        title: 'Measures of Central Tendency',
-        content: 'The **mean** (average) $\\mu = \\frac{\\sum x_i}{N}$ finds the central value. The **median** is the middle value when sorted. The **mode** is the most frequent value. Each measure has different strengths depending on the data distribution.',
-        keyInsight: 'Use median instead of mean when data has extreme outliers.',
-        relatedVariables: ['\\mu', 'x_i', 'N']
+        title: 'Three kinds of average',
+        content: 'The **mean** is the total divided by the number of values, $\\bar{x} = \\dfrac{\\sum x}{n}$. The **median** is the value in the middle once the data is sorted from smallest to largest. The **mode** is the most common value.',
+        keyInsight: 'A single extreme value can drag the mean a long way, but it hardly moves the median.',
+        relatedVariables: ['\\bar{x}', 'x', 'n']
       },
       {
         stepNumber: 2,
-        title: 'Standard Deviation & Spread',
-        content: 'Standard deviation $\\sigma$ measures how far data points typically stray from the mean. A dataset of sensor readings {100, 101, 99, 100} is much tighter than {50, 150, 80, 120} even if both have the same mean.',
-        keyInsight: 'σ tells you the "typical distance" from the average.',
-        relatedVariables: ['\\sigma', '\\mu', 'x_i']
+        title: 'Standard deviation measures spread',
+        content: 'The readings 99, 100, 100, 101 and the readings 50, 80, 120, 150 both have a mean of 100, but the second set is far more spread out. The **standard deviation**, $\\sigma$, puts a number on that spread, using every value.',
+        keyInsight: 'A small standard deviation means the values sit close to the mean. A large one means they are widely spread.',
+        relatedVariables: ['\\sigma', '\\bar{x}', 'x']
       },
       {
         stepNumber: 3,
-        title: 'The Normal Distribution',
-        content: 'In a normal (bell curve) distribution, approximately 68% of data falls within ±1σ of the mean, 95% within ±2σ, and 99.7% within ±3σ. This is the famous empirical rule used in quality control, science, and AI model evaluation.',
-        keyInsight: '68-95-99.7 rule: most data lies within 3 standard deviations of the mean.',
-        relatedVariables: ['\\sigma', '\\mu']
+        title: 'Spotting outliers',
+        content: 'An **outlier** is a value far from the rest of the data. A common rule treats a value as an outlier if it is more than 2 standard deviations from the mean.',
+        keyInsight: 'Find out why an outlier is there before you remove it. It may be a mistake, or it may be the most interesting result.',
+        relatedVariables: ['\\sigma', '\\bar{x}']
       }
     ],
     solvedExample: {
-      problem: 'Find the mean $\\mu$ and standard deviation $\\sigma$ for the dataset: $\\{2, 4, 4, 4, 5, 5, 7, 9\\}$.',
+      problem: 'Find the mean $\\bar{x}$ and the standard deviation $\\sigma$ of the data $2, 4, 4, 4, 5, 5, 7, 9$.',
       steps: [
-        'Calculate the mean: $\\mu = \\frac{2+4+4+4+5+5+7+9}{8} = \\frac{40}{8} = 5$.',
-        'Calculate each squared deviation: $(2-5)^2=9$, $(4-5)^2=1$ (×3), $(5-5)^2=0$ (×2), $(7-5)^2=4$, $(9-5)^2=16$.',
-        'Sum of squared deviations: $9 + 3 + 0 + 4 + 16 = 32$.',
-        'Variance: $\\sigma^2 = \\frac{32}{8} = 4$.'
+        'Find the mean: $\\bar{x} = \\dfrac{2+4+4+4+5+5+7+9}{8} = \\dfrac{40}{8} = 5$.',
+        'Square each distance from the mean: $(2-5)^2 = 9$, $(4-5)^2 = 1$ (three times), $(5-5)^2 = 0$ (twice), $(7-5)^2 = 4$, $(9-5)^2 = 16$.',
+        'Add them up: $9 + 3 + 0 + 4 + 16 = 32$.',
+        'Divide by $n$ to get the variance: $\\sigma^2 = \\dfrac{32}{8} = 4$.',
+        'Take the square root to get the standard deviation.'
       ],
-      resultFormula: '\\sigma = \\sqrt{4} = 2'
+      resultFormula: '\\bar{x} = 5, \\quad \\sigma = \\sqrt{4} = 2'
     },
     practiceProblems: [
       {
@@ -4411,7 +4409,7 @@ The topics in these notes follow the Department for Education documents below.
         answer: "A: its readings are spread out less."
       },
     ],
-    realWorldConnection: 'Engineers use statistics to separate real signals from sensor noise. A reading several standard deviations from the mean is unlikely to be chance, so it is flagged for a closer look.',
+    realWorldConnection: 'In July 2012 two teams at CERN announced the discovery of the Higgs boson. Each team waited until its signal was about five standard deviations away from what chance alone would give, the standard particle physicists set for claiming a discovery.',
     textbookContent: `
 ## Averages and spread
 
@@ -4419,11 +4417,11 @@ A set of data is usually summarised by two numbers: one for its centre, and one 
 
 ### Averages
 
-*   The **mean** is the total divided by the number of values: $\\bar{x} = \\dfrac{\\sum x}{n}$.
+*   The **mean** is the total divided by the number of values: $\\bar{x} = \\dfrac{\\sum x}{n}$, where $\\sum x$ means the sum of all the values.
 *   The **median** is the middle value when the data is in order. With an even number of values, it is halfway between the middle two.
 *   The **mode** is the value that occurs most often.
 
-The mean uses every value, but one extreme value can pull it a long way. The median is not affected by extreme values, so it is often better for skewed data, such as incomes.
+The mean uses every value, but one extreme value can pull it a long way. The median is not affected by extreme values, so it is often better for skewed data (data with a long tail of a few very large or very small values), such as incomes.
 
 ### Spread
 
@@ -4441,17 +4439,9 @@ An equivalent form is easier with **summary statistics**, when you are given $n$
 
 $$\\sigma^2 = \\frac{\\sum x^2}{n} - \\bar{x}^2$$
 
+For the data in the worked example, $\\sum x^2 = 232$, so $\\sigma^2 = \\dfrac{232}{8} - 5^2 = 29 - 25 = 4$: the same answer by the other route.
+
 Some calculators and textbooks divide by $n - 1$ instead of $n$ when estimating from a sample. Use the form your specification asks for.
-
-### Worked example
-
-Find the mean and standard deviation of 2, 4, 4, 4, 5, 5, 7, 9.
-
-1.  Mean: $\\bar{x} = \\dfrac{40}{8} = 5$.
-2.  Squared distances from 5: $9, 1, 1, 1, 0, 0, 4, 16$, which total 32.
-3.  Variance: $\\dfrac{32}{8} = 4$, so $\\sigma = 2$.
-
-Check with summary statistics: $\\sum x^2 = 232$, and $\\dfrac{232}{8} - 5^2 = 29 - 25 = 4$.
 
 ### Outliers
 
@@ -4460,6 +4450,10 @@ An **outlier** is a value far from the rest. Two common rules mark a value as an
 ### Sensor readings in space
 
 A spacecraft's sensors are never perfectly steady. Engineers work out the usual mean and standard deviation of each reading. A reading many standard deviations from the mean is very unlikely to be chance, so the software flags it for a closer look.
+
+### Next on the journey
+
+Light itself is an electromagnetic wave: a ripple of electric and magnetic fields. To see what that means, start with how magnets and electric currents affect each other. How can a moving magnet make a current flow? That is the next lesson.
 
 ### Sources
 
@@ -4480,7 +4474,7 @@ The topics in these notes follow the Department for Education documents below.
     accentColor: 'cyan',
     difficulty: 3,
     estimatedMinutes: 20,
-    formula: '\\mathcal{E} = -N \\frac{d\\Phi_B}{dt}',
+    formula: '\\mathcal{E} = -N \\frac{\\Delta \\Phi}{\\Delta t}',
     formulaLayout: [
       { type: 'variable', symbol: '\\mathcal{E}' },
       { type: 'operator', content: '=' },
@@ -4488,65 +4482,79 @@ The topics in these notes follow the Department for Education documents below.
       { type: 'variable', symbol: 'N' },
       {
         type: 'fraction',
-        numerator: [{ type: 'static', latex: 'd\\Phi_B' }],
-        denominator: [{ type: 'static', latex: 'dt' }]
+        numerator: [
+          { type: 'static', latex: '\\Delta' },
+          { type: 'variable', symbol: '\\Phi' }
+        ],
+        denominator: [
+          { type: 'static', latex: '\\Delta' },
+          { type: 'variable', symbol: 't' }
+        ]
       }
     ],
     variables: [
       {
         symbol: '\\mathcal{E}',
-        name: 'Electromotive Force (EMF)',
-        unit: 'Volts (V)',
-        description: 'The voltage induced in a coil by a changing magnetic flux. The driving force behind electric generators and transformers.',
+        name: 'Induced emf',
+        unit: 'volts (V)',
+        description: 'The voltage produced across the coil. Its full name is electromotive force, but it is a voltage, not a force.',
         color: 'text-cyan-400'
       },
       {
         symbol: 'N',
-        name: 'Number of Turns',
-        unit: 'Count',
-        description: 'The number of loops in the coil. More turns amplify the induced EMF proportionally.',
+        name: 'Number of turns',
+        unit: 'no unit (a count)',
+        description: 'How many loops of wire the coil has. Twice as many turns gives twice the emf.',
         color: 'text-teal-400',
         range: { min: 1, max: 100, default: 10 }
       },
       {
-        symbol: '\\Phi_B',
-        name: 'Magnetic Flux',
-        unit: 'Webers (Wb)',
-        description: 'The total magnetic field passing through a surface: Φ_B = B·A·cos(θ).',
+        symbol: '\\Phi',
+        name: 'Magnetic flux',
+        unit: 'webers (Wb)',
+        description: 'How much magnetic field passes through the coil. For a field $B$ at right angles to an area $A$, $\\Phi = BA$.',
         color: 'text-sky-400'
+      },
+      {
+        symbol: 't',
+        name: 'Time',
+        unit: 'seconds (s)',
+        description: '$\\Delta t$ is the time the change in flux takes.',
+        color: 'text-blue-400'
       }
     ],
     conceptSteps: [
       {
         stepNumber: 1,
-        title: 'Magnetic Fields',
-        content: 'Moving electric charges create magnetic fields. A current-carrying wire produces a circular magnetic field around it. Bar magnets create dipole fields running from south to north pole internally, and north to south externally.',
-        keyInsight: 'Electricity and magnetism are two faces of the same underlying force.',
-        relatedVariables: ['\\Phi_B']
+        title: 'A changing field makes a voltage',
+        content: 'Move a magnet into or out of a coil, turn a coil in a magnetic field, or change the current in a nearby electromagnet, and a voltage appears across the coil. This is **electromagnetic induction**. Connect the coil into a complete circuit and that voltage pushes a current round it.',
+        keyInsight: 'Only change counts. A magnet resting still beside a coil induces no voltage at all.',
+        relatedVariables: ['\\mathcal{E}', '\\Phi']
       },
       {
         stepNumber: 2,
-        title: "Faraday's Law of Induction",
-        content: "A changing magnetic flux through a coil induces an electromotive force (voltage). The faster the flux changes, the greater the induced EMF. This is the operating principle of every electric generator on Earth — from bicycle dynamos to nuclear power stations.",
-        keyInsight: 'Change is key: a static field induces nothing; a changing field induces voltage.',
-        relatedVariables: ['\\mathcal{E}', '\\Phi_B', 'N']
+        title: 'Faster change, bigger emf',
+        content: '**Magnetic flux**, $\\Phi$, measures how much field passes through the coil. For a coil of $N$ turns, $N\\Phi$ is called the **flux linkage**. Faraday\'s law says the induced emf equals the rate of change of flux linkage: $N$ times the change in flux, divided by the time it takes.',
+        keyInsight: 'More turns, a stronger field or a quicker change all give a larger emf.',
+        relatedVariables: ['\\mathcal{E}', 'N', '\\Phi', 't']
       },
       {
         stepNumber: 3,
-        title: "Lenz's Law and the Negative Sign",
-        content: "The negative sign in Faraday's law reflects Lenz's Law: the induced current flows in a direction that opposes the change in flux that created it. This is an expression of energy conservation — you must do work against the opposing force to move the magnet.",
-        keyInsight: 'Induced currents always resist the change that caused them.',
+        title: 'The minus sign is Lenz\'s law',
+        content: 'The induced current always flows in the direction that opposes the change causing it. So when you push a magnet into a coil that is part of a circuit, the coil pushes back, and you have to do work. That work is where the electrical energy comes from.',
+        keyInsight: 'Lenz\'s law is the conservation of energy: you never get electrical energy for nothing.',
         relatedVariables: ['\\mathcal{E}']
       }
     ],
     solvedExample: {
-      problem: 'A coil with $N = 200$ turns experiences a change in magnetic flux from $\\Phi_B = 0.5$ Wb to $0.1$ Wb in $\\Delta t = 0.2$ s. Find the induced EMF.',
+      problem: 'The flux through a 50-turn coil rises from $0.02$ Wb to $0.10$ Wb in $0.4$ s. Find the induced emf.',
       steps: [
-        'Rate of change: $\\frac{d\\Phi_B}{dt} = \\frac{0.1 - 0.5}{0.2} = \\frac{-0.4}{0.2} = -2$ Wb/s.',
-        "Apply Faraday's Law: $\\mathcal{E} = -N \\frac{d\\Phi_B}{dt}$.",
-        'Substitute: $\\mathcal{E} = -200 \\times (-2)$.'
+        'Change in flux: $\\Delta \\Phi = 0.10 - 0.02 = 0.08$ Wb.',
+        'Rate of change of flux: $\\dfrac{\\Delta \\Phi}{\\Delta t} = \\dfrac{0.08}{0.4} = 0.2$ Wb/s.',
+        'Apply Faraday\'s law: $\\mathcal{E} = -N \\dfrac{\\Delta \\Phi}{\\Delta t} = -50 \\times 0.2$.',
+        'The minus sign says the emf acts to oppose the rise in flux (Lenz\'s law). Its size is 10 V.'
       ],
-      resultFormula: '\\mathcal{E} = 400 \\text{ V}'
+      resultFormula: '\\mathcal{E} = -10 \\text{ V}'
     },
     practiceProblems: [
       {
@@ -4580,7 +4588,7 @@ The topics in these notes follow the Department for Education documents below.
         answer: "A north pole, which repels the magnet and opposes its approach (Lenz's law)."
       },
     ],
-    realWorldConnection: "Every power station generator and every transformer on the electricity grid works by Faraday's law. So do wireless phone chargers, induction hobs and the pickups on an electric guitar.",
+    realWorldConnection: 'An electric guitar pickup is a small magnet wrapped in a coil of fine wire. A vibrating steel string changes the magnetic field through the coil, and that induces a small voltage which the amplifier turns into sound.',
     textbookContent: `
 ## Electromagnetic induction
 
@@ -4606,7 +4614,7 @@ Flux is measured in webers (Wb). For a coil of $N$ turns, the **flux linkage** i
 
 ### Faraday's law
 
-The induced emf equals the rate of change of flux linkage:
+The induced voltage is called the **emf** (short for electromotive force, although it is a voltage, measured in volts). It equals the rate of change of flux linkage:
 
 $$\\mathcal{E} = -N\\frac{\\Delta \\Phi}{\\Delta t}$$
 
@@ -4614,15 +4622,7 @@ More turns, a stronger field, or a faster change all give a larger emf.
 
 ### Lenz's law
 
-The minus sign is **Lenz's law**: the induced current flows in the direction that **opposes** the change causing it. Push the north pole of a magnet into a coil and the coil's near end becomes a north pole, pushing back. You have to do work to move the magnet, and that work becomes electrical energy. Lenz's law is the conservation of energy at work.
-
-### Worked example
-
-A 200-turn coil has the flux through it fall from 0.5 Wb to 0.1 Wb in 0.2 s.
-
-1.  Change in flux: $0.1 - 0.5 = -0.4$ Wb.
-2.  Rate of change: $-0.4 \\div 0.2 = -2$ Wb/s.
-3.  $\\mathcal{E} = -200 \\times (-2) = 400$ V.
+The minus sign is **Lenz's law**: the induced current flows in the direction that **opposes** the change causing it. Push the north pole of a magnet into a coil that is part of a circuit, and the coil's near end becomes a north pole, pushing back. You have to do work to move the magnet, and that work becomes electrical energy. Lenz's law is the conservation of energy at work.
 
 ### Where it is used
 
@@ -4631,6 +4631,10 @@ Generators in power stations turn coils in magnetic fields. Transformers change 
 ### A tether in orbit
 
 In 1996 the Space Shuttle unreeled a conducting cable about 20 km long. Moving at orbital speed through the Earth's magnetic field, the cable had an emf of about 3,500 volts induced along it, just as Faraday's law predicts for a conductor cutting through a field.
+
+### Next on the journey
+
+In light, changing electric and magnetic fields keep each other going as a wave. Yet some experiments show light arriving in tiny separate packets. How can light be a wave and a stream of packets at once? That is the next lesson.
 
 ### Sources
 
@@ -4661,23 +4665,23 @@ The topics in these notes follow the Department for Education documents below.
     variables: [
       {
         symbol: 'E',
-        name: 'Photon Energy',
-        unit: 'Joules (J) or eV',
-        description: 'The discrete packet of energy carried by a single photon. Unlike classical waves, energy comes in indivisible chunks called quanta.',
+        name: 'Energy of one photon',
+        unit: 'joules (J), or electronvolts (eV)',
+        description: 'The energy carried by a single packet of light. One electronvolt is $1.60 \\times 10^{-19}$ J.',
         color: 'text-violet-400'
       },
       {
         symbol: 'h',
-        name: "Planck's Constant",
-        unit: 'J·s',
-        description: 'A fundamental constant of nature: h ≈ 6.626 × 10⁻³⁴ J·s. It sets the scale of quantum effects — the minimum "grain size" of action in the universe.',
+        name: 'Planck constant',
+        unit: 'J s',
+        description: 'A fixed number, $6.63 \\times 10^{-34}$ J s. It is so small that one photon carries only a tiny amount of energy.',
         color: 'text-purple-400'
       },
       {
         symbol: 'f',
         name: 'Frequency',
-        unit: 'Hertz (Hz)',
-        description: 'The frequency of the electromagnetic wave associated with the photon. Higher frequency (e.g. UV, X-rays) means more energetic photons.',
+        unit: 'hertz (Hz)',
+        description: 'The frequency of the light. Higher frequency, such as ultraviolet or X-rays, means more energy in each photon.',
         color: 'text-indigo-400',
         range: { min: 1, max: 10, default: 5 }
       }
@@ -4685,34 +4689,34 @@ The topics in these notes follow the Department for Education documents below.
     conceptSteps: [
       {
         stepNumber: 1,
-        title: 'Planck and the Quantum',
-        content: 'In 1900, Max Planck was trying to explain the spectrum of light given off by hot objects. Classical theory got it badly wrong: it predicted ever more energy at high frequencies, a failure later nicknamed the "ultraviolet catastrophe". Planck found a formula that matched the measurements by assuming energy is exchanged in discrete packets, or **quanta**, of size $E = hf$.',
-        keyInsight: 'Energy is quantised — it exists in discrete chunks, not a continuous flow.',
+        title: 'Light comes in packets',
+        content: 'Light travels as a wave, but it gives up its energy in separate packets called **photons**. The energy of one photon depends only on the frequency of the light: $E = hf$.',
+        keyInsight: 'A brighter beam carries more photons, not more energetic ones.',
         relatedVariables: ['E', 'h', 'f']
       },
       {
         stepNumber: 2,
-        title: 'Wave-Particle Duality',
-        content: "In 1905, Einstein used Planck's idea to explain the photoelectric effect: light behaves as particles (photons) when it hits a metal and ejects electrons. Yet light also exhibits wave interference. Matter itself — electrons, protons — also displays wave-like diffraction. This is wave-particle duality.",
-        keyInsight: 'Light and matter are both waves AND particles, depending on how you observe them.',
+        title: 'Evidence from the photoelectric effect',
+        content: 'Light shining on a clean metal can release electrons. Below a certain frequency none come out, however bright the light. A wave model cannot explain this, but the photon model can: each electron takes the energy of one photon, and it escapes only if that energy is at least the **work function**, $\\phi$, the energy needed to leave the metal.',
+        keyInsight: 'One photon, one electron. What matters is the energy of each photon, not how many there are.',
         relatedVariables: ['E', 'f']
       },
       {
         stepNumber: 3,
-        title: 'Electron Diffraction',
-        content: 'Electrons fired through a thin layer of graphite spread into rings, a diffraction pattern, just as light does through a grating. Diffraction is a wave effect, so this shows that particles can behave as waves, with a wavelength $\\lambda = \\frac{h}{p}$.',
+        title: 'Particles can behave as waves',
+        content: 'Electrons fired through a thin layer of graphite spread into rings, a diffraction pattern, just as light does through a grating. Diffraction is a wave effect, so particles can behave as waves too, with a **de Broglie wavelength** $\\lambda = \\dfrac{h}{p}$, where $p$ is the momentum. This is **wave-particle duality**.',
         keyInsight: 'Faster electrons have more momentum and so a shorter wavelength, which makes smaller diffraction rings.',
         relatedVariables: ['h']
       }
     ],
     solvedExample: {
-      problem: 'Calculate the energy of a photon of visible light with $f = 6.0 \\times 10^{14}$ Hz (green light).',
+      problem: 'Find the energy of a photon of green light, with frequency $f = 6.0 \\times 10^{14}$ Hz. Give it in joules and in electronvolts.',
       steps: [
-        'Use $E = hf$ with $h = 6.626 \\times 10^{-34}$ J·s.',
-        'Substitute: $E = 6.626 \\times 10^{-34} \\times 6.0 \\times 10^{14}$.',
-        'Multiply: $E = 6.626 \\times 6.0 \\times 10^{-20} = 39.756 \\times 10^{-20}$.'
+        'Use $E = hf$ with $h = 6.63 \\times 10^{-34}$ J s.',
+        'Substitute: $E = 6.63 \\times 10^{-34} \\times 6.0 \\times 10^{14} = 3.98 \\times 10^{-19}$ J.',
+        'Convert to electronvolts by dividing by $1.60 \\times 10^{-19}$: $E = \\dfrac{3.98 \\times 10^{-19}}{1.60 \\times 10^{-19}}$.'
       ],
-      resultFormula: 'E \\approx 3.98 \\times 10^{-19} \\text{ J} \\approx 2.48 \\text{ eV}'
+      resultFormula: 'E \\approx 3.98 \\times 10^{-19} \\text{ J} \\approx 2.5 \\text{ eV}'
     },
     practiceProblems: [
       {
@@ -4746,7 +4750,7 @@ The topics in these notes follow the Department for Education documents below.
         answer: "About $6.6 \\times 10^{-10}$ m, similar to the spacing of atoms in a crystal, so the electrons can be diffracted."
       },
     ],
-    realWorldConnection: 'Quantum mechanics underpins every semiconductor in your phone, spacecraft solar cells, GPS atomic clocks, and MRI scanners. Understanding quantisation is essential to all modern technology.',
+    realWorldConnection: 'The light sensors in digital cameras, and in telescope cameras such as those on the Hubble Space Telescope, work because a photon landing on a pixel can free an electron in the silicon. Counting those electrons measures the light.',
     textbookContent: `
 ## Photons
 
@@ -4772,6 +4776,8 @@ A wave model cannot explain this. The photon model can: each electron absorbs on
 
 $$hf = \\phi + E_{k(\\text{max})}$$
 
+where $E_{k(\\text{max})}$ is the greatest kinetic energy an escaping electron can have.
+
 ### Evidence: line spectra
 
 A hot gas gives out light at only certain sharp frequencies. Electrons in atoms can only have certain energy levels. When an electron drops between two levels it gives out one photon, whose energy $hf$ equals the difference between the levels. Each element has its own set of levels, so its own set of lines.
@@ -4788,17 +4794,13 @@ where $p$ is the momentum.
 
 A beam of electrons fired through a thin layer of graphite makes rings on a screen, a diffraction pattern, just like light through a grating. Diffraction is a wave effect, and it only shows up clearly when the wavelength is about the size of the gaps, here the spacing between atoms. Faster electrons have shorter wavelengths and make smaller rings, as $\\lambda = \\dfrac{h}{p}$ predicts.
 
-### Worked example
-
-Find the energy of a photon of green light, $f = 6.0 \\times 10^{14}$ Hz.
-
-1.  $E = hf = 6.63 \\times 10^{-34} \\times 6.0 \\times 10^{14}$
-2.  $E \\approx 3.98 \\times 10^{-19}$ J
-3.  In electronvolts: $\\dfrac{3.98 \\times 10^{-19}}{1.60 \\times 10^{-19}} \\approx 2.5$ eV
-
 ### Reading the light of stars
 
 The dark and bright lines in a star's spectrum are photons absorbed or given out as electrons jump between energy levels. Because each element has its own pattern of lines, astronomers can tell what a star is made of from its light alone.
+
+### Next on the journey
+
+This is the end of the journey. You began with the number skills, and you have finished by reading what a star is made of from the light it sends us. Every lesson stays open, so go back to any step you want to make stronger.
 
 ### Sources
 
