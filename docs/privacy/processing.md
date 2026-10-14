@@ -2,7 +2,7 @@
 
 Stella Academy, https://www.stella-academy.org. Checked against the code on 14 October 2026.
 
-**Controller:** the site owner, as an individual (there is no company). Name and contact: to be decided.
+**Controller:** the site owner, as an individual (there is no company): Y. Pei t/a Pixjobs, hello@pixjobs.com.
 **Processors:** Google (Cloud Run, Cloud Logging, Google Analytics), under Google's standard data processing terms.
 
 The site has no accounts, no sign-up, no email list and no payments of its own. Most of what it remembers stays in the

@@ -3,7 +3,7 @@ import { studyModules } from '@/lib/study-modules';
 import { CONTENT_UPDATED, SITE_URL } from '@/lib/site';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const pages = ['', '/journey', '/study', '/gallery', '/about'].map((p) => ({
+  const pages = ['', '/journey', '/study', '/gallery', '/about', '/privacy'].map((p) => ({
     url: `${SITE_URL}${p}`,
     lastModified: CONTENT_UPDATED,
     changeFrequency: 'monthly' as const,

@@ -99,7 +99,11 @@ export default function AboutPage() {
             <Block title="Cost and privacy">
               <p>
                 The lessons are free to use. We use Google Analytics to see which lessons are useful, and it only sets
-                cookies if you accept them in the banner.
+                cookies if you accept them in the banner.{' '}
+                <Link href="/privacy" className={linkClass}>
+                  Read the privacy policy
+                </Link>
+                .
               </p>
               {supportEnabled && (
                 <>

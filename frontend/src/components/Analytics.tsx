@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import Script from 'next/script';
 import { useEffect, useSyncExternalStore } from 'react';
 import { GA_ID } from '@/lib/site';
@@ -37,6 +38,18 @@ function readConsent(): Consent | null {
 }
 
 const unknownOnServer = () => undefined;
+
+/** Forget the visitor's choice, so the banner asks again (the "change your cookie choice" button on /privacy). */
+export function resetConsent() {
+  session = null;
+  try {
+    localStorage.removeItem(CONSENT_KEY);
+  } catch {
+    /* storage unavailable: nothing was saved */
+  }
+  window.gtag?.('consent', 'update', { analytics_storage: 'denied' });
+  listeners.forEach((listener) => listener());
+}
 
 function applyConsent(value: Consent) {
   window.gtag?.('consent', 'update', { analytics_storage: value });
@@ -92,7 +105,10 @@ export default function Analytics() {
           <div className="mx-auto flex max-w-4xl flex-col items-center gap-3 text-sm text-slate-300 sm:flex-row sm:justify-between">
             <p>
               We use Google Analytics cookies to see which lessons are useful. They are not used for
-              advertising. Is that OK?
+              advertising. Is that OK?{' '}
+              <Link href="/privacy" className="underline decoration-white/40 underline-offset-2 hover:decoration-white">
+                Privacy
+              </Link>
             </p>
             <div className="flex shrink-0 gap-2">
               <button

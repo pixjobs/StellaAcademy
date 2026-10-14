@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useState, type FormEvent } from 'react';
 import { REPORT_KINDS, REPORT_RETENTION_DAYS, type ReportKind } from '@/lib/report';
 import { track } from '@/lib/track';
@@ -52,7 +53,10 @@ export default function ReportProblem({ lesson }: { lesson: string }) {
         <form onSubmit={submit} className="mt-4 space-y-4">
           <p className="text-[15px] leading-relaxed text-[var(--ink-soft)]">
             Please do not include your name, email or anything else about yourself. We only need to know what is wrong.
-            We use reports only to put mistakes right, and delete them after {REPORT_RETENTION_DAYS} days.
+            We use reports only to put mistakes right, and delete them after {REPORT_RETENTION_DAYS} days.{' '}
+            <Link href="/privacy#reports" className="font-semibold text-[var(--action)] underline decoration-2 underline-offset-4 hover:text-[var(--action-hover)]">
+              Privacy
+            </Link>
           </p>
           <label className="block text-[var(--ink)]">
             What kind of problem is it?

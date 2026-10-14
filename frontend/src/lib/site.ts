@@ -16,3 +16,9 @@ export const GA_ID = process.env.NEXT_PUBLIC_GA_ID || 'G-2WZE7ZQE3C';
 
 /** When the lessons were last revised; shown to search engines in the sitemap. Update it when content changes. */
 export const CONTENT_UPDATED = '2026-10-14';
+
+/** Who is responsible for visitors' data (the data controller) and how to reach them. Shown on /privacy. */
+export const CONTROLLER_NAME = 'Y. Pei t/a Pixjobs';
+export const PRIVACY_EMAIL = 'hello@pixjobs.com';
+/** When /privacy last changed. Update it with any change to what the site collects. */
+export const PRIVACY_UPDATED = '14 October 2026';

@@ -7,6 +7,7 @@ const LINKS = [
   { href: '/study', label: 'Lessons' },
   { href: '/gallery', label: 'NASA gallery' },
   { href: '/about', label: 'About' },
+  { href: '/privacy', label: 'Privacy' },
 ];
 
 export default function Footer() {
