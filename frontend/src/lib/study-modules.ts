@@ -1433,58 +1433,57 @@ The topics in these notes follow the Department for Education document below.
     variables: [
       {
         symbol: '\\theta',
-        name: 'Viewing Angle',
-        unit: 'Degrees',
-        description: 'The angle between the observer\'s horizon and the satellite.',
+        name: 'Angle',
+        unit: 'degrees (°)',
+        description: 'One of the two angles in the triangle that is not the right angle.',
         color: 'text-amber-400'
       },
       {
         symbol: 'O',
-        name: 'Opposite (Altitude)',
-        unit: 'km',
-        description: 'The vertical height of the satellite above the ground.',
+        name: 'Opposite side',
+        unit: 'a length, such as metres (m)',
+        description: 'The side facing the angle $\\theta$.',
         color: 'text-orange-400'
       },
       {
         symbol: 'H',
-        name: 'Hypotenuse (Line of Sight)',
-        unit: 'km',
-        description: 'The direct distance from the observer to the satellite.',
+        name: 'Hypotenuse',
+        unit: 'a length, such as metres (m)',
+        description: 'The longest side, opposite the right angle.',
         color: 'text-yellow-400'
       }
     ],
     conceptSteps: [
       {
         stepNumber: 1,
-        title: "Right Triangles in Space",
-        content: "Trigonometry allows us to find unknown distances in space by forming imaginary right triangles between planets, observers, and satellites. This builds upon the idea of breaking diagonal paths down into horizontal and vertical components, much like in [Vectors](/study/vectors).",
-        keyInsight: "Angles and side lengths are deeply connected.",
-        relatedVariables: []
+        title: "Naming the sides",
+        content: "In a right-angled triangle, pick one of the two angles that is not the right angle and call it $\\theta$. The longest side, opposite the right angle, is the hypotenuse. The side facing $\\theta$ is the opposite side. The third side, next to $\\theta$, is the adjacent side.",
+        keyInsight: "Which side is opposite and which is adjacent depends on the angle you pick. The hypotenuse is always the same side.",
+        relatedVariables: ["\\theta", "O", "H"]
       },
       {
         stepNumber: 2,
-        title: "SOH CAH TOA",
-        content: "The Sine ratio (SOH) connects the angle of observation with the Opposite side (altitude) and Hypotenuse (direct distance). When working with rotated coordinate systems, we use similar sine and cosine ratios in [Matrices](/study/matrices).",
-        keyInsight: "Sine is Opposite divided by Hypotenuse.",
+        title: "The three ratios",
+        content: "For a given angle, each ratio of two sides is the same however big the triangle is: $\\sin\\theta = \\dfrac{\\text{opposite}}{\\text{hypotenuse}}$, $\\cos\\theta = \\dfrac{\\text{adjacent}}{\\text{hypotenuse}}$ and $\\tan\\theta = \\dfrac{\\text{opposite}}{\\text{adjacent}}$. The letters SOH CAH TOA help you remember which is which.",
+        keyInsight: "To find a side, choose the ratio that contains the side you know and the side you want.",
         relatedVariables: ["\\theta", "O", "H"]
       },
       {
         stepNumber: 3,
-        title: "Tracking Satellites",
-        content: "Ground stations use the viewing angle and radar distance (hypotenuse) to calculate exactly how high a satellite is orbiting.",
-        keyInsight: "Radar gives us H, and sensors give us the angle, letting us find altitude.",
-        relatedVariables: ["O"]
+        title: "Finding an angle",
+        content: "If you know two sides, work out their ratio, then use the inverse function on a calculator ($\\sin^{-1}$, $\\cos^{-1}$ or $\\tan^{-1}$) to turn it back into an angle. If you know two sides and want the third side, Pythagoras' theorem does it without an angle.",
+        keyInsight: "The inverse functions take you from a ratio back to an angle.",
+        relatedVariables: ["\\theta"]
       }
     ],
     solvedExample: {
-      problem: 'A ground station tracks a satellite at a line-of-sight distance ($H$) of $1000$ km, at an angle ($\\theta$) of $30^\\circ$ above the horizon. What is its altitude ($O$)?',
+      problem: 'A tracking station measures the straight-line distance to a climbing rocket as $12$ km, at an angle of $25^\\circ$ above the horizon. How high is the rocket? Over a distance this short, treat the ground as flat.',
       steps: [
-        'Use the sine ratio: $\\sin(\\theta) = \\frac{O}{H}$.',
-        'Substitute knowns: $\\sin(30^\\circ) = \\frac{O}{1000}$.',
-        'Recall that $\\sin(30^\\circ) = 0.5$.',
-        'Multiply by 1000: $O = 0.5 \\cdot 1000$.'
+        'The straight line to the rocket is the hypotenuse, $H = 12$ km. The height is the side opposite the angle, $O$.',
+        'Opposite and hypotenuse are in the sine ratio: $\\sin 25^\\circ = \\dfrac{O}{12}$.',
+        'Multiply both sides by 12: $O = 12 \\times \\sin 25^\\circ = 12 \\times 0.4226$.'
       ],
-      resultFormula: 'O = 500 \\text{ km}'
+      resultFormula: 'O \\approx 5.07 \\text{ km}'
     },
     practiceProblems: [
       {
@@ -1518,7 +1517,7 @@ The topics in these notes follow the Department for Education document below.
         answer: "About 1.0 light-year"
       },
     ],
-    realWorldConnection: 'Parallax measurement uses trigonometry to determine the distance to nearby stars by observing them from opposite sides of Earth\'s orbit.',
+    realWorldConnection: 'Astronomers use trigonometry to measure the distance to nearby stars. They measure how far a star seems to shift against much more distant stars when Earth is on opposite sides of its orbit, six months apart.',
     textbookContent: `
 ## Trigonometry in right-angled triangles
 
@@ -1536,12 +1535,7 @@ Many people remember them as **SOH CAH TOA**.
 
 ### Finding a side
 
-Choose the ratio that contains the side you know and the side you want.
-
-*Example:* the hypotenuse is 10 m and the angle is 30°. Find the opposite side.
-
-1.  Opposite and hypotenuse are in the sine ratio: $\\sin 30° = \\dfrac{\\text{opposite}}{10}$.
-2.  Opposite $= 10 \\times \\sin 30° = 10 \\times 0.5 = 5$ m.
+Choose the ratio that contains the side you know and the side you want, then rearrange it. The worked example above finds the height of a rocket this way.
 
 ### Finding an angle
 
@@ -1572,11 +1566,15 @@ $$a^2 + b^2 = c^2$$
 
 ### Measuring the distance to a star
 
-As Earth goes round the Sun, a nearby star appears to shift slightly against the far more distant stars behind it. Half of that shift is the parallax angle, $p$. The Sun, Earth and the star make a long, thin right-angled triangle. The side opposite $p$ is the distance from Earth to the Sun, and the adjacent side is the distance $d$ to the star, so:
+As Earth goes round the Sun, a nearby star appears to shift slightly against the far more distant stars behind it. Half of that shift is the parallax angle, $p$. The Sun, Earth and the star make a long, thin right-angled triangle, with the right angle at the Sun. The side opposite $p$ is the distance from Earth to the Sun, and the adjacent side is the distance $d$ from the Sun to the star, so:
 
 $$\\tan p = \\frac{\\text{Earth to Sun}}{d}$$
 
 Measure the angle, and the distance follows.
+
+### Next on the journey
+
+A spacecraft's velocity has a size and a direction, like the long side of a triangle. How do you split it into parts, or add two of them together? That is the next lesson, on vectors.
 
 ### Sources
 
