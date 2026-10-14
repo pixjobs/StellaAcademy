@@ -2320,55 +2320,55 @@ The topics in these notes follow the Department for Education documents below.
     variables: [
       {
         symbol: "v",
-        name: "Velocity",
-        unit: "m/s",
-        description: "The current speed of the spacecraft. Drag increases with the square of the velocity.",
+        name: "Speed",
+        unit: "metres per second (m/s)",
+        description: "How fast the capsule is moving at time $t$.",
         color: "text-indigo-400"
       },
       {
         symbol: "t",
         name: "Time",
-        unit: "s",
-        description: "The continuous progression of time.",
+        unit: "seconds (s)",
+        description: "The time since the capsule's speed was $v_0$.",
         color: "text-cyan-400"
       },
       {
         symbol: "k",
-        name: "Drag Constant",
-        unit: "1/m",
-        description: "A coefficient that factors in atmospheric density, spacecraft cross-section, and mass.",
+        name: "Drag constant",
+        unit: "per metre (1/m)",
+        description: "A fixed number for this capsule and this air. It is bigger for thicker air, a wider capsule or a lighter one.",
         color: "text-sky-400"
       }
     ],
     conceptSteps: [
       {
         stepNumber: 1,
-        title: "Rates of Change",
-        content: "If [Calculus](/study/calculus) is the study of change, Differential Equations are the formulas that use that change to predict the future. The expression $dv/dt$ represents acceleration—the exact rate at which velocity changes from moment to moment.",
-        keyInsight: "Differential equations link the current state of a system to how fast it is changing.",
+        title: "Equations about rates of change",
+        content: "A differential equation is an equation that connects a quantity with how fast it changes. Here the quantity is the capsule's speed $v$, and its rate of change, $\\dfrac{dv}{dt}$, is how fast the speed changes each second.",
+        keyInsight: "A differential equation tells you how something changes. Solving it tells you what it is at any time.",
         relatedVariables: ["v", "t"]
       },
       {
         stepNumber: 2,
-        title: "Quadratic Drag",
-        content: "When falling into an atmosphere, air resistance is brutal. It's proportional to the square of velocity. If you double your speed, the drag force doesn't double—it quadruples! This creates a massive braking force.",
-        keyInsight: "The v² term means a fast-moving re-entry vehicle experiences extreme deceleration initially.",
-        relatedVariables: ["v"]
+        title: "Drag and the square of speed",
+        content: "At high speed, the drag on a capsule, and so the rate at which it slows, is roughly proportional to the square of its speed: a constant times $v^2$. That gives $\\dfrac{dv}{dt} = -kv^2$. Double the speed and the drag is four times as big.",
+        keyInsight: "The minus sign shows the speed is falling: drag acts against the motion.",
+        relatedVariables: ["v", "k"]
       },
       {
         stepNumber: 3,
-        title: "Decay Curve",
-        content: "Because the deceleration depends on velocity, the drag force shrinks as the spacecraft slows. Solving the equation gives $v = \\frac{v_0}{1 + k v_0 t}$: the speed falls steeply at first, then more and more gently. This is not exponential decay, which belongs to drag proportional to $v$ rather than $v^2$. Drag alone never settles at a steady speed; a steady (terminal) speed only appears once gravity is included.",
-        keyInsight: "The negative sign ensures that drag opposes the direction of motion.",
-        relatedVariables: ["k"]
+        title: "Solving it",
+        content: "Separating the variables and integrating gives $v = \\dfrac{v_0}{1 + kv_0 t}$, where $v_0$ is the speed at $t = 0$. As the capsule slows, the drag shrinks, so the speed falls steeply at first and then more and more gently. This is not exponential decay, which comes from a rate proportional to $v$ rather than $v^2$.",
+        keyInsight: "Drag alone never brings the capsule to a steady speed. A steady (terminal) speed appears only once gravity is included.",
+        relatedVariables: ["v", "k", "t"]
       }
     ],
     solvedExample: {
-      problem: "Calculate the instantaneous deceleration ($\\frac{dv}{dt}$) of a capsule re-entering at $v = 5000$ m/s, where the drag constant $k = 2 \\times 10^{-6}$.",
+      problem: "A capsule re-enters at $v = 5000$ m/s, with $\\dfrac{dv}{dt} = -kv^2$ and drag constant $k = 2 \\times 10^{-6}$ per metre. How fast is it slowing down at that moment?",
       steps: [
-        "Square the velocity: $5000^2 = 25,000,000$.",
-        "Multiply by the drag constant: $(2 \\times 10^{-6}) \\times 25,000,000$.",
-        "Apply the negative sign to denote deceleration: $-50$."
+        "Square the speed: $5000^2 = 25{,}000{,}000$.",
+        "Multiply by the drag constant: $(2 \\times 10^{-6}) \\times 25{,}000{,}000 = 50$.",
+        "The minus sign shows the speed is falling: $\\dfrac{dv}{dt} = -50$ m/s². The capsule is losing 50 m/s of speed every second."
       ],
       resultFormula: "\\frac{dv}{dt} = -50 \\text{ m/s}^2"
     },
@@ -2404,7 +2404,7 @@ The topics in these notes follow the Department for Education documents below.
         answer: "About 4,545 m/s ($5000 \\div 1.1$)"
       },
     ],
-    realWorldConnection: "Mission control uses complex sets of differential equations, factoring in variable atmospheric density and gravity, to predict exactly where a returning capsule will splash down in the ocean.",
+    realWorldConnection: "A parachute's drag also grows with speed, so it brakes hardest just after it opens. The capsule then settles at a steady speed, once the drag balances its weight.",
     textbookContent: `
 ## Differential equations
 
@@ -2414,7 +2414,7 @@ A **differential equation** links a quantity to its rate of change. It describes
 
 Many models start from a sentence about a rate:
 
-*   "The population grows at a rate proportional to its size": $\\dfrac{dP}{dt} = kP$.
+*   "The amount of a radioactive substance falls at a rate proportional to the amount left": $\\dfrac{dN}{dt} = -kN$.
 *   "The body cools at a rate proportional to the difference between its temperature and the room's": $\\dfrac{dT}{dt} = -k(T - T_{\\text{room}})$.
 *   "Drag slows the capsule at a rate proportional to the square of its speed": $\\dfrac{dv}{dt} = -kv^2$.
 
@@ -2430,7 +2430,7 @@ So $y = Ae^x$. This **general solution** has an unknown constant.
 
 ### Particular solutions
 
-A **particular solution** uses a known value, such as the starting value, to find the constant. If $y = 5$ when $x = 0$, then $A = 5$ and $y = 5e^x$.
+A **particular solution** uses a known value, such as the starting value, to find the constant. If $y = 2$ when $x = 0$, then $A = 2$ and $y = 2e^x$.
 
 ### Worked example: drag on a capsule
 
@@ -2446,6 +2446,10 @@ The speed falls steeply at first, while drag is large, then more and more gently
 ### Coming home from space
 
 A capsule returning from orbit hits the top of the atmosphere at nearly 8 km/s. Drag, which grows with the square of speed, does most of the braking. Real re-entry models add gravity, the thinning of the air with height and the capsule's angle, giving equations that computers solve step by step. The simple model above shows the same shape: hard braking early, gentler later.
+
+### Next on the journey
+
+Once a spacecraft is on its way, everything on board, from its computers to its radio, runs on electricity. How are voltage, current and resistance linked? That is the next mission, starting with electric circuits.
 
 ### Sources
 

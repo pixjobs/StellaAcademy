@@ -12,6 +12,7 @@ const cosD = (x: number) => Math.cos(x * DEG);
 const tanD = (x: number) => Math.tan(x * DEG);
 const R_EARTH_KM = 6371; // mean radius, used only to check the "treat the ground as flat" approximation
 const near = (a: number, b: number, tol = 1e-9) => Math.abs(a - b) <= tol;
+const K_DRAG = 2e-6; // per metre, the diffeq lesson's drag constant
 /** A 2 × 1 column vector as the lessons write it in LaTeX. */
 const col = (top: number, bottom: number) => `\\begin{pmatrix} ${top} \\\\ ${bottom} \\end{pmatrix}`;
 /** Central-difference derivative, and Simpson's rule, as independent checks on hand differentiation and integration. */
@@ -440,5 +441,84 @@ export const ENTRIES: Entry[] = [
       const ok = [-1, 0.5, 2].every((x) => near(numDeriv((u) => 2 * u ** 3 + 7 * u, x), 6 * x ** 2 + 7, 1e-4));
       return { holds: ok, detail: 'numerical derivative of 2x³ + 7x equals 6x² + 7 at x = −1, 0.5, 2' };
     },
+  },
+
+  // ======================================================================================== diffeq
+  {
+    lesson: 'diffeq', where: 'solvedExample.steps[0]', expectQuestionIncludes: 'A capsule re-enters at $v = 5000$ m/s',
+    stated: '= 25{,}000{,}000', compute: () => 5000 ** 2, expected: 25e6, tolerance: 0, unit: '(m/s)²',
+  },
+  {
+    lesson: 'diffeq', where: 'solvedExample.steps[1]', expectQuestionIncludes: 'A capsule re-enters at $v = 5000$ m/s',
+    stated: '= 50$', compute: () => K_DRAG * 5000 ** 2, expected: 50, tolerance: 1e-9, unit: 'm/s²',
+  },
+  {
+    lesson: 'diffeq', where: 'solvedExample.steps[2]', expectQuestionIncludes: 'A capsule re-enters at $v = 5000$ m/s',
+    stated: 'losing 50 m/s of speed every second', compute: () => K_DRAG * 5000 ** 2, expected: 50, tolerance: 1e-9, unit: 'm/s²',
+  },
+  {
+    lesson: 'diffeq', where: 'solvedExample.resultFormula', kind: 'qualitative', expectQuestionIncludes: 'A capsule re-enters at $v = 5000$ m/s',
+    expectAnswerIncludes: '= -50 \\text{ m/s}^2', note: 'The minus sign is checked as text; the size by the steps.',
+    verify: () => ({ holds: -K_DRAG * 5000 ** 2 === -50, detail: '−k v² = −2e-6 × 5000² = −50' }),
+  },
+  {
+    lesson: 'diffeq', where: 'practiceProblems[0]', expectQuestionIncludes: 'If its speed triples, what happens to the deceleration?',
+    compute: () => (K_DRAG * (3 * 100) ** 2) / (K_DRAG * 100 ** 2), expected: 9, tolerance: 1e-9, unit: '×',
+  },
+  {
+    lesson: 'diffeq', where: 'practiceProblems[1]', kind: 'qualitative', expectQuestionIncludes: 'what happens to the deceleration as the capsule slows down?',
+    expectAnswerIncludes: 'It gets smaller',
+    verify: () => ({ holds: K_DRAG * 4000 ** 2 < K_DRAG * 5000 ** 2, detail: 'k v² at 4000 m/s is less than at 5000 m/s' }),
+  },
+  {
+    lesson: 'diffeq', where: 'practiceProblems[2]', kind: 'qualitative', expectQuestionIncludes: 'Solve $\\frac{dy}{dx} = 2x$, given that $y = 3$ when $x = 0$',
+    expectAnswerIncludes: '$y = x^2 + 3$',
+    verify: () => {
+      const y = (x: number) => x ** 2 + 3;
+      const ok = y(0) === 3 && [-1, 0.5, 2].every((x) => near(numDeriv(y, x), 2 * x, 1e-6));
+      return { holds: ok, detail: 'y(0) = 3 and dy/dx = 2x at x = −1, 0.5, 2' };
+    },
+  },
+  {
+    lesson: 'diffeq', where: 'practiceProblems[3]', kind: 'qualitative', expectQuestionIncludes: 'Solve $\\frac{dy}{dx} = y$, given that $y = 5$ when $x = 0$',
+    expectAnswerIncludes: '$y = 5e^x$',
+    verify: () => {
+      const y = (x: number) => 5 * Math.exp(x);
+      const ok = y(0) === 5 && [-1, 0.5, 2].every((x) => near(numDeriv(y, x), y(x), 1e-5 * y(x)));
+      return { holds: ok, detail: 'y(0) = 5 and dy/dx = y at x = −1, 0.5, 2' };
+    },
+  },
+  {
+    lesson: 'diffeq', where: 'practiceProblems[4]', kind: 'qualitative', expectQuestionIncludes: 'grows at a rate proportional to its size',
+    expectAnswerIncludes: '$\\frac{dP}{dt} = kP$, with $k > 0$',
+  },
+  {
+    lesson: 'diffeq', where: 'practiceProblems[5] (k v0 t)', expectQuestionIncludes: 'A capsule enters the atmosphere at $v_0 = 5000$ m/s',
+    stated: '$5000 \\div 1.1$', pick: 1, note: '1 + k v0 t with t = 10 s.', compute: () => 1 + K_DRAG * 5000 * 10, expected: 1.1, tolerance: 1e-9, unit: '',
+  },
+  {
+    lesson: 'diffeq', where: 'practiceProblems[5] (speed)', expectQuestionIncludes: 'A capsule enters the atmosphere at $v_0 = 5000$ m/s',
+    stated: 'About 4,545 m/s', compute: () => 5000 / (1 + K_DRAG * 5000 * 10), expected: 4545.45, tolerance: 0.5, unit: 'm/s',
+  },
+  {
+    lesson: 'diffeq', where: 'practiceProblems[5] (solution solves the equation)', kind: 'qualitative', expectQuestionIncludes: 'Use $v = \\frac{v_0}{1 + kv_0 t}$',
+    expectAnswerIncludes: '4,545',
+    verify: () => {
+      // Step dv/dt = -k v² forward with small time steps and compare with the formula at t = 10 s.
+      let v = 5000;
+      const dt = 1e-4;
+      for (let t = 0; t < 10 - dt / 2; t += dt) v -= K_DRAG * v * v * dt;
+      return { holds: Math.abs(v - 5000 / 1.1) < 0.1, detail: `stepping dv/dt = −kv² for 10 s gives ${v.toFixed(2)} m/s, the formula gives ${(5000 / 1.1).toFixed(2)}` };
+    },
+  },
+  {
+    lesson: 'diffeq', where: 'textbookContent: particular solution', kind: 'claim', expectNotesIncludes: '### Particular solutions',
+    claimIncludes: 'If $y = 2$ when $x = 0$, then $A = 2$ and $y = 2e^x$',
+    verify: () => ({ holds: 2 * Math.exp(0) === 2, detail: 'A e⁰ = A, so A = 2; a different value from practice question 4' }),
+  },
+  {
+    lesson: 'diffeq', where: 'textbookContent: re-entry speed', expectNotesIncludes: 'A capsule returning from orbit hits the top of the atmosphere',
+    stated: 'at nearly 8 km/s', note: 'Circular speed just above the atmosphere (about 120 km up) with GM = 3.986e14: 7.8 km/s. "Nearly 8": ±0.3.',
+    compute: () => Math.sqrt(3.986e14 / ((6371 + 120) * 1e3)) / 1000, expected: 7.835, tolerance: 0.3, unit: 'km/s',
   },
 ];
