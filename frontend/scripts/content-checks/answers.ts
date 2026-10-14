@@ -295,9 +295,9 @@ const TABLE: Entry[] = [
 
   // ======================================================================================== momentum
   {
-    lesson: 'momentum', where: 'conceptSteps[0]', kind: 'claim', expectQuestionIncludes: 'Momentum $p = mv$',
+    lesson: 'momentum', where: 'conceptSteps[0]', kind: 'claim', expectQuestionIncludes: 'Momentum, $p = mv$',
     claimIncludes: 'bullet can have similar momenta',
-    note: 'Known issue (do not fix here).',
+    note: 'Removed in the KAN-68 rewrite; kept so the claim cannot come back.',
     verify: () => {
       const truck = 10000 * 1; // 10 t truck at walking pace, 1 m/s
       const bullet = 0.01 * 1000; // 10 g bullet at 1000 m/s
@@ -314,15 +314,15 @@ const TABLE: Entry[] = [
     stated: '= 50$ kg', compute: () => 5 * 10 + 3 * 0, expected: 50, tolerance: 1e-9, unit: 'kg m/s',
   },
   {
-    lesson: 'momentum', where: 'solvedExample.steps[2]', expectQuestionIncludes: 'the 5 kg ball moves at $4$ m/s',
+    lesson: 'momentum', where: 'solvedExample.steps[2]', expectQuestionIncludes: 'the 5 kg ball carries on in the same direction at $4$ m/s',
     stated: '= 20 + 3v_2', compute: () => 5 * 4, expected: 20, tolerance: 1e-9, unit: 'kg m/s',
   },
   {
-    lesson: 'momentum', where: 'solvedExample.steps[3]', expectQuestionIncludes: 'the 5 kg ball moves at $4$ m/s',
+    lesson: 'momentum', where: 'solvedExample.steps[3]', expectQuestionIncludes: 'the 5 kg ball carries on in the same direction at $4$ m/s',
     stated: '$3v_2 = 30$', pick: 1, compute: () => 5 * 10 - 5 * 4, expected: 30, tolerance: 1e-9, unit: 'kg m/s',
   },
   {
-    lesson: 'momentum', where: 'solvedExample.resultFormula', expectQuestionIncludes: 'the 5 kg ball moves at $4$ m/s',
+    lesson: 'momentum', where: 'solvedExample.resultFormula', expectQuestionIncludes: 'the 5 kg ball carries on in the same direction at $4$ m/s',
     compute: () => (5 * 10 - 5 * 4) / 3, expected: 10, tolerance: 1e-9, unit: 'm/s',
   },
   {
@@ -357,10 +357,6 @@ const TABLE: Entry[] = [
   {
     lesson: 'momentum', where: 'textbookContent: collision, speed after', expectNotesIncludes: 'a 2 kg trolley moving at 3 m/s hits a stationary 1 kg trolley',
     stated: '$3v = 6$, so $v = 2$ m/s', pick: 2, compute: () => (2 * 3) / (2 + 1), expected: 2, tolerance: 1e-9, unit: 'm/s',
-  },
-  {
-    lesson: 'momentum', where: 'textbookContent: skaters', expectNotesIncludes: 'a 60 kg skater and an 80 kg skater push apart',
-    stated: 'the heavier one moves at 3 m/s', compute: () => (60 * 4) / 80, expected: 3, tolerance: 1e-9, unit: 'm/s',
   },
 
   // ======================================================================================== thermodynamics

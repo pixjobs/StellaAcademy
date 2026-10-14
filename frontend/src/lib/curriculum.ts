@@ -155,7 +155,8 @@ export const CURRICULUM: Record<ConceptId, CurriculumPlace> = {
     stage: "GCSE physics (key stage 4)",
     statements: [
       { source: 'gcsePhysics', where: "GCSE physics: Forces and motion", text: "define momentum and describe examples of momentum in collisions" },
-      { source: 'alScience', where: "A-level physics: Mechanics", text: "principle of conservation of momentum; calculations for one-dimensional problems" },
+      { source: 'alScience', where: "A-level physics: Mechanics (momentum)", text: "principle of conservation of momentum" },
+      { source: 'alScience', where: "A-level physics: Mechanics (momentum)", text: "calculations for one-dimensional problems" },
     ],
     note: "Conservation of momentum is listed in the A-level content. Check your own GCSE specification for how far it goes.",
   },

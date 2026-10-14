@@ -4141,7 +4141,7 @@ The topics in these notes follow the Department for Education documents below.
     id: 'momentum',
     category: 'mechanics',
     title: "Momentum and Collisions",
-    subtitle: "Use conservation of momentum to work out what happens in collisions and rocket launches.",
+    subtitle: "Use conservation of momentum to work out what happens in collisions, and see how a rocket speeds up.",
     icon: 'Activity',
     accentColor: 'violet',
     difficulty: 2,
@@ -4157,15 +4157,15 @@ The topics in these notes follow the Department for Education documents below.
       {
         symbol: 'p',
         name: 'Momentum',
-        unit: 'kg·m/s',
-        description: 'A vector quantity describing the quantity of motion an object has. The product of its mass and velocity.',
+        unit: 'kg m/s',
+        description: 'Mass times velocity, in the direction the object is moving.',
         color: 'text-violet-400'
       },
       {
         symbol: 'm',
         name: 'Mass',
-        unit: 'Kilograms (kg)',
-        description: 'The amount of matter in the object. More massive objects are harder to stop or start moving.',
+        unit: 'kilograms (kg)',
+        description: 'How much matter the object has. More mass makes it harder to start or stop.',
         color: 'text-purple-400',
         range: { min: 1, max: 10, default: 3 }
       },
@@ -4173,7 +4173,7 @@ The topics in these notes follow the Department for Education documents below.
         symbol: 'v',
         name: 'Velocity',
         unit: 'm/s',
-        description: 'The speed and direction of the object. Momentum is a vector — direction matters.',
+        description: 'Speed in a particular direction.',
         color: 'text-indigo-400',
         range: { min: 1, max: 20, default: 5 }
       }
@@ -4181,35 +4181,35 @@ The topics in these notes follow the Department for Education documents below.
     conceptSteps: [
       {
         stepNumber: 1,
-        title: 'Momentum: The Quantity of Motion',
-        content: 'Momentum $p = mv$ captures both how heavy an object is and how fast it moves. A slow-moving truck and a fast-moving bullet can have similar momenta despite very different masses and speeds.',
-        keyInsight: 'Momentum depends on both mass AND velocity equally.',
+        title: 'Momentum is mass times velocity',
+        content: 'Momentum, $p = mv$, measures how hard it is to stop something that is moving. Double the mass or double the velocity and the momentum doubles. Momentum also has a direction, the same as the velocity.',
+        keyInsight: 'More mass or more speed means more momentum.',
         relatedVariables: ['p', 'm', 'v']
       },
       {
         stepNumber: 2,
-        title: 'Conservation of Momentum',
-        content: 'In a closed system with no external forces, the total momentum is conserved. Before and after any collision: $m_1v_1 + m_2v_2 = m_1v_1\' + m_2v_2\'$. This is one of the most powerful laws in all of physics.',
-        keyInsight: 'Total momentum before a collision always equals total momentum after.',
+        title: 'Total momentum is conserved',
+        content: "When objects collide or push apart, and no outside force acts on them, the total momentum before equals the total momentum after. This comes from Newton's third law: the objects push on each other with equal and opposite forces for the same length of time, so the change in one object's momentum is equal and opposite to the change in the other's. Added together, the total does not change.",
+        keyInsight: 'Momentum is not lost when objects stick together. Some kinetic energy is transferred to heating and sound, but the total momentum stays the same.',
         relatedVariables: ['p', 'm', 'v']
       },
       {
         stepNumber: 3,
-        title: 'Impulse and Force',
-        content: 'Impulse $J = F\\Delta t = \\Delta p$ links force and time to changes in momentum. This is why airbags work — they extend the collision time, reducing the peak force on passengers.',
-        keyInsight: 'Same change in momentum over longer time = smaller force.',
-        relatedVariables: ['p']
+        title: 'A rocket pushes on the gas it throws out',
+        content: 'Two objects that start at rest have a total momentum of zero, so when they push apart they move in opposite directions, and the lighter one moves faster. A rocket does this all the time: it throws hot gas (the exhaust) out of the back at high speed, the gas gains momentum backwards, and with no outside force, the rocket gains the same amount forwards.',
+        keyInsight: 'A rocket does not push against the air or the ground. That is why it works in space.',
+        relatedVariables: ['p', 'm', 'v']
       }
     ],
     solvedExample: {
-      problem: 'A $5$ kg ball moving at $10$ m/s collides with a stationary $3$ kg ball. After the collision, the 5 kg ball moves at $4$ m/s. Find the velocity of the 3 kg ball.',
+      problem: 'A $5$ kg ball moving at $10$ m/s collides with a stationary $3$ kg ball. After the collision, the 5 kg ball carries on in the same direction at $4$ m/s. Find the velocity of the 3 kg ball.',
       steps: [
         'Apply conservation of momentum: $p_{\\text{before}} = p_{\\text{after}}$.',
-        'Before: $p = 5 \\times 10 + 3 \\times 0 = 50$ kg·m/s.',
+        'Before: $p = 5 \\times 10 + 3 \\times 0 = 50$ kg m/s.',
         'After: $p = 5 \\times 4 + 3 \\times v_2 = 20 + 3v_2$.',
-        'Set equal: $50 = 20 + 3v_2$, so $3v_2 = 30$.'
+        'Set equal: $50 = 20 + 3v_2$, so $3v_2 = 30$. The answer is positive, so the 3 kg ball moves off in the same direction.'
       ],
-      resultFormula: 'v_2 = 10 \\text{ m/s}'
+      resultFormula: 'v_2 = 10 \\text{ m/s, in the same direction}'
     },
     practiceProblems: [
       {
@@ -4243,17 +4243,17 @@ The topics in these notes follow the Department for Education documents below.
         answer: "It throws exhaust gas out backwards at high speed. The gas gains momentum backwards, so the rocket gains the same amount of momentum forwards."
       },
     ],
-    realWorldConnection: 'Spacecraft navigation uses momentum conservation. When a rocket expels propellant backward at high speed, the spacecraft is propelled forward — just like an astronaut throwing a spanner.',
+    realWorldConnection: 'A large rocket throws out tonnes of hot gas every second, at high speed. The rocket pushes the gas down, and the gas pushes the rocket up with an equal and opposite force.',
     textbookContent: `
 ## Momentum
 
-Momentum measures how hard it is to stop something that is moving. It depends on mass and on velocity:
+Momentum depends on mass and on velocity:
 
 $$p = mv$$
 
 Mass $m$ is in kilograms (kg), velocity $v$ in metres per second (m/s), and momentum $p$ in kg m/s.
 
-Momentum has a direction, the same as the velocity. In a problem along a line, choose one direction as positive. Anything moving the other way then has negative momentum.
+Because velocity has a direction, so does momentum. In a problem along a line, take one direction as positive; momentum the other way is then negative.
 
 ### Conservation of momentum
 
@@ -4261,7 +4261,7 @@ When objects collide or push apart, and no outside force acts on them:
 
 **total momentum before = total momentum after**
 
-This is the principle of conservation of momentum. It comes from Newton's third law. During a collision the two objects push on each other with equal and opposite forces for the same length of time, so whatever momentum one loses, the other gains.
+This is the principle of conservation of momentum. It comes from Newton's third law. During a collision the two objects push on each other with equal and opposite forces for the same length of time, so the change in one object's momentum is equal and opposite to the change in the other's. Added together, the total does not change.
 
 ### Collisions
 
@@ -4271,17 +4271,19 @@ This is the principle of conservation of momentum. It comes from Newton's third 
 2.  Afterwards they move as one object of mass 3 kg at velocity $v$, so the momentum is $3v$.
 3.  $3v = 6$, so $v = 2$ m/s.
 
-Momentum is conserved whether the objects stick together or bounce apart. What differs is the kinetic energy: when objects stick together, some of it is transferred to other stores, such as heating and sound.
+Momentum is conserved whether the objects stick together or bounce apart. Kinetic energy is different. When objects stick together, some of it is always transferred to other stores, such as heating and sound. Most real bounces lose some too.
 
 ### Pushing apart
 
 If two objects start at rest, their total momentum is zero. When they push each other apart it must still be zero, so they move in opposite directions with equal amounts of momentum. The lighter one moves faster.
 
-*Example:* a 60 kg skater and an 80 kg skater push apart. If the lighter one moves at 4 m/s, then $60 \\times 4 = 80 \\times v$, so the heavier one moves at 3 m/s the other way.
-
 ### How a rocket works
 
-A rocket is the same idea, kept going. The engine throws hot gas out of the back at very high speed. The gas gains momentum backwards, so the rocket gains an equal amount forwards. The rocket is not pushing against the ground or the air, which is why it works in empty space.
+A rocket is the same idea, kept going. The engine throws hot gas out of the back at very high speed. The gas gains momentum backwards. With no outside force acting, the rocket gains an equal amount forwards. The rocket is not pushing against the ground or the air, which is why it works in empty space.
+
+### Next on the journey
+
+So where does fast, high-pressure gas come from? That is the next lesson, on gases and the rocket engine.
 
 ### Sources
 

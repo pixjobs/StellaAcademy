@@ -17,7 +17,7 @@ export type LessonIntro = {
 export const INTROS: Partial<Record<ConceptId, LessonIntro>> = {
   momentum: {
     caption:
-      'Space Shuttle Discovery, October 2007. Two minutes after lift-off, small rockets push the two spent boosters clear and they fall away while the Shuttle carries on. Each piece keeps its own momentum.',
+      'Space Shuttle Discovery, October 2007. About two minutes after lift-off, small rockets on the two spent boosters fire to push them clear, and the Shuttle carries on climbing on its own engines. Those small rockets work like any rocket: they throw gas one way and are pushed the other.',
     alt: 'A Space Shuttle climbing through a dark blue sky as its two boosters separate and peel away, trailing flame.',
     credit: 'NASA',
   },
