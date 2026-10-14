@@ -13,7 +13,8 @@
     "start": "next start -p ${PORT:-3000}",
     "start:web": "next start -p ${PORT:-3000}",
     "//3": "----- Misc & Database -----",
-    "lint": "eslint . --max-warnings=0"
+    "lint": "eslint . --max-warnings=0",
+    "check:content": "tsx scripts/content-checks/index.ts"
   },
   "dependencies": {
     "@google-cloud/firestore": "^7.11.6",

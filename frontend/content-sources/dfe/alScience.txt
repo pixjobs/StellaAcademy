@@ -1,0 +1,2881 @@
+===== SOURCE FILE: Science_AS_and_level_formatted.pdf =====
+GCE AS and A level
+subject content for
+biology, chemistry,
+physics and
+psychology
+April 2014
+
+Contents
+GCE AS and A level subject content for biology, chemistry, physics and psychology
+
+3
+
+Introduction
+
+3
+
+Aims and objectives
+
+3
+
+Subject content
+
+3
+
+Appendix 1 - biology – knowledge and understanding
+
+5
+
+Appendix 2 - chemistry – knowledge and understanding
+
+9
+
+Appendix 3 - physics – knowledge and understanding
+
+12
+
+Appendix 4 - psychology – knowledge and understanding
+
+16
+
+Appendix 5 - working scientifically
+
+18
+
+Appendix 5a - practical skills identified for indirect assessment and developed
+through teaching and learning
+
+19
+
+Appendix 5b - practical skills identified for direct assessment and developed through
+teaching and learning
+20
+Appendix 5c -
+
+21
+
+Use of apparatus and techniques - biology
+
+21
+
+Use of apparatus and techniques - chemistry
+
+22
+
+Use of apparatus and techniques - physics
+
+23
+
+Appendix 6 - mathematical requirements and exemplifications
+
+24
+
+6a - biology
+
+24
+
+6b - chemistry
+
+29
+
+6c - physics
+
+33
+
+6d - psychology
+
+38
+
+
+GCE AS and A level subject content for biology,
+chemistry, physics and psychology
+Introduction
+1.
+AS and A level subject content sets out the knowledge, understanding and skills
+common to all AS and A level specifications in biology, chemistry, physics and
+psychology.
+
+Aims and objectives
+2.
+
+AS and A level specifications in a science subject must encourage students to:
+•
+
+develop essential knowledge and understanding of different areas of the subject
+and how they relate to each other
+
+•
+
+develop and demonstrate a deep appreciation of the skills, knowledge and
+understanding of scientific methods
+
+•
+
+develop competence and confidence in a variety of practical, mathematical and
+problem solving skills
+
+•
+
+develop their interest in and enthusiasm for the subject, including developing an
+interest in further study and careers associated with the subject
+
+•
+
+understand how society makes decisions about scientific issues and how the
+sciences contribute to the success of the economy and society
+
+Subject content
+3.
+AS and A level science specifications must build on the skills, knowledge and
+understanding set out in the GCSE criteria/content for science.
+4.
+The skills, knowledge and understanding set out in the appendices for AS in each
+science subject must comprise approximately 60 per cent of AS specifications. The skills,
+knowledge and understanding for A level must comprise approximately 60 per cent of an
+A level specification. For A level this would include all the practical requirements in
+Appendix 5, while for AS it would include those from Appendix 5a. For both AS and A
+level it would include the mathematical requirements on Appendix 6.
+5.
+
+The remainder of both AS and A level specifications allows both for:
+•
+
+further consideration of applications and implications of science and the
+development of scientific ideas
+
+•
+
+the introduction of different areas of study
+
+6.
+AS and A level specifications must include a range of contemporary and other
+contexts.
+7.
+AS and A level specifications must require students to cover the areas of the
+subject as illustrated in the relevant appendix.
+8.
+The skills, knowledge and understanding of each specification in the subject must,
+where appropriate, include the requirements set out below, and be integrated into the
+mandatory content indicated in the relevant appendix and any content added by the
+awarding organisation, where appropriate:
+•
+
+use theories, models and ideas to develop scientific explanations
+
+•
+
+use knowledge and understanding to pose scientific questions, define scientific
+problems, present scientific arguments and scientific ideas
+
+•
+
+use appropriate methodology, including information and communication technology
+(ICT), to answer scientific questions and solve scientific problems
+
+•
+
+carry out experimental and investigative activities, including appropriate risk
+management, in a range of contexts
+
+•
+
+analyse and interpret data to provide evidence, recognising correlations and causal
+relationships
+
+•
+
+evaluate methodology, evidence and data, and resolve conflicting evidence
+
+•
+
+know that scientific knowledge and understanding develops over time
+
+•
+
+communicate information and ideas in appropriate ways using appropriate
+terminology
+
+•
+
+consider applications and implications of science and evaluate their associated
+benefits and risks
+
+•
+
+consider ethical issues in the treatment of humans, other organisms and the
+environment
+
+•
+
+evaluate the role of the scientific community in validating new knowledge and
+ensuring integrity
+
+•
+
+evaluate the ways in which society uses science to inform decision making
+
+
+Appendix 1 - biology – knowledge and understanding
+9.
+
+This appendix must be read in conjunction with sections 3 - 8 of this content.
+
+10.
+The A level knowledge and understanding combined must comprise approximately
+60 per cent of an A level specification. All of the content below is required for the A level.
+The AS knowledge and understanding set out in this appendix must comprise
+approximately 60 per cent of the AS specification, and is shown below in normal (nonbold) text.
+11.
+Biology specifications must ensure that there is an appropriate balance between
+plant biology, animal biology and microbiology and include an appreciation of the
+relevance of sustainability to all aspects of scientific developments.
+12.
+Living organisms, including plants, animals and microorganisms, interact with each
+other and with the non-living world. The living world can be studied at population,
+organism, cell and molecular levels. There are fundamental similarities as well as
+differences between plants, animals and microorganisms.
+13.
+
+Biodiversity
+
+•
+
+the variety of life, both past and present, is extensive, but the biochemical basis of
+life is similar for all living things
+
+•
+
+biodiversity refers to the variety and complexity of life and may be considered at
+different levels
+
+•
+
+biodiversity can be measured, for example within a habitat or at the genetic level
+
+•
+
+classification is a means of organising the variety of life based on relationships
+between organisms and is built around the concept of species
+
+•
+
+originally classification systems were based on observable features but more
+recent approaches draw on a wider range of evidence to clarify relationships
+between organisms
+
+•
+
+adaptations of organisms to their environments can be behavioural, physiological
+and anatomical
+
+•
+
+adaptation and selection are major factors in evolution and make a significant
+contribution to the diversity of living organisms
+
+14.
+•
+
+Exchange and transport
+organisms need to exchange substances selectively with their environment and this
+takes place at exchange surfaces
+
+
+•
+
+factors such as size or metabolic rate affect the requirements of organisms and this
+gives rise to adaptations such as specialised exchange surfaces and mass
+transport systems
+
+•
+
+substances are exchanged by passive or active transport across exchange
+surfaces
+
+•
+
+the structure of the plasma membrane enables control of the passage of
+substances into and out of cells
+
+15.
+
+Cells
+
+•
+
+the cell theory is a unifying concept in biology
+
+•
+
+prokaryotic and eukaryotic cells can be distinguished on the basis of their structure
+and ultrastructure
+
+•
+
+in complex multicellular organisms cells are organised into tissues, tissues into
+organs and organs into systems
+
+•
+
+during the cell cycle genetic information is copied and passed to daughter cells
+
+•
+
+daughter cells formed during mitosis have identical copies of genes while cells
+formed during meiosis are not genetically identical
+
+16.
+
+Biological molecules
+
+•
+
+biological molecules are often polymers and are based on a small number of
+chemical elements
+
+•
+
+in living organisms nucleic acids (DNA and RNA), carbohydrates, proteins, lipids,
+inorganic ions and water all have important roles and functions related to their
+properties
+
+•
+
+the sequence of bases in the DNA molecule determines the structure of proteins,
+including enzymes
+
+•
+
+enzymes catalyse the reactions that determine structures and functions from
+cellular to whole-organism level
+
+•
+
+enzymes are proteins with a mechanism of action and other properties determined
+by their tertiary structure
+
+•
+
+enzymes catalyse a wide range of intracellular reactions as well as extracellular
+ones
+
+•
+
+ATP provides the immediate source of energy for biological processes
+
+17.
+•
+
+Ecosystems
+ecosystems range in size from the very large to the very small
+
+
+•
+
+biomass transfers through ecosystems and the efficiency of transfer through
+different trophic levels can be measured
+
+•
+
+microorganisms play a key role in recycling chemical elements
+
+•
+
+ecosystems are dynamic systems, usually moving from colonisation to
+climax communities in a process known as succession
+
+•
+
+the dynamic equilibrium of populations is affected by a range of factors
+
+•
+
+humans are part of the ecological balance and their activities affect it both
+directly and indirectly
+
+•
+
+effective management of the conflict between human needs and conservation
+help to maintain sustainability of resources
+
+18.
+
+Control systems
+
+•
+
+homeostasis is the maintenance of a constant internal environment
+
+•
+
+negative feedback helps maintain an optimal internal state in the context of a
+dynamic equilibrium. Positive feedback also occurs
+
+•
+
+stimuli, both internal and external, are detected leading to responses
+
+•
+
+the genome is regulated by a number of factors
+
+•
+
+coordination may be chemical or electrical in nature
+
+19.
+
+Genetics and evolution
+
+•
+
+transfer of genetic information from one generation to the next can ensure
+continuity of species or lead to variation within a species and possible
+formation of new species
+
+•
+
+reproductive isolation can lead to accumulation of different genetic
+information in populations potentially leading to formation of new species
+
+•
+
+sequencing projects have read the genomes of organisms ranging from
+microbes and plants to humans. This allows the sequences of the proteins
+that derive from the genetic code to be predicted
+
+•
+
+gene technologies allow study and alteration of gene function in order to
+better understand organism function and to design new industrial and
+medical processes
+
+20.
+
+Energy for biological processes
+
+•
+
+in cellular respiration, glycolysis takes place in the cytoplasm and the
+remaining steps in the mitochondria
+
+•
+
+ATP synthesis is associated with the electron transfer chain in the
+membranes of mitochondria and chloroplasts
+
+• in photosynthesis energy is transferred to ATP in the light- dependent stage
+and the ATP is utilised during synthesis in the light-independent stage
+
+
+Appendix 2 - chemistry – knowledge and understanding
+21.
+
+This appendix must be read in conjunction with sections 3 - 8 of this content.
+
+22.
+The A level knowledge and understanding combined must comprise approximately
+60 per cent of an A level specification. All of the content below is required for the A level.
+The AS knowledge and understanding set out in this appendix must comprise
+approximately 60 per cent of the AS specification, and is shown below in normal (nonbold) text.
+23.
+Chemistry specifications must ensure that there is an appreciation of the relevance
+of sustainability to all aspects of scientific developments.
+24.
+
+Formulae, equations and amounts of substance
+
+•
+
+empirical and molecular formulae
+
+•
+
+balanced chemical equations (full and ionic)
+
+•
+
+the Avogadro constant and the amount of substance (mole)
+
+•
+
+relative atomic mass and relative isotopic mass
+
+•
+
+calculation of reacting masses, mole concentrations, volumes of gases, per cent
+yields and atom economies
+
+•
+
+simple acid–base titrations
+
+•
+
+non-structured titration calculations, based solely on experimental results
+
+25.
+
+Atomic structure
+
+•
+
+structure and electronic configuration of atoms (up to Z = 36) in terms of main
+energy levels and s, p and d orbitals
+
+•
+
+ions and isotopes; use of mass spectrometry in determining relative atomic mass
+and relative abundance of isotopes
+
+26.
+
+Bonding and structure
+
+•
+
+interpretation of ionic and covalent bonding in terms of electron arrangements.
+Examples of simple covalent, giant covalent, ionic and metallic structures
+
+•
+
+permanent and induced dipole–dipole interactions between molecules, including
+hydrogen bonding. Electronegativity and its application to bond type. Interpretation
+of the physical properties of materials in terms of structure and bonding
+
+•
+
+shapes of simple molecules and ions with up to six outer pairs of electrons (any
+combination of bonding pairs and lone pairs). Interpretation in terms of electron pair
+repulsion theory
+
+27.
+
+Energetics
+
+•
+
+enthalpy changes, including standard enthalpy changes of reaction, formation and
+combustion. Average bond enthalpies
+
+•
+
+use of Hess’s law to calculate enthalpy changes
+
+•
+
+use of energetics, including entropy, to predict the feasibility of reactions
+
+28.
+
+Kinetics
+
+•
+
+a qualitative understanding of collision theory. Activation energy and its relationship
+to the qualitative effect of temperature changes on rate of reaction. Boltzman
+distribution
+
+•
+
+the role of catalysts in providing alternative routes of lower activation energy
+
+•
+
+determination and use of rate equations of the form: Rate = k[A]m[B]n, where
+m and n are integers. Using orders of reactions where appropriate, which
+may give information about a rate-determining/limiting step
+
+29.
+
+Equilibria
+
+•
+
+the dynamic nature of equilibria. For homogeneous reactions, the qualitative effects
+of temperature, pressure and concentration changes on the position of equilibrium
+
+•
+
+equilibrium constants, Kc
+
+•
+
+calculation of Kc and reacting quantities
+
+•
+
+the effect of temperature changes on Kc
+
+•
+
+the Bronsted–Lowry theory of acid–base reactions. The ionic product of
+water, Kw; pH and its calculation for strong acids and strong bases
+
+•
+
+dissociation constants of weak acids, Ka. Calculation of pH for weak acids.
+Buffer solutions and their applications
+
+30.
+
+Redox
+
+•
+
+oxidation states and their calculation
+
+•
+
+oxidation and reduction as electron transfer, applied to reactions of s, p and d block
+elements
+
+•
+
+electrode potentials and their applications
+
+31.
+
+Inorganic chemistry and the periodic table
+
+•
+
+the organisation of elements according to their proton number and electronic
+structures. Classification of elements into s, p and d blocks
+
+•
+
+the characteristic reactions of the elements and compounds of a metallic group and
+a non-metallic group. Trends in properties of elements and compounds within these
+groups
+
+•
+
+•
+
+32.
+
+trends in properties of elements across a period including:
+•
+
+melting point
+
+•
+
+ionisation energy
+
+the transition metals as d block elements forming one or more stable ions
+that have incompletely filled d orbitals. At least two transition metals, chosen
+from titanium to copper, to illustrate:
+•
+
+the existence of more than one oxidation state for each element in its
+compounds
+
+•
+
+the formation of coloured ions in solution and simple precipitation
+reactions of these
+
+•
+
+reactions with ligands to form complexes and reactions involving ligand
+substitution
+
+•
+
+the catalytic behaviour of the elements and their compounds
+Organic chemistry
+
+•
+
+functional groups. Structural isomers and stereoisomers (to include geometric (E–
+Z) isomerism as a result of restricted rotation about a carbon–carbon double bond
+and optical isomerism as a result of chirality in molecules with a single chiral
+centre)
+
+•
+
+reactions classified as addition, elimination, substitution, oxidation, reduction,
+hydrolysis, addition polymerisation and condensation polymerisation
+
+•
+
+mechanisms classified as radical substitution, electrophilic addition, nucleophilic
+substitution, electrophilic substitution and nucleophilic addition
+
+•
+
+single and double covalent bonds, bond polarity and bond enthalpy as factors
+influencing reactivity, illustrated by reference to appropriate reactions
+
+•
+
+the structure of, and the bonding in, benzene
+
+•
+
+organic synthesis, including characteristic reactions of alkanes, alkenes,
+halogenoalkanes, alcohols, arenes, aldehydes, ketones, carboxylic acids,
+esters, amines, amino acids and amides
+
+33.
+•
+
+Modern analytical techniques
+the use of mass spectrometry, infrared spectroscopy, nuclear magnetic
+resonance spectroscopy and chromatography in analysis, including techniques
+for the elucidation of structure
+
+
+Appendix 3 - physics – knowledge and understanding
+34.
+
+This appendix must be read in conjunction with sections 3 - 8 of this content.
+
+35.
+The A level knowledge and understanding combined must comprise approximately
+60 per cent of an A level specification. All of the content below is required for the A level.
+The AS knowledge and understanding set out in this appendix must comprise
+approximately 60 per cent of the AS specification, and is shown below in normal (nonbold) text.
+36.
+All physics specifications must ensure that there is an appropriate balance
+between mathematical calculations and written explanations. They also need to ensure
+that practical skills are developed.
+37.
+
+All physics specifications must require knowledge and understanding of:
+
+•
+
+the use of SI units and their prefixes
+
+•
+
+Newton’s laws of motion
+
+•
+
+the estimation of physical quantities
+
+•
+
+the limitations of physical measurements
+
+38.
+
+Vectors and scalars
+
+•
+
+the distinction between vector and scalar quantities
+
+•
+
+resolution of vectors into two components at right angles
+
+•
+
+addition rule for two vectors
+
+•
+
+calculations for two perpendicular vectors
+
+39.
+
+Mechanics
+
+•
+
+kinematics:
+
+•
+
+•
+
+use of kinematic equations in one dimension with constant velocity or
+acceleration
+
+•
+
+graphical representation of accelerated motion
+
+•
+
+interpretation of velocity-time and displacement-time graphs
+
+dynamics:
+•
+
+use of F = ma when mass is constant
+
+•
+
+one- and two-dimensional motion under constant force
+
+•
+
+independent effect of perpendicular components with uniform acceleration,
+projectile motion
+
+•
+
+•
+
+•
+
+•
+
+energy:
+•
+
+calculation of work done for constant forces, including force not along the line of
+motion
+
+•
+
+calculation of exchanges between gravitational potential energy and kinetic
+energy
+
+•
+
+principle of conservation of energy
+
+momentum:
+•
+
+definition
+
+•
+
+principle of conservation of momentum
+
+•
+
+calculations for one-dimensional problems
+
+circular motion:
+•
+
+radian measure of angle and angular velocity
+
+•
+
+application of F = ma = mv2/r = mrω2 to motion in a circle at constant speed
+
+oscillations:
+•
+
+simple harmonic motion
+
+•
+
+quantitative treatment using a = –ω²x and its solution x = A cos ωt.
+
+40.
+
+Mechanical properties of matter
+
+•
+
+stress, strain, Young modulus
+
+•
+
+force-extension graphs, energy stored
+
+41.
+•
+
+Electric circuits
+current:
+•
+
+•
+
+•
+
+electric current as rate of flow of charge, I = Δq/Δt
+
+emf and potential difference:
+•
+
+definition of emf and concept of internal resistance
+
+•
+
+potential difference in terms of energy transfer
+
+resistance:
+•
+
+definition
+
+•
+
+resistivity
+
+•
+
+Ohm’s law
+
+
+•
+
+•
+
+DC Circuits:
+•
+
+conservation of charge and energy in circuits
+
+•
+
+relationships between currents, voltages and resistances in series and parallel
+circuits
+
+•
+
+power dissipated
+
+•
+
+potential divider circuits
+
+capacitance:
+•
+
+definition
+
+•
+
+energy of a capacitor
+
+•
+
+quantitative treatment of charge and discharge curves
+
+42.
+
+Waves
+
+•
+
+qualitative treatment of polarisation and diffraction
+
+•
+
+path difference, phase and coherence, interference
+
+•
+
+graphical treatment of superposition and stationary waves
+
+43.
+•
+
+•
+
+Matter
+molecular kinetic theory:
+•
+
+ideal gases; pV = NkT
+
+•
+
+absolute zero
+
+•
+
+relationship between temperature and average molecular
+kinetic energy
+
+internal energy:
+•
+
+idea of internal energy
+
+•
+
+energy required for temperature change = mcΔθ
+
+44.
+•
+
+•
+
+Quantum and nuclear physics
+photons and particles:
+•
+
+photon model to explain observable phenomena
+
+•
+
+evidence supporting the photon model
+
+•
+
+wave-particle duality, particle diffraction
+
+nuclear decay:
+•
+
+connections between nature, penetration and range of emissions from
+radioactive substances
+
+•
+
+•
+
+evidence for existence of nucleus
+
+•
+
+activity of radioactive sources and idea of half-life
+
+•
+
+modelling with constant decay probability leading to exponential decay
+
+•
+
+nuclear changes in decay
+
+nuclear energy:
+•
+
+fission and fusion processes
+
+•
+
+E = mc2 applied to nuclear processes
+
+•
+
+calculations relating mass difference to energy change
+
+45.
+•
+
+•
+
+Fields
+force fields:
+•
+
+concept and definition
+
+•
+
+gravitational force and inverse square field for point (or spherical) masses
+
+•
+
+electric force and field for point (or spherical) charges in a vacuum
+
+•
+
+electric and gravitational potential and changes in potential energy
+
+•
+
+uniform electric field
+
+•
+
+similarities and differences between electric and gravitational fields
+
+B-fields:
+•
+
+•
+
+force on a straight wire and force on a moving charge in a uniform field
+
+flux and electromagnetic induction:
+•
+
+concept and definition
+
+•
+
+Faraday’s and Lenz’s laws
+
+•
+
+emf equals rate of change of magnetic flux linkage
+
+
+Appendix 4 - psychology – knowledge and understanding
+46.
+
+This appendix must be read in conjunction with sections 3 - 8 of this content.
+
+47.
+The A level knowledge and understanding combined must comprise approximately
+60 per cent of an A level specification. All of the content below is required for the A level.
+The AS knowledge and understanding set out in this appendix must comprise
+approximately 60 per cent of the AS specification, and is set out in normal (non-bold) type
+below.
+48.
+No prior knowledge of psychology is required for AS and A level specifications in
+psychology.
+49.
+AS and A level specifications must require students to have a basic understanding
+of the scope of different areas in psychology and the breadth of different approaches
+used in psychology.
+50.
+Students are expected to carry out ethical, investigative activities appropriate for
+the study of psychology at this level, but they will not be directly assessed on these
+activities.
+51.
+AS specifications must require students to develop knowledge and understanding
+from all of the following areas of psychology:
+•
+
+cognitive
+
+•
+
+social
+
+•
+
+developmental
+
+•
+
+individual differences
+
+•
+
+biological
+
+52.
+AS specifications must also require students to develop knowledge and
+understanding of research in psychology including:
+•
+
+methods and techniques for collection of quantitative and qualitative data including
+experimentation, observation, self-report and correlational analysis
+
+•
+
+experimental design including independent measures and repeated measures
+
+•
+
+descriptive statistics including measures of central tendency, dispersion and
+graphical presentation of results
+
+53.
+In 51 and 52 above, there is a minimum requirement for specifications to cover the
+following:
+•
+
+specialist vocabulary and terminology
+
+•
+
+psychological theories, concepts and studies
+
+•
+
+ethical issues in psychology
+
+•
+
+the collection and analysis of both quantitative and qualitative data in psychology,
+including the use of descriptive statistics
+
+•
+
+the strengths and weaknesses of methods of research and investigation in
+psychology
+
+•
+
+the contribution of psychology to an understanding of individual, social and cultural
+diversity
+
+54.
+In addition to the AS content, A level specifications must require students to
+develop further knowledge, understanding and skills from at least two of the core
+areas (from cognitive, social, developmental, individual differences and biological
+psychology).
+55.
+Students must have an understanding of different approaches used in
+psychology including cognitive, biological, behavioural and psychodynamic.
+Knowledge and understanding must be related to:
+•
+
+the applications and implications of psychology to cultural, social and
+contemporary issues
+
+•
+
+the interrelationship between different areas of psychology
+
+•
+
+the scientific nature of psychology
+
+•
+
+the application of theories, concepts and approaches to the solution of
+problems
+
+•
+
+the design and reporting of investigations and drawing valid conclusions
+from them
+
+•
+
+the collection and analysis of both quantitative and qualitative data including
+the use of inferential statistics
+
+•
+
+the application of principles and perspectives
+
+•
+
+an appreciation of issues and debates in psychology
+
+
+Appendix 5 - working scientifically
+Specifications in biology, chemistry and physics must encourage the development of the
+skills, knowledge and understanding in science through teaching and learning
+opportunities for regular hands-on practical work.
+In order to develop the necessary skills, knowledge and understanding, students studying
+A levels in biology, chemistry and physics will be required to have carried out a minimum
+of 12 practical activities, which will contribute towards the Practical Endorsement. These
+skills, knowledge and understanding will also be assessed in A level written examinations
+in the context of these, and other, practical activities. The written examination for AS will
+also assess students in relation to their practical skills, knowledge and understanding.
+The practical skills can be split into those which can be assessed through written
+examinations for AS and A level (Appendix 5a); and those for A levels that will be
+assessed directly through appropriate practical activities (Appendix 5b).
+The practical activities highlighted as the minimum requirement within specifications must
+cover the use of apparatus and practical techniques identified for each science (Appendix
+5c).
+
+
+Appendix 5a - practical skills identified for indirect assessment and
+developed through teaching and learning
+Question papers for AS and A level qualifications will assess student’s abilities to:
+Independent thinking
+•
+
+solve problems set in practical contexts
+
+•
+
+apply scientific knowledge to practical contexts
+
+Use and application of scientific methods and practices
+•
+
+comment on experimental design and evaluate scientific methods
+
+•
+
+present data in appropriate ways
+
+•
+
+evaluate results and draw conclusions with reference to measurement uncertainties
+and errors
+
+•
+
+identify variables including those that must be controlled
+
+Numeracy and the application of mathematical concepts in a practical context
+•
+
+plot and interpret graphs
+
+•
+
+process and analyse data using appropriate mathematical skills as exemplified in
+the mathematical appendix for each science
+
+•
+
+consider margins of error, accuracy and precision of data
+
+Instruments and equipment
+•
+
+know and understand how to use a wide range of experimental and practical
+instruments, equipment and techniques appropriate to the knowledge and
+understanding included in the specification
+
+
+Appendix 5b - practical skills identified for direct assessment and
+developed through teaching and learning
+Practical work carried out throughout each A level course will enable students to develop
+the following skills. Students will be directly assessed in relation to these skills based on
+their completion of at least 12 practical activities during the A level course.
+Independent thinking
+•
+
+apply investigative approaches and methods to practical work
+
+Use and apply scientific methods and practices
+•
+
+safely and correctly use a range of practical equipment and materials
+
+•
+
+follow written instructions
+
+•
+
+make and record observations
+
+•
+
+keep appropriate records of experimental activities
+
+•
+
+present information and data in a scientific way
+
+•
+
+use appropriate software and tools to process data, carry out research and report
+findings
+
+Research and referencing
+•
+
+use online and offline research skills including websites, textbooks and other
+printed scientific sources of information
+
+•
+
+correctly cite sources of information
+
+Instruments and equipment
+•
+
+use a wide range of experimental and practical instruments, equipment and
+techniques appropriate to the knowledge and understanding included in the
+specification
+
+
+Appendix 5c Use of apparatus and techniques - biology
+Specifications for biology must give students opportunities to use relevant apparatus to
+develop and demonstrate these techniques.
+For A level, all of the techniques listed below will be assessed through a minimum of 12
+identified practical activities within each specification. These ‘core’ practicals must allow
+students to demonstrate all of the practical skills given in appendix 5b.
+Practical techniques to be completed by candidates
+•
+
+use appropriate apparatus to record a range of quantitative measurements (to
+include mass, time, volume, temperature, length and pH)
+
+•
+
+use appropriate instrumentation to record quantitative measurements, such as a
+colorimeter or potometer
+
+•
+
+use laboratory glassware apparatus for a variety of experimental techniques to
+include serial dilutions
+
+•
+
+use of light microscope at high power and low power, including use of a graticule
+
+•
+
+produce scientific drawing from observation with annotations
+
+•
+
+use qualitative reagents to identify biological molecules
+
+•
+
+separate biological compounds using thin layer/paper chromatography or
+electrophoresis
+
+•
+
+safely and ethically use organisms to measure:
+•
+
+plant or animal responses
+
+•
+
+physiological functions
+
+•
+
+use microbiological aseptic techniques, including the use of agar plates and broth
+
+•
+
+safely use instruments for dissection of an animal organ, or plant organ
+
+•
+
+use sampling techniques in fieldwork
+
+•
+
+use ICT such as computer modelling, or data logger to collect data, or use software
+to process data
+
+
+Use of apparatus and techniques - chemistry
+Specifications for chemistry must give students opportunities to use relevant apparatus to
+develop and demonstrate these techniques.
+All of the techniques listed below will be assessed through a minimum of 12 identified
+practical activities within each specification. These ‘core’ practicals must allow students to
+demonstrate all of the practical skills given in appendix 5b.
+Practical techniques to be gained by candidate
+•
+
+use appropriate apparatus to record a range of measurements (to include mass,
+time, volume of liquids and gases, temperature)
+
+•
+
+use water bath or electric heater or sand bath for heating
+
+•
+
+measure pH using pH charts, or pH meter, or pH probe on a data logger
+
+•
+
+use laboratory apparatus for a variety of experimental techniques including:
+•
+
+titration, using burette and pipette
+
+•
+
+distillation and heating under reflux, including setting up glassware using retort
+stand and clamps
+
+•
+
+qualitative tests for ions and organic functional groups
+
+•
+
+filtration, including use of fluted filter paper, or filtration under reduced pressure
+
+•
+
+use volumetric flask, including accurate technique for making up a standard
+solution
+
+•
+
+use acid-base indicators in titrations of weak/strong acids with weak/strong alkalis
+
+•
+
+purify:
+•
+
+a solid product by recrystallization
+
+•
+
+a liquid product, including use of separating funnel
+
+•
+
+use melting point apparatus
+
+•
+
+use thin-layer or paper chromatography
+
+•
+
+set up electrochemical cells and measuring voltages
+
+•
+
+safely and carefully handle solids and liquids, including corrosive, irritant,
+flammable and toxic substances
+
+•
+
+measure rates of reaction by at least two different methods, for example:
+•
+
+an initial rate method such as a clock reaction
+
+•
+
+a continuous monitoring method
+
+
+Use of apparatus and techniques - physics
+Specifications for physics must give students opportunities to use relevant apparatus to
+develop and demonstrate these techniques.
+All of the techniques listed below will be assessed through a minimum of 12 identified
+practical activities within each specification. These ‘core’ practicals must allow students to
+demonstrate all of the practical skills given in appendix 5b.
+Practical techniques to be gained by candidate
+•
+
+use appropriate analogue apparatus to record a range of measurements (to include
+length/distance, temperature, pressure, force, angles, volume) and to interpolate
+between scale markings
+
+•
+
+use appropriate digital instruments, including electrical multimeters, to obtain a
+range of measurements (to include time, current, voltage, resistance, mass)
+
+•
+
+use methods to increase accuracy of measurements, such as timing over multiple
+oscillations, or use of fiducial marker, set square or plumb line
+
+•
+
+use stopwatch or light gates for timing
+
+•
+
+use calipers and micrometers for small distances, using digital or vernier scales
+
+•
+
+correctly construct circuits from circuit diagrams using DC power supplies, cells,
+and a range of circuit components, including those where polarity is important
+
+•
+
+design, construct and check circuits using DC power supplies, cells, and a range of
+circuit components
+
+•
+
+use signal generator and oscilloscope, including volts/division and time-base
+
+•
+
+generate and measure waves, using microphone and loudspeaker, or ripple tank,
+or vibration transducer, or microwave / radio wave source
+
+•
+
+use laser or light source to investigate characteristics of light, including interference
+and diffraction
+
+•
+
+use ICT such as computer modelling, or data logger with a variety of sensors to
+collect data, or use of software to process data
+
+•
+
+use ionising radiation, including detectors
+
+
+Appendix 6 - mathematical requirements and exemplifications
+In order to be able to develop their skills, knowledge and understanding in science,
+students need to have been taught, and to have acquired competence in, the appropriate
+areas of mathematics relevant to the subject as indicated in the table of coverage below.
+The assessment of quantitative skills will include at least 10% level 2 or above
+mathematical skills for biology and psychology, 20% for chemistry and 40% for physics,
+these skills will be applied in the context of the relevant science A level.
+All mathematical content must be assessed within the lifetime of the specification.
+The following tables illustrate where these mathematical skills may be developed and
+could be assessed in each of the sciences. Those shown in bold type would only be
+tested in the full A Level course.
+This list of examples is not exhaustive. These skills could be developed in other areas of
+specification content.
+
+6a - biology
+
+Mathematical skills
+
+Exemplification of mathematical skill in
+the context of A level biology
+(assessment is not limited to the
+examples given below)
+
+A.0 - arithmetic and numerical computation
+A.0.1
+
+Recognise and make use of
+appropriate units in calculations
+
+Candidates may be tested on their ability to:
+• convert between units, e.g. mm3 to cm3
+as part of volumetric calculations
+•
+
+A.0.2
+
+Recognise and use expressions
+in decimal and standard form
+
+work out the unit for a rate e.g.
+breathing rate
+
+Candidates may be tested on their ability to:
+• use an appropriate number of decimal
+places in calculations, e.g. for a mean
+
+24
+
+•
+
+carry out calculations using numbers in
+standard and ordinary form, e.g. use of
+magnification
+
+•
+
+understand standard form when applied
+to areas such as size of organelles
+
+•
+
+convert between numbers in standard
+
+and ordinary form
+•
+
+A.0.3
+
+Use ratios, fractions and
+percentages
+
+understand that significant figures need
+retaining when making conversions
+between standard and ordinary form,
+e.g. 0.0050 mol dm-3 is equivalent to
+5.0 x 10-3 mol dm-3
+
+Candidates may be tested on their ability to:
+• calculate percentage yields
+•
+
+calculate surface area to volume ratio
+
+•
+
+use scales for measuring
+
+•
+
+represent phenotypic ratios
+(monohybrid and dihybrid crosses)
+
+A.0.4
+
+Estimate results
+
+Candidates may be tested on their ability to:
+• estimate results to sense check that the
+calculated values are appropriate
+
+A.0.5
+
+Use calculators to find and
+use power, exponential and
+logarithmic functions
+
+Candidates may be tested on their ability
+to:
+• estimate the number of bacteria
+grown over a certain length of time
+
+A.1- handling data
+A.1.1
+
+Use an appropriate number of
+significant figures
+
+Candidates may be tested on their ability to:
+• report calculations to an appropriate
+number of significant figures given raw
+data quoted to varying numbers of
+significant figures
+•
+
+understand that calculated results can
+only be reported to the limits of the
+least accurate measurement
+
+A.1.2
+
+Find arithmetic means
+
+Candidates may be tested on their ability to:
+• find the mean of a range of data, e.g.
+the mean number of stomata in the
+leaves of a plant
+
+A.1.3
+
+Construct and interpret
+frequency tables and diagrams,
+bar charts and histograms
+
+Candidates may be tested on their ability to:
+• represent a range of data in a table with
+clear headings, units and consistent
+decimal places
+•
+25
+
+interpret data from a variety of tables,
+
+e.g. data relating to organ function
+
+A.1.4
+
+Understand simple probability
+
+•
+
+plot a range of data in an appropriate
+format, e.g. enzyme activity over time
+represented on a graph
+
+•
+
+interpret data for a variety of graphs,
+e.g. explain electrocardiogram traces
+
+Candidates may be tested on their ability to:
+• use the terms probability and chance
+appropriately
+•
+
+understand the probability associated
+with genetic inheritance
+
+A.1.5
+
+Understand the principles of
+sampling as applied to scientific
+data
+
+Candidates may be tested on their ability to:
+• analyse random data collected by an
+appropriate means, e.g. use Simpson’s
+index of diversity to calculate the
+biodiversity of a habitat
+
+A.1.6
+
+Understand the terms mean,
+median and mode
+
+Candidates may be tested on their ability to:
+• calculate or compare the mean, median
+and mode of a set of data, e.g.
+height/mass/size of a group of
+organisms
+
+A.1.7
+
+Use a scatter diagram to identify
+a correlation between two
+variables
+
+Candidates may be tested on their ability to:
+• interpret a scattergram, e.g. the effect
+of life style factors on health
+
+A.1.8
+
+Make order of magnitude
+calculations
+
+Candidates may be tested on their ability to:
+• use and manipulate the magnification
+formula
+magnification = size of image
+
+A.1.9
+
+Select and use a statistical test
+
+size of real object
+Candidates may be tested on their ability to
+select and use:
+• the chi squared test to test the
+significance of the difference between
+observed and expected results
+
+26
+
+•
+
+the Student’s t-test
+
+•
+
+the correlation coefficient
+
+A.1.10 Understand measures of
+dispersion, including standard
+deviation and range
+
+Candidates may be tested on their ability to:
+• calculate the standard deviation
+
+A.1.11 Identify uncertainties in
+measurements and use simple
+techniques to determine
+uncertainty when data are
+combined
+
+Candidates may be tested on their ability to:
+• calculate percentage error where there
+are uncertainties in measurement
+
+•
+
+understand why standard deviation
+might be a more useful measure of
+dispersion for a given set of data
+e.g.where there is an outlying result
+
+A.2 – algebra
+A.2.1
+A.2.2
+
+A.2.3
+
+A.2.4
+
+A.2.5
+
+Understand and use the
+symbols: =, <, <<, >>, >, ∝, ~.
+Change the subject of an
+equation
+
+No exemplification required.
+
+Substitute numerical values into
+algebraic equations using
+appropriate units for physical
+quantities
+Solve algebraic equations
+
+Candidates may be tested on their ability to:
+• use a given equation e.g. Simpson’sindex of diversity [D = 1 – (∑(n/N)2]
+
+Use logarithms in relation to
+quantities that range over
+several orders of magnitude
+
+Candidates may be tested on their ability
+to:
+• use a logarithmic scale in the
+context of microbiology, e.g. growth
+rate of a microorganism such as
+yeast
+
+Candidates may be tested on their ability to:
+• use and manipulate equations, e.g.
+magnification
+
+Candidates may be tested on their ability to:
+• solve equations in a biological context,
+e.g. cardiac output = stroke volume x
+heart rate
+
+A.3 - graphs
+A.3.1
+
+Translate information between
+graphical, numerical and
+algebraic forms
+
+Candidates may be tested on their ability to:
+• understand that data may be presented
+in a number of formats and be able to
+use these data, e.g. dissociation curves
+
+A.3.2
+
+Plot two variables from
+experimental or other data
+
+Candidates may be tested on their ability to:
+• select an appropriate format for
+
+presenting data, bar charts, histograms,
+graphs and scattergrams
+A.3.3
+
+Understand that y = mx + c
+represents a linear relationship
+
+Candidates may be tested on their ability to:
+• predict/sketch the shape of a graph
+with a linear relationship, e.g. the effect
+of substrate concentration on the rate
+of an enzyme-controlled reaction with
+excess enzyme
+
+A.3.4
+
+Determine the intercept of a
+graph
+
+Candidates may be tested on their ability
+to:
+• read off an intercept point from a
+graph, e.g. compensation point in
+plants
+
+A.3.5
+
+Calculate rate of change from a
+graph showing a linear
+relationship
+
+Candidates may be tested on their ability to:
+• calculate a rate from a graph, e.g. rate
+of transpiration
+
+A.3.6
+
+Draw and use the slope of a
+tangent to a curve as a measure
+of rate of change
+
+Candidates may be tested on their ability to:
+• use this method to measure the
+gradient of a point on a curve, e.g.
+amount of product formed plotted
+against time when the concentration of
+enzyme is fixed
+
+A.4 - geometry and trigonometry
+A.4.1
+
+Calculate the circumferences,
+surface areas and volumes of
+regular shapes
+
+Candidates may be tested on their ability to:
+• calculate the circumference and area of
+a circle
+
+28
+
+•
+
+calculate the surface area and volume
+of rectangular prisms, of cylindrical
+prisms and of spheres
+
+•
+
+e.g.calculate the surface area or
+volume of a cell
+
+6b - chemistry
+
+Mathematical skills
+
+Exemplification of mathematical skill
+in the context of A level chemistry
+(assessment is not limited to the
+examples given below)
+
+B.0 - arithmetic and numerical computation
+B.0.0 Recognise and make use of
+Candidates may be tested on their ability to:
+appropriate units in calculation
+• convert between units e.g. cm3 to dm3
+as part of volumetric calculations
+• give units for an equilibrium constant
+or a rate constant
+• understand that different units are used
+in similar topic areas, so that
+conversions may be necessary e.g.
+entropy in J mol-1 K-1 and enthalpy
+changes in kJ mol-1
+B.0.1 Recognise and use expressions Candidates may be tested on their ability to:
+in decimal and ordinary form
+• use an appropriate number of decimal
+places in calculations, e.g. for pH
+
+B.0.2 Use ratios, fractions and
+percentages
+
+•
+
+carry out calculations using numbers in
+standard and ordinary form, e.g. use of
+Avogadro’s number
+
+•
+
+understand standard form when applied
+to areas such as (but not limited to) Kw
+
+•
+
+convert between numbers in standard
+and ordinary form
+
+•
+
+understand that significant figures need
+retaining when making conversions
+between standard and ordinary form,
+e.g. 0.0050 mol dm-3 is equivalent to 5.0
+x 10-3 mol dm-3
+
+Candidates may be tested on their ability to:
+• calculate percentage yields
+•
+
+calculate the atom economy of a
+reaction
+
+•
+
+construct and/or balance equations
+
+
+using ratios
+B.0.3 Estimate results
+
+Candidates may be tested on their ability to:
+• evaluate the effect of changing
+experimental parameters on
+measurable values, e.g. how the
+value of Kc would change with
+temperature given different specified
+conditions
+
+B.0.4 Use calculators to find and use
+power, exponential and
+logarithmic functions
+
+Candidates may be tested on their ability to:
+• carry out calculations using the
+Avogadro constant
+•
+
+carry out pH and pKa calculations
+
+•
+
+make appropriate mathematical
+approximations in buffer calculations
+
+B.1- handling data
+B.1.1 Use an appropriate number of
+significant figures
+
+Candidates may be tested on their ability to:
+• report calculations to an appropriate
+number of significant figures given raw
+data quoted to varying numbers of
+significant figures
+•
+
+B.1.2 Find arithmetic means
+
+Candidates may be tested on their ability to:
+• calculate weighted means, e.g.
+calculation of an atomic mass based on
+supplied isotopic abundances
+•
+
+B.1.3 Identify uncertainties in
+measurements and use simple
+techniques to determine
+uncertainty when data are
+combined
+
+understand that calculated results can
+only be reported to the limits of the least
+accurate measurement
+
+select appropriate titration data (i.e.
+identification of outliers) in order to
+calculate mean titres
+
+Candidates may be tested on their ability to:
+• determine uncertainty when two burette
+readings are used to calculate a titre
+value
+
+B.2 – algebra
+B.2.1 Understand and use the
+
+No exemplification required.
+
+symbols: =, <, <<, >>, >, ∝, ~,
+equilibrium sign
+B.2.2 Change the subject of an
+equation
+
+B.2.3 Substitute numerical values into
+algebraic equations using
+appropriate units for physical
+quantities
+
+B.2.4 Solve algebraic equations
+
+Candidates may be tested on their ability to:
+• carry out structured and unstructured
+mole calculations e.g. calculate a rate
+constant k from a rate equation
+
+Candidates may be tested on their ability to:
+• carry out structured and unstructured
+mole calculations
+•
+
+carry out rate calculations
+
+•
+
+calculate the value of an equilibrium
+constant KC
+
+Candidates may be tested on their ability to:
+• carry out Hess’s law calculations
+•
+
+B.2.5 Use logarithms in relation to
+quantities that range over
+several orders of magnitude
+
+calculate a rate constant k from a rate
+equation
+
+Candidates may be tested on their ability
+to:
+• carry out pH and pKa calculations
+
+B.3 – graphs
+B.3.1 Translate information between
+graphical, numerical and
+algebraic forms
+
+Candidates may be tested on their ability to:
+• interpret and analyse spectra
+•
+
+determine the order of a reaction
+from a graph
+
+•
+
+derive rate expression from a graph
+
+B.3.2 Plot two variables from
+experimental or other data
+
+Candidates may be tested on their ability to:
+• plot concentration–time graphs from
+collected or supplied data and draw an
+appropriate best-fit curve
+
+B.3.3 Determine the slope and
+intercept of a linear graph
+
+Candidates may be tested on their ability to:
+• calculate the rate constant of a zeroorder reaction by determination of
+the gradient of a concentration–time
+graph
+
+B.3.4 Calculate rate of change from
+a graph showing a linear
+relationship
+
+Candidates may be tested on their ability to:
+• calculate the rate constant of a zeroorder reaction by determination of
+the gradient of a concentration–time
+graph
+
+B.3.5 Draw and use the slope of a
+tangent to a curve as a
+measure of rate of change
+
+Candidates may be tested on their ability to:
+• determine the order of a reaction
+using the initial rates method
+
+B.4 - geometry and trigonometry
+B.4.1 Use angles and shapes in
+regular 2D and 3D structures
+
+Candidates may be tested on their ability to:
+• predict/identify shapes of and bond
+angles in molecules with and without a
+lone pair(s), for example NH3, CH4, H2O
+etc.
+
+B.4.2 Visualise and represent 2D and
+3D forms including twodimensional representations of
+3D objects
+
+Candidates may be tested on their ability to:
+• draw different forms of isomers
+
+B.4.3 Understand the symmetry of 2D
+and 3D shapes
+
+Candidates may be tested on their ability to:
+• describe the types of stereoisomerism
+shown by molecules/complexes
+
+•
+
+•
+
+32
+
+identify chiral centres from a 2D or
+3D representation
+
+identify chiral centres from a 2D or
+3D representation
+
+6c - physics
+Exemplification of mathematical skill
+Mathematical skills
+in the context of A level physics
+(assessment is not limited to the
+examples given below)
+C.0 - arithmetic and numerical computation
+C.0.1
+Recognise and make use of
+Candidates may be tested on their ability to:
+appropriate units in calculations
+• identify the correct units for physical
+properties such as m s-1, the unit for
+velocity
+•
+
+convert between units with different
+prefixes e.g. cm3 to m3
+
+C.0.2
+
+Recognise and use
+expressions in decimal and
+standard form
+
+Candidates may be tested on their ability to:
+• use physical constants expressed in
+standard form such as
+c = 3.00 x 108 m s–1
+
+C.0.3
+
+Use ratios, fractions and
+percentages
+
+Candidates may be tested on their ability to:
+• calculate efficiency of devices
+•
+
+calculate percentage uncertainties in
+measurements
+
+C.0.4
+
+Estimate results
+
+Candidates may be tested on their ability to:
+• estimate the effect of changing
+experimental parameters on measurable
+values
+
+C.0.5
+
+Use calculators to find and use
+power, exponential and
+logarithmic functions
+
+Candidates may be tested on their ability to:
+• solve for unknowns in decay
+problems such as N = N0e-λt
+
+C.0.6
+
+Use calculators to handle sin x,
+cos x, tan x when x is
+expressed in degrees or
+radians
+
+Candidates may be tested on their ability to:
+• calculate the direction of resultant
+vectors
+
+
+C.1 - handling data
+C.1.1
+
+Use an appropriate number of
+significant figures
+
+Candidates may be tested on their ability to:
+• report calculations to an appropriate
+number of significant figures given raw
+data quoted to varying numbers of
+significant figures
+•
+
+understand that calculated results can
+only be reported to the limits of the least
+accurate measurement
+
+C.1.2
+
+Find arithmetic means
+
+Candidates may be tested on their ability to:
+• calculate a mean value for repeated
+experimental readings
+
+C.1.3
+
+Understand simple probability
+
+Candidates may be tested on their ability to:
+• understand probability in the context of
+radioactive decay
+
+C.1.4
+
+Make order of magnitude
+calculations
+
+Candidates may be tested on their ability to:
+• evaluate equations with variables
+expressed in different orders of
+magnitude
+
+C.1.5
+
+Identify uncertainties in
+measurements and use simple
+techniques to determine
+uncertainty when data are
+combined by addition,
+subtraction, multiplication,
+division and raising to powers
+
+Candidates may be tested on their ability to:
+• determine the uncertainty where two
+readings for length need to be added
+together
+
+C.2 - algebra
+C.2.1
+
+C.2.2
+
+C.2.3
+
+Understand and use the
+Candidates may be tested on their ability to:
+symbols: =, <, <<, >>, >, ∝, ≈, ∆
+• recognise the significance of the symbols
+in the expression F ∝ ∆p/∆t
+Change the subject of an
+Candidates may be tested on their ability to:
+equation, including non-linear
+• rearrange E = mc2 to make m the subject
+equations
+Substitute numerical values into Candidates may be tested on their ability to:
+algebraic equations using
+• calculate the momentum p of an object
+appropriate units for physical
+by substituting the values for mass m
+quantities
+and velocity v into the equation p = mv
+
+C.2.4
+
+Solve algebraic equations,
+including quadratic equations
+
+Candidates may be tested on their ability to:
+•
+solve kinematic equations for constant
+acceleration such as v = u + at and
+s = ut + ½ at2
+
+C.2.5
+
+Use logarithms in relation to
+quantities that range over
+several orders of magnitude
+
+Candidates may be tested on their ability to:
+• recognise and interpret real world
+examples of logarithmic scales
+
+C.3 - graphs
+C.3.1
+
+Translate information between
+graphical, numerical and
+algebraic forms
+
+Candidates may be tested on their ability to:
+• calculate Young modulus for materials
+using stress-strain graphs
+
+C.3.2
+
+Plot two variables from
+experimental or other data
+
+Candidates may be tested on their ability to:
+• plot graphs of extension of a wire against
+force applied
+
+C.3.3
+
+Understand that y = mx + c
+represents a linear relationship
+
+Candidates may be tested on their ability to:
+• rearrange and compare v = u + at with
+y = mx + c for velocity-time graph in
+constant acceleration problems
+
+C.3.4
+
+Determine the slope and
+intercept of a linear graph
+
+Candidates may be tested on their ability to:
+• read off and interpret intercept point from
+a graph e.g. the initial velocity in a
+velocity-time graph
+
+C.3.5
+
+Calculate rate of change from a
+graph showing a linear
+relationship
+
+Candidates may be tested on their ability to:
+• calculate acceleration from a linear
+velocity-time graph
+
+C.3.6
+
+Draw and use the slope of a
+tangent to a curve as a
+measure of rate of change
+
+Candidates may be tested on their ability to:
+• draw a tangent to the curve of a
+displacement–time graph and use the
+gradient to approximate the velocity at a
+specific time
+
+C.3.7
+
+Distinguish between
+instantaneous rate of change
+and average rate of change
+
+Candidates may be tested on their ability to:
+• understand that the gradient of the
+tangent of a displacement–time graph
+gives the velocity at a point in time which
+is a different measure to the average
+velocity
+
+
+C.3.8
+
+Understand the possible
+physical significance of the
+area between a curve and the x
+axis and be able to calculate it
+or estimate it by graphical
+methods as appropriate
+Apply the concepts underlying
+calculus (but without requiring
+the explicit use of derivatives or
+integrals) by solving equations
+involving rates of change, e.g.
+Δx /Δt = –λx
+using a graphical method or
+spreadsheet modelling
+Interpret logarithmic plots
+
+Candidates may be tested on their ability to:
+• recognise that for a capacitor the area
+under a voltage-charge graph is
+equivalent to the energy stored
+
+C.3.11
+
+Use logarithmic plots to test
+exponential and power law
+variations
+
+Candidates may be tested on their ability to:
+• use logarithmic plots with decay law
+of radioactivity / charging and
+discharging of a capacitor
+
+C.3.12
+
+Sketch relationships which are
+modelled by y = k/x, y = kx2, y
+= k/x2, y= kx, y = sin x, y = cos
+x, y = e±x, and y = sin2x, y =
+cos2x as applied to physical
+relationships
+
+Candidates may be tested on their ability to:
+• sketch relationships between
+pressure and volume for an ideal gas
+
+C.3.9
+
+C.3.10
+
+Candidates may be tested on their ability to:
+• determine g from distance-time plot,
+projectile motion
+
+Candidates may be tested on their ability to:
+• obtain time constant for capacitor
+discharge by interpreting plot of log V
+against time
+
+C.4- geometry and trigonometry
+C.4.1
+
+Use angles in regular 2D and
+3D structures
+
+Candidates may be tested on their ability to:
+• interpret force diagrams to solve
+problems
+
+C.4.2
+
+Visualise and represent 2D and
+3D forms including twodimensional representations of
+3D objects
+
+Candidates may be tested on their ability to:
+• draw force diagrams to solve mechanics
+problems
+
+
+C.4.3
+
+Calculate areas of triangles,
+circumferences and areas of
+circles, surface areas and
+volumes of rectangular blocks,
+cylinders and spheres
+Use Pythagoras’ theorem, and
+the angle sum of a triangle
+
+Candidates may be tested on their ability to:
+• calculate the area of the cross section to
+work out the resistance of a conductor
+given its length and resistivity
+
+C.4.5
+
+Use sin, cos and tan in physical
+problems
+
+Candidates may be tested on their ability to:
+• resolve forces into components
+
+C.4.6
+
+Use of small angle
+approximations including sin θ
+≈ θ, tan θ ≈ θ, cos θ ≈ 1 for
+small θ where appropriate
+Understand the relationship
+between degrees and radians
+and translate from one to the
+other
+
+Candidates may be tested on their ability to:
+• calculate fringe separations in
+interference patterns
+
+C.4.4
+
+C.4.7
+
+Candidates may be tested on their ability to:
+• calculate the magnitude of a resultant
+vector, resolving forces into components
+to solve problems
+
+Candidates may be tested on their ability to:
+• convert angle in degrees to angle in
+radians
+
+
+6d - psychology
+
+Mathematical skills
+
+Exemplification of mathematical skill in the
+context of A level psychology (assessment
+is not limited to the examples given below)
+
+D.0 - arithmetic and numerical computation
+D.0.1
+Recognise and use
+For example, converting data in standard form
+expressions in decimal and
+from a results table into decimal form in order to
+standard form
+construct a pie chart.
+D.0.2
+Use ratios, fractions and
+For example, calculating the percentages of
+percentages
+cases that fall into different categories in an
+observation study.
+D.0.3
+Estimate results
+For example, commenting on the spread of
+scores for a set of data, which would require
+estimating the range.
+D.1 - handling data
+D.1.1
+D.1.2
+
+D.1.3
+
+D.1.4
+D.1.5
+
+D.1.6
+
+D.1.7
+
+Use an appropriate number
+of significant figures
+Find arithmetic means
+
+Construct and interpret
+frequency tables and
+diagrams, bar charts and
+histograms
+Understand simple
+probability
+Understand the principles of
+sampling as applied to
+scientific data
+Understand the terms mean,
+median and mode
+
+Use a scatter diagram to
+identify a correlation
+between two variables
+
+For example, expressing a correlation
+coefficient to two or three significant figures.
+For example, calculating the means for two
+conditions using raw data from a class
+experiment.
+For example, selecting and sketching an
+appropriate form of data display for a given set
+of data.
+For example, explaining the difference between
+the 0.05 and 0.01 levels of significance.
+For example, explaining how a random or
+stratified sample could be obtained from a
+target population.
+For example, explaining the differences
+between the mean, median and mode and
+selecting which measure of central tendency is
+most appropriate for a given set of data.
+Calculate standard deviation
+For example, plotting two variables from an
+investigation on a scatter diagram and
+identifying the pattern as a positive correlation,
+a negative correlation or no correlation.
+
+
+D.1.8
+
+Use a statistical test
+
+D.1.9
+
+Make order of magnitude
+calculations
+
+D.1.10
+
+Distinguish between levels
+of measurement
+
+D.1.11
+
+Know the characteristics of
+normal and skewed
+distributions
+
+D.1.12
+
+Select an appropriate
+statistical test
+
+D.1.13
+
+Use statistical tables to
+determine significance
+
+D.1.14
+
+Understand measures of
+dispersion, including
+standard deviation and
+range
+Understand the differences
+between qualitative and
+quantitative data
+Understand the difference
+between primary and
+secondary data
+
+D.1.15
+
+D.1.16
+
+For example, calculating a non-parametric test
+of differences using data from a given
+experiment.
+For example, estimating the mean test score for
+a large number of participants on the basis of
+the total overall score.
+For example, stating the level of
+measurement (nominal, ordinal or interval)
+that has been used in a study.
+For example, being presented with a set of
+scores from an experiment and being asked to
+indicate the position of the mean (or median, or
+mode).
+For example, selecting a suitable inferential
+test for a given practical investigation and
+explaining why the chosen test is
+appropriate.
+For example, using an extract from
+statistical tables to say whether or not a
+given observed value is significant at the
+0.05 level of significance for a one-tailed
+test.
+For example, explaining why the standard
+deviation might be a more useful measure of
+dispersion for a given set of scores e.g. where
+there is an outlying score.
+For example, explaining how a given qualitative
+measure (for example, an interview transcript)
+might be converted into quantitative data.
+For example, stating whether data collected by
+a researcher dealing directly with participants is
+primary or secondary data.
+
+D.2 - algebra
+D.2.1
+
+Understand and use the
+symbols: =, <, <<, >>, >,
+~.
+
+For example, expressing the outcome of an
+∝, inferential test in the conventional form by
+stating the level of significance at the 0.05 level
+or 0.01 level by using symbols appropriately.
+
+
+D.2.2
+
+D.2.3
+
+Substitute numerical
+values into algebraic
+equations using
+appropriate units for
+physical quantities
+Solve simple algebraic
+equations
+
+For example, inserting the appropriate
+values from a given set of data into the
+formula for a statistical test e.g. inserting
+the N value (for the number of scores) into
+the Chi Square formula.
+For example, calculating the degrees of
+freedom for a Chi Square test.
+
+D.3 - graphs
+D.3.1
+
+D.3.2
+
+Translate information
+between graphical,
+numerical and algebraic
+forms
+Plot two variables from
+experimental or other data
+
+For example, using a set of numerical data (a
+set of scores) from a record sheet to construct a
+bar graph.
+For example, sketching a scatter diagram using
+two sets of data from a correlational
+investigation.
+
+
+© Crown copyright 2014
+You may re-use this document/publication (not including logos) free of charge in any
+format or medium, under the terms of the Open Government Licence v2.0. To view this
+licence, visit www.nationalarchives.gov.uk/doc/open-government-licence/version/2 or
+email: psi@nationalarchives.gsi.gov.uk.
+Where we have identified any third party copyright information you will need to obtain
+permission from the copyright holders concerned.
+Any enquiries regarding this publication should be sent to us at
+www.education.gov.uk/contactus.
+This document is available to download at www.gov.uk/government/publications.
+Follow us on Twitter: @educationgovuk
+Like us on Facebook: www.facebook.com/educationgovuk
+
+
