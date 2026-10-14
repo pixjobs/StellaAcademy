@@ -252,82 +252,79 @@ The topics in these notes follow the Department for Education documents below.
     accentColor: 'indigo',
     difficulty: 2,
     estimatedMinutes: 15,
-    formula: 'n_1 \\sin(\\theta_i) = n_2 \\sin(\\theta_r)',
+    formula: 'n_1 \\sin \\theta_1 = n_2 \\sin \\theta_2',
     formulaLayout: [
       { type: 'variable', symbol: 'n_1' },
-      { type: 'static', latex: '\\sin(' },
-      { type: 'variable', symbol: '\\theta_i' },
-      { type: 'static', latex: ')' },
+      { type: 'static', latex: '\\sin' },
+      { type: 'variable', symbol: '\\theta_1' },
       { type: 'operator', content: '=' },
       { type: 'variable', symbol: 'n_2' },
-      { type: 'static', latex: '\\sin(' },
-      { type: 'variable', symbol: '\\theta_r' },
-      { type: 'static', latex: ')' }
+      { type: 'static', latex: '\\sin' },
+      { type: 'variable', symbol: '\\theta_2' }
     ],
     variables: [
       {
         symbol: 'n_1',
-        name: 'Initial Refractive Index',
-        unit: 'Unitless',
-        description: 'A measure of how much light slows down in the first medium (e.g., air).',
+        name: 'Refractive index of the first material',
+        unit: 'no unit (it is a ratio)',
+        description: 'How many times slower light travels in the first material than in a vacuum. For air it is about 1.0.',
         color: 'text-indigo-400'
       },
       {
-        symbol: '\\theta_i',
-        name: 'Angle of Incidence',
-        unit: 'Degrees or Radians',
-        description: 'The angle at which the incoming light ray strikes the boundary, measured from the normal (perpendicular) line.',
+        symbol: '\\theta_1',
+        name: 'Angle of incidence',
+        unit: 'degrees (°)',
+        description: 'The angle between the incoming ray and the normal, a line drawn at right angles to the surface.',
         color: 'text-sky-400'
       },
       {
         symbol: 'n_2',
-        name: 'Final Refractive Index',
-        unit: 'Unitless',
-        description: 'A measure of how much light slows down in the second medium (e.g., glass or water).',
+        name: 'Refractive index of the second material',
+        unit: 'no unit (it is a ratio)',
+        description: 'The same measure for the second material: about 1.33 for water and about 1.5 for glass.',
         color: 'text-cyan-400',
         range: { min: 1, max: 2.5, default: 1.5 }
       },
       {
-        symbol: '\\theta_r',
-        name: 'Angle of Refraction',
-        unit: 'Degrees or Radians',
-        description: 'The angle at which the light ray travels through the second medium, measured from the normal line.',
+        symbol: '\\theta_2',
+        name: 'Angle of refraction',
+        unit: 'degrees (°)',
+        description: 'The angle between the ray in the second material and the normal.',
         color: 'text-rose-400'
       }
     ],
     conceptSteps: [
       {
         stepNumber: 1,
-        title: 'Speed of Light in a Medium',
-        content: 'Light travels slower in materials like glass or water than it does in a vacuum. The refractive index (n) is the ratio of the speed of light in a vacuum to its speed in the medium.',
-        keyInsight: 'A higher refractive index means light travels slower in that material.',
+        title: 'Light changes speed in a material',
+        content: 'Light is fastest in a vacuum, almost as fast in air, slower in water and slower still in glass. The **refractive index**, $n$, says how many times slower: in glass $n$ is about 1.5, so light travels at about two thirds of its speed in a vacuum.',
+        keyInsight: 'A higher refractive index means light travels more slowly in that material.',
         relatedVariables: ['n_1', 'n_2']
       },
       {
         stepNumber: 2,
-        title: 'Bending of Light',
-        content: 'When light enters a new medium at an angle, the change in speed causes the ray to bend. This is called refraction.',
-        keyInsight: 'Light bends towards the normal when slowing down, and away when speeding up.',
-        relatedVariables: ['\\theta_i', '\\theta_r']
+        title: 'Light bends at a boundary',
+        content: 'When a beam of light meets a new material at an angle, one side of the beam reaches it first and changes speed first, so the beam swings round. This is **refraction**. Angles are measured from the **normal**, a line drawn at right angles to the surface.',
+        keyInsight: 'Slowing down bends light towards the normal. Speeding up bends it away from the normal.',
+        relatedVariables: ['\\theta_1', '\\theta_2']
       },
       {
         stepNumber: 3,
-        title: 'Dispersion',
-        content: 'Different colours of light have slightly different refractive indices in materials like glass. This causes white light to split into a rainbow spectrum when passing through a prism.',
-        keyInsight: 'Violet and blue light slow down slightly more in glass than red light, so they bend more.',
-        relatedVariables: ['n_2', '\\theta_r']
+        title: 'Each colour bends by a different amount',
+        content: 'White light is a mixture of colours, each with a different frequency. Glass slows violet light a little more than red light, so violet is bent a little more. A prism therefore spreads white light out into a band of colours called a **spectrum**. This spreading is called **dispersion**.',
+        keyInsight: 'Violet light bends the most and red light the least.',
+        relatedVariables: ['n_2', '\\theta_2']
       }
     ],
     solvedExample: {
-      problem: 'Find the angle of refraction ($\\theta_r$) from air ($n_1 = 1.0$) to glass ($n_2 = 1.5$) at $\\theta_i = 30^\\circ$.',
+      problem: 'Light passes from air ($n_1 = 1.0$) into glass ($n_2 = 1.5$) at $30^\\circ$ to the normal. Find the angle of refraction, $\\theta_2$.',
       steps: [
-        'Apply Snell\'s Law: $1.0 \\cdot \\sin(30^\\circ) = 1.5 \\cdot \\sin(\\theta_r)$.',
-        '$\\sin(30^\\circ)$ is exactly $0.5$.',
-        'Substitute the value: $0.5 = 1.5 \\cdot \\sin(\\theta_r)$.',
-        'Solve for the sine of the angle: $\\sin(\\theta_r) = \\frac{0.5}{1.5} = 0.333$.',
-        'Calculate the inverse sine: $\\theta_r = \\arcsin(0.333)$.'
+        'Write down Snell\'s law: $n_1 \\sin \\theta_1 = n_2 \\sin \\theta_2$.',
+        'Substitute the values: $1.0 \\times \\sin 30^\\circ = 1.5 \\times \\sin \\theta_2$, and $\\sin 30^\\circ = 0.5$.',
+        'Divide both sides by 1.5: $\\sin \\theta_2 = \\dfrac{0.5}{1.5} = 0.333$.',
+        'Use the inverse sine on your calculator: $\\theta_2 = \\sin^{-1}(0.333)$.'
       ],
-      resultFormula: '\\theta_r \\approx 19.47^\\circ'
+      resultFormula: '\\theta_2 \\approx 19.5^\\circ'
     },
     practiceProblems: [
       {
@@ -341,7 +338,7 @@ The topics in these notes follow the Department for Education documents below.
         answer: "Towards the normal."
       },
       {
-        question: "Light leaves a glass block into air at an angle. Does it bend towards or away from the normal?",
+        question: "Light leaves a glass block into air at an angle. Which way does it bend: towards the normal or away from it?",
         hint: "It speeds up as it leaves the glass.",
         answer: "Away from the normal."
       },
@@ -361,7 +358,7 @@ The topics in these notes follow the Department for Education documents below.
         answer: "About 32.1°"
       },
     ],
-    realWorldConnection: 'Spectrometers use prisms or diffraction gratings to analyse the light from distant stars, revealing their chemical composition.',
+    realWorldConnection: 'Helium was found in the Sun before it was found on Earth. In 1868 astronomers saw a yellow line in the Sun\'s spectrum that matched no element known at the time. Helium was first collected on Earth in 1895.',
     textbookContent: `
 ## Refraction
 
@@ -383,7 +380,7 @@ We draw light as **rays**: straight lines with arrows. The **normal** is a line 
 
 ### Lenses
 
-A convex lens is thicker in the middle. Light passing through it is refracted towards the middle, so parallel rays are brought together at a point called the focus. The lens in your eye focuses light onto the back of the eye in this way, and so do the lenses in cameras and telescopes.
+A convex lens is thicker in the middle. Light passing through it is refracted towards the middle, so parallel rays are brought together at a point called the focus. Your eye focuses light onto the back of the eye in this way: the curved, clear front of the eye (the cornea) and the lens behind it both refract the light. Cameras and telescopes use lenses in the same way.
 
 ### Colours and prisms
 
@@ -393,7 +390,7 @@ In glass, violet light slows down slightly more than red light, so it is refract
 
 ### Absorbed, transmitted, reflected
 
-Materials treat different wavelengths of light differently. They may absorb some, let some through (transmit) and reflect some. Glass transmits visible light but absorbs much of the ultraviolet. A red filter transmits red light and absorbs the other colours.
+Materials treat different wavelengths of light differently. They may absorb some, let some through (transmit) and reflect some. Window glass transmits visible light but absorbs some ultraviolet. A red filter transmits red light and absorbs the other colours.
 
 ### Going further: Snell's law
 
@@ -401,15 +398,15 @@ The Department for Education content describes refraction in words. Some specifi
 
 $$n_1 \\sin \\theta_1 = n_2 \\sin \\theta_2$$
 
-Here $n$ is the **refractive index** of each material (how many times slower light travels in it than in a vacuum) and $\\theta$ is the angle to the normal. Light entering glass ($n_2 = 1.5$) from air ($n_1 = 1.0$) at $30°$:
-
-1.  $1.0 \\times \\sin 30° = 1.5 \\times \\sin \\theta_2$
-2.  $\\sin \\theta_2 = \\dfrac{0.5}{1.5} = 0.333$
-3.  $\\theta_2 = \\sin^{-1}(0.333) \\approx 19.5°$
+Here $n$ is the **refractive index** of each material (how many times slower light travels in it than in a vacuum) and $\\theta$ is the angle to the normal. The worked example shows how to use it. Notice that the angle in the glass comes out smaller than the angle in the air: the ray has bent towards the normal, just as the rule in words says.
 
 ### Reading starlight
 
-Astronomers pass starlight through a prism or a similar device to spread it into a spectrum. Dark lines in the spectrum show which colours the gases in a star have absorbed, and that tells us what the star is made of, without anyone ever going there.
+Astronomers pass starlight through a prism or a similar device to spread it into a spectrum. Dark lines in the spectrum show which colours the gases in a star's outer layers have absorbed, and that tells us what the star is made of, without anyone ever going there.
+
+### Next on the journey
+
+A spectrum is a set of measurements, and real measurements never agree perfectly. How do scientists sum up a pile of readings and say how spread out they are? That is the next lesson.
 
 ### Sources
 
