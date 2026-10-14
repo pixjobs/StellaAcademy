@@ -7,6 +7,10 @@ import type { Entry } from '../answers';
  */
 
 const MILLI = 1e-3;
+const MEGA = 1e6;
+const GIGA = 1e9;
+/** Speed of radio waves and light, as the waves lesson gives it (m/s). */
+const C_LESSON = 3.0e8;
 
 export const ENTRIES: Entry[] = [
   // ======================================================================================== circuit
@@ -90,5 +94,50 @@ export const ENTRIES: Entry[] = [
   {
     lesson: 'circuit', where: 'textbookContent: worked example, sum', expectNotesIncludes: 'A 100 $\\Omega$ resistor and a 200 $\\Omega$ resistor are in series with a 6 V battery',
     stated: 'The two add up to the 6 V of the battery', pick: 0, compute: () => (6 / 300) * (100 + 200), expected: 6, tolerance: 1e-9, unit: 'V',
+  },
+
+  // ======================================================================================== waves
+  {
+    lesson: 'waves', where: 'solvedExample.steps[0]', expectQuestionIncludes: 'A radio station broadcasts at $100$ MHz',
+    stated: '= 1.0 \\times 10^8\\text{ Hz}', compute: () => 100 * MEGA, expected: 1e8, relTolerance: 1e-9, unit: 'Hz',
+  },
+  {
+    lesson: 'waves', where: 'solvedExample.resultFormula', expectQuestionIncludes: 'A radio station broadcasts at $100$ MHz',
+    compute: () => C_LESSON / (100 * MEGA), expected: 3.0, tolerance: 1e-9, unit: 'm',
+  },
+  {
+    lesson: 'waves', where: 'practiceProblems[0]', expectQuestionIncludes: 'A sound wave travels at 343 m/s and has a frequency of 343 Hz',
+    compute: () => 343 / 343, expected: 1, tolerance: 1e-9, unit: 'm',
+  },
+  {
+    lesson: 'waves', where: 'practiceProblems[1]', expectQuestionIncludes: 'A wave has a frequency of 4 Hz. What is its period?',
+    compute: () => 1 / 4, expected: 0.25, tolerance: 1e-9, unit: 's',
+  },
+  {
+    lesson: 'waves', where: 'practiceProblems[2]', expectQuestionIncludes: 'wavelength of 1.5 m and a frequency of 2 Hz',
+    compute: () => 2 * 1.5, expected: 3, tolerance: 1e-9, unit: 'm/s',
+  },
+  {
+    lesson: 'waves', where: 'practiceProblems[3]', kind: 'qualitative', expectQuestionIncludes: 'a 2 GHz Wi-Fi signal or a 5 GHz Wi-Fi signal',
+    expectAnswerIncludes: 'The 5 GHz signal',
+    verify: () => {
+      const l2 = C_LESSON / (2 * GIGA);
+      const l5 = C_LESSON / (5 * GIGA);
+      return { holds: l5 < l2, detail: `${l5} m at 5 GHz against ${l2} m at 2 GHz` };
+    },
+  },
+  {
+    lesson: 'waves', where: 'practiceProblems[4]', kind: 'qualitative', expectQuestionIncludes: 'Is sound a transverse or a longitudinal wave',
+    expectAnswerIncludes: 'Longitudinal',
+  },
+  {
+    lesson: 'waves', where: 'practiceProblems[5] (m)', expectQuestionIncludes: 'A spacecraft sends a radio signal at 8.4 GHz',
+    stated: 'About 0.036 m', note: '0.0357 m; 2 s.f., so ±0.0005.',
+    compute: () => C_LESSON / (8.4 * GIGA), expected: 0.03571, tolerance: 0.0005, unit: 'm',
+  },
+  {
+    lesson: 'waves', where: 'practiceProblems[5] (cm)', expectQuestionIncludes: 'A spacecraft sends a radio signal at 8.4 GHz',
+    stated: '3.6 cm', note: '3.57 cm; 2 s.f., so ±0.05.',
+    compute: () => (C_LESSON / (8.4 * GIGA)) * 100, expected: 3.571, tolerance: 0.05, unit: 'cm',
   },
 ];

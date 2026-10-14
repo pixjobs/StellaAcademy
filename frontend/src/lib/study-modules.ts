@@ -972,22 +972,22 @@ The topics in these notes follow the Department for Education documents below.
       {
         symbol: '\\lambda',
         name: 'Wavelength',
-        unit: 'Metres (m)',
-        description: 'The physical distance between two consecutive peaks of a wave.',
+        unit: 'metres (m)',
+        description: 'The distance from one point on a wave to the same point on the next one, for example from crest to crest.',
         color: 'text-emerald-400'
       },
       {
         symbol: 'v',
-        name: 'Wave Velocity',
+        name: 'Wave speed',
         unit: 'm/s',
-        description: 'The speed at which the wave travels through space. For electromagnetic waves like radio, this is the speed of light.',
+        description: 'How fast the wave travels. It is set by what the wave travels through. Radio waves and light travel at $3.0 \\times 10^8$ m/s in space.',
         color: 'text-teal-400'
       },
       {
         symbol: 'f',
         name: 'Frequency',
-        unit: 'Hertz (Hz)',
-        description: 'The number of wave cycles that pass a fixed point per second.',
+        unit: 'hertz (Hz)',
+        description: 'The number of complete waves passing a point each second.',
         color: 'text-lime-400',
         range: { min: 1, max: 10, default: 2 }
       }
@@ -995,35 +995,34 @@ The topics in these notes follow the Department for Education documents below.
     conceptSteps: [
       {
         stepNumber: 1,
-        title: 'Oscillation',
-        content: 'Signals, from sound to radio waves, travel as oscillating fields or pressures. A sine wave is the purest form of oscillation.',
-        keyInsight: 'Frequency measures how rapidly the wave oscillates.',
+        title: 'What a wave is',
+        content: 'A wave carries energy and information from place to place. The water, air or rope it passes through only moves back and forth about where it started. Frequency counts how many waves pass each second; the period, $T = \\dfrac{1}{f}$, is how long one wave takes.',
+        keyInsight: 'The wave moves on, but the material it passes through stays where it is.',
         relatedVariables: ['f']
       },
       {
         stepNumber: 2,
-        title: 'Speed of Propagation',
-        content: 'Waves travel at a specific speed depending on the medium. In a vacuum, radio waves and light travel at approximately 300,000 km/s (c).',
-        keyInsight: 'Wave speed connects time (frequency) to space (wavelength).',
-        relatedVariables: ['v']
+        title: 'The wave equation',
+        content: 'Each second, $f$ waves pass a point, and each one is $\\lambda$ long. So in one second the wave travels $f \\times \\lambda$: that is its speed, $v = f\\lambda$.',
+        keyInsight: 'Wave speed = frequency × wavelength.',
+        relatedVariables: ['v', 'f', '\\lambda']
       },
       {
         stepNumber: 3,
-        title: 'Inverse Relationship',
-        content: 'Because the speed of light is constant, higher frequency waves must have shorter wavelengths. They are inversely proportional.',
-        keyInsight: 'High frequency = short wavelength. Low frequency = long wavelength.',
+        title: 'Higher frequency, shorter wavelength',
+        content: 'Radio waves of every frequency travel through space at the same speed. Sound of every pitch travels through air at the same speed. When the speed stays the same, doubling the frequency halves the wavelength.',
+        keyInsight: 'At a fixed speed, high frequency means short wavelength and low frequency means long wavelength.',
         relatedVariables: ['\\lambda', 'f']
       }
     ],
     solvedExample: {
-      problem: 'Find the wavelength ($\\lambda$) of a radio wave transmitting at $f = 100$ MHz ($10^8$ Hz).',
+      problem: 'A radio station broadcasts at $100$ MHz. Taking the speed of radio waves as $3.0 \\times 10^8$ m/s, what is the wavelength?',
       steps: [
-        'Convert the frequency to hertz: $100\\text{ MHz} = 100 \\times 10^6\\text{ Hz} = 10^8\\text{ Hz}$ (see [Converting Units](/study/units)).',
-        'Note the speed of light $v = c \\approx 3 \\times 10^8$ m/s.',
-        'Use the formula: $\\lambda = \\frac{v}{f}$.',
-        'Substitute the numbers: $\\lambda = \\frac{3 \\times 10^8}{10^8}$.'
+        'Write the frequency in hertz: $100\\text{ MHz} = 100 \\times 10^6\\text{ Hz} = 1.0 \\times 10^8\\text{ Hz}$ (see [Converting Units](/study/units)).',
+        'Use $\\lambda = \\dfrac{v}{f}$.',
+        'Substitute: $\\lambda = \\dfrac{3.0 \\times 10^8}{1.0 \\times 10^8}$.'
       ],
-      resultFormula: '\\lambda = 3.0 \\text{ metres}'
+      resultFormula: '\\lambda = 3.0 \\text{ m}'
     },
     practiceProblems: [
       {
@@ -1057,7 +1056,7 @@ The topics in these notes follow the Department for Education documents below.
         answer: "About 0.036 m, or 3.6 cm"
       },
     ],
-    realWorldConnection: 'Deep Space Network antennas must be precisely sized and shaped based on the wavelengths of the radio signals used to communicate with probes like Voyager.',
+    realWorldConnection: "NASA's Deep Space Network keeps in touch with distant spacecraft, such as Voyager 1, using radio dishes up to 70 metres across in California, Spain and Australia. Radio waves need nothing to travel through, so the signals cross billions of kilometres of empty space.",
     textbookContent: `
 ## Describing a wave
 
@@ -1082,26 +1081,22 @@ $$v = f\\lambda$$
 
 It rearranges to $\\lambda = \\dfrac{v}{f}$ and $f = \\dfrac{v}{\\lambda}$.
 
-The speed is set by what the wave is travelling through. So for waves in the same material, a higher frequency always means a shorter wavelength.
+The speed is set by what the wave is travelling through. For sound in air, and for radio waves and light in space, the speed is the same whatever the frequency, so a higher frequency means a shorter wavelength.
 
 ### Transverse and longitudinal waves
 
 *   In a **transverse** wave the vibrations are at right angles to the direction the wave travels. Ripples on water are transverse, and so are light and radio waves.
 *   In a **longitudinal** wave the vibrations are along the direction the wave travels. Sound in air is longitudinal: the air is squashed together and stretched apart as the wave passes.
 
-### Worked example
-
-A radio station broadcasts at 100 MHz. Radio waves travel at $3.0 \\times 10^8$ m/s. What is the wavelength?
-
-1.  Write the frequency in hertz: $100 \\text{ MHz} = 1.0 \\times 10^8 \\text{ Hz}$.
-2.  Use $\\lambda = \\dfrac{v}{f} = \\dfrac{3.0 \\times 10^8}{1.0 \\times 10^8}$.
-3.  $\\lambda = 3.0$ m.
-
 ### Waves and spacecraft
 
 Radio waves and light are electromagnetic waves. They need nothing to travel through, which is why a spacecraft can send signals across empty space. Sound cannot make that journey, because it needs particles to pass the vibration along.
 
 Every radio wave travels at the same speed in space, so the frequency a spacecraft uses fixes the wavelength of its signal, and the wavelength decides how its antenna has to be built.
+
+### Next on the journey
+
+A radio wave can carry a message home, but how is the message written? Spacecraft send everything as a long string of 1s and 0s. That is the next lesson.
 
 ### Sources
 
