@@ -181,4 +181,71 @@ const STATISTICS: Entry[] = [
   },
 ];
 
-export const ENTRIES: Entry[] = [...PRISM, ...STATISTICS];
+const faradayEmf = (N: number, dPhi: number, dt: number) => -N * (dPhi / dt);
+
+const ELECTROMAGNETISM: Entry[] = [
+  {
+    lesson: 'electromagnetism', where: 'solvedExample.steps[0]', expectQuestionIncludes: 'The flux through a 50-turn coil rises from $0.02$ Wb to $0.10$ Wb in $0.4$ s',
+    stated: '= 0.08', compute: () => 0.10 - 0.02, expected: 0.08, tolerance: 1e-9, unit: 'Wb',
+  },
+  {
+    lesson: 'electromagnetism', where: 'solvedExample.steps[1]', expectQuestionIncludes: 'The flux through a 50-turn coil rises from $0.02$ Wb to $0.10$ Wb in $0.4$ s',
+    stated: '= 0.2', compute: () => 0.08 / 0.4, expected: 0.2, tolerance: 1e-9, unit: 'Wb/s',
+  },
+  {
+    lesson: 'electromagnetism', where: 'solvedExample.steps[3] (size)', expectQuestionIncludes: 'The flux through a 50-turn coil rises from $0.02$ Wb to $0.10$ Wb in $0.4$ s',
+    stated: 'Its size is 10 V', compute: () => Math.abs(faradayEmf(50, 0.10 - 0.02, 0.4)), expected: 10, tolerance: 1e-9, unit: 'V',
+  },
+  {
+    lesson: 'electromagnetism', where: 'solvedExample.resultFormula', expectQuestionIncludes: 'The flux through a 50-turn coil rises from $0.02$ Wb to $0.10$ Wb in $0.4$ s',
+    note: 'The number reader drops the minus sign; the sign is checked by the claim below.',
+    compute: () => Math.abs(faradayEmf(50, 0.10 - 0.02, 0.4)), expected: 10, tolerance: 1e-9, unit: 'V',
+  },
+  {
+    lesson: 'electromagnetism', where: 'solvedExample.resultFormula (sign)', kind: 'claim', expectQuestionIncludes: 'rises from $0.02$ Wb to $0.10$ Wb',
+    claimIncludes: '= -10', verify: () => ({ holds: faradayEmf(50, 0.08, 0.4) < 0, detail: `−N ΔΦ/Δt = ${faradayEmf(50, 0.08, 0.4)} V for a rising flux` }),
+  },
+  {
+    lesson: 'electromagnetism', where: 'practiceProblems[0]', expectQuestionIncludes: 'The number of turns on a coil is doubled',
+    compute: () => faradayEmf(2, 1, 1) / faradayEmf(1, 1, 1), expected: 2, tolerance: 1e-9, unit: '× emf',
+  },
+  {
+    lesson: 'electromagnetism', where: 'practiceProblems[1]', kind: 'qualitative', expectQuestionIncludes: 'A magnet rests next to a coil, and neither moves',
+    expectAnswerIncludes: 'No. The flux through the coil is not changing.',
+    verify: () => ({ holds: Math.abs(faradayEmf(100, 0, 1)) === 0, detail: 'ΔΦ = 0 gives emf = 0' }),
+  },
+  {
+    lesson: 'electromagnetism', where: 'practiceProblems[2]', expectQuestionIncludes: 'A magnetic field of 0.2 T passes straight through a loop of area 0.05 m²',
+    compute: () => 0.2 * 0.05, expected: 0.01, tolerance: 1e-9, unit: 'Wb',
+  },
+  {
+    lesson: 'electromagnetism', where: 'practiceProblems[3]', expectQuestionIncludes: 'The flux through a 200-turn coil falls from 0.5 Wb to 0.1 Wb in 0.2 s',
+    compute: () => Math.abs(faradayEmf(200, 0.1 - 0.5, 0.2)), expected: 400, tolerance: 1e-9, unit: 'V',
+  },
+  {
+    lesson: 'electromagnetism', where: 'practiceProblems[4]', expectQuestionIncludes: 'A 100-turn coil of area 0.02 m² sits in a field that rises from 0 to 0.3 T in 0.1 s',
+    compute: () => Math.abs(faradayEmf(100, 0.02 * (0.3 - 0), 0.1)), expected: 6, tolerance: 1e-9, unit: 'V',
+  },
+  {
+    lesson: 'electromagnetism', where: 'practiceProblems[4] (flux change)', expectQuestionIncludes: 'A 100-turn coil of area 0.02 m² sits in a field that rises from 0 to 0.3 T in 0.1 s',
+    stated: '$100 \\times 0.006 \\div 0.1$', pick: 1, compute: () => 0.02 * 0.3, expected: 0.006, tolerance: 1e-12, unit: 'Wb',
+  },
+  {
+    lesson: 'electromagnetism', where: 'practiceProblems[5]', kind: 'qualitative', expectQuestionIncludes: 'The north pole of a magnet is pushed into a coil',
+    expectAnswerIncludes: 'A north pole, which repels the magnet',
+  },
+  {
+    lesson: 'electromagnetism', where: 'textbookContent: tether emf', expectNotesIncludes: 'In 1996 the Space Shuttle unreeled a conducting cable about 20 km long',
+    kind: 'claim', claimIncludes: 'an emf of about 3,500 volts',
+    note: 'Measured on STS-75 (TSS-1R), February 1996.',
+    verify: () => {
+      // emf = B v L for a conductor moving across a field. Orbital speed about 7.7 km/s, about 20 km of cable,
+      // and the part of Earth's field across the motion at that height about 2 to 3 × 10^-5 T.
+      const lo = 2e-5 * 7.7e3 * 2.0e4;
+      const hi = 3e-5 * 7.7e3 * 2.0e4;
+      return { holds: lo <= 3500 && 3500 <= hi, detail: `B v L gives ${Math.round(lo)} to ${Math.round(hi)} V` };
+    },
+  },
+];
+
+export const ENTRIES: Entry[] = [...PRISM, ...STATISTICS, ...ELECTROMAGNETISM];

@@ -4459,7 +4459,7 @@ The topics in these notes follow the Department for Education documents below.
     accentColor: 'cyan',
     difficulty: 3,
     estimatedMinutes: 20,
-    formula: '\\mathcal{E} = -N \\frac{d\\Phi_B}{dt}',
+    formula: '\\mathcal{E} = -N \\frac{\\Delta \\Phi}{\\Delta t}',
     formulaLayout: [
       { type: 'variable', symbol: '\\mathcal{E}' },
       { type: 'operator', content: '=' },
@@ -4467,65 +4467,79 @@ The topics in these notes follow the Department for Education documents below.
       { type: 'variable', symbol: 'N' },
       {
         type: 'fraction',
-        numerator: [{ type: 'static', latex: 'd\\Phi_B' }],
-        denominator: [{ type: 'static', latex: 'dt' }]
+        numerator: [
+          { type: 'static', latex: '\\Delta' },
+          { type: 'variable', symbol: '\\Phi' }
+        ],
+        denominator: [
+          { type: 'static', latex: '\\Delta' },
+          { type: 'variable', symbol: 't' }
+        ]
       }
     ],
     variables: [
       {
         symbol: '\\mathcal{E}',
-        name: 'Electromotive Force (EMF)',
-        unit: 'Volts (V)',
-        description: 'The voltage induced in a coil by a changing magnetic flux. The driving force behind electric generators and transformers.',
+        name: 'Induced emf',
+        unit: 'volts (V)',
+        description: 'The voltage produced across the coil. Its full name is electromotive force, but it is a voltage, not a force.',
         color: 'text-cyan-400'
       },
       {
         symbol: 'N',
-        name: 'Number of Turns',
-        unit: 'Count',
-        description: 'The number of loops in the coil. More turns amplify the induced EMF proportionally.',
+        name: 'Number of turns',
+        unit: 'no unit (a count)',
+        description: 'How many loops of wire the coil has. Twice as many turns gives twice the emf.',
         color: 'text-teal-400',
         range: { min: 1, max: 100, default: 10 }
       },
       {
-        symbol: '\\Phi_B',
-        name: 'Magnetic Flux',
-        unit: 'Webers (Wb)',
-        description: 'The total magnetic field passing through a surface: Φ_B = B·A·cos(θ).',
+        symbol: '\\Phi',
+        name: 'Magnetic flux',
+        unit: 'webers (Wb)',
+        description: 'How much magnetic field passes through the coil. For a field $B$ at right angles to an area $A$, $\\Phi = BA$.',
         color: 'text-sky-400'
+      },
+      {
+        symbol: 't',
+        name: 'Time',
+        unit: 'seconds (s)',
+        description: '$\\Delta t$ is the time the change in flux takes.',
+        color: 'text-blue-400'
       }
     ],
     conceptSteps: [
       {
         stepNumber: 1,
-        title: 'Magnetic Fields',
-        content: 'Moving electric charges create magnetic fields. A current-carrying wire produces a circular magnetic field around it. Bar magnets create dipole fields running from south to north pole internally, and north to south externally.',
-        keyInsight: 'Electricity and magnetism are two faces of the same underlying force.',
-        relatedVariables: ['\\Phi_B']
+        title: 'A changing field makes a voltage',
+        content: 'Move a magnet into or out of a coil, turn a coil in a magnetic field, or change the current in a nearby electromagnet, and a voltage appears across the coil. This is **electromagnetic induction**. Connect the coil into a complete circuit and that voltage pushes a current round it.',
+        keyInsight: 'Only change counts. A magnet resting still beside a coil induces no voltage at all.',
+        relatedVariables: ['\\mathcal{E}', '\\Phi']
       },
       {
         stepNumber: 2,
-        title: "Faraday's Law of Induction",
-        content: "A changing magnetic flux through a coil induces an electromotive force (voltage). The faster the flux changes, the greater the induced EMF. This is the operating principle of every electric generator on Earth — from bicycle dynamos to nuclear power stations.",
-        keyInsight: 'Change is key: a static field induces nothing; a changing field induces voltage.',
-        relatedVariables: ['\\mathcal{E}', '\\Phi_B', 'N']
+        title: 'Faster change, bigger emf',
+        content: '**Magnetic flux**, $\\Phi$, measures how much field passes through the coil. For a coil of $N$ turns, $N\\Phi$ is called the **flux linkage**. Faraday\'s law says the induced emf equals the rate of change of flux linkage: $N$ times the change in flux, divided by the time it takes.',
+        keyInsight: 'More turns, a stronger field or a quicker change all give a larger emf.',
+        relatedVariables: ['\\mathcal{E}', 'N', '\\Phi', 't']
       },
       {
         stepNumber: 3,
-        title: "Lenz's Law and the Negative Sign",
-        content: "The negative sign in Faraday's law reflects Lenz's Law: the induced current flows in a direction that opposes the change in flux that created it. This is an expression of energy conservation — you must do work against the opposing force to move the magnet.",
-        keyInsight: 'Induced currents always resist the change that caused them.',
+        title: 'The minus sign is Lenz\'s law',
+        content: 'The induced current always flows in the direction that opposes the change causing it. So when you push a magnet into a coil that is part of a circuit, the coil pushes back, and you have to do work. That work is where the electrical energy comes from.',
+        keyInsight: 'Lenz\'s law is the conservation of energy: you never get electrical energy for nothing.',
         relatedVariables: ['\\mathcal{E}']
       }
     ],
     solvedExample: {
-      problem: 'A coil with $N = 200$ turns experiences a change in magnetic flux from $\\Phi_B = 0.5$ Wb to $0.1$ Wb in $\\Delta t = 0.2$ s. Find the induced EMF.',
+      problem: 'The flux through a 50-turn coil rises from $0.02$ Wb to $0.10$ Wb in $0.4$ s. Find the induced emf.',
       steps: [
-        'Rate of change: $\\frac{d\\Phi_B}{dt} = \\frac{0.1 - 0.5}{0.2} = \\frac{-0.4}{0.2} = -2$ Wb/s.',
-        "Apply Faraday's Law: $\\mathcal{E} = -N \\frac{d\\Phi_B}{dt}$.",
-        'Substitute: $\\mathcal{E} = -200 \\times (-2)$.'
+        'Change in flux: $\\Delta \\Phi = 0.10 - 0.02 = 0.08$ Wb.',
+        'Rate of change of flux: $\\dfrac{\\Delta \\Phi}{\\Delta t} = \\dfrac{0.08}{0.4} = 0.2$ Wb/s.',
+        'Apply Faraday\'s law: $\\mathcal{E} = -N \\dfrac{\\Delta \\Phi}{\\Delta t} = -50 \\times 0.2$.',
+        'The minus sign says the emf acts to oppose the rise in flux (Lenz\'s law). Its size is 10 V.'
       ],
-      resultFormula: '\\mathcal{E} = 400 \\text{ V}'
+      resultFormula: '\\mathcal{E} = -10 \\text{ V}'
     },
     practiceProblems: [
       {
@@ -4559,7 +4573,7 @@ The topics in these notes follow the Department for Education documents below.
         answer: "A north pole, which repels the magnet and opposes its approach (Lenz's law)."
       },
     ],
-    realWorldConnection: "Every power station generator and every transformer on the electricity grid works by Faraday's law. So do wireless phone chargers, induction hobs and the pickups on an electric guitar.",
+    realWorldConnection: 'An electric guitar pickup is a small magnet wrapped in a coil of fine wire. A vibrating steel string changes the magnetic field through the coil, and that induces a small voltage which the amplifier turns into sound.',
     textbookContent: `
 ## Electromagnetic induction
 
@@ -4585,7 +4599,7 @@ Flux is measured in webers (Wb). For a coil of $N$ turns, the **flux linkage** i
 
 ### Faraday's law
 
-The induced emf equals the rate of change of flux linkage:
+The induced voltage is called the **emf** (short for electromotive force, although it is a voltage, measured in volts). It equals the rate of change of flux linkage:
 
 $$\\mathcal{E} = -N\\frac{\\Delta \\Phi}{\\Delta t}$$
 
@@ -4593,15 +4607,7 @@ More turns, a stronger field, or a faster change all give a larger emf.
 
 ### Lenz's law
 
-The minus sign is **Lenz's law**: the induced current flows in the direction that **opposes** the change causing it. Push the north pole of a magnet into a coil and the coil's near end becomes a north pole, pushing back. You have to do work to move the magnet, and that work becomes electrical energy. Lenz's law is the conservation of energy at work.
-
-### Worked example
-
-A 200-turn coil has the flux through it fall from 0.5 Wb to 0.1 Wb in 0.2 s.
-
-1.  Change in flux: $0.1 - 0.5 = -0.4$ Wb.
-2.  Rate of change: $-0.4 \\div 0.2 = -2$ Wb/s.
-3.  $\\mathcal{E} = -200 \\times (-2) = 400$ V.
+The minus sign is **Lenz's law**: the induced current flows in the direction that **opposes** the change causing it. Push the north pole of a magnet into a coil that is part of a circuit, and the coil's near end becomes a north pole, pushing back. You have to do work to move the magnet, and that work becomes electrical energy. Lenz's law is the conservation of energy at work.
 
 ### Where it is used
 
@@ -4610,6 +4616,10 @@ Generators in power stations turn coils in magnetic fields. Transformers change 
 ### A tether in orbit
 
 In 1996 the Space Shuttle unreeled a conducting cable about 20 km long. Moving at orbital speed through the Earth's magnetic field, the cable had an emf of about 3,500 volts induced along it, just as Faraday's law predicts for a conductor cutting through a field.
+
+### Next on the journey
+
+In light, changing electric and magnetic fields keep each other going as a wave. Yet some experiments show light arriving in tiny separate packets. How can light be a wave and a stream of packets at once? That is the next lesson.
 
 ### Sources
 

@@ -236,7 +236,8 @@ export const CURRICULUM: Record<ConceptId, CurriculumPlace> = {
     stage: "A-level physics",
     statements: [
       { source: 'gcsePhysics', where: "GCSE physics: Magnetism and electromagnetism", text: "recall that a change in the magnetic field around a conductor can give rise to an induced potential difference across its ends" },
-      { source: 'alScience', where: "A-level physics: Fields", text: "Faraday’s and Lenz’s laws; emf equals rate of change of magnetic flux linkage" },
+      { source: 'alScience', where: "A-level physics: Fields", text: "Faraday’s and Lenz’s laws" },
+      { source: 'alScience', where: "A-level physics: Fields", text: "emf equals rate of change of magnetic flux linkage" },
     ],
   },
   quantum: {
