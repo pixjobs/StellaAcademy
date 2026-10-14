@@ -77,9 +77,9 @@ export const ENTRIES: Entry[] = [
     compute: () => Math.asin(5 / 10) / DEG, expected: 30, tolerance: 1e-9, unit: '°',
   },
   {
-    lesson: 'trigonometry', where: 'practiceProblems[5]', expectQuestionIncludes: 'A star is 1.414 light-years away',
-    note: '"About 1.0": ±0.05.',
-    compute: () => 1.414 * sinD(45), expected: 0.99985, tolerance: 0.05, unit: 'light-years',
+    lesson: 'trigonometry', where: 'practiceProblems[5]', expectQuestionIncludes: 'A star is 14.14 light-years away',
+    note: '"About 10": ±0.5.',
+    compute: () => 14.14 * sinD(45), expected: 9.9985, tolerance: 0.5, unit: 'light-years',
   },
   {
     lesson: 'trigonometry', where: 'textbookContent: finding an angle, ratio', expectNotesIncludes: 'the opposite side is 3 cm and the adjacent side is 4 cm',
@@ -445,19 +445,19 @@ export const ENTRIES: Entry[] = [
 
   // ======================================================================================== diffeq
   {
-    lesson: 'diffeq', where: 'solvedExample.steps[0]', expectQuestionIncludes: 'A capsule re-enters at $v = 5000$ m/s',
+    lesson: 'diffeq', where: 'solvedExample.steps[0]', expectQuestionIncludes: 'A capsule is moving at $v = 5000$ m/s during re-entry',
     stated: '= 25{,}000{,}000', compute: () => 5000 ** 2, expected: 25e6, tolerance: 0, unit: '(m/s)²',
   },
   {
-    lesson: 'diffeq', where: 'solvedExample.steps[1]', expectQuestionIncludes: 'A capsule re-enters at $v = 5000$ m/s',
+    lesson: 'diffeq', where: 'solvedExample.steps[1]', expectQuestionIncludes: 'A capsule is moving at $v = 5000$ m/s during re-entry',
     stated: '= 50$', compute: () => K_DRAG * 5000 ** 2, expected: 50, tolerance: 1e-9, unit: 'm/s²',
   },
   {
-    lesson: 'diffeq', where: 'solvedExample.steps[2]', expectQuestionIncludes: 'A capsule re-enters at $v = 5000$ m/s',
+    lesson: 'diffeq', where: 'solvedExample.steps[2]', expectQuestionIncludes: 'A capsule is moving at $v = 5000$ m/s during re-entry',
     stated: 'losing 50 m/s of speed every second', compute: () => K_DRAG * 5000 ** 2, expected: 50, tolerance: 1e-9, unit: 'm/s²',
   },
   {
-    lesson: 'diffeq', where: 'solvedExample.resultFormula', kind: 'qualitative', expectQuestionIncludes: 'A capsule re-enters at $v = 5000$ m/s',
+    lesson: 'diffeq', where: 'solvedExample.resultFormula', kind: 'qualitative', expectQuestionIncludes: 'A capsule is moving at $v = 5000$ m/s during re-entry',
     expectAnswerIncludes: '= -50 \\text{ m/s}^2', note: 'The minus sign is checked as text; the size by the steps.',
     verify: () => ({ holds: -K_DRAG * 5000 ** 2 === -50, detail: '−k v² = −2e-6 × 5000² = −50' }),
   },
@@ -513,8 +513,12 @@ export const ENTRIES: Entry[] = [
   },
   {
     lesson: 'diffeq', where: 'textbookContent: particular solution', kind: 'claim', expectNotesIncludes: '### Particular solutions',
-    claimIncludes: 'If $y = 2$ when $x = 0$, then $A = 2$ and $y = 2e^x$',
-    verify: () => ({ holds: 2 * Math.exp(0) === 2, detail: 'A e⁰ = A, so A = 2; a different value from practice question 4' }),
+    claimIncludes: 'If $y = 2$ when $x = 0$, then $A = 2$ and $y = 2e^{3x}$',
+    verify: () => {
+      const y = (x: number) => 2 * Math.exp(3 * x);
+      const ok = y(0) === 2 && [-1, 0.5, 2].every((x) => near(numDeriv(y, x), 3 * y(x), 1e-5 * y(x)));
+      return { holds: ok, detail: 'y(0) = 2 and dy/dx = 3y at x = −1, 0.5, 2; a different equation from practice question 4' };
+    },
   },
   {
     lesson: 'diffeq', where: 'textbookContent: re-entry speed', expectNotesIncludes: 'A capsule returning from orbit hits the top of the atmosphere',

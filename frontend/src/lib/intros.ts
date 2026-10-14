@@ -23,7 +23,7 @@ export const INTROS: Partial<Record<ConceptId, LessonIntro>> = {
   },
   diffeq: {
     caption:
-      'Artemis II returning from the Moon, April 2026. Looking up from the Orion capsule as its three main parachutes open, sped up. Drag does the braking here, slowing the capsule from around 200 km/h to under 30 km/h for splashdown.',
+      'Artemis II returning from the Moon, April 2026. Looking up from the Orion capsule as its three main parachutes open, sped up. Drag does the braking here, slowing the capsule from around 200 km/h to about 30 km/h for splashdown.',
     alt: 'Three large orange and white parachutes opening above a spacecraft window, against a hazy sky.',
     credit: 'NASA',
   },

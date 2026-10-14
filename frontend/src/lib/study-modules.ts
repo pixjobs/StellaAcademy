@@ -1546,9 +1546,9 @@ The topics in these notes follow the Department for Education document below.
         answer: "30°"
       },
       {
-        question: "A star is 1.414 light-years away along your line of sight, at 45° to the plane of Earth's orbit. How far is it above that plane? ($\\sin 45° \\approx 0.707$)",
+        question: "A star is 14.14 light-years away along your line of sight, at 45° to the plane of Earth's orbit. How far is it above that plane? ($\\sin 45° \\approx 0.707$)",
         hint: "Opposite = hypotenuse × sin θ.",
-        answer: "About 1.0 light-year"
+        answer: "About 10 light-years"
       },
     ],
     realWorldConnection: 'Astronomers use trigonometry to measure the distance to nearby stars. They measure how far a star seems to shift against much more distant stars when Earth is on opposite sides of its orbit, six months apart.',
@@ -1665,7 +1665,7 @@ The topics in these notes follow the Department for Education documents below.
       {
         stepNumber: 1,
         title: "The gradient of a curve",
-        content: "A straight line has the same gradient everywhere, but a curve's gradient changes as you move along it. The gradient at a point is the gradient of the tangent there. To find it, draw a chord to a nearby point and see what its gradient gets closer to as the nearby point slides in. That value is called the limit.",
+        content: "A straight line has the same gradient everywhere, but a curve's gradient changes as you move along it. The gradient at a point is the gradient of the tangent there, the straight line that just touches the curve. To find it, draw a chord (a straight line) to a nearby point on the curve and see what its gradient gets closer to as the nearby point slides in. That value is called the limit.",
         keyInsight: "The gradient at a point is a rate of change at one instant, not an average over a stretch.",
         relatedVariables: []
       },
@@ -1679,13 +1679,13 @@ The topics in these notes follow the Department for Education documents below.
       {
         stepNumber: 3,
         title: "Velocity and acceleration",
-        content: "For an object moving along a line, velocity is the rate of change of displacement, $v = \\dfrac{ds}{dt}$, and acceleration is the rate of change of velocity, $a = \\dfrac{dv}{dt}$. Integrating takes you back the other way.",
+        content: "For an object moving along a line, velocity is the rate of change of displacement, $v = \\dfrac{ds}{dt}$, and acceleration is the rate of change of velocity, $a = \\dfrac{dv}{dt}$. Integrating takes you back the other way. To integrate a power, add one to the power and divide by the new power. For a definite integral, substitute the two limits and subtract.",
         keyInsight: "Differentiate displacement to get velocity, and velocity to get acceleration.",
         relatedVariables: ["s(t)", "v(t)", "t"]
       }
     ],
     solvedExample: {
-      problem: 'A probe\'s distance from a moon is given by $s(t) = 5t^2 + 10t$ metres. Find its velocity $v(t)$ at $t = 3$ seconds.',
+      problem: 'A probe\'s displacement from a moon is given by $s(t) = 5t^2 + 10t$ metres. Find its velocity $v(t)$ at $t = 3$ seconds.',
       steps: [
         'Velocity is how fast the displacement changes, so differentiate $s$ with respect to $t$.',
         'Differentiate one term at a time: $5t^2$ gives $10t$, and $10t$ gives $10$, so $v = 10t + 10$.',
@@ -1799,21 +1799,21 @@ The topics in these notes follow the Department for Education document below.
       {
         symbol: "|\\vec{v}|",
         name: "Speed",
-        unit: "m/s",
+        unit: "metres per second (m/s)",
         description: "The magnitude (size) of the velocity: how fast the spacecraft is moving, whatever its direction.",
         color: "text-indigo-400"
       },
       {
         symbol: "v_x",
         name: "Horizontal component",
-        unit: "m/s",
+        unit: "metres per second (m/s)",
         description: "The part of the velocity across, in the x direction.",
         color: "text-cyan-400"
       },
       {
         symbol: "v_y",
         name: "Vertical component",
-        unit: "m/s",
+        unit: "metres per second (m/s)",
         description: "The part of the velocity up, in the y direction.",
         color: "text-sky-400"
       }
@@ -1836,7 +1836,7 @@ The topics in these notes follow the Department for Education document below.
       {
         stepNumber: 3,
         title: "Adding vectors",
-        content: "To add two vectors, draw them tip to tail: the second starts where the first ends. The resultant goes from the start of the first to the end of the second. With column vectors, add the top numbers together and the bottom numbers together.",
+        content: "To add two vectors, draw them tip to tail: the second starts where the first ends. The resultant goes from the start of the first to the end of the second. With column vectors, add the top numbers together and the bottom numbers together. To subtract, subtract the matching numbers: taking away $\\mathbf{b}$ is the same as adding $-\\mathbf{b}$ (vectors are printed in bold).",
         keyInsight: "Adding vectors means following one journey and then the other.",
         relatedVariables: []
       },
@@ -1850,14 +1850,14 @@ The topics in these notes follow the Department for Education document below.
       {
         stepNumber: 5,
         title: "Magnitude and direction",
-        content: "The step across and the step up are at right angles, so they make a right-angled triangle with the vector as its hypotenuse. Pythagoras' theorem gives the magnitude, $|\\vec{v}| = \\sqrt{v_x^2 + v_y^2}$, and $\\tan\\theta = \\dfrac{v_y}{v_x}$ gives the angle $\\theta$ above the x direction.",
+        content: "The step across and the step up are at right angles, so they make a right-angled triangle with the vector as its hypotenuse. Pythagoras' theorem gives the magnitude, $|\\vec{v}| = \\sqrt{v_x^2 + v_y^2}$, and $\\tan\\theta = \\dfrac{v_y}{v_x}$ gives the angle $\\theta$ above the x direction (for a vector pointing right).",
         keyInsight: "Square the components, add them and take the square root to get the size.",
         relatedVariables: ["|\\vec{v}|", "v_x", "v_y"]
       },
       {
         stepNumber: 6,
         title: "Steering with thrusters",
-        content: "When a spacecraft fires a thruster, the engine adds a new velocity to the one the spacecraft already has. The new velocity is the sum of the two vectors.",
+        content: "When a spacecraft fires a thruster, it adds a change in velocity to the velocity it already has. Its new velocity is the sum of the two vectors.",
         keyInsight: "Firing straight ahead adds to the speed. Firing at right angles to the motion mostly turns it.",
         relatedVariables: ["|\\vec{v}|"]
       }
@@ -1955,7 +1955,7 @@ In A-level physics you also go the other way: you **resolve** a vector into two 
 
 ### Steering with thrusters
 
-When a spacecraft fires a thruster, it adds a new velocity to the one it already has. Firing straight ahead adds to its speed. Firing sideways mostly changes its direction. Mission planners add these vectors to work out which way to point the engine and for how long.
+Each thruster burn adds its own vector to the spacecraft's velocity. Firing straight ahead adds to the speed. Firing sideways mostly changes its direction. Mission planners add these vectors to work out which way to point the engine and for how long.
 
 ### Next on the journey
 
@@ -2028,7 +2028,7 @@ The topics in these notes follow the Department for Education documents below.
       {
         stepNumber: 3,
         title: "Matrices move points",
-        content: "Multiply a 2 × 2 matrix by a point's position vector and you get a new point. Doing this to every point moves the whole plane. The rotation matrix $R(\\theta)$ turns every point through the angle $\\theta$ anticlockwise about the origin.",
+        content: "Multiply a 2 × 2 matrix by a point's position vector (the vector from the origin to the point) and you get a new point. Doing this to every point moves the whole plane. The rotation matrix $R(\\theta)$ turns every point through the angle $\\theta$ anticlockwise about the origin. The first column of a matrix shows where $\\begin{pmatrix} 1 \\\\ 0 \\end{pmatrix}$ ends up and the second column shows where $\\begin{pmatrix} 0 \\\\ 1 \\end{pmatrix}$ ends up, so you can read off what a matrix does.",
         keyInsight: "A rotation turns vectors without changing their length.",
         relatedVariables: ["\\vec{v}", "R(\\theta)", "\\vec{v}'"]
       },
@@ -2129,7 +2129,7 @@ which is a reflection in the line $y = -x$. Do the same two steps the other way 
 
 ### Turning a spacecraft
 
-A spacecraft keeps track of which way it faces using matrices. A star tracker, a camera that recognises patterns of stars, measures the directions of known stars along the spacecraft's own x, y and z directions. A rotation matrix converts those directions into fixed ones. Rotations do not change lengths or angles, so the angles between the stars come out the same either way.
+A spacecraft can keep track of which way it faces with a rotation matrix (many use a closely related tool called a quaternion). A star tracker, a camera that recognises patterns of stars, measures the directions of known stars along the spacecraft's own x, y and z directions. A rotation matrix converts those directions into fixed ones. Rotations do not change lengths or angles, so the angles between the stars come out the same either way.
 
 ### Next on the journey
 
@@ -2366,7 +2366,7 @@ The topics in these notes follow the Department for Education documents below.
         symbol: "t",
         name: "Time",
         unit: "seconds (s)",
-        description: "The time since the capsule's speed was $v_0$.",
+        description: "The time since the start, when the speed was $v_0$.",
         color: "text-cyan-400"
       },
       {
@@ -2401,7 +2401,7 @@ The topics in these notes follow the Department for Education documents below.
       }
     ],
     solvedExample: {
-      problem: "A capsule re-enters at $v = 5000$ m/s, with $\\dfrac{dv}{dt} = -kv^2$ and drag constant $k = 2 \\times 10^{-6}$ per metre. How fast is it slowing down at that moment?",
+      problem: "A capsule is moving at $v = 5000$ m/s during re-entry, with $\\dfrac{dv}{dt} = -kv^2$ and drag constant $k = 2 \\times 10^{-6}$ per metre. How fast is it slowing down at that moment?",
       steps: [
         "Square the speed: $5000^2 = 25{,}000{,}000$.",
         "Multiply by the drag constant: $(2 \\times 10^{-6}) \\times 25{,}000{,}000 = 50$.",
@@ -2459,15 +2459,15 @@ Many models start from a sentence about a rate:
 
 ### Separating the variables
 
-A **first-order** equation where the right-hand side is a function of $x$ times a function of $y$ can be solved by **separating the variables**: get all the $y$ terms on one side and all the $x$ terms on the other, then integrate both sides.
+A **first-order** equation (one with only $\\dfrac{dy}{dx}$ in it) where the right-hand side is a function of $x$ times a function of $y$ can be solved by **separating the variables**: get all the $y$ terms on one side and all the $x$ terms on the other, then integrate both sides.
 
-$$\\frac{dy}{dx} = y \\quad \\Rightarrow \\quad \\int \\frac{1}{y}\\,dy = \\int 1\\,dx \\quad \\Rightarrow \\quad \\ln|y| = x + c$$
+$$\\frac{dy}{dx} = 3y \\quad \\Rightarrow \\quad \\int \\frac{1}{y}\\,dy = \\int 3\\,dx \\quad \\Rightarrow \\quad \\ln|y| = 3x + c$$
 
-So $y = Ae^x$. This **general solution** has an unknown constant.
+So $y = Ae^{3x}$. This **general solution** has an unknown constant.
 
 ### Particular solutions
 
-A **particular solution** uses a known value, such as the starting value, to find the constant. If $y = 2$ when $x = 0$, then $A = 2$ and $y = 2e^x$.
+A **particular solution** uses a known value, such as the starting value, to find the constant. If $y = 2$ when $x = 0$, then $A = 2$ and $y = 2e^{3x}$.
 
 ### Worked example: drag on a capsule
 
@@ -2486,7 +2486,7 @@ A capsule returning from orbit hits the top of the atmosphere at nearly 8 km/s. 
 
 ### Next on the journey
 
-Once a spacecraft is on its way, everything on board, from its computers to its radio, runs on electricity. How are voltage, current and resistance linked? That is the next mission, starting with electric circuits.
+Once a spacecraft is on its way, much of what is on board, from its computers to its radio, runs on electricity. How are voltage, current and resistance linked? That is the next mission, starting with electric circuits.
 
 ### Sources
 
@@ -3240,7 +3240,7 @@ The topics in these notes follow the Department for Education document below.
         stepNumber: 2,
         title: 'Arc length',
         content: 'An arc is part of the edge of a circle. With the angle at the centre in radians, the arc length is the radius times the angle: $s = r\\theta$.',
-        keyInsight: 'This only works with the angle in radians. In degrees you need the fraction of 360 instead.',
+        keyInsight: 'This only works with the angle in radians. In degrees, the arc is $\\dfrac{\\theta}{360}$ of the circumference $2\\pi r$.',
         relatedVariables: ['s', 'r', '\\theta']
       },
       {
@@ -3324,7 +3324,7 @@ These formulas only work with the angle in radians.
 
 ### Why radians are used
 
-In radians, an angle is a ratio of two lengths, arc over radius, so it is a pure number. Because of this, later results such as $\\sin\\theta \\approx \\theta$ for small angles, and the derivative of $\\sin x$ being $\\cos x$, only work in radians.
+In radians, an angle is a ratio of two lengths, arc over radius, so it is a pure number. Because one radian is defined by an arc as long as the radius, later results such as $\\sin\\theta \\approx \\theta$ for small angles, and the derivative of $\\sin x$ being $\\cos x$, only work in radians.
 
 ### Satellites going round
 
