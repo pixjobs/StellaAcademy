@@ -1,4 +1,4 @@
-import type { Entry } from '../answers';
+import type { Entry, NumericEntry } from '../answers';
 
 /**
  * Answer checks for the "toolkit" mission's lessons (see MISSIONS in src/lib/missions.ts).
@@ -482,7 +482,7 @@ const lcm = (x: number, y: number) => (x * y) / gcd(x, y);
 /** One fraction-valued entry: `read` turns the numbers of `stated` into the value to compare. */
 const fv = (
   lesson: string, where: string, fragment: string, stated: string, read: (n: number[]) => number, value: number,
-): Entry => ({
+): NumericEntry => ({
   lesson, where,
   ...(where.startsWith('textbookContent') ? { expectNotesIncludes: fragment } : { expectQuestionIncludes: fragment }),
   stated, combine: read, compute: () => value, expected: value, tolerance: 1e-9, unit: '',
@@ -542,7 +542,7 @@ const DP_SOLVED = 'A £40 shirt is on sale with 25% off.';
 /** A plain numeric entry. */
 const nv = (
   lesson: string, where: string, fragment: string, stated: string, pick: number, value: number, unit = '', tolerance = 1e-9,
-): Entry => ({
+): NumericEntry => ({
   lesson, where,
   ...(where.startsWith('textbookContent') || where.startsWith('conceptSteps') ? { expectNotesIncludes: fragment, expectQuestionIncludes: fragment } : { expectQuestionIncludes: fragment }),
   stated, pick, compute: () => value, expected: value, tolerance, unit,
@@ -714,7 +714,75 @@ const BASIC_GEOMETRY: Entry[] = [
   nv(BG, 'textbookContent: 5 m square', 'A square with sides of 5 m has an area of', '$5 \\times 5 = 25$ m²', 2, 5 * 5, 'm²'),
 ];
 
+const ER = 'exponents-roots';
+const ER_SOLVED = 'Write $2^3 \\times 2^4$ as a single power of 2';
+const SPEED_OF_LIGHT = 299792458; // m/s, exact by definition of the metre
+const claim = (where: string, fragment: string, claimIncludes: string, holds: boolean, detail: string): Entry => ({
+  lesson: ER, where, kind: 'claim',
+  ...(where.startsWith('textbookContent') ? { expectNotesIncludes: fragment } : { expectQuestionIncludes: fragment }),
+  claimIncludes, verify: () => ({ holds, detail }),
+});
+const powersOf = (b: number, k: number) => Array.from({ length: k }, (_, i) => b ** (i + 1));
+const sameList = (x: number[], y: number[]) => x.length === y.length && x.every((v, i) => v === y[i]);
+
+const EXPONENTS_ROOTS: Entry[] = [
+  // Concept steps
+  nv(ER, 'conceptSteps[0] (2^4)', 'In $a^n$, the base $a$ appears $n$ times', '$2^4 = 2 \\times 2 \\times 2 \\times 2 = 16$', 5, 2 ** 4),
+  claim('conceptSteps[1] (square root of 9)', 'A root undoes a power.', 'The square root of 9 is 3, because $3^2 = 9$.', Math.sqrt(9) === 3 && 3 ** 2 === 9, '3 × 3 = 9'),
+  claim('conceptSteps[1] (cube root of 8)', 'A root undoes a power.', 'The cube root of 8 is 2, because $2^3 = 8$.', Math.cbrt(8) === 2 && 2 ** 3 === 8, '2 × 2 × 2 = 8'),
+  claim('conceptSteps[1] (root 2)', 'A root undoes a power.', 'A decimal such as 1.41 for $\\sqrt{2}$ is only close', Math.abs(Math.SQRT2 - 1.41) < 0.005 && 1.41 ** 2 !== 2, `√2 = ${Math.SQRT2.toFixed(5)}, 1.41² = ${(1.41 ** 2).toFixed(4)}`),
+  nv(ER, 'conceptSteps[2] (3000)', 'So 3000 is $3 \\times 10^3$.', 'So 3000 is $3 \\times 10^3$.', 1, 3000),
+  // Worked example
+  claim('solvedExample.steps[0]', ER_SOLVED, '$2^3 \\times 2^4 = 2^{3+4} = 2^7$', 2 ** 3 * 2 ** 4 === 2 ** 7, '2³ × 2⁴ = 8 × 16 = 128 = 2⁷'),
+  nv(ER, 'solvedExample.steps[1]', ER_SOLVED, '$2^7 = 128$', 1, 2 ** 7),
+  nv(ER, 'solvedExample.steps[2] (2^3)', ER_SOLVED, '$2^3 = 8$', 1, 2 ** 3),
+  nv(ER, 'solvedExample.steps[2] (2^4)', ER_SOLVED, '$2^4 = 16$', 1, 2 ** 4),
+  nv(ER, 'solvedExample.steps[2] (8 × 16)', ER_SOLVED, '$8 \\times 16 = 128$', 2, 8 * 16),
+  nv(ER, 'solvedExample.resultFormula', ER_SOLVED, '= 128', 0, 2 ** 3 * 2 ** 4),
+  // Practice
+  nv(ER, 'practiceProblems[0]', 'What is $3^2$?', '9', 0, 3 ** 2),
+  nv(ER, 'practiceProblems[1]', 'What is $2^5$?', '32', 0, 2 ** 5),
+  nv(ER, 'practiceProblems[2]', 'What is $\\sqrt{144}$?', '12', 0, Math.sqrt(144)),
+  nv(ER, 'practiceProblems[3]', 'What is the cube root of 64?', '4, because 4 × 4 × 4 = 64', 0, Math.cbrt(64)),
+  nv(ER, 'practiceProblems[3] (check)', 'What is the cube root of 64?', '4, because 4 × 4 × 4 = 64', 4, 4 ** 3),
+  { ...nv(ER, 'practiceProblems[4]', 'The Sun is about 150,000,000 km from Earth.', '$1.5 \\times 10^8$ km', 0, 150000000, 'km'), relTolerance: 1e-9 },
+  { ...nv(ER, 'practiceProblems[5]', 'Write 0.0031 in standard form.', '$3.1 \\times 10^{-3}$', 0, 0.0031), relTolerance: 1e-9 },
+  {
+    lesson: ER, where: 'practiceProblems[6]', kind: 'qualitative', expectQuestionIncludes: 'Which is larger: $4.2 \\times 10^5$ or $9.8 \\times 10^4$?',
+    expectAnswerIncludes: '$4.2 \\times 10^5$, which is 420,000',
+    verify: () => ({ holds: 4.2e5 > 9.8e4, detail: '420,000 > 98,000' }),
+  },
+  nv(ER, 'practiceProblems[6] (420,000)', 'Which is larger: $4.2 \\times 10^5$ or $9.8 \\times 10^4$?', 'which is 420,000', 0, 4.2e5),
+  nv(ER, 'practiceProblems[6] (98,000)', 'Which is larger: $4.2 \\times 10^5$ or $9.8 \\times 10^4$?', 'The other is 98,000.', 0, 9.8e4),
+  // Notes
+  nv(ER, 'textbookContent: 3^4', 'In $3^4$, the 3 is the **base**', '$3^4 = 3 \\times 3 \\times 3 \\times 3 = 81$', 5, 3 ** 4),
+  ...(
+    [
+      [2, '| 2 | 2, 4, 8, 16, 32, 64 |', 6],
+      [3, '| 3 | 3, 9, 27, 81 |', 4],
+      [4, '| 4 | 4, 16, 64 |', 3],
+      [5, '| 5 | 5, 25, 125 |', 3],
+    ] as const
+  ).map(([b, row, k]) => {
+    const listed = row.split('|')[2].split(',').map((t) => Number(t.trim()));
+    return claim(`textbookContent: powers of ${b}`, 'It helps to recognise the first few powers', row, sameList(listed, powersOf(b, k)), `${b}¹ to ${b}^${k}: ${powersOf(b, k).join(', ')}`);
+  }),
+  claim('textbookContent: square root of 49', 'A root undoes a power.', '$\\sqrt{49} = 7$', Math.sqrt(49) === 7, '7 × 7 = 49'),
+  claim('textbookContent: cube root of 27', 'A root undoes a power.', '$\\sqrt[3]{27} = 3$', Math.cbrt(27) === 3, '3 × 3 × 3 = 27'),
+  { ...nv(ER, 'textbookContent: root 2', 'Most roots do not come out as whole numbers.', '$\\sqrt{2}$ is 1.41421...', 1, Math.SQRT2), tolerance: 1e-5 },
+  claim('textbookContent: multiplying rule', '| Multiplying: add the indices |', '$3^2 \\times 3^3 = 3^5$', 3 ** 2 * 3 ** 3 === 3 ** 5, '9 × 27 = 243 = 3⁵'),
+  claim('textbookContent: dividing rule', '| Dividing: subtract the indices |', '$\\dfrac{5^6}{5^2} = 5^4$', 5 ** 6 / 5 ** 2 === 5 ** 4, '15,625 ÷ 25 = 625 = 5⁴'),
+  claim('textbookContent: power of a power', '| Power of a power: multiply the indices |', '$(3^2)^3 = 3^6$', (3 ** 2) ** 3 === 3 ** 6, '9³ = 729 = 3⁶'),
+  claim('textbookContent: power of zero', '| Power of zero (when $a$ is not 0) |', '$7^0 = 1$', 7 ** 0 === 1, '7⁰ = 1'),
+  { ...nv(ER, 'textbookContent: negative index', '| Negative index |', '$10^{-3} = \\dfrac{1}{1000}$', 0, 1 / 1000), relTolerance: 1e-9 },
+  { ...fv(ER, 'textbookContent: negative index (fraction)', '| Negative index |', '$10^{-3} = \\dfrac{1}{1000}$', frac(1), 10 ** -3), tolerance: 1e-12 },
+  { ...nv(ER, 'textbookContent: 93,000,000', 'A large number has a positive power of ten', '$93{,}000{,}000 = 9.3 \\times 10^7$', 0, 9.3e7), pick: [0, 1], relTolerance: 1e-9 },
+  { ...nv(ER, 'textbookContent: 0.00056', 'A number smaller than 1 has a negative power of ten', '$0.00056 = 5.6 \\times 10^{-4}$', 0, 5.6e-4), pick: [0, 1], relTolerance: 1e-9 },
+  claim('textbookContent: comparing', 'To compare two numbers in standard form', '$2 \\times 10^8$ is larger than $9 \\times 10^7$', 2e8 > 9e7, '200,000,000 > 90,000,000'),
+  { ...nv(ER, 'textbookContent: speed of light', 'Scientists use standard form for numbers like these.', 'Light travels about $3 \\times 10^8$ metres every second.', 0, SPEED_OF_LIGHT, 'm/s'), relTolerance: 0.01 },
+];
+
 export const ENTRIES: Entry[] = [
   ...ARITHMETIC, ...NEGATIVE_NUMBERS, ...MULTIPLICATION, ...FRACTIONS, ...FRACTION_OPS, ...DECIMALS_PERCENTAGES,
-  ...PROPORTIONS, ...BASIC_GEOMETRY,
+  ...PROPORTIONS, ...BASIC_GEOMETRY, ...EXPONENTS_ROOTS,
 ];

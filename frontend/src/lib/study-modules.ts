@@ -3785,37 +3785,38 @@ The topics in these notes follow the Department for Education document below.
       { type: 'static', latex: '\\cdots' }
     ],
     variables: [
-      { symbol: 'a', name: 'Base', unit: 'Real Number', description: 'The number being multiplied by itself.', color: 'text-cyan-400' },
-      { symbol: 'n', name: 'Exponent / Power', unit: 'Integer', description: 'How many times the base is multiplied by itself.', color: 'text-sky-400' }
+      { symbol: 'a', name: 'Base', unit: 'no unit', description: 'The number that is multiplied by itself.', color: 'text-cyan-400' },
+      { symbol: 'n', name: 'Index (power)', unit: 'no unit', description: 'How many times the base appears in the multiplication. In $2^4$ it is 4.', color: 'text-sky-400' }
     ],
     conceptSteps: [
       {
         stepNumber: 1,
-        title: 'What Is a Power?',
-        content: '$a^n$ means the base $a$ is multiplied by itself $n$ times. For example, $2^4 = 2 \\times 2 \\times 2 \\times 2 = 16$.',
-        keyInsight: 'Exponentiation is repeated multiplication, just as multiplication is repeated addition.',
+        title: 'Powers',
+        content: 'A power is shorthand for multiplying a number by itself. In $a^n$, the base $a$ appears $n$ times: $2^4 = 2 \\times 2 \\times 2 \\times 2 = 16$. The small raised number is called the index.',
+        keyInsight: 'To multiply two powers of the same base, add the indices.',
         relatedVariables: ['a', 'n']
       },
       {
         stepNumber: 2,
-        title: 'Key Exponent Laws',
-        content: '$a^m \\times a^n = a^{m+n}$ (same base, add exponents). $(a^m)^n = a^{mn}$ (power of a power). $a^0 = 1$ for any $a \\ne 0$.',
-        keyInsight: 'The laws of exponents let you simplify complex expressions without computing huge numbers.',
-        relatedVariables: ['n']
+        title: 'Roots',
+        content: 'A root undoes a power. The square root of 9 is 3, because $3^2 = 9$. The cube root of 8 is 2, because $2^3 = 8$.',
+        keyInsight: 'Most roots are not whole numbers. A decimal such as 1.41 for $\\sqrt{2}$ is only close to the exact value.',
+        relatedVariables: []
       },
       {
         stepNumber: 3,
-        title: 'Square & Cube Roots',
-        content: 'The square root $\\sqrt{a}$ is the inverse of squaring: $\\sqrt{9} = 3$ because $3^2 = 9$. Roots are fractional exponents: $\\sqrt{a} = a^{1/2}$.',
-        keyInsight: '$\\sqrt{a} = a^{1/2}$ — roots are just fractional exponents.',
-        relatedVariables: []
+        title: 'Standard form',
+        content: 'Very big and very small numbers are written as a number from 1 up to (but not including) 10, times a power of ten. So 3000 is $3 \\times 10^3$.',
+        keyInsight: 'Big numbers have a positive power of ten. Numbers smaller than 1 have a negative one.',
+        relatedVariables: ['n']
       }
     ],
     solvedExample: {
-      problem: 'Simplify $2^3 \\times 2^4$.',
+      problem: 'Write $2^3 \\times 2^4$ as a single power of 2, then work it out.',
       steps: [
-        'Same base ($2$), so add the exponents: $2^3 \\times 2^4 = 2^{3+4}$.',
-        'Compute: $2^7 = 128$.'
+        'Both powers have the same base, 2, so add the indices: $2^3 \\times 2^4 = 2^{3+4} = 2^7$.',
+        'Work it out: $2^7 = 128$.',
+        'Check the long way: $2^3 = 8$ and $2^4 = 16$, and $8 \\times 16 = 128$.'
       ],
       resultFormula: '2^3 \\times 2^4 = 2^7 = 128'
     },
@@ -3856,7 +3857,7 @@ The topics in these notes follow the Department for Education document below.
         answer: "$4.2 \\times 10^5$, which is 420,000. The other is 98,000."
       },
     ],
-    realWorldConnection: 'Standard form uses powers of 10 to write huge numbers compactly — the distance to the Sun is $1.5 \\times 10^{11}$ metres.',
+    realWorldConnection: 'Calculators and spreadsheets show very large and very small answers in standard form. A spreadsheet may show $1.5 \\times 10^{11}$ as 1.5E+11, where E+11 means "times $10^{11}$".',
     textbookContent: `
 ## Powers and roots
 
@@ -3866,7 +3867,7 @@ A power is a short way to write repeated multiplication:
 
 $$a^n = \\underbrace{a \\times a \\times \\cdots \\times a}_{n \\text{ times}}$$
 
-In $2^5$, the 2 is the **base** and the 5 is the **index** (also called the power or exponent). So $2^5 = 2 \\times 2 \\times 2 \\times 2 \\times 2 = 32$.
+In $3^4$, the 3 is the **base** and the 4 is the **index** (also called the power or exponent). So $3^4 = 3 \\times 3 \\times 3 \\times 3 = 81$.
 
 A number to the power 2 is **squared**. A number to the power 3 is **cubed**.
 
@@ -3892,10 +3893,10 @@ Most roots do not come out as whole numbers. $\\sqrt{2}$ is 1.41421... and its d
 
 | Rule | In symbols | Example |
 |---|---|---|
-| Multiplying: add the indices | $a^m \\times a^n = a^{m+n}$ | $2^3 \\times 2^4 = 2^7$ |
+| Multiplying: add the indices | $a^m \\times a^n = a^{m+n}$ | $3^2 \\times 3^3 = 3^5$ |
 | Dividing: subtract the indices | $\\dfrac{a^m}{a^n} = a^{m-n}$ | $\\dfrac{5^6}{5^2} = 5^4$ |
 | Power of a power: multiply the indices | $(a^m)^n = a^{mn}$ | $(3^2)^3 = 3^6$ |
-| Power of zero | $a^0 = 1$ | $7^0 = 1$ |
+| Power of zero (when $a$ is not 0) | $a^0 = 1$ | $7^0 = 1$ |
 | Negative index | $a^{-n} = \\dfrac{1}{a^n}$ | $10^{-3} = \\dfrac{1}{1000}$ |
 
 ### Standard form
@@ -3911,7 +3912,11 @@ where $A$ is at least 1 and less than 10, and $n$ is a whole number.
 
 To compare two numbers in standard form, look at the power of ten first. $2 \\times 10^8$ is larger than $9 \\times 10^7$, even though 9 is larger than 2.
 
-Scientists use standard form all the time. The distance from Earth to the Sun is about $1.5 \\times 10^{11}$ metres.
+Scientists use standard form for numbers like these. Light travels about $3 \\times 10^8$ metres every second.
+
+### Next on the journey
+
+That completes your toolkit. Scientists often swap powers of ten for short words: 1000 metres is 1 kilometre, and $10^{-3}$ amperes is 1 milliampere. Mission 2, "Get to orbit", starts with converting units like these.
 
 ### Sources
 
