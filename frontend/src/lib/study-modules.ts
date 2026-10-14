@@ -790,22 +790,22 @@ The topics in these notes follow the Department for Education documents below.
       {
         symbol: 'I',
         name: 'Current',
-        unit: 'Amperes (A)',
-        description: 'The rate of flow of electrical charge. Think of it as the amount of water flowing through a pipe.',
+        unit: 'amperes (A)',
+        description: 'The rate at which electric charge flows round the circuit.',
         color: 'text-emerald-400'
       },
       {
         symbol: 'V',
-        name: 'Voltage',
-        unit: 'Volts (V)',
-        description: 'The electrical potential difference that pushes electrons through a circuit. Think of it as water pressure.',
+        name: 'Potential difference',
+        unit: 'volts (V)',
+        description: 'Often called voltage. It is what drives the charge round the circuit.',
         color: 'text-teal-400'
       },
       {
         symbol: 'R',
         name: 'Resistance',
-        unit: 'Ohms (Ω)',
-        description: 'A material\'s opposition to the flow of electric current. Think of it as the narrowness of the pipe.',
+        unit: 'ohms (Ω)',
+        description: 'How hard it is for the current to flow through a component.',
         color: 'text-lime-400',
         range: { min: 10, max: 1000, default: 100 }
       }
@@ -813,34 +813,34 @@ The topics in these notes follow the Department for Education documents below.
     conceptSteps: [
       {
         stepNumber: 1,
-        title: 'The Driving Force',
-        content: 'Voltage is the push that causes electrons to move. A battery provides this potential difference across a closed circuit.',
-        keyInsight: 'Without voltage, there is no current.',
-        relatedVariables: ['V']
+        title: 'Potential difference drives the current',
+        content: 'A battery provides a potential difference. It drives charge round the circuit, but only if the circuit is a complete loop with no gaps. Around a single loop, the current is the same everywhere.',
+        keyInsight: 'No potential difference, or a gap in the circuit, means no current.',
+        relatedVariables: ['V', 'I']
       },
       {
         stepNumber: 2,
-        title: 'Resistance Limits Flow',
-        content: 'Every component and wire has some resistance. Resistors are used specifically to limit current to safe levels for sensitive components like LEDs.',
-        keyInsight: 'Higher resistance means less current flows for a given voltage.',
+        title: 'Resistance limits the current',
+        content: 'Every component and wire has some resistance. With the same potential difference across it, a component with more resistance lets less current through. Resistors are often added to a circuit to keep the current low enough for a delicate component such as an LED.',
+        keyInsight: 'More resistance means less current for the same potential difference.',
         relatedVariables: ['R', 'I']
       },
       {
         stepNumber: 3,
-        title: 'Ohm\'s Law',
-        content: 'Current is directly proportional to voltage and inversely proportional to resistance. This fundamental relationship governs all basic electrical circuits.',
-        keyInsight: 'I = V / R',
+        title: 'How the three are linked',
+        content: 'The three are linked by $V = IR$, which rearranges to $I = \\dfrac{V}{R}$ and $R = \\dfrac{V}{I}$. For a fixed resistor at a steady temperature the resistance stays the same, so doubling the potential difference doubles the current. For some components, such as a filament lamp, the resistance changes as the current changes.',
+        keyInsight: 'Resistance is the ratio of potential difference to current: $R = V \\div I$.',
         relatedVariables: ['I', 'V', 'R']
       }
     ],
     solvedExample: {
-      problem: 'Determine current ($I$) in a $12$V loop with a $150 \\Omega$ resistor.',
+      problem: 'A $150$ Ω resistor is connected to a $12$ V battery. Find the current through it.',
       steps: [
-        'Apply Ohm\'s Law: $I = \\frac{V}{R}$.',
-        'Substitute values: $I = \\frac{12}{150}$.',
-        'Calculate the result in Amperes.'
+        'Use $I = \\dfrac{V}{R}$.',
+        'Substitute: $I = \\dfrac{12}{150}$.',
+        'Work it out: $I = 0.08$ A. A milliampere (mA) is a thousandth of an ampere, so this is $80$ mA.'
       ],
-      resultFormula: 'I = 0.08 \\text{ A (80 mA)}'
+      resultFormula: 'I = 0.08 \\text{ A, or } 80 \\text{ mA}'
     },
     practiceProblems: [
       {
@@ -874,7 +874,7 @@ The topics in these notes follow the Department for Education documents below.
         answer: "The total resistance goes down, so the current from the battery goes up."
       },
     ],
-    realWorldConnection: 'Spacecraft engineers use these calculations to ensure solar panels and batteries safely power onboard computers without burning them out.',
+    realWorldConnection: 'A spacecraft runs on electricity from its solar panels and batteries. Engineers use these relationships to work out the current each part will draw, and to choose wires and fuses that can carry it.',
     textbookContent: `
 ## Current, potential difference and resistance
 
@@ -935,7 +935,11 @@ The power a component transfers is:
 
 $$P = VI = I^2 R$$
 
-A spacecraft's heaters are resistors chosen to turn a known amount of electrical power into heat.
+Power is measured in watts (W). A spacecraft's heaters are resistors chosen to transfer a known amount of electrical power to heating.
+
+### Next on the journey
+
+The spacecraft now has power. But how does it send word home across millions of kilometres of space? It sends waves, the subject of the next lesson.
 
 ### Sources
 
