@@ -343,18 +343,18 @@ const MULTIPLICATION: Entry[] = [
     stated: 'An answer of $3{,}085$', compute: () => (1234 * 25) / 10, expected: 3085, tolerance: 0, unit: '',
   },
   {
-    lesson: 'multiplication', where: 'textbookContent: ISS orbits, 365 × 10', expectNotesIncludes: 'goes round the Earth about 16 times a day',
+    lesson: 'multiplication', where: 'textbookContent: ISS orbits, 365 × 10', expectNotesIncludes: 'goes round the Earth nearly 16 times a day',
     stated: '$365 \\times 16 = (365 \\times 10) + (365 \\times 6) = 3{,}650 + 2{,}190 = 5{,}840$', pick: 6, compute: () => 365 * 10, expected: 3650, tolerance: 0, unit: 'orbits',
   },
   {
-    lesson: 'multiplication', where: 'textbookContent: ISS orbits, 365 × 6', expectNotesIncludes: 'goes round the Earth about 16 times a day',
+    lesson: 'multiplication', where: 'textbookContent: ISS orbits, 365 × 6', expectNotesIncludes: 'goes round the Earth nearly 16 times a day',
     stated: '$365 \\times 16 = (365 \\times 10) + (365 \\times 6) = 3{,}650 + 2{,}190 = 5{,}840$', pick: 7, compute: () => 365 * 6, expected: 2190, tolerance: 0, unit: 'orbits',
   },
   {
-    lesson: 'multiplication', where: 'textbookContent: ISS orbits in a year', expectNotesIncludes: 'goes round the Earth about 16 times a day',
+    lesson: 'multiplication', where: 'textbookContent: ISS orbits in a year', expectNotesIncludes: 'goes round the Earth nearly 16 times a day',
     stated: '$365 \\times 16 = (365 \\times 10) + (365 \\times 6) = 3{,}650 + 2{,}190 = 5{,}840$', pick: 8,
     compute: () => 365 * ISS_ORBITS_PER_DAY_LESSON, expected: 5840, tolerance: 0, unit: 'orbits',
-    note: 'With the true figure of about 15.5 orbits a day the year has about 5,660; the lesson says "about 16" and "roughly".',
+    note: 'With the true figure of about 15.5 orbits a day the year has about 5,660; the lesson says "nearly 16" and "a little under".',
   },
 ];
 
@@ -373,16 +373,28 @@ const FRACTIONS: Entry[] = [
     stated: '$P = \\dfrac{7500}{10\\,000}$', combine: frac(0), compute: () => 7500 / 10000, expected: 0.75, tolerance: 1e-9, unit: '',
   },
   {
-    lesson: 'fractions', where: 'solvedExample.steps[2] (top)', expectQuestionIncludes: 'total mass of $10\\,000$ kg, and $7500$ kg of it is fuel',
-    stated: '$7500 \\div 2500 = 3$', pick: 2, compute: () => 7500 / 2500, expected: 3, tolerance: 0, unit: '',
+    lesson: 'fractions', where: 'solvedExample.steps[2] (top ÷ 100)', expectQuestionIncludes: 'total mass of $10\\,000$ kg, and $7500$ kg of it is fuel',
+    stated: '$7500 \\div 100 = 75$', pick: 2, compute: () => 7500 / 100, expected: 75, tolerance: 0, unit: '',
   },
   {
-    lesson: 'fractions', where: 'solvedExample.steps[2] (bottom)', expectQuestionIncludes: 'total mass of $10\\,000$ kg, and $7500$ kg of it is fuel',
-    stated: '$10\\,000 \\div 2500 = 4$', pick: 2, compute: () => 10000 / 2500, expected: 4, tolerance: 0, unit: '',
+    lesson: 'fractions', where: 'solvedExample.steps[2] (bottom ÷ 100)', expectQuestionIncludes: 'total mass of $10\\,000$ kg, and $7500$ kg of it is fuel',
+    stated: '$10\\,000 \\div 100 = 100$', pick: 2, compute: () => 10000 / 100, expected: 100, tolerance: 0, unit: '',
   },
   {
-    lesson: 'fractions', where: 'solvedExample.steps[2] (2500 is the biggest common factor)', expectQuestionIncludes: 'total mass of $10\\,000$ kg, and $7500$ kg of it is fuel',
-    stated: 'dividing the top and the bottom by 2500', compute: () => gcd(7500, 10000), expected: 2500, tolerance: 0, unit: '',
+    lesson: 'fractions', where: 'solvedExample.steps[2] (75/100)', expectQuestionIncludes: 'total mass of $10\\,000$ kg, and $7500$ kg of it is fuel',
+    stated: 'which gives $\\dfrac{75}{100}$', combine: frac(0), compute: () => 7500 / 10000, expected: 0.75, tolerance: 1e-9, unit: '',
+  },
+  {
+    lesson: 'fractions', where: 'solvedExample.steps[2] (top ÷ 25)', expectQuestionIncludes: 'total mass of $10\\,000$ kg, and $7500$ kg of it is fuel',
+    stated: '$75 \\div 25 = 3$', pick: 2, compute: () => 75 / 25, expected: 3, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'fractions', where: 'solvedExample.steps[2] (bottom ÷ 25)', expectQuestionIncludes: 'total mass of $10\\,000$ kg, and $7500$ kg of it is fuel',
+    stated: '$100 \\div 25 = 4$', pick: 2, compute: () => 100 / 25, expected: 4, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'fractions', where: 'solvedExample.steps[2] (100 × 25 is the biggest common factor)', expectQuestionIncludes: 'total mass of $10\\,000$ kg, and $7500$ kg of it is fuel',
+    stated: 'divide both by 25', compute: () => gcd(7500, 10000) / 100, expected: 25, tolerance: 0, unit: '',
   },
   {
     lesson: 'fractions', where: 'solvedExample.resultFormula', expectQuestionIncludes: 'total mass of $10\\,000$ kg, and $7500$ kg of it is fuel',
@@ -399,8 +411,8 @@ const FRACTIONS: Entry[] = [
   },
   {
     lesson: 'fractions', where: 'practiceProblems[0] (rule)', kind: 'claim', expectQuestionIncludes: 'Write two fractions that are equivalent to 2/3.',
-    claimIncludes: 'the bottom is 1½ times the top',
-    verify: () => ({ holds: 3 / 2 === 1.5, detail: 'in 2/3 the bottom is 3 ÷ 2 = 1.5 times the top, and scaling keeps that' }),
+    claimIncludes: 'multiply the top and bottom of 2/3 by the same number',
+    verify: () => ({ holds: (2 * 2) / (3 * 2) === 2 / 3 && (2 * 3) / (3 * 3) === 2 / 3, detail: '4/6 is 2/3 times 2/2 and 6/9 is 2/3 times 3/3' }),
   },
   {
     lesson: 'fractions', where: 'practiceProblems[1]', expectQuestionIncludes: 'Write 3/10 as a number of hundredths.',
@@ -621,7 +633,7 @@ const PROPORTIONS: Entry[] = [
   // Worked example
   nv(PR, 'solvedExample.steps[1]', PR_SOLVED, '$150 \\div 15 = 10$ miles', 2, 150 / 15, 'miles per litre'),
   nv(PR, 'solvedExample.steps[2]', PR_SOLVED, '$10 \\times 24 = 240$ miles', 2, (150 / 15) * 24, 'miles'),
-  nv(PR, 'solvedExample.resultFormula', PR_SOLVED, 'x = 240', 0, (150 * 24) / 15, 'miles'),
+  nv(PR, 'solvedExample.resultFormula', PR_SOLVED, '\\text{Distance} = 240', 0, (150 * 24) / 15, 'miles'),
   // Practice
   fv(PR, 'practiceProblems[0]', 'Write the ratio 12 : 18 in its simplest form.', '2 : 3', frac(0), 12 / 18),
   {
@@ -709,6 +721,10 @@ const BASIC_GEOMETRY: Entry[] = [
     nv(BG, `textbookContent: ${l} by ${w}, area`, row, row, 2, l * w, 'cm²'),
     nv(BG, `textbookContent: ${l} by ${w}, perimeter`, row, row, 3, rectP(l, w), 'cm'),
   ]),
+  nv(BG, 'textbookContent: same perimeter, 3 by 3', 'A 3 cm by 3 cm square and a 1 cm by 5 cm rectangle', 'both have a perimeter of 12 cm', 0, rectP(3, 3), 'cm'),
+  nv(BG, 'textbookContent: same perimeter, 1 by 5', 'A 3 cm by 3 cm square and a 1 cm by 5 cm rectangle', 'both have a perimeter of 12 cm', 0, rectP(1, 5), 'cm'),
+  nv(BG, 'textbookContent: same perimeter, 3 by 3 area', 'A 3 cm by 3 cm square and a 1 cm by 5 cm rectangle', 'their areas are 9 cm² and 5 cm²', 0, 3 * 3, 'cm²'),
+  nv(BG, 'textbookContent: same perimeter, 1 by 5 area', 'A 3 cm by 3 cm square and a 1 cm by 5 cm rectangle', 'their areas are 9 cm² and 5 cm²', 1, 1 * 5, 'cm²'),
   nv(BG, 'textbookContent: solar panel', 'A panel 4 m long and 2 m wide', '$4 \\times 2 = 8$ m²', 2, 4 * 2, 'm²'),
   nv(BG, 'textbookContent: ten panels', 'A panel 4 m long and 2 m wide', 'so ten of them cover 80 m²', 0, 10 * 4 * 2, 'm²'),
   nv(BG, 'textbookContent: 5 m square', 'A square with sides of 5 m has an area of', '$5 \\times 5 = 25$ m²', 2, 5 * 5, 'm²'),

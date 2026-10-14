@@ -1169,7 +1169,7 @@ The topics in these notes follow the Department for Education documents below.
       {
         stepNumber: 2,
         title: 'Equivalent fractions',
-        content: 'If you multiply or divide the top and the bottom of a fraction by the same number, you get an equivalent fraction. It looks different, but it is the same amount.',
+        content: 'If you multiply or divide the top and the bottom of a fraction by the same number, you get an equivalent fraction. It looks different, but it is the same amount. If the only number that goes into both the top and the bottom is 1, the fraction is in its simplest form.',
         keyInsight: 'Two quarters is the same amount as one half.',
         relatedVariables: []
       },
@@ -1186,7 +1186,7 @@ The topics in these notes follow the Department for Education documents below.
       steps: [
         'The part is the fuel, $m_p = 7500$ kg. The whole is the total mass, $m_t = 10\\,000$ kg.',
         'Put the part over the whole: $P = \\dfrac{7500}{10\\,000}$.',
-        'Simplify by dividing the top and the bottom by 2500: $7500 \\div 2500 = 3$ and $10\\,000 \\div 2500 = 4$.'
+        'Simplify in two easy steps. First divide the top and the bottom by 100: $7500 \\div 100 = 75$ and $10\\,000 \\div 100 = 100$, which gives $\\dfrac{75}{100}$. Then divide both by 25: $75 \\div 25 = 3$ and $100 \\div 25 = 4$.'
       ],
       resultFormula: 'P = \\dfrac{3}{4}'
     },
@@ -1194,7 +1194,7 @@ The topics in these notes follow the Department for Education documents below.
       {
         question: "Write two fractions that are equivalent to 2/3.",
         hint: "Multiply the top and the bottom by the same number.",
-        answer: "For example 4/6 and 6/9 (any fraction where the bottom is 1½ times the top)"
+        answer: "For example 4/6 and 6/9 (multiply the top and bottom of 2/3 by the same number)"
       },
       {
         question: "Write 3/10 as a number of hundredths.",
@@ -1262,7 +1262,7 @@ To say what fraction one amount is of another, put the part over the whole and s
 
 $\\dfrac{300}{900} = \\dfrac{1}{3}$ fuel.
 
-In key stage 3 you will also write fractions bigger than 1 this way. A 15 m rocket next to a 10 m one is $\\dfrac{15}{10} = \\dfrac{3}{2}$ times as tall.
+Later you will also write fractions bigger than 1 this way. A 15 m rocket next to a 10 m one is $\\dfrac{15}{10} = \\dfrac{3}{2}$ times as tall.
 
 ### A fraction of an amount
 
@@ -1277,7 +1277,7 @@ A large rocket on the launch pad is mostly fuel. Here "fuel" means everything it
 
 ### Next on the journey
 
-You know what one fraction means. What happens when you put two together? What is $\\dfrac{1}{3} + \\dfrac{1}{4}$? The next lesson shows how to add, subtract, multiply and divide fractions.
+You know what one fraction means. What happens when you put two together? What is $\\dfrac{1}{3} + \\dfrac{1}{4}$? The next lesson shows how to add, subtract and multiply fractions, and divide them by whole numbers.
 
 ### Sources
 
@@ -2575,8 +2575,8 @@ The topics in these notes follow the Department for Education document below.
       },
       {
         stepNumber: 3,
-        title: 'Same rank, left to right',
-        content: 'Division and multiplication have the same rank, so do them in the order you read them, from left to right. Addition and subtraction come last. They share a rank too, so they are also done from left to right.',
+        title: 'Left to right',
+        content: 'Division and multiplication are equally important, so do them in the order you read them, from left to right. Addition and subtraction come last. They are equally important too, so they are also done from left to right.',
         keyInsight: 'The D before the M in BIDMAS does not mean "divide first". Do whichever comes first, reading from left to right.',
         relatedVariables: ['D', 'M', 'A', 'S']
       }
@@ -2642,7 +2642,7 @@ Some schools say BODMAS. The O stands for "orders", which is another word for in
 
 ### Multiply and divide in the order you read them
 
-Division and multiplication have the same rank. When both appear, work from **left to right**:
+Neither division nor multiplication goes first. When both appear, work from **left to right**:
 
 $16 \\div 4 \\times 2 = 4 \\times 2 = 8$
 
@@ -2650,7 +2650,7 @@ It is not $16 \\div 8 = 2$. The D coming before the M in BIDMAS does not mean "d
 
 ### Add and subtract in the order you read them
 
-Addition and subtraction also share a rank, so they are worked from left to right too:
+Addition and subtraction are also equally important, so they are worked from left to right too:
 
 $10 - 4 + 3 = 6 + 3 = 9$
 
@@ -2742,7 +2742,7 @@ The topics in these notes follow the Department for Education document below.
         stepNumber: 1,
         title: 'Perimeter',
         content: 'The perimeter is how far it is all the way round the edge of a flat shape. Add up the lengths of all the sides. A rectangle has two lengths and two widths, so $P = 2l + 2w$.',
-        keyInsight: 'A perimeter is a distance, like a piece of string laid round the edge.',
+        keyInsight: 'A perimeter is a distance, like a piece of string laid round the edge. For an L shape, the two sides of a cut-out corner add up to the same as the corner, so the perimeter is the same as the full rectangle\'s.',
         relatedVariables: ['P', 'l', 'w']
       },
       {
@@ -2802,7 +2802,7 @@ The topics in these notes follow the Department for Education document below.
         answer: "5 panels (each is 6 m²)"
       },
     ],
-    realWorldConnection: 'Builders use area to work out how much carpet or how many tiles a floor needs, and perimeter to work out how much fencing goes round a garden.',
+    realWorldConnection: 'People use area to work out how much carpet or how many tiles a floor needs, and perimeter to work out how much fencing goes round a garden.',
     textbookContent: `
 ## Area and perimeter
 
@@ -2845,7 +2845,7 @@ Shapes with the same area can have different perimeters. These rectangles all ha
 | 2 cm by 8 cm | 16 cm² | 20 cm |
 | 1 cm by 16 cm | 16 cm² | 34 cm |
 
-It works the other way too: shapes with the same perimeter can have different areas.
+It works the other way too: shapes with the same perimeter can have different areas. A 3 cm by 3 cm square and a 1 cm by 5 cm rectangle both have a perimeter of 12 cm, but their areas are 9 cm² and 5 cm².
 
 ### Solar panels in space
 
@@ -2920,7 +2920,7 @@ The topics in these notes follow the Department for Education document below.
         stepNumber: 1,
         title: 'What a ratio is',
         content: 'A ratio compares two or more quantities. A mixture with 2 parts fuel to every 3 parts oxidiser (the substance the fuel burns with) has a fuel to oxidiser ratio of $2 : 3$.',
-        keyInsight: 'The order matters. Oxidiser to fuel is $3 : 2$.',
+        keyInsight: 'The order matters. Oxidiser to fuel is $3 : 2$. Simplify a ratio by dividing every part by the same number: $15 : 25 = 3 : 5$.',
         relatedVariables: ['a', 'b']
       },
       {
@@ -2945,7 +2945,7 @@ The topics in these notes follow the Department for Education document below.
         'Find how far one litre goes: $150 \\div 15 = 10$ miles.',
         'Multiply by the number of litres: $10 \\times 24 = 240$ miles.'
       ],
-      resultFormula: 'x = 240 \\text{ miles}'
+      resultFormula: '\\text{Distance} = 240 \\text{ miles}'
     },
     practiceProblems: [
       {
@@ -2979,7 +2979,7 @@ The topics in these notes follow the Department for Education document below.
         answer: "3,420 N"
       },
     ],
-    realWorldConnection: 'A map scale is a ratio. On a map with a scale of $1 : 25\\,000$, 1 cm on the map stands for 25 000 cm, which is 250 m, on the ground.',
+    realWorldConnection: 'A map scale is a ratio. On a map with a scale of $1 : 25{,}000$, 1 cm on the map stands for 25,000 cm, which is 250 m, on the ground.',
     textbookContent: `
 ## Ratio and proportion
 
@@ -3005,11 +3005,11 @@ $$\\frac{a}{b} = \\frac{c}{d}$$
 
 If you know three of the values, you can find the fourth. If 5 litres of paint cover 30 m², one litre covers $30 \\div 5 = 6$ m², so 8 litres cover $6 \\times 8 = 48$ m².
 
-Algebraically, $y = kx$ for some fixed number $k$. On a graph, direct proportion is a straight line through the origin.
+Written with letters, $y = kx$, where $k$ is a fixed number. On a graph it is a straight line through the origin, the point $(0, 0)$ where the axes cross.
 
 ### Inverse proportion
 
-Two quantities are in **inverse proportion** when doubling one halves the other. Their product stays the same:
+Two quantities are in **inverse proportion** when doubling one halves the other. Their product (the two numbers multiplied together) stays the same:
 
 $$xy = k \\quad \\text{or} \\quad y = \\frac{k}{x}$$
 
@@ -3017,7 +3017,7 @@ At 50 km/h a journey takes 6 hours; at 100 km/h it takes 3 hours. Speed × time 
 
 ### Weight on other worlds
 
-Your weight on Mars is directly proportional to your weight on Earth: it is about $0.38$ times as much, because Mars pulls more weakly. An astronaut who weighs 800 N on Earth weighs $0.38 \\times 800 = 304$ N on Mars. Their mass is the same on both planets.
+Your weight on Mars is directly proportional to your weight on Earth: it is about $0.38$ times as much, because Mars pulls more weakly. An astronaut who weighs 800 N on Earth weighs $0.38 \\times 800 = 304$ N on Mars. Weight is a force, measured in newtons (N). Mass, the amount of stuff in you, stays the same on both planets.
 
 ### Next on the journey
 
@@ -3068,7 +3068,7 @@ The topics in these notes follow the Department for Education document below.
         stepNumber: 1,
         title: 'Three ways to write one amount',
         content: 'Per cent means "out of 100". A fraction, a decimal and a percentage can all describe the same amount: one half is $\\dfrac{1}{2}$, 0.5 and 50%.',
-        keyInsight: 'To turn a fraction into a decimal, divide the top by the bottom: $\\dfrac{3}{4}$ is $3 \\div 4 = 0.75$.',
+        keyInsight: 'To turn a fraction into a decimal, divide the top by the bottom: $\\dfrac{3}{4}$ is $3 \\div 4 = 0.75$. To compare amounts, write them all the same way, for example all as percentages.',
         relatedVariables: ['X']
       },
       {
@@ -3081,7 +3081,7 @@ The topics in these notes follow the Department for Education document below.
       {
         stepNumber: 3,
         title: 'A percentage of an amount',
-        content: 'Build the percentage up from easy ones: 10% is a tenth, 50% is a half and 25% is a quarter. Or change the percentage into a decimal and multiply: 20% of 50 is $0.2 \\times 50 = 10$.',
+        content: 'Build the percentage up from easy ones: 10% is a tenth, 50% is a half and 25% is a quarter. 5% is half of 10%. Or change the percentage into a decimal and multiply: 20% of 50 is $0.2 \\times 50 = 10$.',
         keyInsight: 'In maths, "of" usually means multiply.',
         relatedVariables: ['X']
       }
@@ -3127,7 +3127,7 @@ The topics in these notes follow the Department for Education document below.
         answer: "45% (9/20 = 45/100)"
       },
     ],
-    realWorldConnection: 'Shops show discounts as percentages, and banks show interest rates as percentages. In the UK, value added tax, a tax added to the price of many things you buy, is usually 20%.',
+    realWorldConnection: 'Shops show discounts as percentages. In the UK, value added tax, a tax included in the price of most things you buy, is usually 20%.',
     textbookContent: `
 ## Fractions, decimals and percentages
 
@@ -3173,7 +3173,7 @@ To compare amounts written in different ways, change them all into the same form
 
 ### Reading a fuel gauge
 
-A fuel gauge often shows how full a tank is as a percentage. A tank showing 75% is $\\dfrac{3}{4}$ full. If the full tank holds 600 litres, 75% is $600 \\div 4 \\times 3 = 450$ litres.
+Some fuel gauges show how full a tank is as a percentage. A tank showing 75% is $\\dfrac{3}{4}$ full. If the full tank holds 600 litres, 75% is $600 \\div 4 \\times 3 = 450$ litres.
 
 ### Next on the journey
 
@@ -3377,8 +3377,8 @@ The topics in these notes follow the Department for Education documents below.
       {
         stepNumber: 1,
         title: 'Split into tens and ones',
-        content: 'Split the bottom number into tens and ones. Multiply the top number by the ones, then by the tens, and add the two answers. The row for the tens starts with a 0 in the ones column, because it counts tens.',
-        keyInsight: 'Each answer on the way is a partial product. Long multiplication is just adding up the partial products.',
+        content: 'Split the bottom number into tens and ones. Multiply the top number by the ones, then by the tens. Each of these two answers is called a partial product. Add the partial products to get the answer. The row for the tens starts with a 0 in the ones column, because it counts tens.',
+        keyInsight: 'Long multiplication is just adding up the partial products.',
         relatedVariables: ['a', 'b']
       },
       {
@@ -3438,7 +3438,7 @@ The topics in these notes follow the Department for Education documents below.
         answer: "30,000 kg (5,000 + 25,000)"
       },
     ],
-    realWorldConnection: 'One way a computer can multiply is the same as long multiplication, but with binary numbers: it makes a partial product for each digit, moves it one place along, and adds them up.',
+    realWorldConnection: 'Computers can multiply in the same way: they make a partial product for each digit, shift it along one place, and add them up. They just use 0s and 1s instead of the digits 0 to 9.',
     textbookContent: `
 ## Long multiplication
 
@@ -3484,7 +3484,7 @@ Round the numbers and multiply in your head. $1{,}234$ is about $1{,}200$, and $
 
 ### Orbits in a year
 
-The International Space Station goes round the Earth about 16 times a day. In a year of 365 days that is roughly
+The International Space Station goes round the Earth nearly 16 times a day. In a year of 365 days that is a little under
 
 $365 \\times 16 = (365 \\times 10) + (365 \\times 6) = 3{,}650 + 2{,}190 = 5{,}840$ orbits.
 
@@ -3503,7 +3503,7 @@ The topics in these notes follow the Department for Education document below.
     id: 'fraction-ops',
     category: 'elementary-math',
     title: "Calculating with Fractions",
-    subtitle: "Add, subtract, multiply and divide fractions.",
+    subtitle: "Add, subtract and multiply fractions, and divide them by whole numbers.",
     icon: 'Sparkles',
     accentColor: 'violet',
     difficulty: 2,
@@ -3542,8 +3542,8 @@ The topics in these notes follow the Department for Education document below.
       {
         stepNumber: 1,
         title: 'Adding and subtracting',
-        content: 'You can only add or subtract fractions when their denominators are the same. If they are different, change both fractions into equivalent fractions with a common multiple of the denominators. Then add or subtract the tops and keep the bottom.',
-        keyInsight: 'Multiplying the two denominators, $b \\times d$, always gives a common multiple. That is where the formula comes from.',
+        content: 'You can only add or subtract fractions when their denominators are the same. If they are different, change both fractions into equivalent fractions with the same bottom number. Use a number both denominators divide into (a common multiple). Then add or subtract the tops and keep the bottom. A mixed number such as $2\\tfrac{1}{4}$ is a whole number and a fraction. When you add mixed numbers, add the whole numbers first and then the fractions.',
+        keyInsight: 'Here $ad$ means $a \\times d$. Multiplying the two bottoms, $b \\times d$, always gives a common multiple, so the formula always works.',
         relatedVariables: ['a', 'b', 'c', 'd']
       },
       {
@@ -3602,7 +3602,7 @@ The topics in these notes follow the Department for Education document below.
         answer: "1/6 (2/12 simplified)"
       },
     ],
-    realWorldConnection: 'Recipes use fractions. To make twice as much of a recipe that needs $\\dfrac{3}{4}$ of a litre of water, you need $2 \\times \\dfrac{3}{4} = 1\\tfrac{1}{2}$ litres.',
+    realWorldConnection: 'If a recipe needs $\\dfrac{3}{4}$ of a litre of water and you make half as much, you need $\\dfrac{1}{2} \\times \\dfrac{3}{4} = \\dfrac{3}{8}$ of a litre.',
     textbookContent: `
 ## Calculating with fractions
 
@@ -3626,7 +3626,7 @@ A **mixed number** has a whole number and a fraction, such as $1\\tfrac{1}{2}$. 
 
 $1\\tfrac{1}{2} + 2\\tfrac{1}{3} = 3 + \\dfrac{3}{6} + \\dfrac{2}{6} = 3\\tfrac{5}{6}$
 
-For subtraction it is often easier to turn each mixed number into an **improper fraction** first, where the top is bigger than the bottom:
+For subtraction it is often easier to turn each mixed number into an **improper fraction** first, where the top is the same as or bigger than the bottom:
 
 $3\\tfrac{1}{4} - 1\\tfrac{1}{2} = \\dfrac{13}{4} - \\dfrac{6}{4} = \\dfrac{7}{4} = 1\\tfrac{3}{4}$
 
@@ -3678,7 +3678,7 @@ The topics in these notes follow the Department for Education document below.
     accentColor: 'rose',
     difficulty: 1,
     estimatedMinutes: 10,
-    formula: '-(-a) = a, \\quad (-a)(-b) = ab',
+    formula: '-(-a) = a',
     formulaLayout: [
       { type: 'static', latex: '-(' },
       { type: 'variable', symbol: '-a' },
@@ -3700,14 +3700,14 @@ The topics in these notes follow the Department for Education document below.
       {
         stepNumber: 2,
         title: 'Adding and subtracting negatives',
-        content: 'A negative number turns the move around. Adding $-2$ moves you 2 to the left, just like subtracting 2. Subtracting $-2$ moves you 2 to the right, just like adding 2.',
+        content: 'A negative number turns the move around. Adding $-2$ moves you 2 to the left, just like subtracting 2. Subtracting $-2$ moves you 2 to the right, just like adding 2. To find the difference between a temperature below 0 and one above it, count up to 0 and then on from 0.',
         keyInsight: 'Taking away a negative number makes the answer bigger.',
         relatedVariables: ['a']
       },
       {
         stepNumber: 3,
         title: 'Multiplying and dividing',
-        content: 'First find the size of the answer, ignoring the signs. Then choose the sign. If the two numbers have the same sign, the answer is positive. If their signs are different, the answer is negative.',
+        content: 'First find the size of the answer, ignoring the signs. Then choose the sign. If the two numbers have the same sign, the answer is positive. If their signs are different, the answer is negative. This works for decimals too.',
         keyInsight: 'A negative times a negative gives a positive. The same is true when you divide.',
         relatedVariables: ['a']
       }
@@ -3748,11 +3748,11 @@ The topics in these notes follow the Department for Education document below.
       },
       {
         question: "The Moon's surface reaches about 120 °C in sunlight and falls to about −130 °C at night. What is the difference?",
-        hint: "Find the interval across 0: from −130 up to 0, then from 0 up to 120.",
+        hint: "Count up from −130 to 0, then from 0 up to 120, and add the two steps.",
         answer: "250 °C"
       },
     ],
-    realWorldConnection: 'Negative numbers are used for temperatures below 0 °C, for depths below sea level and for money that is owed.',
+    realWorldConnection: 'Weather forecasts give winter temperatures such as −3 °C, and a bank statement shows money owed as a negative number.',
     textbookContent: `
 ## Negative numbers
 
@@ -3831,7 +3831,7 @@ The topics in these notes follow the Department for Education document below.
         stepNumber: 1,
         title: 'Powers',
         content: 'A power is shorthand for multiplying a number by itself. In $a^n$, the base $a$ appears $n$ times: $2^4 = 2 \\times 2 \\times 2 \\times 2 = 16$. The small raised number is called the index.',
-        keyInsight: 'To multiply two powers of the same base, add the indices.',
+        keyInsight: 'To multiply two powers of the same base, add the indices (the small raised numbers).',
         relatedVariables: ['a', 'n']
       },
       {
@@ -3844,7 +3844,7 @@ The topics in these notes follow the Department for Education document below.
       {
         stepNumber: 3,
         title: 'Standard form',
-        content: 'Very big and very small numbers are written as a number from 1 up to (but not including) 10, times a power of ten. So 3000 is $3 \\times 10^3$.',
+        content: 'Very big and very small numbers are written as a number from 1 up to (but not including) 10, times a power of ten. So 3000 is $3 \\times 10^3$. And 0.004 is $4 \\times 10^{-3}$: the 4 is 3 places after the decimal point.',
         keyInsight: 'Big numbers have a positive power of ten. Numbers smaller than 1 have a negative one.',
         relatedVariables: ['n']
       }
@@ -3933,7 +3933,7 @@ Most roots do not come out as whole numbers. $\\sqrt{2}$ is 1.41421... and its d
 |---|---|---|
 | Multiplying: add the indices | $a^m \\times a^n = a^{m+n}$ | $3^2 \\times 3^3 = 3^5$ |
 | Dividing: subtract the indices | $\\dfrac{a^m}{a^n} = a^{m-n}$ | $\\dfrac{5^6}{5^2} = 5^4$ |
-| Power of a power: multiply the indices | $(a^m)^n = a^{mn}$ | $(3^2)^3 = 3^6$ |
+| Power of a power: multiply the indices | $(a^m)^n = a^{m \\times n}$ | $(3^2)^3 = 3^6$ |
 | Power of zero (when $a$ is not 0) | $a^0 = 1$ | $7^0 = 1$ |
 | Negative index | $a^{-n} = \\dfrac{1}{a^n}$ | $10^{-3} = \\dfrac{1}{1000}$ |
 
@@ -3943,7 +3943,7 @@ Very large and very small numbers are written in **standard form** (also called 
 
 $$A \\times 10^n$$
 
-where $A$ is at least 1 and less than 10, and $n$ is a whole number.
+where $A$ is at least 1 and less than 10, and $n$ is a whole number, which can be positive, negative or zero.
 
 *   A large number has a positive power of ten: $93{,}000{,}000 = 9.3 \\times 10^7$.
 *   A number smaller than 1 has a negative power of ten: $0.00056 = 5.6 \\times 10^{-4}$.
@@ -3954,7 +3954,7 @@ Scientists use standard form for numbers like these. Light travels about $3 \\ti
 
 ### Next on the journey
 
-That completes your toolkit. Scientists often swap powers of ten for short words: 1000 metres is 1 kilometre, and $10^{-3}$ amperes is 1 milliampere. Mission 2, "Get to orbit", starts with converting units like these.
+That completes your toolkit. Scientists often swap powers of ten for short words: 1000 metres is 1 kilometre, and $10^{-3}$ metres is 1 millimetre. Mission 2, "Get to orbit", starts with converting units like these.
 
 ### Sources
 
