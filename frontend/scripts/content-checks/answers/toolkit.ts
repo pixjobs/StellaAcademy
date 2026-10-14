@@ -242,4 +242,120 @@ const NEGATIVE_NUMBERS: Entry[] = [
   },
 ];
 
-export const ENTRIES: Entry[] = [...ARITHMETIC, ...NEGATIVE_NUMBERS];
+const ISS_ORBITS_PER_DAY_LESSON = 16; // the lesson's round figure; the true value is about 15.5 (period about 93 min)
+
+const MULTIPLICATION: Entry[] = [
+  // Worked example: 24 × 13
+  {
+    lesson: 'multiplication', where: 'solvedExample.steps[0]', expectQuestionIncludes: 'Work out $24 \\times 13$',
+    stated: '$13 = 10 + 3$', combine: (n) => n[1] + n[2], compute: () => 13, expected: 13, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'multiplication', where: 'solvedExample.steps[1]', expectQuestionIncludes: 'Work out $24 \\times 13$',
+    stated: '$24 \\times 3 = 72$', pick: 2, compute: () => 24 * 3, expected: 72, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'multiplication', where: 'solvedExample.steps[2]', expectQuestionIncludes: 'Work out $24 \\times 13$',
+    stated: '$24 \\times 10 = 240$', pick: 2, compute: () => 24 * 10, expected: 240, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'multiplication', where: 'solvedExample.steps[3]', expectQuestionIncludes: 'Work out $24 \\times 13$',
+    stated: '$72 + 240 = 312$', pick: 2, compute: () => 72 + 240, expected: 312, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'multiplication', where: 'solvedExample.resultFormula', expectQuestionIncludes: 'Work out $24 \\times 13$',
+    stated: '= 312', compute: () => 24 * 13, expected: 312, tolerance: 0, unit: '',
+  },
+  // Practice: the answer and both partial products
+  ...(
+    [
+      [0, 'Work out 15 × 12.', 15, 12, null, null],
+      [1, 'Work out 23 × 14.', 23, 14, '(92 + 230)', [23 * 4, 23 * 10]],
+      [2, 'Work out 47 × 36.', 47, 36, '(282 + 1,410)', [47 * 6, 47 * 30]],
+      [3, 'Work out 325 × 18.', 325, 18, '(2,600 + 3,250)', [325 * 8, 325 * 10]],
+      [4, 'Work out 2,406 × 15.', 2406, 15, '(12,030 + 24,060)', [2406 * 5, 2406 * 10]],
+      [5, 'burn 1,250 kg of fuel every second', 1250, 24, '(5,000 + 25,000)', [1250 * 4, 1250 * 20]],
+    ] as const
+  ).flatMap(([i, q, x, y, parts, partials]): Entry[] => {
+    const out: Entry[] = [
+      {
+        lesson: 'multiplication', where: `practiceProblems[${i}]`, expectQuestionIncludes: q,
+        compute: () => x * y, expected: x * y, tolerance: 0, unit: '',
+      },
+    ];
+    if (parts && partials) {
+      partials.forEach((v, k) =>
+        out.push({
+          lesson: 'multiplication', where: `practiceProblems[${i}] (partial product ${k + 1})`, expectQuestionIncludes: q,
+          stated: parts, pick: k, compute: () => v, expected: v, tolerance: 0, unit: '',
+        }),
+      );
+      out.push({
+        lesson: 'multiplication', where: `practiceProblems[${i}] (partials add up)`, expectQuestionIncludes: q,
+        stated: parts, combine: (n) => n[0] + n[1], compute: () => x * y, expected: x * y, tolerance: 0, unit: '',
+      });
+    }
+    return out;
+  }),
+  // Notes
+  {
+    lesson: 'multiplication', where: 'textbookContent: 31 × 12', expectNotesIncludes: 'For $31 \\times 12$, use $12 = 10 + 2$.',
+    stated: '$31 \\times 12 = (31 \\times 10) + (31 \\times 2) = 310 + 62 = 372$', pick: 8, compute: () => 31 * 12, expected: 372, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'multiplication', where: 'textbookContent: 31 × 10', expectNotesIncludes: 'For $31 \\times 12$, use $12 = 10 + 2$.',
+    stated: '$31 \\times 12 = (31 \\times 10) + (31 \\times 2) = 310 + 62 = 372$', pick: 6, compute: () => 31 * 10, expected: 310, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'multiplication', where: 'textbookContent: 31 × 2', expectNotesIncludes: 'For $31 \\times 12$, use $12 = 10 + 2$.',
+    stated: '$31 \\times 12 = (31 \\times 10) + (31 \\times 2) = 310 + 62 = 372$', pick: 7, compute: () => 31 * 2, expected: 62, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'multiplication', where: 'textbookContent: carrying, 8 × 7', expectNotesIncludes: 'For $38 \\times 7$:',
+    stated: '$8 \\times 7 = 56$. Write 6 and carry 5.', pick: [2], compute: () => 8 * 7, expected: 56, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'multiplication', where: 'textbookContent: carrying, 3 × 7 + 5', expectNotesIncludes: 'For $38 \\times 7$:',
+    stated: '$3 \\times 7 = 21$, plus the 5 carried, is 26.', pick: 4, compute: () => 3 * 7 + 5, expected: 26, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'multiplication', where: 'textbookContent: carrying, 38 × 7', expectNotesIncludes: 'For $38 \\times 7$:',
+    stated: 'The answer is 266.', compute: () => 38 * 7, expected: 266, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'multiplication', where: 'textbookContent: 1,234 × 5', expectNotesIncludes: 'For $1{,}234 \\times 25$:',
+    stated: '$1{,}234 \\times 5 = 6{,}170$', pick: 2, compute: () => 1234 * 5, expected: 6170, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'multiplication', where: 'textbookContent: 1,234 × 20', expectNotesIncludes: 'For $1{,}234 \\times 25$:',
+    stated: '$1{,}234 \\times 20 = 24{,}680$', pick: 2, compute: () => 1234 * 20, expected: 24680, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'multiplication', where: 'textbookContent: 1,234 × 25', expectNotesIncludes: 'For $1{,}234 \\times 25$:',
+    stated: '$6{,}170 + 24{,}680 = 30{,}850$', pick: 2, compute: () => 1234 * 25, expected: 30850, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'multiplication', where: 'textbookContent: estimate', expectNotesIncludes: '$1{,}234$ is about $1{,}200$',
+    stated: '$1{,}200 \\times 25 = 30{,}000$', pick: 2, compute: () => 1200 * 25, expected: 30000, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'multiplication', where: 'textbookContent: ten times too small', expectNotesIncludes: 'An answer of $3{,}085$ would be ten times too small.',
+    stated: 'An answer of $3{,}085$', compute: () => (1234 * 25) / 10, expected: 3085, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'multiplication', where: 'textbookContent: ISS orbits, 365 × 10', expectNotesIncludes: 'goes round the Earth about 16 times a day',
+    stated: '$365 \\times 16 = (365 \\times 10) + (365 \\times 6) = 3{,}650 + 2{,}190 = 5{,}840$', pick: 6, compute: () => 365 * 10, expected: 3650, tolerance: 0, unit: 'orbits',
+  },
+  {
+    lesson: 'multiplication', where: 'textbookContent: ISS orbits, 365 × 6', expectNotesIncludes: 'goes round the Earth about 16 times a day',
+    stated: '$365 \\times 16 = (365 \\times 10) + (365 \\times 6) = 3{,}650 + 2{,}190 = 5{,}840$', pick: 7, compute: () => 365 * 6, expected: 2190, tolerance: 0, unit: 'orbits',
+  },
+  {
+    lesson: 'multiplication', where: 'textbookContent: ISS orbits in a year', expectNotesIncludes: 'goes round the Earth about 16 times a day',
+    stated: '$365 \\times 16 = (365 \\times 10) + (365 \\times 6) = 3{,}650 + 2{,}190 = 5{,}840$', pick: 8,
+    compute: () => 365 * ISS_ORBITS_PER_DAY_LESSON, expected: 5840, tolerance: 0, unit: 'orbits',
+    note: 'With the true figure of about 15.5 orbits a day the year has about 5,660; the lesson says "about 16" and "roughly".',
+  },
+];
+
+export const ENTRIES: Entry[] = [...ARITHMETIC, ...NEGATIVE_NUMBERS, ...MULTIPLICATION];

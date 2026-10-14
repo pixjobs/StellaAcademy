@@ -3316,41 +3316,49 @@ The topics in these notes follow the Department for Education documents below.
     variables: [
       {
         symbol: 'a',
-        name: 'Multiplicand',
-        unit: 'Whole Number',
-        description: 'The number being multiplied.',
+        name: 'The number being multiplied',
+        unit: 'no unit',
+        description: 'The top number in long multiplication.',
         color: 'text-amber-400'
       },
       {
         symbol: 'b',
-        name: 'Multiplier',
-        unit: 'Whole Number',
-        description: 'The number of times to add the multiplicand.',
+        name: 'How many lots of it',
+        unit: 'no unit',
+        description: 'The bottom number: how many times $a$ is added.',
         color: 'text-orange-400'
       }
     ],
     conceptSteps: [
       {
         stepNumber: 1,
-        title: 'Multiply Each Digit',
-        content: 'Start from the ones digit of the bottom number. Multiply it by each digit of the top number, right to left, carrying any tens digit.',
-        keyInsight: 'Multiplication is repeated addition — 4 × 3 means 4 added together 3 times.',
+        title: 'Split into tens and ones',
+        content: 'Split the bottom number into tens and ones. Multiply the top number by the ones, then by the tens, and add the two answers. The row for the tens starts with a 0 in the ones column, because it counts tens.',
+        keyInsight: 'Each answer on the way is a partial product. Long multiplication is just adding up the partial products.',
         relatedVariables: ['a', 'b']
       },
       {
         stepNumber: 2,
-        title: 'Shift & Add Partial Products',
-        content: 'For each digit in the bottom number, write the partial product on a new row, shifted one place to the left. Then add all partial products together.',
-        keyInsight: 'Each digit position represents a power of 10 — that is why you shift left.',
-        relatedVariables: []
+        title: 'Carrying',
+        content: 'If one digit times another gives 10 or more, keep only the ones digit in that column. Carry the tens to the next column on the left.',
+        keyInsight: 'Multiply the next column first, then add the digit you carried.',
+        relatedVariables: ['a']
+      },
+      {
+        stepNumber: 3,
+        title: 'Check with an estimate',
+        content: 'Round each number and multiply in your head. Your answer should be close to the estimate.',
+        keyInsight: 'If you forget the 0 in the tens row, that row is ten times too small and the answer comes out far too small.',
+        relatedVariables: ['a', 'b']
       }
     ],
     solvedExample: {
-      problem: 'Calculate $24 \\times 13$.',
+      problem: 'Work out $24 \\times 13$ using long multiplication.',
       steps: [
-        'Multiply $24 \\times 3 = 72$ (first partial product).',
-        'Multiply $24 \\times 10 = 240$ (second partial product, shifted left).',
-        'Add: $72 + 240 = 312$.'
+        'Split the bottom number into tens and ones: $13 = 10 + 3$.',
+        'Multiply by the ones: $24 \\times 3 = 72$. This is the first partial product.',
+        'Multiply by the tens: $24 \\times 10 = 240$. Write a 0 in the ones column first, because these are tens.',
+        'Add the partial products: $72 + 240 = 312$.'
       ],
       resultFormula: '24 \\times 13 = 312'
     },
@@ -3386,17 +3394,17 @@ The topics in these notes follow the Department for Education documents below.
         answer: "30,000 kg (5,000 + 25,000)"
       },
     ],
-    realWorldConnection: 'Computers multiply in a very similar way: a processor works through the digits of a binary number, shifting and adding partial products, just as you do in long multiplication.',
+    realWorldConnection: 'One way a computer can multiply is the same as long multiplication, but with binary numbers: it makes a partial product for each digit, moves it one place along, and adds them up.',
     textbookContent: `
 ## Long multiplication
 
-Times tables take you up to $12 \\times 12$. For bigger numbers, such as $24 \\times 13$, you split the problem into smaller multiplications you already know how to do.
+Times tables take you up to $12 \\times 12$. For bigger numbers you split the problem into smaller multiplications you already know how to do.
 
 ### Why it works
 
-Split the second number into tens and ones: $13 = 10 + 3$. Then multiply by each part and add the answers:
+Split the second number into tens and ones. For $31 \\times 12$, use $12 = 10 + 2$. Then multiply by each part and add the answers:
 
-$24 \\times 13 = (24 \\times 10) + (24 \\times 3) = 240 + 72 = 312$
+$31 \\times 12 = (31 \\times 10) + (31 \\times 2) = 310 + 62 = 372$
 
 Each answer on the way is called a **partial product**.
 
@@ -3404,17 +3412,19 @@ Each answer on the way is called a **partial product**.
 
 Write the bigger number on top and the smaller one underneath, lining up the ones.
 
-1.  Multiply the top number by the **ones** digit of the bottom number. Write the answer on the first row: $24 \\times 3 = 72$.
-2.  Multiply the top number by the **tens** digit. Because it is really tens, write a 0 in the ones column first, then the answer: $24 \\times 10 = 240$.
-3.  Add the rows: $72 + 240 = 312$.
+1.  Multiply the top number by the **ones** digit of the bottom number. Write the answer on the first row.
+2.  Multiply the top number by the **tens** digit. Because it is really tens, write a 0 in the ones column first, then the answer.
+3.  Add the rows.
+
+The worked example above shows each step for $24 \\times 13$.
 
 ### Carrying
 
-When one digit times another gives a two-digit answer, write down the ones digit and carry the tens to the next column. For $47 \\times 6$:
+When one digit times another gives a two-digit answer, write down the ones digit and carry the tens to the next column. For $38 \\times 7$:
 
-*   $7 \\times 6 = 42$. Write 2 and carry 4.
-*   $4 \\times 6 = 24$, plus the 4 carried, is 28.
-*   The answer is 282.
+*   $8 \\times 7 = 56$. Write 6 and carry 5.
+*   $3 \\times 7 = 21$, plus the 5 carried, is 26.
+*   The answer is 266.
 
 ### Bigger numbers
 
@@ -3426,13 +3436,17 @@ The method works the same way for a four-digit number times a two-digit number. 
 
 ### Check with an estimate
 
-Round the numbers and multiply in your head. $1{,}234$ is about $1{,}200$, and $1{,}200 \\times 25 = 30{,}000$. The answer $30{,}850$ is close, so it is probably right. An answer of $3{,}085$ would be wrong by a whole place value.
+Round the numbers and multiply in your head. $1{,}234$ is about $1{,}200$, and $1{,}200 \\times 25 = 30{,}000$. The answer $30{,}850$ is close, so it is probably right. An answer of $3{,}085$ would be ten times too small.
 
 ### Orbits in a year
 
-The International Space Station goes round the Earth about 16 times a day. In a year of 365 days that is
+The International Space Station goes round the Earth about 16 times a day. In a year of 365 days that is roughly
 
 $365 \\times 16 = (365 \\times 10) + (365 \\times 6) = 3{,}650 + 2{,}190 = 5{,}840$ orbits.
+
+### Next on the journey
+
+Multiplying whole numbers always gives a whole number. But what if 3 pizzas are shared between 4 people? Each person gets part of a pizza. The next lesson is about fractions, the numbers for parts of a whole.
 
 ### Sources
 
