@@ -20,6 +20,8 @@
  *      characters (so "cm²" = "cm2", "10⁻³" = "10-3"), and because PDF text extraction often sets a
  *      raised or lowered character apart, whitespace is allowed before and after a character that is a
  *      superscript or subscript in the statement.
+ *   6. Brackets: PDF text extraction sets formulas apart ("f ( x )"), so whitespace just inside a
+ *      bracket and just before an opening bracket is ignored on both sides: "f(x)" = "f ( x )".
  * Nothing else is normalised: case, punctuation, symbols (x and ×, ≤ and <=), spelling and word order
  * must match exactly.
  */
@@ -66,8 +68,13 @@ function normaliseChars(s: string): string {
 }
 
 /** The source text, normalised; line-end hyphens become LINE_HYPHEN. */
+/** Normalisation 6. */
+function tightenBrackets(s: string): string {
+  return s.replace(/\s*\(\s*/g, '(').replace(/\s*\)/g, ')');
+}
+
 function normaliseSource(raw: string): string {
-  const chars = normaliseChars(raw);
+  const chars = tightenBrackets(normaliseChars(raw));
   return chars
     .replace(/-[ \t\u00a0]*(?:\r?\n|\f)[\s\u00a0]*/g, LINE_HYPHEN)
     .replace(WHITESPACE, ' ')
@@ -83,7 +90,7 @@ function escapeRe(c: string): string {
  * matched against the normalised source text.
  */
 function statementPattern(text: string): RegExp {
-  const raw = text.replace(WHITESPACE, ' ').trim();
+  const raw = tightenBrackets(text.replace(WHITESPACE, ' ').trim());
   const isScript = [...raw].map((c) => c in SUPERS);
   const chars = [...normaliseChars(raw)];
   let re = '';

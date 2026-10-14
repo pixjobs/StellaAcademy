@@ -218,7 +218,7 @@ export const CURRICULUM: Record<ConceptId, CurriculumPlace> = {
   calculus: {
     stage: "A-level mathematics",
     statements: [
-      { source: 'alMaths', where: "A-level mathematics: Differentiation", text: "Understand and use the derivative of f ( x ) as the gradient of the tangent to the graph of y = f ( x ) at a general point (x, y);the gradient of the tangent as a limit; interpretation as a rate of change" },
+      { source: 'alMaths', where: "A-level mathematics: Differentiation", text: "Understand and use the derivative of f(x) as the gradient of the tangent to the graph of y = f(x) at a general point (x, y);the gradient of the tangent as a limit; interpretation as a rate of change" },
       { source: 'alMaths', where: "A-level mathematics: Kinematics", text: "Use calculus in kinematics for motion in a straight line" },
     ],
   },
