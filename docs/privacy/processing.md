@@ -16,7 +16,7 @@ visitor's own browser.
 | Problem reports: lesson, kind of problem, the text typed, with email addresses and phone numbers removed | Anyone who uses "Report a problem" | Cloud Logging, one entry per report | Correcting the lessons (legitimate interests); see the DPIA | 30 days |
 | IP address for rate limits on search and reports | Visitors who search the gallery or send a report | Server memory only; never written down | Preventing abuse (legitimate interests) | At most 10 minutes |
 | Gallery searches: the words typed | Visitors who search the gallery | Passed to NASA's image library API to get results. Not sent to Analytics | Providing the search the visitor asked for | Not kept by Stella |
-| Usage statistics: pages viewed, lesson events (for example "answer shown", "report sent"), device type, approximate location | Visitors | Google Analytics 4 | Learning which lessons are useful (consent for cookies) | GA4 retention setting (check: action 6) |
+| Usage statistics: pages viewed, lesson events (for example "answer shown", "report sent"), device type, approximate location | Visitors who press Accept | Google Analytics 4 (loaded only after Accept) | Learning which lessons are useful (consent) | GA4 retention setting (check: action 6) |
 | Choices kept in the browser: cookie choice, journey progress, display settings, notes | Each visitor, on their own device | The visitor's browser (localStorage). Never sent to Stella | Providing what the visitor asked for (strictly necessary under PECR) | Until the visitor clears it |
 
 ## Things loaded from other sites
@@ -29,23 +29,19 @@ visitor's own browser.
 
 ## Analytics before consent
 
-The site uses Google's Consent Mode with analytics storage **denied** until a visitor presses Accept, so no
-analytics cookies are set without consent. However, the Google tag still loads before a choice is made, and while
-consent is denied it sends Google cookieless pings (page and event, with no identifier). This is Google's "advanced"
-Consent Mode.
-
-That is common and Google presents it as compliant, but it does send data about visitors who declined, including
-children, to Google. The more cautious option is "basic" Consent Mode: do not load the Google tag at all until a
-visitor accepts. The cost is that visits from people who decline or ignore the banner are not counted, so traffic
-figures will be lower. Decision for the owner (action 4).
+Decided 14 October 2026: "basic" Consent Mode. The Google tag is not loaded until a visitor presses Accept, so
+nothing at all goes to Google from visitors who decline or do not choose. If a visitor accepts and later withdraws
+(the "Change your cookie choice" button on /privacy), consent is set to denied and the `_ga` cookies are deleted.
+Google signals and all advertising storage are off. The cost is that visits from people who decline or ignore the
+banner are not counted, so traffic figures are lower than the real number of visits.
 
 ## Children
 
 The site is designed for ages 9 and up, so the Children's Code applies. What the site does now:
 
 - No accounts, no profiling and no adverts.
-- Analytics cookies only with consent. Accept and Decline are both on the banner's first view, but Accept is the
-  brighter button; the Children's Code asks for no nudging, so the two should be made equal (README, action 9).
+- Analytics only with consent: nothing loads before Accept. Accept and Decline are on the banner's first view and
+  look the same, so neither is nudged (done 14 October 2026).
 - No geolocation or other device sensors, and no sharing with third parties beyond the processors above.
 - The report form asks for no personal details, says so in plain words, and removes emails and phone numbers.
 

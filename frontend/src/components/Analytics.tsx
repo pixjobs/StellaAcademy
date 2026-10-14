@@ -47,17 +47,32 @@ export function resetConsent() {
   } catch {
     /* storage unavailable: nothing was saved */
   }
-  window.gtag?.('consent', 'update', { analytics_storage: 'denied' });
+  applyConsent('denied');
   listeners.forEach((listener) => listener());
 }
 
 function applyConsent(value: Consent) {
   window.gtag?.('consent', 'update', { analytics_storage: value });
+  if (value === 'denied') clearAnalyticsCookies();
+}
+
+/** Delete Google Analytics' cookies (_ga, _ga_<id>) after consent is withdrawn, on this host and the parent domain. */
+function clearAnalyticsCookies() {
+  const host = window.location.hostname;
+  const domains = ['', host, host.replace(/^www\./, '.')];
+  for (const name of document.cookie.split(';').map((c) => c.split('=')[0].trim())) {
+    if (!name.startsWith('_ga')) continue;
+    for (const domain of domains) {
+      document.cookie = `${name}=; Max-Age=0; path=/${domain ? `; domain=${domain}` : ''}`;
+    }
+  }
 }
 
 /**
- * Google Analytics 4 with Consent Mode: analytics storage is denied by default
- * and only granted once the visitor accepts (UK PECR / GDPR).
+ * Google Analytics 4, loaded only after the visitor presses Accept (UK PECR /
+ * GDPR and the ICO Children's Code). Until then, and after Decline, no Google
+ * script loads and nothing is sent: lesson events go nowhere because
+ * window.gtag does not exist. Withdrawing consent later deletes the cookies.
  */
 export default function Analytics() {
   // undefined until the browser has been asked, so the banner never flashes for someone who has already chosen.
@@ -79,22 +94,27 @@ export default function Analytics() {
 
   return (
     <>
-      <Script id="ga-init" strategy="afterInteractive">
-        {`
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          window.gtag = gtag;
-          gtag('consent', 'default', {
-            analytics_storage: 'denied',
-            ad_storage: 'denied',
-            ad_user_data: 'denied',
-            ad_personalization: 'denied'
-          });
-          gtag('js', new Date());
-          gtag('config', '${GA_ID}');
-        `}
-      </Script>
-      <Script src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} strategy="afterInteractive" />
+      {choice === 'granted' && (
+        <>
+          <Script id="ga-init" strategy="afterInteractive">
+            {`
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              window.gtag = gtag;
+              gtag('consent', 'default', {
+                analytics_storage: 'granted',
+                ad_storage: 'denied',
+                ad_user_data: 'denied',
+                ad_personalization: 'denied'
+              });
+              gtag('set', 'allow_google_signals', false);
+              gtag('js', new Date());
+              gtag('config', '${GA_ID}');
+            `}
+          </Script>
+          <Script src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} strategy="afterInteractive" />
+        </>
+      )}
 
       {choice === null && (
         <div
@@ -110,18 +130,19 @@ export default function Analytics() {
                 Privacy
               </Link>
             </p>
+            {/* Decline and Accept look the same on purpose: the Children's Code asks for no nudging. */}
             <div className="flex shrink-0 gap-2">
               <button
                 type="button"
                 onClick={() => decide('denied')}
-                className="rounded-lg border border-white/15 px-4 py-1.5 text-slate-300 hover:bg-white/5"
+                className="rounded-lg border border-white/40 px-4 py-1.5 font-medium text-white hover:bg-white/10"
               >
                 Decline
               </button>
               <button
                 type="button"
                 onClick={() => decide('granted')}
-                className="rounded-lg bg-indigo-500 px-4 py-1.5 font-medium text-white hover:bg-indigo-400"
+                className="rounded-lg border border-white/40 px-4 py-1.5 font-medium text-white hover:bg-white/10"
               >
                 Accept
               </button>

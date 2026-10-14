@@ -41,8 +41,8 @@ export default function PrivacyPage() {
                 <li>Your progress, notes and settings stay on your own device. We never see them.</li>
                 <li>
                   If you press <strong>Accept</strong> on the cookie message, Google Analytics counts which pages are
-                  visited, so we can see which lessons help. If you press <strong>Decline</strong>, it sets no cookies.
-                  You can change your mind at any time.
+                  visited, so we can see which lessons help. If you press <strong>Decline</strong>, or do not choose,
+                  Google Analytics is not used at all. You can change your mind at any time.
                 </li>
                 <li>
                   If you report a problem with a lesson, please do not include your name or anything about yourself.
@@ -78,9 +78,10 @@ export default function PrivacyPage() {
                 as your town or city). We use it only to learn which lessons are useful.
               </p>
               <p>
-                Until you choose, or if you decline, Google Analytics sets no cookies but is still told that a page was
-                viewed or a lesson action happened, without any identifier, so those visits cannot be linked to you or
-                to each other. Google says Google Analytics does not store IP addresses.
+                Until you choose, or if you decline, Google Analytics is not loaded at all and nothing is sent to
+                Google. If you accept and later change your mind, its cookies are deleted. We have turned off
+                Google&rsquo;s advertising features and its &ldquo;signals&rdquo; that link activity across devices, and
+                Google says Google Analytics does not store IP addresses.
               </p>
               <p>Analytics data is kept for no more than 14 months.</p>
               <CookieChoice />
