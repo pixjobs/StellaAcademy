@@ -52,6 +52,9 @@ export function resetConsent() {
 }
 
 function applyConsent(value: Consent) {
+  // Google's switch for turning the tag off completely. Without it, a tag that loaded after Accept would keep sending
+  // cookieless pings for the rest of the visit once consent is withdrawn.
+  (window as unknown as Record<string, unknown>)[`ga-disable-${GA_ID}`] = value === 'denied';
   window.gtag?.('consent', 'update', { analytics_storage: value });
   if (value === 'denied') clearAnalyticsCookies();
 }
@@ -98,6 +101,7 @@ export default function Analytics() {
         <>
           <Script id="ga-init" strategy="afterInteractive">
             {`
+              window['ga-disable-${GA_ID}'] = false;
               window.dataLayer = window.dataLayer || [];
               function gtag(){dataLayer.push(arguments);}
               window.gtag = gtag;
