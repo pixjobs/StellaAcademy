@@ -1771,77 +1771,78 @@ The topics in these notes follow the Department for Education document below.
         symbol: "|\\vec{v}|",
         name: "Speed",
         unit: "m/s",
-        description: "The magnitude of the velocity vector: how fast the spacecraft is moving, ignoring direction.",
+        description: "The magnitude (size) of the velocity: how fast the spacecraft is moving, whatever its direction.",
         color: "text-indigo-400"
       },
       {
         symbol: "v_x",
-        name: "X-Velocity",
+        name: "Horizontal component",
         unit: "m/s",
-        description: "The horizontal component of the velocity vector.",
+        description: "The part of the velocity across, in the x direction.",
         color: "text-cyan-400"
       },
       {
         symbol: "v_y",
-        name: "Y-Velocity",
+        name: "Vertical component",
         unit: "m/s",
-        description: "The vertical component of the velocity vector.",
+        description: "The part of the velocity up, in the y direction.",
         color: "text-sky-400"
       }
     ],
     conceptSteps: [
       {
         stepNumber: 1,
-        title: "What is a Vector?",
-        content: "Imagine drawing an arrow on a map. A vector is exactly that: a mathematical arrow that has both a length (called magnitude) and a direction. Unlike a simple number like '5 kg' (a scalar), a vector tells you '5 m/s going North'.",
-        keyInsight: "A vector requires two pieces of information: how much (magnitude), and which way (direction).",
+        title: "Scalars and vectors",
+        content: "A scalar has size only, such as a mass of 5 kg. A vector has size and direction, such as a velocity of 5 m/s north. You can draw a vector as an arrow: its length shows the size, called the magnitude, and it points in the direction.",
+        keyInsight: "A vector tells you how much and which way.",
         relatedVariables: ["|\\vec{v}|"]
       },
       {
         stepNumber: 2,
-        title: "Vector Components",
-        content: "Instead of dealing with angles, it's often easier to break that diagonal arrow into a horizontal step (X) and a vertical step (Y). Any diagonal movement is just a combination of moving sideways and moving up or down.",
-        keyInsight: "You can perfectly recreate any diagonal path by moving purely horizontally then vertically.",
+        title: "Components",
+        content: "Written as a column, a vector shows its two parts, the step across on top and the step up below. For a velocity, these parts are its components, $v_x$ across and $v_y$ up. A negative part means left or down.",
+        keyInsight: "Any arrow can be made from one step across and one step up.",
         relatedVariables: ["v_x", "v_y"]
       },
       {
         stepNumber: 3,
-        title: "The Pythagorean Theorem",
-        content: "Because the X and Y steps form a 90-degree right angle, we can use the Pythagorean theorem ($a^2 + b^2 = c^2$) to find the length of the hypotenuse, which gives us the original vector's total length (magnitude).",
-        keyInsight: "Squaring the components, adding them, and taking the square root gives you the total speed.",
-        relatedVariables: ["|\\vec{v}|", "v_x", "v_y"]
-      },
-      {
-        stepNumber: 4,
-        title: "Adding Vectors",
-        content: "To add two vectors, draw them tip to tail: the second starts where the first ends. The resultant goes from the start of the first to the end of the second. In column form, add the top numbers together and the bottom numbers together.",
+        title: "Adding vectors",
+        content: "To add two vectors, draw them tip to tail: the second starts where the first ends. The resultant goes from the start of the first to the end of the second. With column vectors, add the top numbers together and the bottom numbers together.",
         keyInsight: "Adding vectors means following one journey and then the other.",
         relatedVariables: []
       },
       {
-        stepNumber: 5,
-        title: "Multiplying by a Number",
-        content: "Multiplying a vector by a number stretches it without turning it: 2a is twice as long as a and points the same way, while -a points the opposite way. Vectors that are multiples of each other are parallel.",
+        stepNumber: 4,
+        title: "Multiplying by a number",
+        content: "Multiplying a vector by a number stretches it without turning it. $2\\mathbf{a}$ is twice as long as $\\mathbf{a}$ and points the same way, while $-\\mathbf{a}$ is the same length and points the opposite way.",
         keyInsight: "If one vector is a multiple of another, they are parallel.",
         relatedVariables: []
       },
       {
+        stepNumber: 5,
+        title: "Magnitude and direction",
+        content: "The step across and the step up are at right angles, so they make a right-angled triangle with the vector as its hypotenuse. Pythagoras' theorem gives the magnitude, $|\\vec{v}| = \\sqrt{v_x^2 + v_y^2}$, and $\\tan\\theta = \\dfrac{v_y}{v_x}$ gives the angle $\\theta$ above the x direction.",
+        keyInsight: "Square the components, add them and take the square root to get the size.",
+        relatedVariables: ["|\\vec{v}|", "v_x", "v_y"]
+      },
+      {
         stepNumber: 6,
-        title: "Transformations and Thrust",
-        content: "When a spacecraft fires its thrusters, it essentially 'adds' a new thrust vector to its current velocity vector. If you want to change direction, you calculate a transformation to figure out exactly which angle to point your engines.",
-        keyInsight: "Thrusting forward adds to your magnitude (speed). Thrusting sideways changes your direction.",
+        title: "Steering with thrusters",
+        content: "When a spacecraft fires a thruster, the engine adds a new velocity to the one the spacecraft already has. The new velocity is the sum of the two vectors.",
+        keyInsight: "Firing straight ahead adds to the speed. Firing at right angles to the motion mostly turns it.",
         relatedVariables: ["|\\vec{v}|"]
       }
     ],
     solvedExample: {
-      problem: "A spacecraft is travelling with a horizontal velocity ($v_x$) of $3000$ m/s and a vertical velocity ($v_y$) of $4000$ m/s. What is its speed ($|\\vec{v}|$)?",
+      problem: "A spacecraft is travelling with a horizontal velocity ($v_x$) of $3000$ m/s and a vertical velocity ($v_y$) of $4000$ m/s. What is its speed ($|\\vec{v}|$), and at what angle above the horizontal is it moving?",
       steps: [
-        "Identify the components: $v_x = 3000$ and $v_y = 4000$.",
-        "Square both components: $3000^2 = 9,000,000$ and $4000^2 = 16,000,000$.",
-        "Add the squared values together: $9,000,000 + 16,000,000 = 25,000,000$.",
-        "Take the square root of the sum: $\\sqrt{25,000,000}$."
+        "The two components are at right angles, so they make a right-angled triangle with the velocity as its hypotenuse.",
+        "Square both components: $3000^2 = 9{,}000{,}000$ and $4000^2 = 16{,}000{,}000$.",
+        "Add them: $9{,}000{,}000 + 16{,}000{,}000 = 25{,}000{,}000$.",
+        "Take the square root: $|\\vec{v}| = \\sqrt{25{,}000{,}000} = 5000$ m/s.",
+        "For the direction, $\\tan\\theta = \\dfrac{4000}{3000}$, so $\\theta = \\tan^{-1}\\!\\left(\\dfrac{4}{3}\\right) \\approx 53.1°$."
       ],
-      resultFormula: "|\\vec{v}| = 5000 \\text{ m/s}"
+      resultFormula: "|\\vec{v}| = 5000 \\text{ m/s, at about } 53.1° \\text{ above the horizontal}"
     },
     practiceProblems: [
       {
@@ -1875,7 +1876,7 @@ The topics in these notes follow the Department for Education document below.
         answer: "5 km/s, about 36.9° north of east"
       },
     ],
-    realWorldConnection: "Navigation computers on the Apollo missions continuously calculated state vectors (position and velocity in 3D space) to ensure astronauts remained on the correct trajectory to the Moon.",
+    realWorldConnection: "The guidance computer on the Apollo spacecraft kept track of its state vector: the spacecraft's position and velocity, each a vector in three dimensions.",
     textbookContent: `
 ## Vectors
 
@@ -1895,7 +1896,7 @@ means 3 to the right and 2 up. Negative numbers mean left or down.
 
 To add vectors, draw them **tip to tail**: the second starts where the first ends. The sum, called the **resultant**, goes from the start of the first to the end of the second. In columns, add the matching numbers:
 
-$$\\begin{pmatrix} 3 \\\\ 2 \\end{pmatrix} + \\begin{pmatrix} 1 \\\\ -4 \\end{pmatrix} = \\begin{pmatrix} 4 \\\\ -2 \\end{pmatrix}$$
+$$\\begin{pmatrix} 3 \\\\ 2 \\end{pmatrix} + \\begin{pmatrix} 2 \\\\ -1 \\end{pmatrix} = \\begin{pmatrix} 5 \\\\ 1 \\end{pmatrix}$$
 
 Subtracting $\\mathbf{b}$ is the same as adding $-\\mathbf{b}$, the vector of the same size pointing the opposite way.
 
@@ -1917,21 +1918,19 @@ and trigonometry gives the direction, as an angle $\\theta$ above the x directio
 
 $$\\tan \\theta = \\frac{y}{x}$$
 
+For a velocity $\\vec{v}$ with components $v_x$ and $v_y$, the magnitude $|\\vec{v}|$ is the speed.
+
 ### Splitting a vector into parts
 
 In A-level physics you also go the other way: you **resolve** a vector into two parts at right angles. A velocity $v$ at angle $\\theta$ to the horizontal has a horizontal part $v \\cos \\theta$ and a vertical part $v \\sin \\theta$.
 
-### Worked example
-
-A spacecraft has a horizontal velocity of 3000 m/s and a vertical velocity of 4000 m/s. Its speed is
-
-$$\\sqrt{3000^2 + 4000^2} = \\sqrt{25\\,000\\,000} = 5000 \\text{ m/s}$$
-
-and it is climbing at $\\tan^{-1}\\!\\left(\\dfrac{4000}{3000}\\right) \\approx 53°$ above the horizontal.
-
 ### Steering with thrusters
 
-When a spacecraft fires a thruster, it adds a new velocity to the one it already has. Firing straight ahead adds to its speed. Firing sideways changes its direction. Mission planners add these vectors to work out exactly which way to point the engine and for how long.
+When a spacecraft fires a thruster, it adds a new velocity to the one it already has. Firing straight ahead adds to its speed. Firing sideways mostly changes its direction. Mission planners add these vectors to work out which way to point the engine and for how long.
+
+### Next on the journey
+
+So far, directions have been angles in degrees. Mathematicians and engineers often use a different unit, the radian, which ties an angle to a distance around a circle. That is the next lesson.
 
 ### Sources
 

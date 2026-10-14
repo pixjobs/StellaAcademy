@@ -12,6 +12,8 @@ const cosD = (x: number) => Math.cos(x * DEG);
 const tanD = (x: number) => Math.tan(x * DEG);
 const R_EARTH_KM = 6371; // mean radius, used only to check the "treat the ground as flat" approximation
 const near = (a: number, b: number, tol = 1e-9) => Math.abs(a - b) <= tol;
+/** A 2 × 1 column vector as the lessons write it in LaTeX. */
+const col = (top: number, bottom: number) => `\\begin{pmatrix} ${top} \\\\ ${bottom} \\end{pmatrix}`;
 
 export const ENTRIES: Entry[] = [
   // ======================================================================================== trigonometry
@@ -87,6 +89,78 @@ export const ENTRIES: Entry[] = [
         near(sinD(60), r3 / 2) && near(cosD(60), 1 / 2) && near(tanD(60), r3) &&
         near(sinD(90), 1) && near(cosD(90), 0);
       return { holds: ok, detail: 'every sin, cos and tan in the table matches Math.sin/cos/tan (tan 90° is undefined)' };
+    },
+  },
+
+  // ======================================================================================== vectors
+  {
+    lesson: 'vectors', where: 'solvedExample.steps[1] (3000 squared)', expectQuestionIncludes: 'horizontal velocity ($v_x$) of $3000$ m/s',
+    stated: '$3000^2 = 9{,}000{,}000$', pick: 1, compute: () => 3000 ** 2, expected: 9e6, tolerance: 0, unit: '(m/s)²',
+  },
+  {
+    lesson: 'vectors', where: 'solvedExample.steps[1] (4000 squared)', expectQuestionIncludes: 'horizontal velocity ($v_x$) of $3000$ m/s',
+    stated: '$4000^2 = 16{,}000{,}000$', pick: 1, compute: () => 4000 ** 2, expected: 16e6, tolerance: 0, unit: '(m/s)²',
+  },
+  {
+    lesson: 'vectors', where: 'solvedExample.steps[2]', expectQuestionIncludes: 'horizontal velocity ($v_x$) of $3000$ m/s',
+    stated: '= 25{,}000{,}000', compute: () => 3000 ** 2 + 4000 ** 2, expected: 25e6, tolerance: 0, unit: '(m/s)²',
+  },
+  {
+    lesson: 'vectors', where: 'solvedExample.steps[3]', expectQuestionIncludes: 'horizontal velocity ($v_x$) of $3000$ m/s',
+    stated: '= 5000$ m/s', compute: () => Math.hypot(3000, 4000), expected: 5000, tolerance: 1e-9, unit: 'm/s',
+  },
+  {
+    lesson: 'vectors', where: 'solvedExample.steps[4]', expectQuestionIncludes: 'horizontal velocity ($v_x$) of $3000$ m/s',
+    stated: '\\approx 53.1°', compute: () => Math.atan2(4000, 3000) / DEG, expected: 53.13, tolerance: 0.05, unit: '°',
+  },
+  {
+    lesson: 'vectors', where: 'solvedExample.resultFormula (speed)', expectQuestionIncludes: 'horizontal velocity ($v_x$) of $3000$ m/s',
+    stated: '5000 \\text{ m/s', compute: () => Math.hypot(3000, 4000), expected: 5000, tolerance: 1e-9, unit: 'm/s',
+  },
+  {
+    lesson: 'vectors', where: 'solvedExample.resultFormula (angle)', expectQuestionIncludes: 'horizontal velocity ($v_x$) of $3000$ m/s',
+    stated: '53.1°', compute: () => Math.atan2(4000, 3000) / DEG, expected: 53.13, tolerance: 0.05, unit: '°',
+  },
+  ...([
+    [0, 'Work out $\\mathbf{a} + \\mathbf{b}$', 3 + 1, 2 + -4, 'a + b'],
+    [1, 'work out $\\mathbf{a} - \\mathbf{b}$', 3 - 1, 2 - -4, 'a − b'],
+    [2, 'Work out $3\\mathbf{a}$', 3 * 3, 3 * 2, '3a'],
+  ] as const).map(([i, q, top, bottom, label]): Entry => ({
+    // The number reader drops minus signs, so the column vector is checked as text built from the computed values.
+    lesson: 'vectors', where: `practiceProblems[${i}] (${label})`, kind: 'qualitative', expectQuestionIncludes: q,
+    expectAnswerIncludes: col(top, bottom),
+    verify: () => ({ holds: true, detail: `answer is the computed column ${col(top, bottom)}` }),
+  })),
+  {
+    lesson: 'vectors', where: 'practiceProblems[3]', expectQuestionIncludes: 'A probe moves at 6 km/s in the x direction and 8 km/s in the y direction',
+    compute: () => Math.hypot(6, 8), expected: 10, tolerance: 1e-9, unit: 'km/s',
+  },
+  {
+    lesson: 'vectors', where: 'practiceProblems[4]', expectQuestionIncludes: 'Find the magnitude of $\\begin{pmatrix} -5 \\\\ 12 \\end{pmatrix}$',
+    compute: () => Math.hypot(-5, 12), expected: 13, tolerance: 1e-9, unit: '',
+  },
+  {
+    lesson: 'vectors', where: 'practiceProblems[5] (speed)', expectQuestionIncludes: 'A spacecraft moves at 4 km/s east and 3 km/s north',
+    stated: '5 km/s', compute: () => Math.hypot(4, 3), expected: 5, tolerance: 1e-9, unit: 'km/s',
+  },
+  {
+    lesson: 'vectors', where: 'practiceProblems[5] (angle)', expectQuestionIncludes: 'A spacecraft moves at 4 km/s east and 3 km/s north',
+    stated: 'about 36.9° north of east', compute: () => Math.atan2(3, 4) / DEG, expected: 36.87, tolerance: 0.05, unit: '°',
+  },
+  {
+    lesson: 'vectors', where: 'textbookContent: adding', kind: 'qualitative', expectNotesIncludes: 'In columns, add the matching numbers',
+    expectAnswerIncludes: `${col(3, 2)} + ${col(2, -1)} = ${col(3 + 2, 2 + -1)}`,
+    verify: () => ({ holds: true, detail: '(3, 2) + (2, −1) = (5, 1), a different sum from the practice question' }),
+  },
+  {
+    lesson: 'vectors', where: 'textbookContent: sideways thrust', kind: 'claim', expectNotesIncludes: '### Steering with thrusters',
+    claimIncludes: 'Firing sideways mostly changes its direction',
+    verify: () => {
+      // A 7.7 km/s spacecraft given 0.1 km/s at right angles to its motion.
+      const v = 7.7, dv = 0.1;
+      const turn = Math.atan2(dv, v) / DEG;
+      const gain = Math.hypot(v, dv) - v;
+      return { holds: gain < dv / 10, detail: `0.1 km/s sideways at 7.7 km/s turns it ${turn.toFixed(2)}° and adds only ${(gain * 1000).toFixed(2)} m/s of speed` };
     },
   },
 ];
