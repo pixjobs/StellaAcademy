@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react';
 import { track } from '@/lib/track';
+import { useReadableLabels } from './useReadableLabels';
 
 // Stage geometry (SVG units) and the physical scale it represents.
 const W = 560;
@@ -43,6 +44,7 @@ function Readout({ label, value, note }: { label: string; value: string; note?: 
  * is always the complete picture.
  */
 export default function TrigTriangle({ placement = 'lesson' }: { placement?: string }) {
+  const labelsRef = useReadableLabels();
   const [angle, setAngle] = useState(35); // degrees
   const [hyp, setHyp] = useState(8); // metres
   const [ratio, setRatio] = useState<Ratio>('sin');
@@ -92,6 +94,7 @@ export default function TrigTriangle({ placement = 'lesson' }: { placement?: str
       </figcaption>
 
       <svg
+        ref={labelsRef}
         viewBox={`0 0 ${W} ${H}`}
         className="mt-4 w-full rounded-2xl bg-black/25 ring-1 ring-white/10"
         role="img"
@@ -129,8 +132,12 @@ export default function TrigTriangle({ placement = 'lesson' }: { placement?: str
         <text x={hypLabelX} y={hypLabelY} fill={GOLD} fillOpacity={opacity('hypotenuse')} fontSize="14" fontWeight="600" textAnchor="end">
           hypotenuse {hyp.toFixed(2)} m
         </text>
-        <text x={CX + 12} y={(CY + by) / 2 + 5} fill={MINT} fillOpacity={opacity('opposite')} fontSize="14" fontWeight="600">
-          opposite {opposite.toFixed(2)} m
+        {/* two lines, so the label still fits beside the triangle when phones enlarge it */}
+        <text x={CX + 12} y={(CY + by) / 2 - 3} fill={MINT} fillOpacity={opacity('opposite')} fontSize="14" fontWeight="600">
+          <tspan>opposite</tspan>
+          <tspan x={CX + 12} dy="1.2em">
+            {opposite.toFixed(2)} m
+          </tspan>
         </text>
         <text x={(ax + CX) / 2} y={CY + 24} fill={PERI} fillOpacity={opacity('adjacent')} fontSize="14" fontWeight="600" textAnchor="middle">
           adjacent {adjacent.toFixed(2)} m

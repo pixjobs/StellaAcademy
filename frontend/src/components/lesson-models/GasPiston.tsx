@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { track } from '@/lib/track';
+import { useReadableLabels } from './useReadableLabels';
 
 // Physical constants (SI).
 const R_GAS = 8.31; // molar gas constant, J/(mol K)
@@ -86,6 +87,7 @@ function Slider(props: { name: string; shown: string; min: number; max: number; 
  * temperature, and readouts that obey pV = nRT as the sliders move.
  */
 export default function GasPiston({ placement = 'lesson' }: { placement?: string }) {
+  const labelsRef = useReadableLabels();
   const [temperature, setTemperature] = useState(300); // kelvin
   const [volume, setVolume] = useState(25); // litres
   const [amount, setAmount] = useState(1); // moles
@@ -159,6 +161,7 @@ export default function GasPiston({ placement = 'lesson' }: { placement?: string
       </figcaption>
 
       <svg
+        ref={labelsRef}
         viewBox={`0 0 ${W} ${H}`}
         className="mt-4 w-full rounded-2xl bg-black/25 ring-1 ring-white/10"
         role="img"

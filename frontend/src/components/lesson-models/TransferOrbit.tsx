@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { track } from '@/lib/track';
+import { useReadableLabels } from './useReadableLabels';
 
 // Stage geometry (SVG units). The target orbit is always drawn at OUTER_PX, and
 // everything else uses the same linear scale, so the picture is to scale.
@@ -98,6 +99,7 @@ function Readout({ label, value, note }: { label: string; value: string; note?: 
  * and the vis-viva equation.
  */
 export default function TransferOrbit({ placement = 'lesson' }: { placement?: string }) {
+  const labelsRef = useReadableLabels();
   const [h1, setH1] = useState(300);
   const [h2Wanted, setH2Wanted] = useState(35800);
   // The target must sit at least 1,000 km above the start, on the slider's 200 km steps.
@@ -154,6 +156,7 @@ export default function TransferOrbit({ placement = 'lesson' }: { placement?: st
       </figcaption>
 
       <svg
+        ref={labelsRef}
         viewBox={`0 0 ${W} ${H}`}
         className="mt-4 w-full rounded-2xl bg-black/25 ring-1 ring-white/10"
         role="img"
@@ -191,7 +194,7 @@ export default function TransferOrbit({ placement = 'lesson' }: { placement?: st
             Burn 2:
           </text>
           <text x={apogeeX - 12} y={CY + 14} textAnchor="end">
-            speed up again
+            speed up
           </text>
         </g>
 

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { track } from '@/lib/track';
+import { useReadableLabels } from './useReadableLabels';
 
 // Stage geometry (SVG units). Both layouts share the same outer loop of wire.
 const W = 560;
@@ -70,6 +71,7 @@ function Readout({ label, value, note }: { label: string; value: string; note?: 
  * the wires at a speed in proportion to the current, and every label obeys V = IR.
  */
 export default function CircuitBoard({ placement = 'lesson' }: { placement?: string }) {
+  const labelsRef = useReadableLabels();
   const [layout, setLayout] = useState<Layout>('series');
   const [voltage, setVoltage] = useState(6);
   const [r1, setR1] = useState(4);
@@ -148,7 +150,7 @@ export default function CircuitBoard({ placement = 'lesson' }: { placement?: str
         <span className="font-fraunces text-xl font-semibold text-white">Circuits: series and parallel</span>
       </figcaption>
 
-      <svg viewBox={`0 0 ${W} ${H}`} className="mt-4 w-full rounded-2xl bg-black/25 ring-1 ring-white/10" role="img" aria-label={describe}>
+      <svg ref={labelsRef} viewBox={`0 0 ${W} ${H}`} className="mt-4 w-full rounded-2xl bg-black/25 ring-1 ring-white/10" role="img" aria-label={describe}>
         {/* wires: the outer loop, broken at the battery, plus the middle branch in parallel */}
         <g fill="none" stroke={WIRE} strokeWidth="2.5" strokeLinejoin="round">
           <path d={`M${LEFT} 170V${BOTTOM}H${RIGHT}V${TOP}H${LEFT}V140`} />

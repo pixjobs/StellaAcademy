@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { track } from '@/lib/track';
+import { useReadableLabels } from './useReadableLabels';
 
 // Stage geometry (SVG units).
 const W = 560;
@@ -72,6 +73,7 @@ function Gear({ teeth, k, offset, colour, innerRef }: { teeth: number; k: number
  * speed of turning for turning effect (moment) while their product stays the same.
  */
 export default function GearTrain({ placement = 'lesson' }: { placement?: string }) {
+  const labelsRef = useReadableLabels();
   const [driver, setDriver] = useState(16);
   const [driven, setDriven] = useState(40);
   const [speed, setSpeed] = useState(30);
@@ -149,6 +151,7 @@ export default function GearTrain({ placement = 'lesson' }: { placement?: string
       </figcaption>
 
       <svg
+        ref={labelsRef}
         viewBox={`0 0 ${W} ${H}`}
         className="mt-4 w-full rounded-2xl bg-black/25 ring-1 ring-white/10"
         role="img"

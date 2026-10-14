@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type RefObject } from 'react';
 import { track } from '@/lib/track';
+import { useReadableLabels } from './useReadableLabels';
 
 // Stage geometry (SVG units) and the physical scale it represents.
 const W = 560;
@@ -139,6 +140,7 @@ function Slider(props: { label: string; shown: string; min: number; max: number;
  * of collision, the total momentum before equals the total momentum after.
  */
 export default function MomentumTrack({ placement = 'lesson' }: { placement?: string }) {
+  const labelsRef = useReadableLabels();
   const [mA, setMA] = useState(2);
   const [uA, setUA] = useState(3);
   const [mB, setMB] = useState(1);
@@ -230,6 +232,7 @@ export default function MomentumTrack({ placement = 'lesson' }: { placement?: st
       </figcaption>
 
       <svg
+        ref={labelsRef}
         viewBox={`0 0 ${W} ${H}`}
         className="mt-4 w-full rounded-2xl bg-black/25 ring-1 ring-white/10"
         role="img"
