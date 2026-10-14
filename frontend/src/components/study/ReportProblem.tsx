@@ -38,7 +38,7 @@ export default function ReportProblem({ lesson }: { lesson: string }) {
     }
   }
 
-  const field = 'mt-1 w-full rounded-xl border border-[var(--rule)] bg-[var(--paper)] p-3 text-[var(--ink)]';
+  const field = 'mt-1 w-full rounded-xl border border-[var(--rule)] bg-[var(--paper)] min-h-[42px] px-3 py-2 leading-normal text-[var(--ink)]';
 
   return (
     <details className="rounded-2xl border border-[var(--rule)] bg-[var(--sheet)] p-5" data-testid="report-problem">

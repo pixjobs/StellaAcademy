@@ -61,7 +61,7 @@ export default function HelpForm() {
     );
   }
 
-  const field = 'mt-1 w-full rounded-xl border border-[var(--rule)] bg-[var(--paper)] p-3 text-[var(--ink)]';
+  const field = 'mt-1 w-full rounded-xl border border-[var(--rule)] bg-[var(--paper)] min-h-[42px] px-3 py-2 leading-normal text-[var(--ink)]';
   const linkClass = 'font-semibold text-[var(--action)] underline decoration-2 underline-offset-4 hover:text-[var(--action-hover)]';
 
   return (
