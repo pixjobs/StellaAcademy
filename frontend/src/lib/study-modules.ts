@@ -1120,7 +1120,7 @@ The topics in these notes follow the Department for Education documents below.
     id: 'fractions',
     category: 'mathematics',
     title: "Fractions and Proportions",
-    subtitle: "What a fraction means, using the share of a rocket's mass that is payload or fuel.",
+    subtitle: "What a fraction means, using the share of a rocket's mass that is fuel.",
     icon: 'Activity',
     accentColor: 'indigo',
     difficulty: 1,
@@ -1138,57 +1138,57 @@ The topics in these notes follow the Department for Education documents below.
     variables: [
       {
         symbol: 'P',
-        name: 'Proportion',
-        unit: 'Unitless',
-        description: 'The fraction of the total mass that is payload or fuel.',
+        name: 'Fraction of the whole',
+        unit: 'no unit',
+        description: 'What fraction of the total mass one part makes up.',
         color: 'text-indigo-400'
       },
       {
         symbol: 'm_p',
-        name: 'Part Mass',
-        unit: 'kg',
-        description: 'The mass of the specific part (e.g., fuel or payload).',
+        name: 'Mass of the part',
+        unit: 'kilograms (kg)',
+        description: 'The mass of one part, for example the fuel.',
         color: 'text-cyan-400'
       },
       {
         symbol: 'm_t',
-        name: 'Total Mass',
-        unit: 'kg',
-        description: 'The total mass of the rocket.',
+        name: 'Total mass',
+        unit: 'kilograms (kg)',
+        description: 'The mass of the whole thing, for example the whole rocket.',
         color: 'text-sky-400'
       }
     ],
     conceptSteps: [
       {
         stepNumber: 1,
-        title: "The Whole and the Parts",
-        content: "A rocket consists of payload, structure, and fuel. A fraction represents how much of the whole is made up of one specific part. We need this basic understanding before moving to more advanced topics like [Probability](/study/probability).",
-        keyInsight: "The denominator is the total mass, and the numerator is the part mass.",
-        relatedVariables: ["m_p", "m_t"]
+        title: 'What a fraction means',
+        content: 'A fraction is part of a whole that has been split into equal parts. The denominator, the bottom number, tells you how many equal parts there are. The numerator, the top number, tells you how many of them you have.',
+        keyInsight: 'The parts must all be the same size.',
+        relatedVariables: []
       },
       {
         stepNumber: 2,
-        title: "Ratios in Space",
-        content: "Understanding what fraction of a spacecraft is fuel is critical. If 3/4 of a rocket is fuel, only 1/4 remains for the structure and payload!",
-        keyInsight: "High fuel fractions are necessary to reach orbit.",
-        relatedVariables: ["P"]
+        title: 'Equivalent fractions',
+        content: 'If you multiply or divide the top and the bottom of a fraction by the same number, you get an equivalent fraction. It looks different, but it is the same amount.',
+        keyInsight: 'Two quarters is the same amount as one half.',
+        relatedVariables: []
       },
       {
         stepNumber: 3,
-        title: "Equivalent Fractions",
-        content: "Scaling up a small satellite to a massive rocket often requires keeping these proportions equivalent (e.g., 2/4 is the same ratio as 1/2).",
-        keyInsight: "Proportions remain constant even if the scale changes.",
-        relatedVariables: []
+        title: 'Part over whole',
+        content: 'To say what fraction one amount is of another, put the part on top and the whole underneath, then simplify. For a rocket, the part might be its fuel and the whole its total mass.',
+        keyInsight: 'Fraction of the whole $=$ part $\\div$ whole, or $P = \\dfrac{m_p}{m_t}$.',
+        relatedVariables: ['P', 'm_p', 'm_t']
       }
     ],
     solvedExample: {
-      problem: 'A rocket has a total mass of $10000$ kg. If the fuel mass is $7500$ kg, what fraction of the total mass is fuel?',
+      problem: 'A rocket has a total mass of $10\\,000$ kg, and $7500$ kg of it is fuel. What fraction of the total mass is fuel?',
       steps: [
-        'Identify the part ($m_p = 7500$) and the whole ($m_t = 10000$).',
-        'Write the fraction: $P = \\frac{7500}{10000}$.',
-        'Divide both numerator and denominator by 2500 to simplify.'
+        'The part is the fuel, $m_p = 7500$ kg. The whole is the total mass, $m_t = 10\\,000$ kg.',
+        'Put the part over the whole: $P = \\dfrac{7500}{10\\,000}$.',
+        'Simplify by dividing the top and the bottom by 2500: $7500 \\div 2500 = 3$ and $10\\,000 \\div 2500 = 4$.'
       ],
-      resultFormula: 'P = \\frac{3}{4}'
+      resultFormula: 'P = \\dfrac{3}{4}'
     },
     practiceProblems: [
       {
@@ -1245,8 +1245,8 @@ These are **equivalent fractions**. To make one, multiply or divide the top and 
 
 Tenths and hundredths link fractions to decimals and percentages. Multiply the top and bottom by 10 to turn tenths into hundredths:
 
-*   $\\dfrac{3}{10} = \\dfrac{30}{100}$
 *   $\\dfrac{7}{10} = \\dfrac{70}{100}$
+*   $\\dfrac{9}{10} = \\dfrac{90}{100}$
 
 Some other fractions can be turned into hundredths too: $\\dfrac{1}{4} = \\dfrac{25}{100}$ and $\\dfrac{1}{5} = \\dfrac{20}{100}$.
 
@@ -1254,26 +1254,30 @@ Some other fractions can be turned into hundredths too: $\\dfrac{1}{4} = \\dfrac
 
 A fraction is in its **simplest form** when no number except 1 divides into both the top and the bottom. To simplify, divide both by the biggest number that goes into each:
 
-$\\dfrac{12}{16} = \\dfrac{3}{4}$ (dividing both by 4)
+$\\dfrac{10}{15} = \\dfrac{2}{3}$ (dividing both by 5)
 
 ### One amount as a fraction of another
 
-To say what fraction one amount is of another, put the part over the whole and simplify. A lander of 800 kg carrying 200 kg of fuel is
+To say what fraction one amount is of another, put the part over the whole and simplify. A satellite of 900 kg carrying 300 kg of fuel is
 
-$\\dfrac{200}{800} = \\dfrac{1}{4}$ fuel.
+$\\dfrac{300}{900} = \\dfrac{1}{3}$ fuel.
 
 In key stage 3 you will also write fractions bigger than 1 this way. A 15 m rocket next to a 10 m one is $\\dfrac{15}{10} = \\dfrac{3}{2}$ times as tall.
 
 ### A fraction of an amount
 
-To find a fraction of an amount, divide by the bottom number, then multiply by the top number. For $\\dfrac{3}{5}$ of 500 kg:
+To find a fraction of an amount, divide by the bottom number, then multiply by the top number. For $\\dfrac{2}{3}$ of 90 kg:
 
-1.  $500 \\div 5 = 100$, so one fifth is 100 kg.
-2.  $100 \\times 3 = 300$, so three fifths is 300 kg.
+1.  $90 \\div 3 = 30$, so one third is 30 kg.
+2.  $30 \\times 2 = 60$, so two thirds is 60 kg.
 
 ### Rockets are mostly fuel
 
-A large rocket on the launch pad is mostly fuel. Often more than four fifths of its mass is fuel, and only a small fraction is the spacecraft it is launching. Engineers talk about rockets in fractions like this all the time.
+A large rocket on the launch pad is mostly fuel. Here "fuel" means everything its engines burn, including the liquid oxygen. For many large rockets more than four fifths of the mass at launch is fuel, and only a small fraction is the spacecraft being launched.
+
+### Next on the journey
+
+You know what one fraction means. What happens when you put two together? What is $\\dfrac{1}{3} + \\dfrac{1}{4}$? The next lesson shows how to add, subtract, multiply and divide fractions.
 
 ### Sources
 
@@ -2522,7 +2526,7 @@ The topics in these notes follow the Department for Education document below.
         symbol: 'I',
         name: 'Indices',
         unit: 'x²',
-        description: 'Indices (powers and roots) are worked out second.',
+        description: 'Powers, such as squared and cubed numbers, are worked out second.',
         color: 'text-cyan-400'
       },
       {
@@ -2558,32 +2562,32 @@ The topics in these notes follow the Department for Education document below.
       {
         stepNumber: 1,
         title: 'Brackets',
-        content: 'Anything inside brackets must be worked out before anything outside them. If brackets sit inside other brackets, work from the inside out.',
-        keyInsight: 'Brackets act as a VIP pass, moving the operation to the front of the queue.',
+        content: 'Work out anything inside brackets first. If there are brackets inside other brackets, start with the inside ones.',
+        keyInsight: 'Brackets let you choose which part of a calculation happens first.',
         relatedVariables: ['B']
       },
       {
         stepNumber: 2,
-        title: 'Indices (Powers)',
-        content: 'After brackets, work out any indices: powers and roots. A power is repeated multiplication, so it comes before ordinary multiplication.',
-        keyInsight: 'Indices are worked out before multiplying, dividing, adding or subtracting.',
+        title: 'Indices (powers)',
+        content: 'Next come indices. An index is the small raised number in a power such as $3^2$, which means $3 \\times 3 = 9$. Squared and cubed numbers are worked out before any multiplying, dividing, adding or subtracting.',
+        keyInsight: 'Work out powers straight after brackets.',
         relatedVariables: ['I']
       },
       {
         stepNumber: 3,
-        title: 'Left-to-Right Operations',
-        content: 'Division and Multiplication share the same priority, so work through them from left to right. Then Addition and Subtraction share the lowest priority, and are also worked from left to right.',
-        keyInsight: 'The D before the M in BIDMAS does not mean divide first. Do whichever comes first reading left to right.',
+        title: 'Same rank, left to right',
+        content: 'Division and multiplication have the same rank, so do them in the order you read them, from left to right. Addition and subtraction come last. They share a rank too, so they are also done from left to right.',
+        keyInsight: 'The D before the M in BIDMAS does not mean "divide first". Do whichever comes first, reading from left to right.',
         relatedVariables: ['D', 'M', 'A', 'S']
       }
     ],
     solvedExample: {
-      problem: 'Evaluate the expression: $8 - 4 \\div 2 + (1 + 1)^2$',
+      problem: 'Work out $8 - 4 \\div 2 + (1 + 1)^2$.',
       steps: [
-        'First, work out the brackets: $(1 + 1) = 2$. The expression is now $8 - 4 \\div 2 + 2^2$.',
-        'Next, work out the index: $2^2 = 4$. The expression is now $8 - 4 \\div 2 + 4$.',
-        'Then do the division: $4 \\div 2 = 2$. The expression is now $8 - 2 + 4$.',
-        'Finally, add and subtract from left to right: $8 - 2 = 6$, then $6 + 4 = 10$.'
+        'Brackets first: $1 + 1 = 2$. The calculation is now $8 - 4 \\div 2 + 2^2$.',
+        'Then the power: $2^2 = 2 \\times 2 = 4$. The calculation is now $8 - 4 \\div 2 + 4$.',
+        'Then the division: $4 \\div 2 = 2$. The calculation is now $8 - 2 + 4$.',
+        'Last, subtract and add from left to right: $8 - 2 = 6$, then $6 + 4 = 10$.'
       ],
       resultFormula: '= 10'
     },
@@ -2619,18 +2623,18 @@ The topics in these notes follow the Department for Education document below.
         answer: "4 × 3 + 2 = 14 km"
       },
     ],
-    realWorldConnection: 'Computer programming relies heavily on the order of operations. Programmers add brackets to make sure a computer carries out a calculation in the order they intend.',
+    realWorldConnection: 'Most programming languages, such as Python, use the same order of operations. Programmers add brackets when they want a computer to do a calculation in a different order.',
     textbookContent: `
 ## Doing a calculation in the right order
 
-What is $2 + 3 \\times 4$? If you add first you get 20. If you multiply first you get 14. Both cannot be right, so mathematicians agreed a rule that everyone follows. The answer is **14**.
+What is $5 + 2 \\times 3$? If you add first you get 21. If you multiply first you get 11. Both cannot be right, so mathematicians agreed a rule that everyone follows. The answer is **11**.
 
 ### BIDMAS
 
 The rule says which part of a calculation to do first. In the UK it is remembered as **BIDMAS**:
 
 1.  **B**rackets: work out anything inside brackets first.
-2.  **I**ndices: squared and cubed numbers, such as $3^2 = 3 \\times 3 = 9$.
+2.  **I**ndices: powers, such as squared and cubed numbers. For example, $3^2 = 3 \\times 3 = 9$.
 3.  **D**ivision and **M**ultiplication.
 4.  **A**ddition and **S**ubtraction.
 
@@ -2654,16 +2658,8 @@ $10 - 4 + 3 = 6 + 3 = 9$
 
 Brackets let you choose what happens first:
 
-*   $2 + 3 \\times 4 = 2 + 12 = 14$
-*   $(2 + 3) \\times 4 = 5 \\times 4 = 20$
-
-### Worked example
-
-Work out $20 - 3 \\times (2 + 4)$.
-
-1.  Brackets first: $2 + 4 = 6$. Now it is $20 - 3 \\times 6$.
-2.  Multiply: $3 \\times 6 = 18$. Now it is $20 - 18$.
-3.  Subtract: $20 - 18 = 2$.
+*   $5 + 2 \\times 3 = 5 + 6 = 11$
+*   $(5 + 2) \\times 3 = 7 \\times 3 = 21$
 
 ### Packing food for a space mission
 
@@ -2671,9 +2667,11 @@ Three astronauts each eat 2 packed meals a day on a 5-day trip, and the crew tak
 
 $3 \\times 2 \\times 5 + 4 = 30 + 4 = 34$
 
-If you added $5 + 4$ first you would pack 54 meals, far more than the spacecraft has room for. The order matters.
+If you added $5 + 4$ first you would get $3 \\times 2 \\times 9 = 54$ meals, 20 more than the crew needs. The order matters.
 
-In key stage 3 you will use the same order with powers, roots and other operations.
+### Next on the journey
+
+What is $3 - 5$? The answer is less than zero. The next lesson is about negative numbers, the numbers below zero.
 
 ### Sources
 
@@ -2711,30 +2709,30 @@ The topics in these notes follow the Department for Education document below.
       {
         symbol: 'A',
         name: 'Area',
-        unit: 'sq units',
-        description: 'The amount of 2D space inside a closed figure.',
+        unit: 'square units, such as cm² or m²',
+        description: 'The amount of flat space inside the shape.',
         color: 'text-emerald-400'
       },
       {
         symbol: 'P',
         name: 'Perimeter',
-        unit: 'units',
-        description: 'The total distance around the outside edge of a figure.',
+        unit: 'a length, such as cm or m',
+        description: 'The distance all the way round the edge of the shape.',
         color: 'text-rose-400'
       },
       {
         symbol: 'l',
         name: 'Length',
-        unit: 'units',
-        description: 'The measurement of the longer side of a rectangle.',
+        unit: 'a length, such as cm or m',
+        description: 'How long one side of the rectangle is.',
         color: 'text-indigo-400',
         range: { min: 1, max: 20, default: 5 }
       },
       {
         symbol: 'w',
         name: 'Width',
-        unit: 'units',
-        description: 'The measurement of the shorter side of a rectangle.',
+        unit: 'a length, such as cm or m',
+        description: 'How long the side next to it is.',
         color: 'text-cyan-400',
         range: { min: 1, max: 20, default: 3 }
       }
@@ -2742,33 +2740,33 @@ The topics in these notes follow the Department for Education document below.
     conceptSteps: [
       {
         stepNumber: 1,
-        title: 'What is Area?',
-        content: 'Area is the amount of flat space a shape takes up. You can think of it as the number of 1x1 unit squares needed to completely cover the inside of the shape without overlapping.',
-        keyInsight: 'Area is measured in square units (e.g., square centimetres, square metres).',
-        relatedVariables: ['A']
+        title: 'Perimeter',
+        content: 'The perimeter is how far it is all the way round the edge of a flat shape. Add up the lengths of all the sides. A rectangle has two lengths and two widths, so $P = 2l + 2w$.',
+        keyInsight: 'A perimeter is a distance, like a piece of string laid round the edge.',
+        relatedVariables: ['P', 'l', 'w']
       },
       {
         stepNumber: 2,
-        title: 'What is Perimeter?',
-        content: 'Perimeter is the distance all the way round the edge of a shape. Find it by adding up the lengths of all the sides.',
-        keyInsight: 'Perimeter is a length, like a piece of string laid round the edge of the shape.',
-        relatedVariables: ['P']
+        title: 'Area',
+        content: 'The area is how much flat space a shape covers. Think of covering it with squares 1 cm along each side and counting them. A rectangle has $w$ rows of $l$ squares, so $A = l \\times w$.',
+        keyInsight: 'Area is measured in square units: square centimetres (cm²) or square metres (m²).',
+        relatedVariables: ['A', 'l', 'w']
       },
       {
         stepNumber: 3,
-        title: 'Formulas for Rectangles',
-        content: 'For a rectangle, the area is simply Length × Width. Because rectangles have two equal lengths and two equal widths, the perimeter is (2 × Length) + (2 × Width).',
-        keyInsight: 'These formulas are shortcuts for counting squares (area) or adding all four sides individually (perimeter).',
-        relatedVariables: ['l', 'w']
+        title: 'Same area, different perimeter',
+        content: 'Two shapes can cover the same area but have different perimeters. A long, thin rectangle has a longer perimeter than a square with the same area.',
+        keyInsight: 'Area and perimeter measure different things, so knowing one does not tell you the other.',
+        relatedVariables: ['A', 'P']
       }
     ],
     solvedExample: {
-      problem: 'Find the Area and Perimeter of a rectangular garden with length $l = 8$ metres and width $w = 3$ metres.',
+      problem: 'A rectangular garden is $l = 8$ metres long and $w = 3$ metres wide. Find its area and its perimeter.',
       steps: [
-        'To find the Area, multiply length by width: $A = l \\times w$.',
-        'Substitute the values: $A = 8 \\times 3 = 24$. The Area is 24 square metres.',
-        'To find the Perimeter, add all four sides: $P = 2l + 2w$.',
-        'Substitute the values: $P = 2(8) + 2(3) = 16 + 6 = 22$. The Perimeter is 22 metres.'
+        'Area is length times width: $A = l \\times w$.',
+        'Put in the numbers: $A = 8 \\times 3 = 24$. The area is 24 square metres.',
+        'Perimeter is all four sides added: $P = 2l + 2w$.',
+        'Put in the numbers: $P = 2 \\times 8 + 2 \\times 3 = 16 + 6 = 22$. The perimeter is 22 metres.'
       ],
       resultFormula: 'A = 24 \\text{ m}^2, P = 22 \\text{ m}'
     },
@@ -2804,7 +2802,7 @@ The topics in these notes follow the Department for Education document below.
         answer: "5 panels (each is 6 m²)"
       },
     ],
-    realWorldConnection: 'Architects and builders use area to determine how much carpet or tile is needed for a floor, and perimeter to determine how much fencing is needed to enclose a garden.',
+    realWorldConnection: 'Builders use area to work out how much carpet or how many tiles a floor needs, and perimeter to work out how much fencing goes round a garden.',
     textbookContent: `
 ## Area and perimeter
 
@@ -2851,7 +2849,11 @@ It works the other way too: shapes with the same perimeter can have different ar
 
 ### Solar panels in space
 
-Spacecraft make their electricity from sunlight with solar panels. The more area the panels have, the more sunlight they catch. A panel 3 m long and 2 m wide has an area of 6 m², so five of them cover 30 m².
+Many spacecraft make their electricity from sunlight with solar panels. The more area the panels have, the more sunlight they catch. A panel 4 m long and 2 m wide has an area of $4 \\times 2 = 8$ m², so ten of them cover 80 m².
+
+### Next on the journey
+
+A square with sides of 5 m has an area of $5 \\times 5 = 25$ m². Multiplying a number by itself is called squaring it. If you know a square's area, how do you find its side? The next lesson is about powers and roots.
 
 ### Sources
 
@@ -2886,63 +2888,62 @@ The topics in these notes follow the Department for Education document below.
     variables: [
       {
         symbol: 'a',
-        name: 'Part 1',
-        unit: 'units',
-        description: 'The first quantity in the first ratio.',
+        name: 'First amount',
+        unit: 'any unit',
+        description: 'One quantity, for example the fuel used. It has the same unit as $c$.',
         color: 'text-amber-400'
       },
       {
         symbol: 'b',
-        name: 'Part 2',
-        unit: 'units',
-        description: 'The second quantity in the first ratio.',
+        name: 'Second amount',
+        unit: 'any unit',
+        description: 'The quantity it is compared with, for example the distance travelled. It has the same unit as $d$.',
         color: 'text-rose-400'
       },
       {
         symbol: 'c',
-        name: 'Scaled Part 1',
-        unit: 'units',
-        description: 'The first quantity in the equivalent scaled ratio.',
+        name: 'New first amount',
+        unit: 'any unit',
+        description: 'The first quantity after scaling up or down.',
         color: 'text-amber-400'
       },
       {
         symbol: 'd',
-        name: 'Scaled Part 2',
-        unit: 'units',
-        description: 'The second quantity in the equivalent scaled ratio.',
+        name: 'New second amount',
+        unit: 'any unit',
+        description: 'The second quantity after scaling by the same number.',
         color: 'text-rose-400'
       }
     ],
     conceptSteps: [
       {
         stepNumber: 1,
-        title: 'What is a Ratio?',
-        content: 'A ratio is a way to compare two or more quantities. If a recipe calls for 200 g of flour for every 100 g of sugar, the ratio of flour to sugar is 2 to 1 (written as 2:1 or 2/1).',
-        keyInsight: 'Ratios describe the relative sizes of two or more values.',
+        title: 'What a ratio is',
+        content: 'A ratio compares two or more quantities. A mixture with 2 parts fuel to every 3 parts oxidiser (the substance the fuel burns with) has a fuel to oxidiser ratio of $2 : 3$.',
+        keyInsight: 'The order matters. Oxidiser to fuel is $3 : 2$.',
         relatedVariables: ['a', 'b']
       },
       {
         stepNumber: 2,
-        title: 'What is a Proportion?',
-        content: 'A proportion is simply an equation stating that two ratios are equal. If 200 g of flour needs 100 g of sugar, then 400 g of flour will need 200 g of sugar.',
-        keyInsight: 'Proportions are scaled-up or scaled-down versions of the same ratio.',
+        title: 'Direct proportion',
+        content: 'In direct proportion, if one quantity doubles, so does the other. Their ratio stays the same, so $\\dfrac{a}{b} = \\dfrac{c}{d}$. To find a missing value, work out the amount for one first, then multiply.',
+        keyInsight: 'If you know three of the four values, you can find the fourth.',
         relatedVariables: ['a', 'b', 'c', 'd']
       },
       {
         stepNumber: 3,
-        title: 'Solving for an Unknown',
-        content: 'If you know three parts of a proportion, you can find the fourth using cross-multiplication. For a/b = c/d, it is always true that a×d = b×c.',
-        keyInsight: 'Cross-multiplication is a powerful tool to solve any proportion problem.',
-        relatedVariables: ['a', 'b', 'c', 'd']
+        title: 'Inverse proportion',
+        content: 'In inverse proportion, if one quantity doubles, the other halves. Going twice as fast makes a journey take half as long.',
+        keyInsight: 'In inverse proportion the two quantities multiplied together always give the same number.',
+        relatedVariables: []
       }
     ],
     solvedExample: {
       problem: 'A car travels 150 miles on 15 litres of petrol. How many miles can it travel on 24 litres?',
       steps: [
-        'Set up a proportion: $\\frac{\\text{miles}}{\\text{litres}} = \\frac{\\text{miles}}{\\text{litres}}$.',
-        'Put in the known values: $\\frac{150}{15} = \\frac{x}{24}$.',
-        'Cross-multiply: $150 \\times 24 = 15 \\times x$.',
-        'Solve the equation: $3600 = 15x$, so $x = \\frac{3600}{15} = 240$.'
+        'Distance and fuel are in direct proportion: twice the fuel takes the car twice as far.',
+        'Find how far one litre goes: $150 \\div 15 = 10$ miles.',
+        'Multiply by the number of litres: $10 \\times 24 = 240$ miles.'
       ],
       resultFormula: 'x = 240 \\text{ miles}'
     },
@@ -2978,7 +2979,7 @@ The topics in these notes follow the Department for Education document below.
         answer: "3,420 N"
       },
     ],
-    realWorldConnection: 'Chefs use proportions constantly to scale recipes up or down depending on the number of guests. Mapmakers use ratios (scales) to accurately represent large geographic areas on small pieces of paper.',
+    realWorldConnection: 'A map scale is a ratio. On a map with a scale of $1 : 25\\,000$, 1 cm on the map stands for 25 000 cm, which is 250 m, on the ground.',
     textbookContent: `
 ## Ratio and proportion
 
@@ -2988,13 +2989,13 @@ A **ratio** compares two or more quantities. If a mixture has 2 parts fuel to 3 
 
 To write a ratio in its **simplest form**, divide every part by the same number, as you would simplify a fraction:
 
-$$12 : 18 = 2 : 3 \\quad \\text{(dividing both by 6)}$$
+$$15 : 25 = 3 : 5 \\quad \\text{(dividing both by 5)}$$
 
 ### Ratios and fractions
 
 A ratio can also be written as fractions of the whole. In $2 : 3$ there are $2 + 3 = 5$ parts, so the first quantity is $\\dfrac{2}{5}$ of the total and the second is $\\dfrac{3}{5}$. The first is $\\dfrac{2}{3}$ of the second.
 
-To share £60 in the ratio $2 : 3$: one part is $60 \\div 5 = 12$, so the shares are $2 \\times 12 = £24$ and $3 \\times 12 = £36$.
+To share £40 in the ratio $3 : 5$: there are $3 + 5 = 8$ parts, so one part is $40 \\div 8 = 5$, and the shares are $3 \\times 5 = £15$ and $5 \\times 5 = £25$.
 
 ### Direct proportion
 
@@ -3002,9 +3003,7 @@ Two quantities are in **direct proportion** when doubling one doubles the other.
 
 $$\\frac{a}{b} = \\frac{c}{d}$$
 
-If you know three of the values, you can find the fourth. A car goes 150 miles on 15 litres of fuel. On 24 litres it goes
-
-$$\\frac{150}{15} = \\frac{x}{24} \\quad \\Rightarrow \\quad x = 10 \\times 24 = 240 \\text{ miles}$$
+If you know three of the values, you can find the fourth. If 5 litres of paint cover 30 m², one litre covers $30 \\div 5 = 6$ m², so 8 litres cover $6 \\times 8 = 48$ m².
 
 Algebraically, $y = kx$ for some fixed number $k$. On a graph, direct proportion is a straight line through the origin.
 
@@ -3016,17 +3015,13 @@ $$xy = k \\quad \\text{or} \\quad y = \\frac{k}{x}$$
 
 At 50 km/h a journey takes 6 hours; at 100 km/h it takes 3 hours. Speed × time is 300 each time. On a graph, inverse proportion is a curve that gets closer and closer to the axes without touching them.
 
-### Worked example
-
-Food for 4 astronauts lasts 30 days. How long does it last 6 astronauts?
-
-1.  More astronauts means fewer days, so this is inverse proportion.
-2.  The fixed product is $4 \\times 30 = 120$ astronaut-days of food.
-3.  For 6 astronauts: $120 \\div 6 = 20$ days.
-
 ### Weight on other worlds
 
-Your weight on Mars is directly proportional to your weight on Earth: it is about $0.38$ times as much, because Mars pulls more weakly. A rover that weighs 9,000 N on Earth weighs $0.38 \\times 9{,}000 = 3{,}420$ N on Mars. Its mass is the same on both planets.
+Your weight on Mars is directly proportional to your weight on Earth: it is about $0.38$ times as much, because Mars pulls more weakly. An astronaut who weighs 800 N on Earth weighs $0.38 \\times 800 = 304$ N on Mars. Their mass is the same on both planets.
+
+### Next on the journey
+
+A scale drawing uses a ratio to show a real shape smaller. How much space does a shape cover, and how far is it round its edge? The next lesson is about area and perimeter.
 
 ### Sources
 
@@ -3044,60 +3039,61 @@ The topics in these notes follow the Department for Education document below.
     accentColor: 'violet',
     difficulty: 2,
     estimatedMinutes: 10,
-    formula: '\\frac{X}{100} = 0.XX = XX\\%',
+    formula: 'X\\% = \\frac{X}{100} = X \\div 100',
     formulaLayout: [
+      { type: 'variable', symbol: 'X' },
+      { type: 'static', latex: '\\%' },
+      { type: 'operator', content: '=' },
       {
         type: 'fraction',
         numerator: [{ type: 'variable', symbol: 'X' }],
         denominator: [{ type: 'static', latex: '100' }]
       },
       { type: 'operator', content: '=' },
-      { type: 'static', latex: '0.' },
       { type: 'variable', symbol: 'X' },
-      { type: 'operator', content: '=' },
-      { type: 'variable', symbol: 'X' },
-      { type: 'static', latex: '\\%' }
+      { type: 'operator', content: '\\div' },
+      { type: 'static', latex: '100' }
     ],
     variables: [
       {
         symbol: 'X',
-        name: 'The Number',
-        unit: '',
-        description: 'The numerical value representing parts per hundred.',
+        name: 'Parts per 100',
+        unit: 'no unit',
+        description: 'How many out of every 100. In 37%, $X$ is 37, so 37% is $\\dfrac{37}{100}$, or 0.37.',
         color: 'text-violet-400'
       }
     ],
     conceptSteps: [
       {
         stepNumber: 1,
-        title: 'Fractions to Decimals',
-        content: 'Fractions are just division. To convert a fraction like 3/4 to a decimal, divide the top number by the bottom number (3 ÷ 4 = 0.75).',
-        keyInsight: 'The fraction bar literally means "divided by".',
+        title: 'Three ways to write one amount',
+        content: 'Per cent means "out of 100". A fraction, a decimal and a percentage can all describe the same amount: one half is $\\dfrac{1}{2}$, 0.5 and 50%.',
+        keyInsight: 'To turn a fraction into a decimal, divide the top by the bottom: $\\dfrac{3}{4}$ is $3 \\div 4 = 0.75$.',
         relatedVariables: ['X']
       },
       {
         stepNumber: 2,
-        title: 'Decimals to Percentages',
-        content: 'Percent means "per 100". To convert a decimal to a percentage, multiply it by 100 (which shifts the decimal point two places to the right) and add a % sign. 0.75 becomes 75%.',
-        keyInsight: 'Decimals and percentages are two ways of writing the same exact value.',
+        title: 'Decimals and percentages',
+        content: 'To turn a decimal into a percentage, multiply by 100: 0.75 becomes 75%. To turn a percentage back into a decimal, divide by 100.',
+        keyInsight: 'Multiplying by 100 moves every digit two places to the left, so 0.75 becomes 75.',
         relatedVariables: ['X']
       },
       {
         stepNumber: 3,
-        title: 'Finding a Percentage of a Number',
-        content: 'To find a percentage of a number, first convert the percentage to a decimal, then multiply. For example, to find 20% of 50: convert 20% to 0.20, then multiply 0.20 × 50 = 10.',
-        keyInsight: 'The word "of" in maths often means "multiply".',
+        title: 'A percentage of an amount',
+        content: 'Build the percentage up from easy ones: 10% is a tenth, 50% is a half and 25% is a quarter. Or change the percentage into a decimal and multiply: 20% of 50 is $0.2 \\times 50 = 10$.',
+        keyInsight: 'In maths, "of" usually means multiply.',
         relatedVariables: ['X']
       }
     ],
     solvedExample: {
-      problem: 'A £40 shirt is on sale for 25% off. What is the discount amount, and what is the final price?',
+      problem: 'A £40 shirt is on sale with 25% off. How much is taken off, and what is the sale price?',
       steps: [
-        'Convert the percentage to a decimal: $25\\% = 0.25$.',
-        'Find the discount amount by multiplying the original price by the decimal: $40 \\times 0.25 = 10$. The discount is £10.',
-        'Subtract the discount from the original price to find the final price: $40 - 10 = 30$.'
+        'Change the percentage into a decimal: $25\\% = 0.25$.',
+        'Find the discount, the amount taken off: $40 \\times 0.25 = 10$. The discount is £10.',
+        'Take the discount away from the price: $40 - 10 = 30$.'
       ],
-      resultFormula: '\\text{Discount} = \\pounds 10, \\text{Final Price} = \\pounds 30'
+      resultFormula: '\\text{Discount} = \\pounds 10, \\text{ sale price} = \\pounds 30'
     },
     practiceProblems: [
       {
@@ -3131,7 +3127,7 @@ The topics in these notes follow the Department for Education document below.
         answer: "45% (9/20 = 45/100)"
       },
     ],
-    realWorldConnection: 'Financial literacy relies heavily on percentages. Interest rates on loans, tax rates on purchases, and discounts during sales are all calculated using percentages and decimals.',
+    realWorldConnection: 'Shops show discounts as percentages, and banks show interest rates as percentages. In the UK, value added tax, a tax added to the price of many things you buy, is usually 20%.',
     textbookContent: `
 ## Fractions, decimals and percentages
 
@@ -3158,7 +3154,7 @@ $37\\% = \\dfrac{37}{100} = 0.37$
 
 *   **Fraction to percentage:** make the denominator 100. $\\dfrac{3}{5} = \\dfrac{60}{100} = 60\\%$
 *   **Fraction to decimal:** divide the top by the bottom. $\\dfrac{3}{8} = 3 \\div 8 = 0.375$
-*   **Decimal to percentage:** multiply by 100. $0.45 \\times 100 = 45\\%$
+*   **Decimal to percentage:** multiply by 100. $0.65 \\times 100 = 65\\%$
 *   **Percentage to decimal:** divide by 100. $42\\% = 42 \\div 100 = 0.42$
 
 ### A percentage of an amount
@@ -3169,7 +3165,7 @@ Build it up from percentages that are easy to find:
 *   50% is a half and 25% is a quarter.
 *   1% is a hundredth: divide by 100.
 
-For 15% of 200: 10% is 20 and 5% is 10, so 15% is $20 + 10 = 30$.
+For 15% of 60: 10% is 6 and 5% is 3, so 15% is $6 + 3 = 9$.
 
 ### Comparing amounts
 
@@ -3177,7 +3173,11 @@ To compare amounts written in different ways, change them all into the same form
 
 ### Reading a fuel gauge
 
-Mission control shows how full a rocket's tanks are as a percentage. A tank showing 75% is $\\dfrac{3}{4}$ full. If the full tank holds 800 litres, 75% is $800 \\div 4 \\times 3 = 600$ litres.
+A fuel gauge often shows how full a tank is as a percentage. A tank showing 75% is $\\dfrac{3}{4}$ full. If the full tank holds 600 litres, 75% is $600 \\div 4 \\times 3 = 450$ litres.
+
+### Next on the journey
+
+A recipe for 4 people needs 300 g of flour. How much do you need for 6 people? The next lesson, on ratio and proportion, shows how to scale amounts up and down.
 
 ### Sources
 
@@ -3360,41 +3360,49 @@ The topics in these notes follow the Department for Education documents below.
     variables: [
       {
         symbol: 'a',
-        name: 'Multiplicand',
-        unit: 'Whole Number',
-        description: 'The number being multiplied.',
+        name: 'The number being multiplied',
+        unit: 'no unit',
+        description: 'The top number in long multiplication.',
         color: 'text-amber-400'
       },
       {
         symbol: 'b',
-        name: 'Multiplier',
-        unit: 'Whole Number',
-        description: 'The number of times to add the multiplicand.',
+        name: 'How many lots of it',
+        unit: 'no unit',
+        description: 'The bottom number: how many times $a$ is added.',
         color: 'text-orange-400'
       }
     ],
     conceptSteps: [
       {
         stepNumber: 1,
-        title: 'Multiply Each Digit',
-        content: 'Start from the ones digit of the bottom number. Multiply it by each digit of the top number, right to left, carrying any tens digit.',
-        keyInsight: 'Multiplication is repeated addition — 4 × 3 means 4 added together 3 times.',
+        title: 'Split into tens and ones',
+        content: 'Split the bottom number into tens and ones. Multiply the top number by the ones, then by the tens, and add the two answers. The row for the tens starts with a 0 in the ones column, because it counts tens.',
+        keyInsight: 'Each answer on the way is a partial product. Long multiplication is just adding up the partial products.',
         relatedVariables: ['a', 'b']
       },
       {
         stepNumber: 2,
-        title: 'Shift & Add Partial Products',
-        content: 'For each digit in the bottom number, write the partial product on a new row, shifted one place to the left. Then add all partial products together.',
-        keyInsight: 'Each digit position represents a power of 10 — that is why you shift left.',
-        relatedVariables: []
+        title: 'Carrying',
+        content: 'If one digit times another gives 10 or more, keep only the ones digit in that column. Carry the tens to the next column on the left.',
+        keyInsight: 'Multiply the next column first, then add the digit you carried.',
+        relatedVariables: ['a']
+      },
+      {
+        stepNumber: 3,
+        title: 'Check with an estimate',
+        content: 'Round each number and multiply in your head. Your answer should be close to the estimate.',
+        keyInsight: 'If you forget the 0 in the tens row, that row is ten times too small and the answer comes out far too small.',
+        relatedVariables: ['a', 'b']
       }
     ],
     solvedExample: {
-      problem: 'Calculate $24 \\times 13$.',
+      problem: 'Work out $24 \\times 13$ using long multiplication.',
       steps: [
-        'Multiply $24 \\times 3 = 72$ (first partial product).',
-        'Multiply $24 \\times 10 = 240$ (second partial product, shifted left).',
-        'Add: $72 + 240 = 312$.'
+        'Split the bottom number into tens and ones: $13 = 10 + 3$.',
+        'Multiply by the ones: $24 \\times 3 = 72$. This is the first partial product.',
+        'Multiply by the tens: $24 \\times 10 = 240$. Write a 0 in the ones column first, because these are tens.',
+        'Add the partial products: $72 + 240 = 312$.'
       ],
       resultFormula: '24 \\times 13 = 312'
     },
@@ -3430,17 +3438,17 @@ The topics in these notes follow the Department for Education documents below.
         answer: "30,000 kg (5,000 + 25,000)"
       },
     ],
-    realWorldConnection: 'Computers multiply in a very similar way: a processor works through the digits of a binary number, shifting and adding partial products, just as you do in long multiplication.',
+    realWorldConnection: 'One way a computer can multiply is the same as long multiplication, but with binary numbers: it makes a partial product for each digit, moves it one place along, and adds them up.',
     textbookContent: `
 ## Long multiplication
 
-Times tables take you up to $12 \\times 12$. For bigger numbers, such as $24 \\times 13$, you split the problem into smaller multiplications you already know how to do.
+Times tables take you up to $12 \\times 12$. For bigger numbers you split the problem into smaller multiplications you already know how to do.
 
 ### Why it works
 
-Split the second number into tens and ones: $13 = 10 + 3$. Then multiply by each part and add the answers:
+Split the second number into tens and ones. For $31 \\times 12$, use $12 = 10 + 2$. Then multiply by each part and add the answers:
 
-$24 \\times 13 = (24 \\times 10) + (24 \\times 3) = 240 + 72 = 312$
+$31 \\times 12 = (31 \\times 10) + (31 \\times 2) = 310 + 62 = 372$
 
 Each answer on the way is called a **partial product**.
 
@@ -3448,17 +3456,19 @@ Each answer on the way is called a **partial product**.
 
 Write the bigger number on top and the smaller one underneath, lining up the ones.
 
-1.  Multiply the top number by the **ones** digit of the bottom number. Write the answer on the first row: $24 \\times 3 = 72$.
-2.  Multiply the top number by the **tens** digit. Because it is really tens, write a 0 in the ones column first, then the answer: $24 \\times 10 = 240$.
-3.  Add the rows: $72 + 240 = 312$.
+1.  Multiply the top number by the **ones** digit of the bottom number. Write the answer on the first row.
+2.  Multiply the top number by the **tens** digit. Because it is really tens, write a 0 in the ones column first, then the answer.
+3.  Add the rows.
+
+The worked example above shows each step for $24 \\times 13$.
 
 ### Carrying
 
-When one digit times another gives a two-digit answer, write down the ones digit and carry the tens to the next column. For $47 \\times 6$:
+When one digit times another gives a two-digit answer, write down the ones digit and carry the tens to the next column. For $38 \\times 7$:
 
-*   $7 \\times 6 = 42$. Write 2 and carry 4.
-*   $4 \\times 6 = 24$, plus the 4 carried, is 28.
-*   The answer is 282.
+*   $8 \\times 7 = 56$. Write 6 and carry 5.
+*   $3 \\times 7 = 21$, plus the 5 carried, is 26.
+*   The answer is 266.
 
 ### Bigger numbers
 
@@ -3470,13 +3480,17 @@ The method works the same way for a four-digit number times a two-digit number. 
 
 ### Check with an estimate
 
-Round the numbers and multiply in your head. $1{,}234$ is about $1{,}200$, and $1{,}200 \\times 25 = 30{,}000$. The answer $30{,}850$ is close, so it is probably right. An answer of $3{,}085$ would be wrong by a whole place value.
+Round the numbers and multiply in your head. $1{,}234$ is about $1{,}200$, and $1{,}200 \\times 25 = 30{,}000$. The answer $30{,}850$ is close, so it is probably right. An answer of $3{,}085$ would be ten times too small.
 
 ### Orbits in a year
 
-The International Space Station goes round the Earth about 16 times a day. In a year of 365 days that is
+The International Space Station goes round the Earth about 16 times a day. In a year of 365 days that is roughly
 
 $365 \\times 16 = (365 \\times 10) + (365 \\times 6) = 3{,}650 + 2{,}190 = 5{,}840$ orbits.
+
+### Next on the journey
+
+Multiplying whole numbers always gives a whole number. But what if 3 pizzas are shared between 4 people? Each person gets part of a pizza. The next lesson is about fractions, the numbers for parts of a whole.
 
 ### Sources
 
@@ -3519,40 +3533,40 @@ The topics in these notes follow the Department for Education document below.
       }
     ],
     variables: [
-      { symbol: 'a', name: 'Numerator 1', unit: 'Integer', description: 'Top of the first fraction.', color: 'text-violet-400' },
-      { symbol: 'b', name: 'Denominator 1', unit: 'Integer ≠ 0', description: 'Bottom of the first fraction.', color: 'text-purple-400' },
-      { symbol: 'c', name: 'Numerator 2', unit: 'Integer', description: 'Top of the second fraction.', color: 'text-fuchsia-400' },
-      { symbol: 'd', name: 'Denominator 2', unit: 'Integer ≠ 0', description: 'Bottom of the second fraction.', color: 'text-pink-400' }
+      { symbol: 'a', name: 'Top of the first fraction', unit: 'no unit', description: 'The numerator of the first fraction.', color: 'text-violet-400' },
+      { symbol: 'b', name: 'Bottom of the first fraction', unit: 'no unit', description: 'The denominator of the first fraction. It cannot be 0.', color: 'text-purple-400' },
+      { symbol: 'c', name: 'Top of the second fraction', unit: 'no unit', description: 'The numerator of the second fraction.', color: 'text-fuchsia-400' },
+      { symbol: 'd', name: 'Bottom of the second fraction', unit: 'no unit', description: 'The denominator of the second fraction. It cannot be 0.', color: 'text-pink-400' }
     ],
     conceptSteps: [
       {
         stepNumber: 1,
-        title: 'Adding & Subtracting',
-        content: 'To add or subtract fractions, they must share a common denominator. Find a common multiple of the denominators, convert both fractions, then add or subtract the numerators.',
-        keyInsight: 'You can only add like parts — you cannot add thirds and quarters directly.',
+        title: 'Adding and subtracting',
+        content: 'You can only add or subtract fractions when their denominators are the same. If they are different, change both fractions into equivalent fractions with a common multiple of the denominators. Then add or subtract the tops and keep the bottom.',
+        keyInsight: 'Multiplying the two denominators, $b \\times d$, always gives a common multiple. That is where the formula comes from.',
         relatedVariables: ['a', 'b', 'c', 'd']
       },
       {
         stepNumber: 2,
         title: 'Multiplying',
-        content: 'To multiply two fractions, multiply the numerators together and the denominators together: $\\frac{a}{b} \\times \\frac{c}{d} = \\frac{ac}{bd}$.',
-        keyInsight: 'No common denominator needed — multiplication is simpler than addition!',
-        relatedVariables: []
+        content: 'To multiply two fractions, multiply the tops together and the bottoms together: $\\dfrac{a}{b} \\times \\dfrac{c}{d} = \\dfrac{a \\times c}{b \\times d}$. Then simplify if you can.',
+        keyInsight: 'You do not need a common denominator to multiply.',
+        relatedVariables: ['a', 'b', 'c', 'd']
       },
       {
         stepNumber: 3,
-        title: 'Dividing by a Whole Number',
-        content: 'To divide a fraction by a whole number, keep the numerator and multiply the denominator by the whole number: $\\frac{1}{2} \\div 3 = \\frac{1}{6}$. Dividing by another fraction comes in key stage 3.',
-        keyInsight: 'Dividing by 3 shares the fraction into 3 equal parts, so each part is smaller.',
-        relatedVariables: []
+        title: 'Dividing by a whole number',
+        content: 'To divide a fraction by a whole number, you share it into equal parts. Keep the top the same and multiply the bottom by the whole number.',
+        keyInsight: 'Sharing into more parts makes each part smaller, so the bottom number gets bigger.',
+        relatedVariables: ['a', 'b']
       }
     ],
     solvedExample: {
-      problem: 'Calculate $\\frac{1}{3} + \\frac{1}{4}$.',
+      problem: 'Work out $\\dfrac{1}{3} + \\dfrac{1}{4}$.',
       steps: [
         'Find a number that 3 and 4 both divide into: 12.',
-        'Convert: $\\frac{1}{3} = \\frac{4}{12}$ and $\\frac{1}{4} = \\frac{3}{12}$.',
-        'Add the numerators: $\\frac{4}{12} + \\frac{3}{12} = \\frac{7}{12}$.'
+        'Change both fractions into twelfths: $\\dfrac{1}{3} = \\dfrac{4}{12}$ and $\\dfrac{1}{4} = \\dfrac{3}{12}$.',
+        'Add the tops and keep the bottom: $\\dfrac{4}{12} + \\dfrac{3}{12} = \\dfrac{7}{12}$.'
       ],
       resultFormula: '\\frac{1}{3} + \\frac{1}{4} = \\frac{7}{12}'
     },
@@ -3588,7 +3602,7 @@ The topics in these notes follow the Department for Education document below.
         answer: "1/6 (2/12 simplified)"
       },
     ],
-    realWorldConnection: 'Engineers use fraction arithmetic constantly when scaling recipes, mixing materials in ratios, or dividing resources across teams.',
+    realWorldConnection: 'Recipes use fractions. To make twice as much of a recipe that needs $\\dfrac{3}{4}$ of a litre of water, you need $2 \\times \\dfrac{3}{4} = 1\\tfrac{1}{2}$ litres.',
     textbookContent: `
 ## Calculating with fractions
 
@@ -3600,11 +3614,11 @@ $\\dfrac{2}{7} + \\dfrac{3}{7} = \\dfrac{5}{7}$
 
 When the denominators are different, first change the fractions into **equivalent fractions** with the same denominator. Use a number that both denominators divide into, called a **common multiple**:
 
-$\\dfrac{1}{3} + \\dfrac{1}{4} = \\dfrac{4}{12} + \\dfrac{3}{12} = \\dfrac{7}{12}$
+$\\dfrac{1}{2} + \\dfrac{1}{5} = \\dfrac{5}{10} + \\dfrac{2}{10} = \\dfrac{7}{10}$
 
 Subtracting works the same way:
 
-$\\dfrac{3}{4} - \\dfrac{1}{6} = \\dfrac{9}{12} - \\dfrac{2}{12} = \\dfrac{7}{12}$
+$\\dfrac{3}{4} - \\dfrac{1}{3} = \\dfrac{9}{12} - \\dfrac{4}{12} = \\dfrac{5}{12}$
 
 ### Mixed numbers
 
@@ -3620,7 +3634,7 @@ $3\\tfrac{1}{4} - 1\\tfrac{1}{2} = \\dfrac{13}{4} - \\dfrac{6}{4} = \\dfrac{7}{4
 
 To multiply two fractions, multiply the numerators together and the denominators together, then simplify:
 
-$\\dfrac{2}{3} \\times \\dfrac{3}{4} = \\dfrac{6}{12} = \\dfrac{1}{2}$
+$\\dfrac{4}{5} \\times \\dfrac{1}{2} = \\dfrac{4}{10} = \\dfrac{2}{5}$
 
 Multiplying by a fraction is like finding a fraction **of** something. Half of a quarter is $\\dfrac{1}{2} \\times \\dfrac{1}{4} = \\dfrac{1}{8}$.
 
@@ -3638,11 +3652,15 @@ Dividing one fraction by another fraction comes later, in key stage 3.
 
 ### A rover's battery
 
-A Mars rover's battery is $\\dfrac{3}{4}$ full. Each drive uses $\\dfrac{1}{8}$ of a full battery. After two drives the battery holds
+Imagine a Mars rover whose battery is $\\dfrac{3}{4}$ full. Each drive uses $\\dfrac{1}{8}$ of a full battery. After two drives the battery holds
 
 $\\dfrac{3}{4} - \\dfrac{2}{8} = \\dfrac{6}{8} - \\dfrac{2}{8} = \\dfrac{4}{8} = \\dfrac{1}{2}$
 
 so it is half full.
+
+### Next on the journey
+
+A fraction is one way to write part of a whole. Decimals and percentages are two more. How are $\\dfrac{3}{4}$, 0.75 and 75% the same amount? That is the next lesson.
 
 ### Sources
 
@@ -3669,36 +3687,36 @@ The topics in these notes follow the Department for Education document below.
       { type: 'variable', symbol: 'a' }
     ],
     variables: [
-      { symbol: 'a', name: 'Positive Value', unit: 'Real Number', description: 'A value greater than zero.', color: 'text-rose-400' }
+      { symbol: 'a', name: 'A number', unit: 'no unit', description: 'Any number. If $a$ is 5, then $-a$ is $-5$, and $-(-a)$ is 5 again.', color: 'text-rose-400' }
     ],
     conceptSteps: [
       {
         stepNumber: 1,
-        title: 'The Number Line',
-        content: 'Negative numbers lie to the left of zero on the number line. Adding a positive number moves right; adding a negative number moves left.',
-        keyInsight: 'Subtracting is the same as adding a negative: $5 - 3 = 5 + (-3)$.',
+        title: 'The number line',
+        content: 'Negative numbers are numbers less than zero. On a number line they sit to the left of 0. A number further to the right is bigger, so $-2$ is bigger than $-5$.',
+        keyInsight: 'Adding a positive number moves you right. Subtracting a positive number moves you left.',
         relatedVariables: []
       },
       {
         stepNumber: 2,
-        title: 'Sign Rules for Multiplication',
-        content: 'Positive × Positive = Positive. Negative × Negative = Positive. Positive × Negative = Negative.',
-        keyInsight: 'Two negatives cancel out — mathematically and intuitively.',
-        relatedVariables: []
+        title: 'Adding and subtracting negatives',
+        content: 'A negative number turns the move around. Adding $-2$ moves you 2 to the left, just like subtracting 2. Subtracting $-2$ moves you 2 to the right, just like adding 2.',
+        keyInsight: 'Taking away a negative number makes the answer bigger.',
+        relatedVariables: ['a']
       },
       {
         stepNumber: 3,
-        title: 'Absolute Value',
-        content: 'The absolute value $|a|$ is the distance of $a$ from zero on the number line, always non-negative: $|-5| = 5$.',
-        keyInsight: 'Distance is never negative — that is what absolute value captures.',
-        relatedVariables: []
+        title: 'Multiplying and dividing',
+        content: 'First find the size of the answer, ignoring the signs. Then choose the sign. If the two numbers have the same sign, the answer is positive. If their signs are different, the answer is negative.',
+        keyInsight: 'A negative times a negative gives a positive. The same is true when you divide.',
+        relatedVariables: ['a']
       }
     ],
     solvedExample: {
-      problem: 'Calculate $(-3) \\times (-4) + (-2)$.',
+      problem: 'Work out $(-3) \\times (-4) + (-2)$.',
       steps: [
-        'Apply sign rule: $(-3) \\times (-4) = +12$ (negative × negative = positive).',
-        'Add $-2$: $12 + (-2) = 12 - 2 = 10$.'
+        'Multiply first: $(-3) \\times (-4) = 12$. The signs are the same, so the answer is positive.',
+        'Then add $-2$: $12 + (-2) = 12 - 2 = 10$.'
       ],
       resultFormula: '(-3)(-4) + (-2) = 10'
     },
@@ -3734,7 +3752,7 @@ The topics in these notes follow the Department for Education document below.
         answer: "250 °C"
       },
     ],
-    realWorldConnection: 'Negative numbers model temperature below zero, debt in finance, and downward forces in physics.',
+    realWorldConnection: 'Negative numbers are used for temperatures below 0 °C, for depths below sea level and for money that is owed.',
     textbookContent: `
 ## Negative numbers
 
@@ -3750,10 +3768,10 @@ A number further to the right is bigger. So $-2$ is bigger than $-5$, even thoug
 
 ### Adding and subtracting
 
-*   Adding a positive number moves you **right**: $-5 + 8 = 3$.
+*   Adding a positive number moves you **right**: $-4 + 6 = 2$.
 *   Subtracting a positive number moves you **left**: $4 - 9 = -5$.
 *   Adding a negative number is the same as subtracting: $6 + (-2) = 6 - 2 = 4$.
-*   Subtracting a negative number is the same as adding: $-3 - (-7) = -3 + 7 = 4$.
+*   Subtracting a negative number is the same as adding: $-2 - (-5) = -2 + 5 = 3$.
 
 ### Intervals across zero
 
@@ -3765,28 +3783,17 @@ Work out the size of the answer as normal, then decide the sign:
 
 | Signs | Answer | Example |
 | --- | --- | --- |
-| positive and positive | positive | $3 \\times 4 = 12$ |
-| negative and negative | positive | $(-3) \\times (-4) = 12$ |
-| positive and negative | negative | $3 \\times (-4) = -12$ |
+| positive and positive | positive | $2 \\times 6 = 12$ |
+| negative and negative | positive | $(-2) \\times (-6) = 12$ |
+| positive and negative | negative | $2 \\times (-6) = -12$ |
 
 Division follows the same rules: $(-12) \\div (-4) = 3$ and $12 \\div (-4) = -3$.
 
-The same rules apply to decimals and fractions: $-2.5 \\times 4 = -10$ and $-\\dfrac{1}{2} \\times -\\dfrac{2}{3} = \\dfrac{1}{3}$.
+The same rules apply to decimals and fractions: $-1.5 \\times 4 = -6$ and $\\left(-\\dfrac{1}{2}\\right) \\times \\left(-\\dfrac{2}{3}\\right) = \\dfrac{1}{3}$.
 
-### Worked example
+### Next on the journey
 
-Work out $(-3) \\times (-4) + (-2)$.
-
-1.  Multiply first: $(-3) \\times (-4) = 12$.
-2.  Then add: $12 + (-2) = 12 - 2 = 10$.
-
-### Hot and cold on the Moon
-
-The Moon has no air to hold heat. In sunlight its surface reaches about $120$ °C; at night it falls to about $-130$ °C. The change between them is
-
-$$120 - (-130) = 120 + 130 = 250 \\text{ °C}$$
-
-Spacecraft that land there must survive that whole range.
+You can now multiply small numbers, positive or negative. How do you multiply bigger numbers, such as $24 \\times 13$, without a calculator? That is the next lesson.
 
 ### Sources
 
@@ -3816,37 +3823,38 @@ The topics in these notes follow the Department for Education document below.
       { type: 'static', latex: '\\cdots' }
     ],
     variables: [
-      { symbol: 'a', name: 'Base', unit: 'Real Number', description: 'The number being multiplied by itself.', color: 'text-cyan-400' },
-      { symbol: 'n', name: 'Exponent / Power', unit: 'Integer', description: 'How many times the base is multiplied by itself.', color: 'text-sky-400' }
+      { symbol: 'a', name: 'Base', unit: 'no unit', description: 'The number that is multiplied by itself.', color: 'text-cyan-400' },
+      { symbol: 'n', name: 'Index (power)', unit: 'no unit', description: 'How many times the base appears in the multiplication. In $2^4$ it is 4.', color: 'text-sky-400' }
     ],
     conceptSteps: [
       {
         stepNumber: 1,
-        title: 'What Is a Power?',
-        content: '$a^n$ means the base $a$ is multiplied by itself $n$ times. For example, $2^4 = 2 \\times 2 \\times 2 \\times 2 = 16$.',
-        keyInsight: 'Exponentiation is repeated multiplication, just as multiplication is repeated addition.',
+        title: 'Powers',
+        content: 'A power is shorthand for multiplying a number by itself. In $a^n$, the base $a$ appears $n$ times: $2^4 = 2 \\times 2 \\times 2 \\times 2 = 16$. The small raised number is called the index.',
+        keyInsight: 'To multiply two powers of the same base, add the indices.',
         relatedVariables: ['a', 'n']
       },
       {
         stepNumber: 2,
-        title: 'Key Exponent Laws',
-        content: '$a^m \\times a^n = a^{m+n}$ (same base, add exponents). $(a^m)^n = a^{mn}$ (power of a power). $a^0 = 1$ for any $a \\ne 0$.',
-        keyInsight: 'The laws of exponents let you simplify complex expressions without computing huge numbers.',
-        relatedVariables: ['n']
+        title: 'Roots',
+        content: 'A root undoes a power. The square root of 9 is 3, because $3^2 = 9$. The cube root of 8 is 2, because $2^3 = 8$.',
+        keyInsight: 'Most roots are not whole numbers. A decimal such as 1.41 for $\\sqrt{2}$ is only close to the exact value.',
+        relatedVariables: []
       },
       {
         stepNumber: 3,
-        title: 'Square & Cube Roots',
-        content: 'The square root $\\sqrt{a}$ is the inverse of squaring: $\\sqrt{9} = 3$ because $3^2 = 9$. Roots are fractional exponents: $\\sqrt{a} = a^{1/2}$.',
-        keyInsight: '$\\sqrt{a} = a^{1/2}$ — roots are just fractional exponents.',
-        relatedVariables: []
+        title: 'Standard form',
+        content: 'Very big and very small numbers are written as a number from 1 up to (but not including) 10, times a power of ten. So 3000 is $3 \\times 10^3$.',
+        keyInsight: 'Big numbers have a positive power of ten. Numbers smaller than 1 have a negative one.',
+        relatedVariables: ['n']
       }
     ],
     solvedExample: {
-      problem: 'Simplify $2^3 \\times 2^4$.',
+      problem: 'Write $2^3 \\times 2^4$ as a single power of 2, then work it out.',
       steps: [
-        'Same base ($2$), so add the exponents: $2^3 \\times 2^4 = 2^{3+4}$.',
-        'Compute: $2^7 = 128$.'
+        'Both powers have the same base, 2, so add the indices: $2^3 \\times 2^4 = 2^{3+4} = 2^7$.',
+        'Work it out: $2^7 = 128$.',
+        'Check the long way: $2^3 = 8$ and $2^4 = 16$, and $8 \\times 16 = 128$.'
       ],
       resultFormula: '2^3 \\times 2^4 = 2^7 = 128'
     },
@@ -3887,7 +3895,7 @@ The topics in these notes follow the Department for Education document below.
         answer: "$4.2 \\times 10^5$, which is 420,000. The other is 98,000."
       },
     ],
-    realWorldConnection: 'Standard form uses powers of 10 to write huge numbers compactly — the distance to the Sun is $1.5 \\times 10^{11}$ metres.',
+    realWorldConnection: 'Calculators and spreadsheets show very large and very small answers in standard form. A spreadsheet may show $1.5 \\times 10^{11}$ as 1.5E+11, where E+11 means "times $10^{11}$".',
     textbookContent: `
 ## Powers and roots
 
@@ -3897,7 +3905,7 @@ A power is a short way to write repeated multiplication:
 
 $$a^n = \\underbrace{a \\times a \\times \\cdots \\times a}_{n \\text{ times}}$$
 
-In $2^5$, the 2 is the **base** and the 5 is the **index** (also called the power or exponent). So $2^5 = 2 \\times 2 \\times 2 \\times 2 \\times 2 = 32$.
+In $3^4$, the 3 is the **base** and the 4 is the **index** (also called the power or exponent). So $3^4 = 3 \\times 3 \\times 3 \\times 3 = 81$.
 
 A number to the power 2 is **squared**. A number to the power 3 is **cubed**.
 
@@ -3923,10 +3931,10 @@ Most roots do not come out as whole numbers. $\\sqrt{2}$ is 1.41421... and its d
 
 | Rule | In symbols | Example |
 |---|---|---|
-| Multiplying: add the indices | $a^m \\times a^n = a^{m+n}$ | $2^3 \\times 2^4 = 2^7$ |
+| Multiplying: add the indices | $a^m \\times a^n = a^{m+n}$ | $3^2 \\times 3^3 = 3^5$ |
 | Dividing: subtract the indices | $\\dfrac{a^m}{a^n} = a^{m-n}$ | $\\dfrac{5^6}{5^2} = 5^4$ |
 | Power of a power: multiply the indices | $(a^m)^n = a^{mn}$ | $(3^2)^3 = 3^6$ |
-| Power of zero | $a^0 = 1$ | $7^0 = 1$ |
+| Power of zero (when $a$ is not 0) | $a^0 = 1$ | $7^0 = 1$ |
 | Negative index | $a^{-n} = \\dfrac{1}{a^n}$ | $10^{-3} = \\dfrac{1}{1000}$ |
 
 ### Standard form
@@ -3942,7 +3950,11 @@ where $A$ is at least 1 and less than 10, and $n$ is a whole number.
 
 To compare two numbers in standard form, look at the power of ten first. $2 \\times 10^8$ is larger than $9 \\times 10^7$, even though 9 is larger than 2.
 
-Scientists use standard form all the time. The distance from Earth to the Sun is about $1.5 \\times 10^{11}$ metres.
+Scientists use standard form for numbers like these. Light travels about $3 \\times 10^8$ metres every second.
+
+### Next on the journey
+
+That completes your toolkit. Scientists often swap powers of ten for short words: 1000 metres is 1 kilometre, and $10^{-3}$ amperes is 1 milliampere. Mission 2, "Get to orbit", starts with converting units like these.
 
 ### Sources
 

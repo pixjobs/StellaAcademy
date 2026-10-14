@@ -101,7 +101,7 @@ export const CURRICULUM: Record<ConceptId, CurriculumPlace> = {
     stage: "Key stage 3",
     statements: [
       { source: 'ncMaths', where: "Key stage 3", text: "use integer powers and associated real roots (square, cube and higher), recognise powers of 2, 3, 4, 5 and distinguish between exact representations of roots and their decimal approximations" },
-      { source: 'ncMaths', where: "Key stage 3", text: "interpret and compare numbers in standard form A x 10ⁿ, 1≤A<10, where n is a positive or negative integer or 0" },
+      { source: 'ncMaths', where: "Key stage 3", text: "interpret and compare numbers in standard form A x 10ⁿ 1≤A<10, where n is a positive or negative integer or 0" },
     ],
   },
   binary: {
