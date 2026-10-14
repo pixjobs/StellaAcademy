@@ -16,15 +16,37 @@ const MAX_BODY = 4_000;
 const MAX_TEXT = 1_000;
 const LESSONS = new Set<string>(studyModules.map((m) => m.id));
 
+/** The request body as text, or null once it passes `max` bytes (stops reading there, whatever Content-Length said). */
+async function readCapped(req: NextRequest, max: number): Promise<string | null> {
+  if (!req.body) return '';
+  const reader = req.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let size = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    size += value.byteLength;
+    if (size > max) {
+      await reader.cancel();
+      return null;
+    }
+    chunks.push(value);
+  }
+  return new TextDecoder().decode(Buffer.concat(chunks));
+}
+
 export async function POST(req: NextRequest) {
   if (rateLimited(clientAddress(req))) {
     return NextResponse.json({ error: 'Too many reports. Please try again in a few minutes.' }, { status: 429 });
   }
 
+  const tooLong = () => NextResponse.json({ error: 'Report too long.' }, { status: 413 });
+  if (Number(req.headers.get('content-length')) > MAX_BODY) return tooLong();
+
   let body: { lesson?: unknown; kind?: unknown; text?: unknown };
   try {
-    const raw = await req.text();
-    if (raw.length > MAX_BODY) return NextResponse.json({ error: 'Report too long.' }, { status: 413 });
+    const raw = await readCapped(req, MAX_BODY);
+    if (raw === null) return tooLong();
     body = JSON.parse(raw);
   } catch {
     return NextResponse.json({ error: 'Invalid report.' }, { status: 400 });
