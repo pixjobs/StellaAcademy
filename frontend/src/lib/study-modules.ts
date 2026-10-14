@@ -2844,63 +2844,62 @@ The topics in these notes follow the Department for Education document below.
     variables: [
       {
         symbol: 'a',
-        name: 'Part 1',
-        unit: 'units',
-        description: 'The first quantity in the first ratio.',
+        name: 'First amount',
+        unit: 'any unit',
+        description: 'One quantity, for example the fuel used. It has the same unit as $c$.',
         color: 'text-amber-400'
       },
       {
         symbol: 'b',
-        name: 'Part 2',
-        unit: 'units',
-        description: 'The second quantity in the first ratio.',
+        name: 'Second amount',
+        unit: 'any unit',
+        description: 'The quantity it is compared with, for example the distance travelled. It has the same unit as $d$.',
         color: 'text-rose-400'
       },
       {
         symbol: 'c',
-        name: 'Scaled Part 1',
-        unit: 'units',
-        description: 'The first quantity in the equivalent scaled ratio.',
+        name: 'New first amount',
+        unit: 'any unit',
+        description: 'The first quantity after scaling up or down.',
         color: 'text-amber-400'
       },
       {
         symbol: 'd',
-        name: 'Scaled Part 2',
-        unit: 'units',
-        description: 'The second quantity in the equivalent scaled ratio.',
+        name: 'New second amount',
+        unit: 'any unit',
+        description: 'The second quantity after scaling by the same number.',
         color: 'text-rose-400'
       }
     ],
     conceptSteps: [
       {
         stepNumber: 1,
-        title: 'What is a Ratio?',
-        content: 'A ratio is a way to compare two or more quantities. If a recipe calls for 200 g of flour for every 100 g of sugar, the ratio of flour to sugar is 2 to 1 (written as 2:1 or 2/1).',
-        keyInsight: 'Ratios describe the relative sizes of two or more values.',
+        title: 'What a ratio is',
+        content: 'A ratio compares two or more quantities. A mixture with 2 parts fuel to every 3 parts oxidiser (the substance the fuel burns with) has a fuel to oxidiser ratio of $2 : 3$.',
+        keyInsight: 'The order matters. Oxidiser to fuel is $3 : 2$.',
         relatedVariables: ['a', 'b']
       },
       {
         stepNumber: 2,
-        title: 'What is a Proportion?',
-        content: 'A proportion is simply an equation stating that two ratios are equal. If 200 g of flour needs 100 g of sugar, then 400 g of flour will need 200 g of sugar.',
-        keyInsight: 'Proportions are scaled-up or scaled-down versions of the same ratio.',
+        title: 'Direct proportion',
+        content: 'In direct proportion, if one quantity doubles, so does the other. Their ratio stays the same, so $\\dfrac{a}{b} = \\dfrac{c}{d}$. To find a missing value, work out the amount for one first, then multiply.',
+        keyInsight: 'If you know three of the four values, you can find the fourth.',
         relatedVariables: ['a', 'b', 'c', 'd']
       },
       {
         stepNumber: 3,
-        title: 'Solving for an Unknown',
-        content: 'If you know three parts of a proportion, you can find the fourth using cross-multiplication. For a/b = c/d, it is always true that a×d = b×c.',
-        keyInsight: 'Cross-multiplication is a powerful tool to solve any proportion problem.',
-        relatedVariables: ['a', 'b', 'c', 'd']
+        title: 'Inverse proportion',
+        content: 'In inverse proportion, if one quantity doubles, the other halves. Going twice as fast makes a journey take half as long.',
+        keyInsight: 'In inverse proportion the two quantities multiplied together always give the same number.',
+        relatedVariables: []
       }
     ],
     solvedExample: {
       problem: 'A car travels 150 miles on 15 litres of petrol. How many miles can it travel on 24 litres?',
       steps: [
-        'Set up a proportion: $\\frac{\\text{miles}}{\\text{litres}} = \\frac{\\text{miles}}{\\text{litres}}$.',
-        'Put in the known values: $\\frac{150}{15} = \\frac{x}{24}$.',
-        'Cross-multiply: $150 \\times 24 = 15 \\times x$.',
-        'Solve the equation: $3600 = 15x$, so $x = \\frac{3600}{15} = 240$.'
+        'Distance and fuel are in direct proportion: twice the fuel takes the car twice as far.',
+        'Find how far one litre goes: $150 \\div 15 = 10$ miles.',
+        'Multiply by the number of litres: $10 \\times 24 = 240$ miles.'
       ],
       resultFormula: 'x = 240 \\text{ miles}'
     },
@@ -2936,7 +2935,7 @@ The topics in these notes follow the Department for Education document below.
         answer: "3,420 N"
       },
     ],
-    realWorldConnection: 'Chefs use proportions constantly to scale recipes up or down depending on the number of guests. Mapmakers use ratios (scales) to accurately represent large geographic areas on small pieces of paper.',
+    realWorldConnection: 'A map scale is a ratio. On a map with a scale of $1 : 25\\,000$, 1 cm on the map stands for 25 000 cm, which is 250 m, on the ground.',
     textbookContent: `
 ## Ratio and proportion
 
@@ -2946,13 +2945,13 @@ A **ratio** compares two or more quantities. If a mixture has 2 parts fuel to 3 
 
 To write a ratio in its **simplest form**, divide every part by the same number, as you would simplify a fraction:
 
-$$12 : 18 = 2 : 3 \\quad \\text{(dividing both by 6)}$$
+$$15 : 25 = 3 : 5 \\quad \\text{(dividing both by 5)}$$
 
 ### Ratios and fractions
 
 A ratio can also be written as fractions of the whole. In $2 : 3$ there are $2 + 3 = 5$ parts, so the first quantity is $\\dfrac{2}{5}$ of the total and the second is $\\dfrac{3}{5}$. The first is $\\dfrac{2}{3}$ of the second.
 
-To share £60 in the ratio $2 : 3$: one part is $60 \\div 5 = 12$, so the shares are $2 \\times 12 = £24$ and $3 \\times 12 = £36$.
+To share £40 in the ratio $3 : 5$: there are $3 + 5 = 8$ parts, so one part is $40 \\div 8 = 5$, and the shares are $3 \\times 5 = £15$ and $5 \\times 5 = £25$.
 
 ### Direct proportion
 
@@ -2960,9 +2959,7 @@ Two quantities are in **direct proportion** when doubling one doubles the other.
 
 $$\\frac{a}{b} = \\frac{c}{d}$$
 
-If you know three of the values, you can find the fourth. A car goes 150 miles on 15 litres of fuel. On 24 litres it goes
-
-$$\\frac{150}{15} = \\frac{x}{24} \\quad \\Rightarrow \\quad x = 10 \\times 24 = 240 \\text{ miles}$$
+If you know three of the values, you can find the fourth. If 5 litres of paint cover 30 m², one litre covers $30 \\div 5 = 6$ m², so 8 litres cover $6 \\times 8 = 48$ m².
 
 Algebraically, $y = kx$ for some fixed number $k$. On a graph, direct proportion is a straight line through the origin.
 
@@ -2974,17 +2971,13 @@ $$xy = k \\quad \\text{or} \\quad y = \\frac{k}{x}$$
 
 At 50 km/h a journey takes 6 hours; at 100 km/h it takes 3 hours. Speed × time is 300 each time. On a graph, inverse proportion is a curve that gets closer and closer to the axes without touching them.
 
-### Worked example
-
-Food for 4 astronauts lasts 30 days. How long does it last 6 astronauts?
-
-1.  More astronauts means fewer days, so this is inverse proportion.
-2.  The fixed product is $4 \\times 30 = 120$ astronaut-days of food.
-3.  For 6 astronauts: $120 \\div 6 = 20$ days.
-
 ### Weight on other worlds
 
-Your weight on Mars is directly proportional to your weight on Earth: it is about $0.38$ times as much, because Mars pulls more weakly. A rover that weighs 9,000 N on Earth weighs $0.38 \\times 9{,}000 = 3{,}420$ N on Mars. Its mass is the same on both planets.
+Your weight on Mars is directly proportional to your weight on Earth: it is about $0.38$ times as much, because Mars pulls more weakly. An astronaut who weighs 800 N on Earth weighs $0.38 \\times 800 = 304$ N on Mars. Their mass is the same on both planets.
+
+### Next on the journey
+
+A scale drawing uses a ratio to show a real shape smaller. How much space does a shape cover, and how far is it round its edge? The next lesson is about area and perimeter.
 
 ### Sources
 

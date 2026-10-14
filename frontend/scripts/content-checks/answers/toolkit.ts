@@ -613,6 +613,56 @@ const DECIMALS_PERCENTAGES: Entry[] = [
   nv(DP, 'textbookContent: 75% of 600 litres', 'If the full tank holds 600 litres', '$600 \\div 4 \\times 3 = 450$', 3, 0.75 * 600, 'litres'),
 ];
 
+const PR = 'proportions';
+const PR_SOLVED = 'A car travels 150 miles on 15 litres of petrol.';
+const MARS_WEIGHT_RATIO = 3.71 / 9.81; // surface gravity of Mars over Earth's, about 0.378
+
+const PROPORTIONS: Entry[] = [
+  // Worked example
+  nv(PR, 'solvedExample.steps[1]', PR_SOLVED, '$150 \\div 15 = 10$ miles', 2, 150 / 15, 'miles per litre'),
+  nv(PR, 'solvedExample.steps[2]', PR_SOLVED, '$10 \\times 24 = 240$ miles', 2, (150 / 15) * 24, 'miles'),
+  nv(PR, 'solvedExample.resultFormula', PR_SOLVED, 'x = 240', 0, (150 * 24) / 15, 'miles'),
+  // Practice
+  fv(PR, 'practiceProblems[0]', 'Write the ratio 12 : 18 in its simplest form.', '2 : 3', frac(0), 12 / 18),
+  {
+    lesson: PR, where: 'practiceProblems[0] (simplest)', kind: 'claim', expectQuestionIncludes: 'Write the ratio 12 : 18 in its simplest form.',
+    claimIncludes: '2 : 3', verify: () => ({ holds: gcd(12, 18) === 6 && gcd(2, 3) === 1, detail: '12 : 18 ÷ 6 = 2 : 3' }),
+  },
+  nv(PR, 'practiceProblems[1] (first share)', 'Share £60 in the ratio 2 : 3.', '£24 and £36', 0, (60 / 5) * 2, '£'),
+  nv(PR, 'practiceProblems[1] (second share)', 'Share £60 in the ratio 2 : 3.', '£24 and £36', 1, (60 / 5) * 3, '£'),
+  nv(PR, 'practiceProblems[2]', '3 apples cost £2. How much do 9 apples cost?', '£6', 0, (2 / 3) * 9, '£'),
+  nv(PR, 'practiceProblems[3]', 'A map uses 1 cm for every 10 km.', '4.5 cm', 0, 45 / 10, 'cm'),
+  nv(PR, 'practiceProblems[4]', 'Food for 4 astronauts lasts 30 days.', '20 days', 0, (4 * 30) / 6, 'days'),
+  nv(PR, 'practiceProblems[4] (astronaut-days)', 'Food for 4 astronauts lasts 30 days.', '4 × 30 = 120 astronaut-days', 2, 4 * 30, 'astronaut-days'),
+  nv(PR, 'practiceProblems[5]', 'A rover weighs 9,000 N on Earth.', '3,420 N', 0, 0.38 * 9000, 'N'),
+  {
+    lesson: PR, where: 'practiceProblems[5] (0.38)', kind: 'claim', expectQuestionIncludes: 'Weight on Mars is 0.38 times weight on Earth.',
+    claimIncludes: '3,420 N',
+    verify: () => ({ holds: Math.abs(MARS_WEIGHT_RATIO - 0.38) < 0.005, detail: `g on Mars ÷ g on Earth = 3.71 ÷ 9.81 = ${MARS_WEIGHT_RATIO.toFixed(3)}` }),
+  },
+  // Notes
+  fv(PR, 'textbookContent: 15 : 25', 'To write a ratio in its **simplest form**', '$$15 : 25 = 3 : 5', frac(2), 15 / 25),
+  nv(PR, 'textbookContent: 15 : 25, divide by', 'To write a ratio in its **simplest form**', '(dividing both by 5)', 0, gcd(15, 25)),
+  fv(PR, 'textbookContent: 2 : 3, first part of the whole', 'In $2 : 3$ there are $2 + 3 = 5$ parts', 'the first quantity is $\\dfrac{2}{5}$ of the total', frac(0), 2 / (2 + 3)),
+  fv(PR, 'textbookContent: 2 : 3, second part of the whole', 'In $2 : 3$ there are $2 + 3 = 5$ parts', 'the second is $\\dfrac{3}{5}$', frac(0), 3 / (2 + 3)),
+  fv(PR, 'textbookContent: 2 : 3, first of second', 'In $2 : 3$ there are $2 + 3 = 5$ parts', 'The first is $\\dfrac{2}{3}$ of the second.', frac(0), 2 / 3),
+  nv(PR, 'textbookContent: share £40, parts', 'To share £40 in the ratio $3 : 5$', '$3 + 5 = 8$ parts', 2, 3 + 5),
+  nv(PR, 'textbookContent: share £40, one part', 'To share £40 in the ratio $3 : 5$', '$40 \\div 8 = 5$', 2, 40 / 8, '£'),
+  nv(PR, 'textbookContent: share £40, first', 'To share £40 in the ratio $3 : 5$', '$3 \\times 5 = £15$', 2, (40 / 8) * 3, '£'),
+  nv(PR, 'textbookContent: share £40, second', 'To share £40 in the ratio $3 : 5$', '$5 \\times 5 = £25$', 2, (40 / 8) * 5, '£'),
+  nv(PR, 'textbookContent: paint, one litre', 'If 5 litres of paint cover 30 m²', '$30 \\div 5 = 6$ m²', 2, 30 / 5, 'm²'),
+  nv(PR, 'textbookContent: paint, 8 litres', 'If 5 litres of paint cover 30 m²', '$6 \\times 8 = 48$ m²', 2, (30 / 5) * 8, 'm²'),
+  nv(PR, 'textbookContent: journey at 50 km/h', 'At 50 km/h a journey takes 6 hours', 'Speed × time is 300 each time.', 0, 50 * 6, 'km'),
+  nv(PR, 'textbookContent: journey at 100 km/h', 'At 50 km/h a journey takes 6 hours', 'at 100 km/h it takes 3 hours', 1, 300 / 100, 'hours'),
+  {
+    lesson: PR, where: 'textbookContent: Mars weight ratio', kind: 'claim', expectNotesIncludes: 'Your weight on Mars is directly proportional',
+    claimIncludes: 'it is about $0.38$ times as much',
+    verify: () => ({ holds: Math.abs(MARS_WEIGHT_RATIO - 0.38) < 0.005, detail: `3.71 ÷ 9.81 = ${MARS_WEIGHT_RATIO.toFixed(3)}` }),
+  },
+  nv(PR, 'textbookContent: astronaut on Mars', 'An astronaut who weighs 800 N on Earth', '$0.38 \\times 800 = 304$ N', 2, 0.38 * 800, 'N'),
+];
+
 export const ENTRIES: Entry[] = [
   ...ARITHMETIC, ...NEGATIVE_NUMBERS, ...MULTIPLICATION, ...FRACTIONS, ...FRACTION_OPS, ...DECIMALS_PERCENTAGES,
+  ...PROPORTIONS,
 ];
