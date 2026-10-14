@@ -53,17 +53,15 @@ export const studyModules: StudyModule[] = [
     accentColor: 'indigo',
     difficulty: 2,
     estimatedMinutes: 15,
-    formula: 'F_g = G \\frac{M \\cdot m}{r^2}',
+    formula: 'F = \\frac{GMm}{r^2}',
     formulaLayout: [
-      { type: 'variable', symbol: 'F_g' },
+      { type: 'variable', symbol: 'F' },
       { type: 'operator', content: '=' },
-      { type: 'variable', symbol: 'G' },
-      { type: 'operator', content: '·' },
       {
         type: 'fraction',
         numerator: [
+          { type: 'variable', symbol: 'G' },
           { type: 'variable', symbol: 'M' },
-          { type: 'operator', content: '·' },
           { type: 'variable', symbol: 'm' }
         ],
         denominator: [
@@ -74,39 +72,39 @@ export const studyModules: StudyModule[] = [
     ],
     variables: [
       {
-        symbol: 'F_g',
-        name: 'Gravitational Force',
-        unit: 'Newtons (N)',
-        description: 'The attractive force between two masses. Gravity is always attractive, pulling masses together across space.',
+        symbol: 'F',
+        name: 'Gravitational force',
+        unit: 'newtons (N)',
+        description: 'The pull between the two masses. It always attracts.',
         color: 'text-indigo-400'
       },
       {
         symbol: 'G',
-        name: 'Gravitational Constant',
-        unit: 'N⋅m²/kg²',
-        description: 'A fundamental constant of the universe that determines the baseline strength of gravity.',
+        name: 'Gravitational constant',
+        unit: 'N m² kg⁻²',
+        description: 'A fixed number, $6.67 \\times 10^{-11}$, the same everywhere in the universe.',
         color: 'text-violet-400'
       },
       {
         symbol: 'M',
-        name: 'Mass 1 (Attractor)',
-        unit: 'Kilograms (kg)',
-        description: 'The mass of the larger object, typically a planet or star in orbital mechanics.',
+        name: 'Larger mass',
+        unit: 'kilograms (kg)',
+        description: 'Usually a planet or a star.',
         color: 'text-cyan-400',
         range: { min: 1, max: 10, default: 1 }
       },
       {
         symbol: 'm',
-        name: 'Mass 2 (Satellite)',
-        unit: 'Kilograms (kg)',
-        description: 'The mass of the smaller object, such as a satellite or spacecraft.',
+        name: 'Smaller mass',
+        unit: 'kilograms (kg)',
+        description: 'For example a satellite or a spacecraft.',
         color: 'text-sky-400'
       },
       {
         symbol: 'r',
-        name: 'Distance',
-        unit: 'Metres (m)',
-        description: 'The distance between the centres of mass of the two objects. Because it is squared in the denominator, gravity weakens quickly as distance increases.',
+        name: 'Distance between centres',
+        unit: 'metres (m)',
+        description: 'Measured from the centre of one mass to the centre of the other, not from the surface.',
         color: 'text-rose-400',
         range: { min: 1, max: 10, default: 2 }
       }
@@ -114,35 +112,34 @@ export const studyModules: StudyModule[] = [
     conceptSteps: [
       {
         stepNumber: 1,
-        title: 'Universal Attraction',
-        content: 'Every particle attracts every other particle in the universe with a force proportional to the product of their masses.',
-        keyInsight: 'More massive objects create a stronger gravitational pull.',
+        title: 'Every mass attracts every other mass',
+        content: 'Any two masses pull on each other. The pull is bigger when either mass is bigger: double one of the masses and the force doubles.',
+        keyInsight: 'Gravity only ever pulls. It never pushes masses apart.',
         relatedVariables: ['M', 'm']
       },
       {
         stepNumber: 2,
-        title: 'The Inverse-Square Law',
-        content: 'The gravitational force is inversely proportional to the square of the distance between the centres of the masses. If you double the distance, the force becomes a quarter as strong.',
-        keyInsight: 'Gravity weakens very quickly as you move away from a planet.',
-        relatedVariables: ['r', 'F_g']
+        title: 'The inverse square law',
+        content: 'The force also depends on how far apart the centres of the masses are. Move twice as far from the centre of a planet and its pull falls to a quarter.',
+        keyInsight: 'Gravity weakens with the square of the distance from the centre.',
+        relatedVariables: ['r', 'F']
       },
       {
         stepNumber: 3,
-        title: 'Orbital Mechanics',
-        content: 'In orbit, a satellite moves sideways so fast that as it falls towards the planet, the surface curves away beneath it. It is constantly in free-fall.',
-        keyInsight: 'Orbits are just falling while moving sideways fast enough to miss the ground.',
-        relatedVariables: ['F_g']
+        title: 'Orbiting is falling',
+        content: 'A satellite in orbit is falling towards Earth the whole time, but it moves sideways so fast that the ground curves away beneath it as quickly as it falls.',
+        keyInsight: 'An orbit is a fall that never reaches the ground.',
+        relatedVariables: ['F']
       }
     ],
     solvedExample: {
-      problem: 'Calculate the gravitational force between Earth ($M = 5.97 \\times 10^{24}$ kg) and a $1000$ kg satellite in Low Earth Orbit ($r = 6.7 \\times 10^6$ m).',
+      problem: 'Find the gravitational force between Earth ($M = 5.97 \\times 10^{24}$ kg) and a $1000$ kg satellite in a low orbit, $r = 6.7 \\times 10^6$ m from Earth\'s centre.',
       steps: [
-        'Identify given values and the gravitational constant $G \\approx 6.674 \\times 10^{-11}$.',
-        'Plug values into the formula: $F_g = G \\frac{M \\cdot m}{r^2}$.',
-        'Substitute the numbers: $F_g = (6.674 \\times 10^{-11}) \\frac{5.97 \\times 10^{24} \\cdot 1000}{(6.7 \\times 10^6)^2}$.',
-        'Calculate the result.'
+        'Write down the constant: $G = 6.67 \\times 10^{-11}$ N m² kg⁻².',
+        'Substitute into $F = \\dfrac{GMm}{r^2}$: $F = \\dfrac{6.67 \\times 10^{-11} \\times 5.97 \\times 10^{24} \\times 1000}{(6.7 \\times 10^6)^2}$.',
+        'Work out the top and the bottom: $F = \\dfrac{3.98 \\times 10^{17}}{4.49 \\times 10^{13}}$.'
       ],
-      resultFormula: 'F_g \\approx 8880 \\text{ N}'
+      resultFormula: 'F \\approx 8870 \\text{ N}'
     },
     practiceProblems: [
       {
@@ -176,7 +173,7 @@ export const studyModules: StudyModule[] = [
         answer: "The station and everyone in it are falling freely together around Earth. Nothing presses on them, so they feel weightless even though gravity still acts."
       },
     ],
-    realWorldConnection: 'Engineers use this exact law to calculate the precise trajectories of spacecraft, ensuring they can slingshot around planets or establish stable orbits without burning excess fuel.',
+    realWorldConnection: 'Mission planners use this law to work out how fast a spacecraft must travel to stay in orbit at any height.',
     textbookContent: `
 ## Gravitational fields
 
@@ -233,6 +230,10 @@ It is negative because work has to be done to pull a mass away from the planet, 
 ### Comparing gravity with electric fields
 
 Both follow an inverse square law for point sources, and both have a field strength and a potential. The difference is that gravity only ever attracts, while electric forces can attract or repel.
+
+### Next on the journey
+
+You can now work out how fast a satellite must move to stay in a circular orbit. How does a spacecraft climb to a higher one? That is the next lesson.
 
 ### Sources
 
@@ -446,72 +447,72 @@ The topics in these notes follow the Department for Education documents below.
     variables: [
       {
         symbol: '\\text{Ratio}',
-        name: 'Gear Ratio',
-        unit: 'Unitless',
-        description: 'The ratio of the number of teeth on the driven gear to the number of teeth on the driving gear.',
+        name: 'Gear ratio',
+        unit: 'no unit',
+        description: 'Teeth on the driven gear divided by teeth on the driver gear.',
         color: 'text-amber-400',
         range: { min: 1, max: 5, default: 2 }
       },
       {
         symbol: 'N_{\\text{driven}}',
-        name: 'Driven Gear Teeth',
-        unit: 'Count',
-        description: 'The number of teeth on the gear that is receiving power.',
+        name: 'Teeth on the driven gear',
+        unit: 'a count',
+        description: 'The gear that is turned by the other one.',
         color: 'text-orange-400'
       },
       {
         symbol: 'N_{\\text{driver}}',
-        name: 'Driver Gear Teeth',
-        unit: 'Count',
-        description: 'The number of teeth on the gear that is attached to the motor or power source.',
+        name: 'Teeth on the driver gear',
+        unit: 'a count',
+        description: 'The gear turned by the motor, the pedals or your hand.',
         color: 'text-yellow-400'
       },
       {
         symbol: '\\omega_{\\text{driver}}',
-        name: 'Driver Speed',
-        unit: 'RPM or rad/s',
-        description: 'The rotational speed of the driving gear.',
+        name: 'Speed of the driver gear',
+        unit: 'turns per minute',
+        description: 'How many times the driver gear goes round each minute.',
         color: 'text-rose-400'
       },
       {
         symbol: '\\omega_{\\text{driven}}',
-        name: 'Driven Speed',
-        unit: 'RPM or rad/s',
-        description: 'The rotational speed of the driven gear.',
+        name: 'Speed of the driven gear',
+        unit: 'turns per minute',
+        description: 'How many times the driven gear goes round each minute.',
         color: 'text-red-400'
       }
     ],
     conceptSteps: [
       {
         stepNumber: 1,
-        title: 'Transmitting Motion',
-        content: 'Gears are used to transmit rotational motion and torque between shafts. When two gears mesh, they rotate in opposite directions.',
-        keyInsight: 'Gears allow us to trade speed for torque, or torque for speed.',
+        title: 'Meshing gears pass on a turning effect',
+        content: 'A gear is a wheel with teeth around its edge. When two gears mesh and the driver gear turns, its teeth push on the teeth of the driven gear, so the turning effect passes from one shaft to the next.',
+        keyInsight: 'Meshing gears always turn in opposite ways.',
         relatedVariables: ['\\text{Ratio}']
       },
       {
         stepNumber: 2,
-        title: 'Calculating the Ratio',
-        content: 'The gear ratio is found by dividing the number of teeth on the driven gear by the number of teeth on the driver gear.',
-        keyInsight: 'A ratio > 1 means the output is slower but has more torque.',
+        title: 'The gear ratio',
+        content: 'The gear ratio is the number of teeth on the driven gear divided by the number on the driver gear. A 10-tooth gear driving a 40-tooth gear has a ratio of 4, so the driven gear turns once for every four turns of the driver.',
+        keyInsight: 'A ratio bigger than 1 means the driven gear turns more slowly than the driver.',
         relatedVariables: ['N_{\\text{driven}}', 'N_{\\text{driver}}']
       },
       {
         stepNumber: 3,
-        title: 'Speed vs. Torque',
-        content: 'If a small gear drives a large gear, the large gear turns slower but can provide a much stronger twisting force (torque).',
-        keyInsight: 'Speed and torque are inversely related in a gear train.',
+        title: 'Speed or turning force, not both',
+        content: 'The turning effect of a force is its moment: the force times its distance from the pivot, in newton metres (N m). When a small gear drives a large one, the large gear turns more slowly but with a larger moment.',
+        keyInsight: 'Ignoring friction, the moment is multiplied by the gear ratio and the speed is divided by it. Gears never give more of both.',
         relatedVariables: ['\\omega_{\\text{driver}}', '\\omega_{\\text{driven}}']
       }
     ],
     solvedExample: {
-      problem: 'Find the output torque ($\\tau_{\\text{out}}$) if a motor drives a 12-tooth gear at $5$ Nm, meshed with a 36-tooth gear.',
+      problem: 'A motor turns a 12-tooth gear 90 times a minute with a moment of 5 N m. It drives a 36-tooth gear. How fast does the driven gear turn, and with what moment?',
       steps: [
-        'Find the gear ratio: $\\text{Ratio} = \\frac{36}{12} = 3.0$.',
-        'Remember that torque multiplies by the gear ratio.',
-        'Calculate output torque: $\\tau_{\\text{out}} = \\tau_{\\text{in}} \\cdot \\text{Ratio} = 5 \\cdot 3.0$.'
+        'Gear ratio: $\\dfrac{36}{12} = 3$.',
+        'Speed of the driven gear: $90 \\div 3 = 30$ turns per minute.',
+        'Moment on the driven gear: $5 \\times 3 = 15$ N m.'
       ],
-      resultFormula: '\\tau_{\\text{out}} = 15 \\text{ Nm}'
+      resultFormula: '30 \\text{ turns per minute, with a moment of } 15 \\text{ N m}'
     },
     practiceProblems: [
       {
@@ -545,7 +546,7 @@ The topics in these notes follow the Department for Education documents below.
         answer: "Anticlockwise. Meshing gears always turn in opposite directions."
       },
     ],
-    realWorldConnection: 'Rovers on Mars use highly geared motors to drive slowly over rocks while producing enormous amounts of torque to avoid getting stuck.',
+    realWorldConnection: 'Each wheel of a Mars rover is driven by a small electric motor through gears, so the wheel turns slowly but with a large moment, enough to climb over rocks.',
     textbookContent: `
 ## Gears and turning forces
 
@@ -583,17 +584,9 @@ If there is no friction:
 
 A gear ratio bigger than 1 gives a larger moment but a slower turn. A ratio smaller than 1 gives a faster turn but a smaller moment. Gears never give more of both. A simple machine can make a force bigger only by making the movement smaller.
 
-### Worked example
-
-A motor turns a 12-tooth gear 90 times a minute with a moment of 5 N m. It drives a 36-tooth gear.
-
-1.  Gear ratio: $\\dfrac{36}{12} = 3$.
-2.  Speed of the driven gear: $90 \\div 3 = 30$ turns per minute.
-3.  Moment on the driven gear: $5 \\times 3 = 15$ N m.
-
 ### Where gears matter
 
-A bicycle's low gear lets you climb a hill with less push on the pedals, in exchange for more turns of them. A rover on Mars does the same thing with its wheels: small electric motors that spin fast drive the wheels through gears, so the wheels turn slowly but with enough moment to climb over rocks.
+A bicycle's low gear lets you climb a hill with less push on the pedals, in exchange for more turns of them. Engineers use the same trade wherever a small motor has to move something heavy, from a car's gearbox to the wheels of a rover.
 
 ### Sources
 
@@ -631,56 +624,56 @@ The topics in these notes follow the Department for Education documents below.
     variables: [
       {
         symbol: 'a',
-        name: 'Semi-major Axis',
-        unit: 'Metres or Kilometres',
-        description: 'Half of the longest diameter of the elliptical transfer orbit. It defines the size and energy of the orbit.',
+        name: 'Semi-major axis',
+        unit: 'kilometres (km) or metres (m)',
+        description: 'Half the length of the transfer ellipse, measured along its longest line.',
         color: 'text-amber-400'
       },
       {
         symbol: 'r_1',
-        name: 'Initial Orbit Radius',
-        unit: 'Metres or Kilometres',
-        description: 'The radius of the circular orbit the spacecraft starts in.',
+        name: 'Radius of the starting orbit',
+        unit: 'kilometres (km) or metres (m)',
+        description: 'Measured from the centre of Earth.',
         color: 'text-orange-400'
       },
       {
         symbol: 'r_2',
-        name: 'Target Orbit Radius',
-        unit: 'Metres or Kilometres',
-        description: 'The radius of the destination circular orbit.',
+        name: 'Radius of the target orbit',
+        unit: 'kilometres (km) or metres (m)',
+        description: 'Also measured from the centre of Earth.',
         color: 'text-yellow-400'
       }
     ],
     conceptSteps: [
       {
         stepNumber: 1,
-        title: 'Orbital Transfers',
-        content: 'To move from one orbit to another, a spacecraft must change its velocity (ΔV). A Hohmann transfer is the most fuel-efficient way to transfer between two circular, coplanar orbits.',
-        keyInsight: 'A Hohmann transfer needs exactly two engine burns.',
+        title: 'Changing orbit takes two burns',
+        content: 'To climb to a higher circular orbit, a spacecraft usually makes two short engine burns, with a long coast in between. This is called a Hohmann transfer.',
+        keyInsight: 'One burn starts the climb. A second burn keeps the spacecraft at its new height.',
         relatedVariables: []
       },
       {
         stepNumber: 2,
-        title: 'The Transfer Ellipse',
-        content: 'The first burn puts the spacecraft into an elliptical transfer orbit. The lowest point (periapsis) is at the original orbit, and the highest point (apoapsis) touches the target orbit.',
-        keyInsight: 'The semi-major axis (a) of this ellipse is the average of the two orbital radii.',
+        title: 'The transfer ellipse',
+        content: 'The first burn speeds the spacecraft up, so it climbs away along an ellipse, a stretched circle. The ellipse touches the starting orbit at its lowest point and the target orbit at its highest.',
+        keyInsight: 'The semi-major axis of the ellipse is the average of the two orbit radii.',
         relatedVariables: ['a', 'r_1', 'r_2']
       },
       {
         stepNumber: 3,
-        title: 'Circularising',
-        content: 'When the spacecraft reaches the target altitude, it is moving too slowly to stay there. A second burn is required to circularise the orbit at the new altitude.',
-        keyInsight: 'Without the second burn, the spacecraft stays on the transfer ellipse and swings back down to its original altitude.',
+        title: 'The second burn',
+        content: 'At the top of the ellipse the spacecraft is moving too slowly for a circular orbit at that height. The second burn speeds it up to the right speed.',
+        keyInsight: 'Without the second burn, the spacecraft swings back down to where it started.',
         relatedVariables: []
       }
     ],
     solvedExample: {
-      problem: 'Calculate the semi-major axis ($a$) of a Hohmann transfer from LEO ($r_1 = 6700$ km) to GEO ($r_2 = 42000$ km).',
+      problem: 'A spacecraft is to move from a low orbit of radius 6,700 km to geostationary orbit, of radius 42,000 km. Find the semi-major axis of the transfer ellipse.',
       steps: [
-        'Sum the radii: $r_1 + r_2 = 6700 + 42000 = 48700$ km.',
-        'Divide by 2 to find the average: $a = \\frac{48700}{2}$.'
+        'Add the radii: $6{,}700 + 42{,}000 = 48{,}700$ km.',
+        'Halve the total: $a = 48{,}700 \\div 2$.'
       ],
-      resultFormula: 'a = 24,350 \\text{ km}'
+      resultFormula: 'a = 24{,}350 \\text{ km}'
     },
     practiceProblems: [
       {
@@ -714,7 +707,7 @@ The topics in these notes follow the Department for Education documents below.
         answer: "It becomes 8 times longer."
       },
     ],
-    realWorldConnection: 'This trajectory is used by satellites moving from Low Earth Orbit to Geostationary Orbit, as well as missions sending probes to Mars.',
+    realWorldConnection: 'Communications satellites that sit above one spot on the equator, about 36,000 km up, reach that height along a transfer ellipse like this one.',
     textbookContent: `
 ## Changing orbit
 
@@ -732,7 +725,7 @@ $$T = \\frac{2\\pi r}{v} = 2\\pi\\sqrt{\\frac{r^3}{GM}}$$
 
 ### The problem
 
-A spacecraft in a low orbit cannot simply point at a higher orbit and fire its engine. Whatever it does, it keeps orbiting. The most economical way to climb between two circular orbits is the **Hohmann transfer**, which uses two short engine burns.
+A spacecraft in a low orbit cannot simply point at a higher orbit and fire its engine. Whatever it does, it keeps orbiting. Usually the most economical way to climb between two circular orbits is the **Hohmann transfer**, which uses two short engine burns.
 
 1.  **Burn 1.** The spacecraft speeds up. It is now moving too fast for its circular orbit, so it climbs away along an ellipse.
 2.  **Coast.** It travels half way round that ellipse, slowing down as it climbs, until it reaches the height of the target orbit.
@@ -743,13 +736,6 @@ A spacecraft in a low orbit cannot simply point at a higher orbit and fire its e
 The ellipse just touches the inner orbit at its lowest point and the outer orbit at its highest. If the two orbits have radii $r_1$ and $r_2$, the ellipse is $r_1 + r_2$ long from end to end. Half of that is its **semi-major axis**:
 
 $$a = \\frac{r_1 + r_2}{2}$$
-
-### Worked example
-
-A spacecraft is to move from a low orbit of radius 6,700 km to geostationary orbit, of radius 42,000 km.
-
-1.  Add the radii: $6{,}700 + 42{,}000 = 48{,}700$ km.
-2.  Halve the total: $a = 24{,}350$ km.
 
 ### Going further: speeds and timing
 
@@ -768,6 +754,10 @@ For a transfer from 300 km above the ground to geostationary orbit, burn 1 adds 
 ### Faster twice, yet slower
 
 The spacecraft speeds up at both burns, but ends up moving more slowly than when it started: about 3.1 km/s in geostationary orbit against 7.7 km/s in the low one. The energy from the engine has gone into raising the spacecraft against gravity, not into keeping it fast.
+
+### Next on the journey
+
+That completes the climb to orbit. The next mission, Navigate, is about finding your way once you are up there, starting with trigonometry.
 
 ### Sources
 
@@ -3929,14 +3919,14 @@ The topics in these notes follow the Department for Education document below.
     id: 'thermodynamics',
     category: 'physics',
     title: "Thermodynamics and the Ideal Gas Law",
-    subtitle: "How the pressure, volume and temperature of a gas are linked, and what entropy means.",
+    subtitle: "How the pressure, volume and temperature of a gas are linked, and why hot gas drives a rocket engine.",
     icon: 'Sparkles',
     accentColor: 'rose',
     difficulty: 3,
     estimatedMinutes: 20,
-    formula: 'PV = nRT',
+    formula: 'pV = nRT',
     formulaLayout: [
-      { type: 'variable', symbol: 'P' },
+      { type: 'variable', symbol: 'p' },
       { type: 'variable', symbol: 'V' },
       { type: 'operator', content: '=' },
       { type: 'variable', symbol: 'n' },
@@ -3945,40 +3935,40 @@ The topics in these notes follow the Department for Education document below.
     ],
     variables: [
       {
-        symbol: 'P',
+        symbol: 'p',
         name: 'Pressure',
-        unit: 'Pascals (Pa)',
-        description: 'The force exerted per unit area by gas molecules colliding with the container walls.',
+        unit: 'pascals (Pa)',
+        description: 'The push of the gas particles on each square metre of the container walls.',
         color: 'text-rose-400',
         range: { min: 1, max: 10, default: 1 }
       },
       {
         symbol: 'V',
         name: 'Volume',
-        unit: 'Cubic metres (m³)',
-        description: 'The space occupied by the gas. As volume decreases, pressure rises if temperature stays constant.',
+        unit: 'cubic metres (m³)',
+        description: 'The space the gas fills.',
         color: 'text-orange-400',
         range: { min: 1, max: 10, default: 5 }
       },
       {
         symbol: 'n',
-        name: 'Amount of Substance',
-        unit: 'Moles (mol)',
-        description: 'The number of moles of gas. One mole contains approximately 6.022 × 10²³ molecules.',
+        name: 'Amount of gas',
+        unit: 'moles (mol)',
+        description: 'One mole is about $6.02 \\times 10^{23}$ particles.',
         color: 'text-amber-400'
       },
       {
         symbol: 'R',
-        name: 'Ideal Gas Constant',
-        unit: 'J/(mol·K)',
-        description: 'A universal constant: R ≈ 8.314 J/(mol·K). It relates energy to temperature for one mole of an ideal gas.',
+        name: 'Molar gas constant',
+        unit: 'J mol⁻¹ K⁻¹',
+        description: 'A fixed number, 8.31, the same for every ideal gas.',
         color: 'text-yellow-400'
       },
       {
         symbol: 'T',
         name: 'Temperature',
-        unit: 'Kelvin (K)',
-        description: 'Absolute temperature. Always use Kelvin (K = °C + 273.15) — never Celsius in gas laws.',
+        unit: 'kelvin (K)',
+        description: 'Temperature measured from absolute zero. Add 273 to a temperature in degrees Celsius.',
         color: 'text-red-400',
         range: { min: 200, max: 600, default: 300 }
       }
@@ -3986,35 +3976,35 @@ The topics in these notes follow the Department for Education document below.
     conceptSteps: [
       {
         stepNumber: 1,
-        title: 'The Ideal Gas Model',
-        content: 'An ideal gas is a theoretical model where gas molecules are perfectly elastic point particles that do not interact with each other. Real gases approximate this model well under low pressure and high temperature conditions.',
-        keyInsight: 'Pressure is caused by enormous numbers of gas molecules bouncing off the container walls every second.',
-        relatedVariables: ['P', 'V']
+        title: 'The ideal gas model',
+        content: 'Picture a gas as a huge number of tiny particles moving at random. They take up almost no room and only affect each other when they collide. Pressure is the push of these particles hitting the walls of their container.',
+        keyInsight: 'Pressure goes up when the particles hit the walls more often, or harder.',
+        relatedVariables: ['p', 'V']
       },
       {
         stepNumber: 2,
-        title: 'Four Gas Laws in One',
-        content: 'PV = nRT combines Boyle\'s Law (P ∝ 1/V at constant T), Charles\'s Law (V ∝ T at constant P), the pressure law (P ∝ T at constant V) and Avogadro\'s Law (V ∝ n) into a single equation for predicting gas behaviour.',
-        keyInsight: 'If you know any four of the five quantities, you can solve for the fifth.',
-        relatedVariables: ['P', 'V', 'n', 'T']
+        title: 'One equation for pressure, volume and temperature',
+        content: 'The equation $pV = nRT$ links the pressure, volume and temperature of an amount of gas. Hold one quantity steady and the others follow simple rules: at a steady temperature, $pV$ stays the same; in a fixed volume, pressure is proportional to the temperature in kelvin.',
+        keyInsight: 'Always use kelvin. Zero kelvin, absolute zero, is the lowest temperature there can be.',
+        relatedVariables: ['p', 'V', 'n', 'T']
       },
       {
         stepNumber: 3,
-        title: 'Entropy & the Second Law',
-        content: 'The Second Law of Thermodynamics states that the total entropy of an isolated system never decreases. Heat flows spontaneously from hot to cold — never the reverse — because the disordered state is statistically overwhelmingly more probable.',
-        keyInsight: 'Entropy never decreases in an isolated system. Left alone, ordered systems tend towards disorder.',
-        relatedVariables: ['T']
+        title: 'Hot gas drives a rocket engine',
+        content: 'A rocket engine burns fuel in a small chamber. The gas it makes is extremely hot, and hot gas in a small space has a very high pressure. That pressure forces the gas out of the nozzle at great speed.',
+        keyInsight: 'Heat a gas without letting it expand and its pressure rises.',
+        relatedVariables: ['p', 'T']
       }
     ],
     solvedExample: {
-      problem: 'A sealed container holds $n = 2$ mol of gas at $T = 300$ K and $V = 0.05$ m³. Find the pressure $P$.',
+      problem: 'A sealed tank holds 2 mol of gas at 300 K in a volume of 0.05 m³. Find the pressure. Take $R = 8.31$ J mol⁻¹ K⁻¹.',
       steps: [
-        'Use the ideal gas law: $P = \\frac{nRT}{V}$.',
-        'Substitute: $P = \\frac{2 \\times 8.314 \\times 300}{0.05}$.',
-        'Numerator: $2 \\times 8.314 \\times 300 = 4988.4$ J.',
-        'Divide: $P = \\frac{4988.4}{0.05}$.'
+        'Rearrange $pV = nRT$ to give $p = \\dfrac{nRT}{V}$.',
+        'Substitute: $p = \\dfrac{2 \\times 8.31 \\times 300}{0.05}$.',
+        'Top line: $2 \\times 8.31 \\times 300 = 4986$.',
+        'Divide: $4986 \\div 0.05 = 99\\,720$ Pa.'
       ],
-      resultFormula: 'P \\approx 99{,}768 \\text{ Pa} \\approx 0.985 \\text{ atm}'
+      resultFormula: 'p = 99\\,720 \\text{ Pa, about } 99.7 \\text{ kPa}'
     },
     practiceProblems: [
       {
@@ -4048,7 +4038,7 @@ The topics in these notes follow the Department for Education document below.
         answer: "The Celsius scale has an arbitrary zero and can be negative, which would give zero or negative pressures. The kelvin scale starts at absolute zero, so pressure is proportional to it."
       },
     ],
-    realWorldConnection: 'Spacecraft thermal control engineers apply thermodynamics daily — managing heat from the Sun, electronics, and the cold of deep space to keep instruments within safe operating temperatures.',
+    realWorldConnection: 'The RS-25 engines that flew on the Space Shuttle, and now power NASA’s Artemis rockets, burn liquid hydrogen and oxygen at more than 3,000 °C.',
     textbookContent: `
 ## Ideal gases
 
@@ -4111,21 +4101,17 @@ $$E = mc\\,\\Delta\\theta$$
 
 where $c$ is the specific heat capacity.
 
-### Worked example
-
-A sealed tank holds 2 mol of gas at 300 K in a volume of 0.05 m³. Find the pressure.
-
-1.  Rearrange: $p = \\dfrac{nRT}{V}$.
-2.  Substitute: $p = \\dfrac{2 \\times 8.31 \\times 300}{0.05}$.
-3.  $p = 99{,}720$ Pa, about 99.7 kPa.
-
 ### In a rocket engine
 
-Burning fuel makes very hot gas in a small chamber. A high temperature in a fixed volume means a high pressure, and that pressure drives the gas out through the nozzle at great speed.
+Burning the fuel makes a large amount of very hot gas in a small chamber, so its pressure is very high. The nozzle lets that high-pressure gas escape in one direction only, which is what gives the rocket its push (see [Momentum and Collisions](/study/momentum)).
 
 ### Going further: entropy
 
 Entropy is not in the required A-level content, but it explains why heat flows the way it does. It measures the number of ways the particles and their energy can be arranged. Left alone, a system moves towards arrangements with more entropy, which is why energy spreads from hot objects to cold ones and never the other way by itself.
+
+### Next on the journey
+
+Hot gas gives a rocket its push. What is it working against? Gravity, the subject of the next lesson.
 
 ### Sources
 
@@ -4849,30 +4835,30 @@ The topics in these notes follow the Department for Education document below.
     conceptSteps: [
       {
         stepNumber: 1,
-        title: 'Same Quantity, Different Number',
+        title: 'Same quantity, different number',
         content: 'A length of 2 km and a length of 2000 m are exactly the same distance. Converting units never changes the quantity; it changes the number and the unit together. A smaller unit needs a bigger number to describe the same thing.',
         keyInsight: 'Smaller unit, bigger number. Bigger unit, smaller number.',
         relatedVariables: ['x', 'x_{\\text{base}}']
       },
       {
         stepNumber: 2,
-        title: 'Prefixes Are Powers of Ten',
+        title: 'Prefixes are powers of ten',
         content: 'A prefix is shorthand for a power of ten: giga (G) is $10^9$, mega (M) is $10^6$, kilo (k) is $10^3$, centi (c) is $10^{-2}$, milli (m) is $10^{-3}$, micro (μ) is $10^{-6}$ and nano (n) is $10^{-9}$. To get to the base unit, replace the prefix with its power of ten: $20\\text{ mA} = 20 \\times 10^{-3}\\text{ A} = 0.02\\text{ A}$.',
         keyInsight: 'To reach the base unit, multiply by the prefix factor. To go back, divide by it.',
         relatedVariables: ['10^{n}']
       },
       {
         stepNumber: 3,
-        title: 'Compound Units, One Unit at a Time',
+        title: 'Units made of two units',
         content: 'Units such as km/h are built from two units, so convert each one separately. For $72\\text{ km/h}$: the distance is $72\\text{ km} = 72\\,000\\text{ m}$ and the time is $1\\text{ h} = 3600\\text{ s}$, so the speed is $72\\,000 \\div 3600 = 20\\text{ m/s}$.',
         keyInsight: 'To change km/h into m/s, divide by 3.6. To change m/s into km/h, multiply by 3.6.',
         relatedVariables: ['x']
       },
       {
         stepNumber: 4,
-        title: 'Areas and Volumes',
+        title: 'Areas and volumes',
         content: 'Because $1\\text{ m} = 100\\text{ cm}$, a square metre is $100 \\times 100 = 10\\,000\\text{ cm}^2$ and a cubic metre is $100 \\times 100 \\times 100 = 1\\,000\\,000\\text{ cm}^3$. A common mistake is to use 100 for all three.',
-        keyInsight: 'Square the length factor for an area and cube it for a volume.',
+        keyInsight: 'For an area, square the length factor. For a volume, cube it.',
         relatedVariables: ['10^{n}']
       }
     ],
@@ -4941,15 +4927,15 @@ A prefix in front of a unit stands for a power of ten:
 | micro | μ | $10^{-6}$ | 1 μm = 0.000 001 m |
 | nano | n | $10^{-9}$ | 1 nm = 0.000 000 001 m |
 
-To reach the base unit, replace the prefix with its factor: $20 \\text{ mA} = 20 \\times 10^{-3} \\text{ A} = 0.02 \\text{ A}$. Take care with capitals: m is milli but M is mega.
+To reach the base unit, replace the prefix with its factor: $250 \\text{ mA} = 250 \\times 10^{-3} \\text{ A} = 0.25 \\text{ A}$. Take care with capitals: m is milli but M is mega.
 
 ### Units made of two units
 
-For a unit such as km/h, convert each part separately. For 72 km/h:
+For a unit such as km/h, convert each part separately. For 36 km/h:
 
-1.  $72 \\text{ km} = 72\\,000 \\text{ m}$
+1.  $36 \\text{ km} = 36\\,000 \\text{ m}$
 2.  $1 \\text{ h} = 3600 \\text{ s}$
-3.  $72\\,000 \\div 3600 = 20$ m/s
+3.  $36\\,000 \\div 3600 = 10$ m/s
 
 The shortcut: divide km/h by 3.6 to get m/s, and multiply m/s by 3.6 to get km/h.
 
@@ -4964,9 +4950,9 @@ Square the length factor for an area and cube it for a volume. Using 100 for all
 
 ### Standard form
 
-Very large and very small answers are written in standard form. A radio station at $97.5$ MHz broadcasts at
+Very large and very small answers are written in standard form. The Moon is on average about 384 000 km from Earth:
 
-$$97.5 \\times 10^6 \\text{ Hz} = 9.75 \\times 10^7 \\text{ Hz}$$
+$$384\\,000 \\text{ km} = 3.84 \\times 10^8 \\text{ m}$$
 
 ### A spacecraft lost to units
 

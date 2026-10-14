@@ -225,7 +225,9 @@ export const CURRICULUM: Record<ConceptId, CurriculumPlace> = {
     stage: "A-level physics",
     statements: [
       { source: 'gcsePhysics', where: "GCSE physics: equations", text: "for gases: pressure x volume = constant (for a given mass of gas and at a constant temperature)" },
-      { source: 'alScience', where: "A-level physics: Matter", text: "ideal gases; pV = NkT; absolute zero; relationship between temperature and average molecular kinetic energy" },
+      { source: 'alScience', where: "A-level physics: Matter", text: "ideal gases; pV = NkT" },
+      { source: 'alScience', where: "A-level physics: Matter", text: "absolute zero" },
+      { source: 'alScience', where: "A-level physics: Matter", text: "relationship between temperature and average molecular kinetic energy" },
     ],
     note: "The official content writes the ideal gas equation as pV = NkT. This lesson uses the equivalent form pV = nRT. Entropy is not in the required content.",
   },

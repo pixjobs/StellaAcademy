@@ -211,16 +211,16 @@ const TABLE: Entry[] = [
     unit: '× base unit',
   })),
   {
-    lesson: 'units', where: 'textbookContent: 20 mA', expectNotesIncludes: '$20 \\text{ mA} = 20 \\times 10^{-3}',
-    stated: '= 0.02 \\text{ A}', compute: () => 20 * C.PREFIX.m, expected: 0.02, tolerance: 1e-9, unit: 'A',
+    lesson: 'units', where: 'textbookContent: 250 mA', expectNotesIncludes: '$250 \\text{ mA} = 250 \\times 10^{-3}',
+    stated: '= 0.25 \\text{ A}', compute: () => 250 * C.PREFIX.m, expected: 0.25, tolerance: 1e-9, unit: 'A',
   },
   {
-    lesson: 'units', where: 'textbookContent: 72 km in m', expectNotesIncludes: 'For 72 km/h:',
-    stated: '$72 \\text{ km} = 72\\,000 \\text{ m}$', pick: 1, compute: () => 72 * C.M_PER_KM, expected: 72000, tolerance: 0, unit: 'm',
+    lesson: 'units', where: 'textbookContent: 36 km in m', expectNotesIncludes: 'For 36 km/h:',
+    stated: '$36 \\text{ km} = 36\\,000 \\text{ m}$', pick: 1, compute: () => 36 * C.M_PER_KM, expected: 36000, tolerance: 0, unit: 'm',
   },
   {
-    lesson: 'units', where: 'textbookContent: 72 km/h in m/s', expectNotesIncludes: 'For 72 km/h:',
-    stated: '$72\\,000 \\div 3600 = 20$ m/s', pick: 2, compute: () => (72 * C.M_PER_KM) / C.S_PER_H, expected: 20, tolerance: 1e-9, unit: 'm/s',
+    lesson: 'units', where: 'textbookContent: 36 km/h in m/s', expectNotesIncludes: 'For 36 km/h:',
+    stated: '$36\\,000 \\div 3600 = 10$ m/s', pick: 2, compute: () => (36 * C.M_PER_KM) / C.S_PER_H, expected: 10, tolerance: 1e-9, unit: 'm/s',
   },
   {
     lesson: 'units', where: 'textbookContent: 1 m² in cm²', expectNotesIncludes: 'Because $1 \\text{ m} = 100 \\text{ cm}$',
@@ -235,19 +235,11 @@ const TABLE: Entry[] = [
     stated: '$1 \\text{ m}^3 = 1000$ litres', pick: 1, compute: () => C.CM_PER_M ** 3 / 1000, expected: 1000, tolerance: 0, unit: 'litres',
   },
   {
-    lesson: 'units', where: 'textbookContent: 97.5 MHz', expectNotesIncludes: 'A radio station at $97.5$ MHz',
-    stated: '= 9.75 \\times 10^7 \\text{ Hz}', compute: () => 97.5 * C.PREFIX.M, expected: 9.75e7, relTolerance: 1e-9, unit: 'Hz',
+    lesson: 'units', where: 'textbookContent: Moon distance', expectNotesIncludes: 'about 384 000 km from Earth',
+    stated: '= 3.84 \\times 10^8 \\text{ m}', compute: () => 384000 * C.M_PER_KM, expected: 3.84e8, relTolerance: 1e-9, unit: 'm',
   },
 
   // ======================================================================================== gears
-  {
-    lesson: 'gears', where: 'solvedExample.steps[0]', expectQuestionIncludes: 'drives a 12-tooth gear at $5$ Nm, meshed with a 36-tooth gear',
-    stated: '= 3.0', compute: () => 36 / 12, expected: 3, tolerance: 1e-9, unit: '',
-  },
-  {
-    lesson: 'gears', where: 'solvedExample.resultFormula', expectQuestionIncludes: 'drives a 12-tooth gear at $5$ Nm, meshed with a 36-tooth gear',
-    compute: () => 5 * (36 / 12), expected: 15, tolerance: 1e-9, unit: 'N m',
-  },
   {
     lesson: 'gears', where: 'practiceProblems[0]', expectQuestionIncludes: 'driver gear has 20 teeth and the gear it drives has 40 teeth',
     compute: () => 40 / 20, expected: 2, tolerance: 1e-9, unit: '',
@@ -281,15 +273,15 @@ const TABLE: Entry[] = [
     expectAnswerIncludes: 'Anticlockwise',
   },
   {
-    lesson: 'gears', where: 'textbookContent: worked example, ratio', expectNotesIncludes: 'A motor turns a 12-tooth gear 90 times a minute with a moment of 5 N m. It drives a 36-tooth gear.',
+    lesson: 'gears', where: 'solvedExample.steps[0]', expectQuestionIncludes: 'A motor turns a 12-tooth gear 90 times a minute with a moment of 5 N m. It drives a 36-tooth gear.',
     stated: 'Gear ratio: $\\dfrac{36}{12} = 3$', pick: 2, compute: () => 36 / 12, expected: 3, tolerance: 1e-9, unit: '',
   },
   {
-    lesson: 'gears', where: 'textbookContent: worked example, speed', expectNotesIncludes: 'A motor turns a 12-tooth gear 90 times a minute with a moment of 5 N m. It drives a 36-tooth gear.',
+    lesson: 'gears', where: 'solvedExample.steps[1]', expectQuestionIncludes: 'A motor turns a 12-tooth gear 90 times a minute with a moment of 5 N m. It drives a 36-tooth gear.',
     stated: '$90 \\div 3 = 30$ turns per minute', pick: 2, compute: () => 90 / (36 / 12), expected: 30, tolerance: 1e-9, unit: 'turns/min',
   },
   {
-    lesson: 'gears', where: 'textbookContent: worked example, moment', expectNotesIncludes: 'A motor turns a 12-tooth gear 90 times a minute with a moment of 5 N m. It drives a 36-tooth gear.',
+    lesson: 'gears', where: 'solvedExample.steps[2]', expectQuestionIncludes: 'A motor turns a 12-tooth gear 90 times a minute with a moment of 5 N m. It drives a 36-tooth gear.',
     stated: '$5 \\times 3 = 15$ N m', pick: 2, compute: () => 5 * (36 / 12), expected: 15, tolerance: 1e-9, unit: 'N m',
   },
 
@@ -361,17 +353,8 @@ const TABLE: Entry[] = [
 
   // ======================================================================================== thermodynamics
   {
-    lesson: 'thermodynamics', where: 'solvedExample.steps[2]', expectQuestionIncludes: '$n = 2$ mol of gas at $T = 300$ K and $V = 0.05$ m³',
-    stated: '= 4988.4$ J', compute: () => 2 * C.R_SOLVED_THERMO * 300, expected: 4988.4, tolerance: 0.05, unit: 'J',
-  },
-  {
-    lesson: 'thermodynamics', where: 'solvedExample.resultFormula (Pa)', expectQuestionIncludes: '$n = 2$ mol of gas at $T = 300$ K and $V = 0.05$ m³',
-    note: 'Uses R = 8.314 as the solvedExample does.',
-    compute: () => (2 * C.R_SOLVED_THERMO * 300) / 0.05, expected: 99768, tolerance: 0.5, unit: 'Pa',
-  },
-  {
-    lesson: 'thermodynamics', where: 'solvedExample.resultFormula (atm)', expectQuestionIncludes: '$n = 2$ mol of gas at $T = 300$ K and $V = 0.05$ m³',
-    pick: 1, compute: () => (2 * C.R_SOLVED_THERMO * 300) / 0.05 / C.ATM_PA, expected: 0.98463, tolerance: 0.0005, unit: 'atm',
+    lesson: 'thermodynamics', where: 'solvedExample.steps[2]', expectQuestionIncludes: 'A sealed tank holds 2 mol of gas at 300 K in a volume of 0.05 m³',
+    stated: '= 4986$', compute: () => 2 * C.R_NOTES_THERMO * 300, expected: 4986, tolerance: 0.05, unit: '',
   },
   {
     lesson: 'thermodynamics', where: 'practiceProblems[0]', expectQuestionIncludes: 'Convert 27 °C to kelvin',
@@ -413,24 +396,28 @@ const TABLE: Entry[] = [
     stated: '= 6.21 \\times 10^{-21}$ J', compute: () => 1.5 * C.K_BOLTZMANN_LESSON * 300, expected: 6.21e-21, relTolerance: 0.001, unit: 'J',
   },
   {
-    lesson: 'thermodynamics', where: 'textbookContent: worked example (Pa)', expectNotesIncludes: 'A sealed tank holds 2 mol of gas at 300 K in a volume of 0.05 m³',
-    stated: '$p = 99{,}720$ Pa', note: 'Uses R = 8.31 as the notes do.',
+    lesson: 'thermodynamics', where: 'solvedExample.steps[3]', expectQuestionIncludes: 'A sealed tank holds 2 mol of gas at 300 K in a volume of 0.05 m³',
+    stated: '= 99\\,720$ Pa',
     compute: () => (2 * C.R_NOTES_THERMO * 300) / 0.05, expected: 99720, tolerance: 0.5, unit: 'Pa',
   },
   {
-    lesson: 'thermodynamics', where: 'textbookContent: worked example (kPa)', expectNotesIncludes: 'A sealed tank holds 2 mol of gas at 300 K in a volume of 0.05 m³',
-    stated: 'about 99.7 kPa', compute: () => (2 * C.R_NOTES_THERMO * 300) / 0.05 / 1000, expected: 99.72, tolerance: 0.05, unit: 'kPa',
+    lesson: 'thermodynamics', where: 'solvedExample.resultFormula (kPa)', expectQuestionIncludes: 'A sealed tank holds 2 mol of gas at 300 K in a volume of 0.05 m³',
+    stated: 'about } 99.7', compute: () => (2 * C.R_NOTES_THERMO * 300) / 0.05 / 1000, expected: 99.72, tolerance: 0.05, unit: 'kPa',
   },
 
   // ======================================================================================== gravity
   {
-    lesson: 'gravity', where: 'conceptSteps[1]', expectQuestionIncludes: 'If you double the distance',
-    stated: 'the force becomes a quarter', compute: () => 1 / 2 ** 2, expected: 0.25, tolerance: 1e-9, unit: '× force',
+    lesson: 'gravity', where: 'conceptSteps[1]', expectQuestionIncludes: 'Move twice as far from the centre of a planet',
+    stated: 'its pull falls to a quarter', compute: () => 1 / 2 ** 2, expected: 0.25, tolerance: 1e-9, unit: '× force',
   },
   {
-    lesson: 'gravity', where: 'solvedExample.resultFormula', expectQuestionIncludes: 'Earth ($M = 5.97 \\times 10^{24}$ kg) and a $1000$ kg satellite in Low Earth Orbit ($r = 6.7 \\times 10^6$ m)',
-    note: 'G = 6.674e-11 as the solvedExample states. "≈ 8880": 3 s.f., so ±5 N. (With the notes\' G = 6.67e-11 it would be 8870 N.)',
-    compute: () => (C.G_SOLVED_GRAVITY * C.M_EARTH * 1000) / (6.7e6) ** 2, expected: 8875.8, tolerance: 5, unit: 'N',
+    lesson: 'gravity', where: 'solvedExample.resultFormula', expectQuestionIncludes: 'Earth ($M = 5.97 \\times 10^{24}$ kg) and a $1000$ kg satellite in a low orbit',
+    note: 'G = 6.67e-11, as in the notes. "≈ 8870": 3 s.f., so ±5 N.',
+    compute: () => (C.G_NOTES_GRAVITY * C.M_EARTH * 1000) / (6.7e6) ** 2, expected: 8870.5, tolerance: 5, unit: 'N',
+  },
+  {
+    lesson: 'gravity', where: 'solvedExample.steps[2]', expectQuestionIncludes: 'Earth ($M = 5.97 \\times 10^{24}$ kg) and a $1000$ kg satellite in a low orbit',
+    stated: '{3.98 \\times 10^{17}}', compute: () => C.G_NOTES_GRAVITY * C.M_EARTH * 1000, expected: 3.982e17, relTolerance: 0.002, unit: 'N m²',
   },
   {
     lesson: 'gravity', where: 'practiceProblems[0]', expectQuestionIncludes: 'The distance between two masses is tripled',
@@ -512,14 +499,6 @@ const TABLE: Entry[] = [
 
   // ======================================================================================== trajectory
   {
-    lesson: 'trajectory', where: 'solvedExample.steps[0]', expectQuestionIncludes: 'LEO ($r_1 = 6700$ km) to GEO ($r_2 = 42000$ km)',
-    stated: '= 48700$ km', compute: () => 6700 + 42000, expected: 48700, tolerance: 0, unit: 'km',
-  },
-  {
-    lesson: 'trajectory', where: 'solvedExample.resultFormula', expectQuestionIncludes: 'LEO ($r_1 = 6700$ km) to GEO ($r_2 = 42000$ km)',
-    compute: () => (6700 + 42000) / 2, expected: 24350, tolerance: 0, unit: 'km',
-  },
-  {
     lesson: 'trajectory', where: 'practiceProblems[0]', kind: 'qualitative', expectQuestionIncludes: 'circular orbit of radius 7,000 km, or one of radius 42,000 km',
     expectAnswerIncludes: 'The one at 7,000 km',
     verify: () => {
@@ -555,17 +534,17 @@ const TABLE: Entry[] = [
     compute: () => 3.986e14 / 1000 ** 3, expected: 3.986e5, relTolerance: 1e-9, unit: 'km³ s⁻²',
   },
   {
-    lesson: 'trajectory', where: 'textbookContent: GEO radius', expectNotesIncludes: 'to geostationary orbit, of radius 42,000 km',
-    stated: 'of radius 42,000 km', note: 'True GEO radius from one sidereal day is 42,164 km; 42,000 is fine to 2 s.f. (±500).',
+    lesson: 'trajectory', where: 'solvedExample.steps[0] (GEO radius)', expectQuestionIncludes: 'to geostationary orbit, of radius 42,000 km',
+    stated: '+ 42{,}000 =',  note: 'True GEO radius from one sidereal day is 42,164 km; 42,000 is fine to 2 s.f. (±500).',
     compute: () => hohmann.r2, expected: 42164, tolerance: 500, unit: 'km',
   },
   {
-    lesson: 'trajectory', where: 'textbookContent: worked example, sum', expectNotesIncludes: 'from a low orbit of radius 6,700 km to geostationary orbit',
+    lesson: 'trajectory', where: 'solvedExample.steps[0]', expectQuestionIncludes: 'from a low orbit of radius 6,700 km to geostationary orbit',
     stated: '$6{,}700 + 42{,}000 = 48{,}700$ km', pick: 2, compute: () => 6700 + 42000, expected: 48700, tolerance: 0, unit: 'km',
   },
   {
-    lesson: 'trajectory', where: 'textbookContent: worked example, a', expectNotesIncludes: 'from a low orbit of radius 6,700 km to geostationary orbit',
-    stated: '$a = 24{,}350$ km', compute: () => (6700 + 42000) / 2, expected: 24350, tolerance: 0, unit: 'km',
+    lesson: 'trajectory', where: 'solvedExample.resultFormula', expectQuestionIncludes: 'from a low orbit of radius 6,700 km to geostationary orbit',
+    compute: () => (6700 + 42000) / 2, expected: 24350, tolerance: 0, unit: 'km',
   },
   {
     lesson: 'trajectory', where: 'textbookContent: burn 1', expectNotesIncludes: 'For a transfer from 300 km above the ground to geostationary orbit',
