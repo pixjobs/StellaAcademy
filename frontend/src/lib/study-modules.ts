@@ -4650,23 +4650,23 @@ The topics in these notes follow the Department for Education documents below.
     variables: [
       {
         symbol: 'E',
-        name: 'Photon Energy',
-        unit: 'Joules (J) or eV',
-        description: 'The discrete packet of energy carried by a single photon. Unlike classical waves, energy comes in indivisible chunks called quanta.',
+        name: 'Energy of one photon',
+        unit: 'joules (J), or electronvolts (eV)',
+        description: 'The energy carried by a single packet of light. One electronvolt is $1.60 \\times 10^{-19}$ J.',
         color: 'text-violet-400'
       },
       {
         symbol: 'h',
-        name: "Planck's Constant",
-        unit: 'J·s',
-        description: 'A fundamental constant of nature: h ≈ 6.626 × 10⁻³⁴ J·s. It sets the scale of quantum effects — the minimum "grain size" of action in the universe.',
+        name: 'Planck constant',
+        unit: 'J s',
+        description: 'A fixed number, $6.63 \\times 10^{-34}$ J s. It is so small that one photon carries only a tiny amount of energy.',
         color: 'text-purple-400'
       },
       {
         symbol: 'f',
         name: 'Frequency',
-        unit: 'Hertz (Hz)',
-        description: 'The frequency of the electromagnetic wave associated with the photon. Higher frequency (e.g. UV, X-rays) means more energetic photons.',
+        unit: 'hertz (Hz)',
+        description: 'The frequency of the light. Higher frequency, such as ultraviolet or X-rays, means more energy in each photon.',
         color: 'text-indigo-400',
         range: { min: 1, max: 10, default: 5 }
       }
@@ -4674,34 +4674,34 @@ The topics in these notes follow the Department for Education documents below.
     conceptSteps: [
       {
         stepNumber: 1,
-        title: 'Planck and the Quantum',
-        content: 'In 1900, Max Planck was trying to explain the spectrum of light given off by hot objects. Classical theory got it badly wrong: it predicted ever more energy at high frequencies, a failure later nicknamed the "ultraviolet catastrophe". Planck found a formula that matched the measurements by assuming energy is exchanged in discrete packets, or **quanta**, of size $E = hf$.',
-        keyInsight: 'Energy is quantised — it exists in discrete chunks, not a continuous flow.',
+        title: 'Light comes in packets',
+        content: 'Light travels as a wave, but it gives up its energy in separate packets called **photons**. The energy of one photon depends only on the frequency of the light: $E = hf$.',
+        keyInsight: 'A brighter beam carries more photons, not more energetic ones.',
         relatedVariables: ['E', 'h', 'f']
       },
       {
         stepNumber: 2,
-        title: 'Wave-Particle Duality',
-        content: "In 1905, Einstein used Planck's idea to explain the photoelectric effect: light behaves as particles (photons) when it hits a metal and ejects electrons. Yet light also exhibits wave interference. Matter itself — electrons, protons — also displays wave-like diffraction. This is wave-particle duality.",
-        keyInsight: 'Light and matter are both waves AND particles, depending on how you observe them.',
+        title: 'Evidence from the photoelectric effect',
+        content: 'Light shining on a clean metal can release electrons. Below a certain frequency none come out, however bright the light. A wave model cannot explain this, but the photon model can: each electron takes the energy of one photon, and it escapes only if that energy is at least the **work function**, $\\phi$, the energy needed to leave the metal.',
+        keyInsight: 'One photon, one electron. What matters is the energy of each photon, not how many there are.',
         relatedVariables: ['E', 'f']
       },
       {
         stepNumber: 3,
-        title: 'Electron Diffraction',
-        content: 'Electrons fired through a thin layer of graphite spread into rings, a diffraction pattern, just as light does through a grating. Diffraction is a wave effect, so this shows that particles can behave as waves, with a wavelength $\\lambda = \\frac{h}{p}$.',
+        title: 'Particles can behave as waves',
+        content: 'Electrons fired through a thin layer of graphite spread into rings, a diffraction pattern, just as light does through a grating. Diffraction is a wave effect, so particles can behave as waves too, with a **de Broglie wavelength** $\\lambda = \\dfrac{h}{p}$, where $p$ is the momentum. This is **wave-particle duality**.',
         keyInsight: 'Faster electrons have more momentum and so a shorter wavelength, which makes smaller diffraction rings.',
         relatedVariables: ['h']
       }
     ],
     solvedExample: {
-      problem: 'Calculate the energy of a photon of visible light with $f = 6.0 \\times 10^{14}$ Hz (green light).',
+      problem: 'Find the energy of a photon of green light, with frequency $f = 6.0 \\times 10^{14}$ Hz. Give it in joules and in electronvolts.',
       steps: [
-        'Use $E = hf$ with $h = 6.626 \\times 10^{-34}$ J·s.',
-        'Substitute: $E = 6.626 \\times 10^{-34} \\times 6.0 \\times 10^{14}$.',
-        'Multiply: $E = 6.626 \\times 6.0 \\times 10^{-20} = 39.756 \\times 10^{-20}$.'
+        'Use $E = hf$ with $h = 6.63 \\times 10^{-34}$ J s.',
+        'Substitute: $E = 6.63 \\times 10^{-34} \\times 6.0 \\times 10^{14} = 3.98 \\times 10^{-19}$ J.',
+        'Convert to electronvolts by dividing by $1.60 \\times 10^{-19}$: $E = \\dfrac{3.98 \\times 10^{-19}}{1.60 \\times 10^{-19}}$.'
       ],
-      resultFormula: 'E \\approx 3.98 \\times 10^{-19} \\text{ J} \\approx 2.48 \\text{ eV}'
+      resultFormula: 'E \\approx 3.98 \\times 10^{-19} \\text{ J} \\approx 2.5 \\text{ eV}'
     },
     practiceProblems: [
       {
@@ -4735,7 +4735,7 @@ The topics in these notes follow the Department for Education documents below.
         answer: "About $6.6 \\times 10^{-10}$ m, similar to the spacing of atoms in a crystal, so the electrons can be diffracted."
       },
     ],
-    realWorldConnection: 'Quantum mechanics underpins every semiconductor in your phone, spacecraft solar cells, GPS atomic clocks, and MRI scanners. Understanding quantisation is essential to all modern technology.',
+    realWorldConnection: 'The light sensors in digital cameras, and in telescope cameras such as those on the Hubble Space Telescope, work because a photon landing on a pixel can free an electron in the silicon. Counting those electrons measures the light.',
     textbookContent: `
 ## Photons
 
@@ -4761,6 +4761,8 @@ A wave model cannot explain this. The photon model can: each electron absorbs on
 
 $$hf = \\phi + E_{k(\\text{max})}$$
 
+where $E_{k(\\text{max})}$ is the greatest kinetic energy an escaping electron can have.
+
 ### Evidence: line spectra
 
 A hot gas gives out light at only certain sharp frequencies. Electrons in atoms can only have certain energy levels. When an electron drops between two levels it gives out one photon, whose energy $hf$ equals the difference between the levels. Each element has its own set of levels, so its own set of lines.
@@ -4777,17 +4779,13 @@ where $p$ is the momentum.
 
 A beam of electrons fired through a thin layer of graphite makes rings on a screen, a diffraction pattern, just like light through a grating. Diffraction is a wave effect, and it only shows up clearly when the wavelength is about the size of the gaps, here the spacing between atoms. Faster electrons have shorter wavelengths and make smaller rings, as $\\lambda = \\dfrac{h}{p}$ predicts.
 
-### Worked example
-
-Find the energy of a photon of green light, $f = 6.0 \\times 10^{14}$ Hz.
-
-1.  $E = hf = 6.63 \\times 10^{-34} \\times 6.0 \\times 10^{14}$
-2.  $E \\approx 3.98 \\times 10^{-19}$ J
-3.  In electronvolts: $\\dfrac{3.98 \\times 10^{-19}}{1.60 \\times 10^{-19}} \\approx 2.5$ eV
-
 ### Reading the light of stars
 
 The dark and bright lines in a star's spectrum are photons absorbed or given out as electrons jump between energy levels. Because each element has its own pattern of lines, astronomers can tell what a star is made of from its light alone.
+
+### Next on the journey
+
+This is the end of the journey. You began with the number skills, and you have finished by reading what a star is made of from the light it sends us. Every lesson stays open, so go back to any step you want to make stronger.
 
 ### Sources
 

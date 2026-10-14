@@ -243,7 +243,9 @@ export const CURRICULUM: Record<ConceptId, CurriculumPlace> = {
   quantum: {
     stage: "A-level physics",
     statements: [
-      { source: 'alScience', where: "A-level physics: Quantum and nuclear physics", text: "photon model to explain observable phenomena; evidence supporting the photon model; wave-particle duality, particle diffraction" },
+      { source: 'alScience', where: "A-level physics: Quantum and nuclear physics", text: "photon model to explain observable phenomena" },
+      { source: 'alScience', where: "A-level physics: Quantum and nuclear physics", text: "evidence supporting the photon model" },
+      { source: 'alScience', where: "A-level physics: Quantum and nuclear physics", text: "wave-particle duality, particle diffraction" },
     ],
   },
   matrices: {

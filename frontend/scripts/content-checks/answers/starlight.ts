@@ -248,4 +248,61 @@ const ELECTROMAGNETISM: Entry[] = [
   },
 ];
 
-export const ENTRIES: Entry[] = [...PRISM, ...STATISTICS, ...ELECTROMAGNETISM];
+const Q = {
+  H: 6.63e-34, // J s, the value the quantum lesson uses everywhere
+  EV: 1.60e-19, // J per eV, as the lesson gives it
+};
+
+const QUANTUM: Entry[] = [
+  {
+    lesson: 'quantum', where: 'solvedExample.steps[1]', expectQuestionIncludes: 'frequency $f = 6.0 \\times 10^{14}$ Hz',
+    stated: '= 3.98 \\times 10^{-19}', note: '6.63 × 6.0 = 39.78, so 3.978e-19 J; 3 s.f.',
+    compute: () => Q.H * 6.0e14, expected: 3.978e-19, relTolerance: 0.002, unit: 'J',
+  },
+  {
+    lesson: 'quantum', where: 'solvedExample.resultFormula (J)', expectQuestionIncludes: 'frequency $f = 6.0 \\times 10^{14}$ Hz',
+    stated: 'E \\approx 3.98 \\times 10^{-19}', compute: () => Q.H * 6.0e14, expected: 3.978e-19, relTolerance: 0.002, unit: 'J',
+  },
+  {
+    lesson: 'quantum', where: 'solvedExample.resultFormula (eV)', expectQuestionIncludes: 'frequency $f = 6.0 \\times 10^{14}$ Hz',
+    stated: '\\approx 2.5 \\text{ eV}', note: '3.978e-19 / 1.60e-19 = 2.486; "2.5": ±0.05. ("Green": c / f = 500 nm, inside the 495 to 570 nm green band.)',
+    compute: () => (Q.H * 6.0e14) / Q.EV, expected: 2.486, tolerance: 0.05, unit: 'eV',
+  },
+  {
+    lesson: 'quantum', where: 'practiceProblems[0]', kind: 'qualitative', expectQuestionIncludes: 'twice the frequency of a green photon',
+    expectAnswerIncludes: 'twice the energy',
+    verify: () => ({ holds: Math.abs((Q.H * 2) / (Q.H * 1) - 2) < 1e-12, detail: 'E ∝ f' }),
+  },
+  {
+    lesson: 'quantum', where: 'practiceProblems[1]', expectQuestionIncludes: 'Radio waves have frequencies around $10^8$ Hz and X-rays around $10^{18}$ Hz',
+    stated: '$10^{10}$', compute: () => (Q.H * 1e18) / (Q.H * 1e8), expected: 1e10, relTolerance: 1e-9, unit: '× energy',
+  },
+  {
+    lesson: 'quantum', where: 'practiceProblems[2]', expectQuestionIncludes: 'Find the energy of a photon of frequency $5.0 \\times 10^{14}$ Hz',
+    note: '6.63e-34 × 5.0e14 = 3.315e-19; "about 3.3": 2 s.f.', compute: () => Q.H * 5.0e14, expected: 3.315e-19, relTolerance: 0.02, unit: 'J',
+  },
+  {
+    lesson: 'quantum', where: 'practiceProblems[3]', expectQuestionIncludes: 'photons of 3.0 eV falls on a metal whose work function is 2.3 eV',
+    compute: () => 3.0 - 2.3, expected: 0.7, tolerance: 1e-9, unit: 'eV',
+  },
+  {
+    lesson: 'quantum', where: 'practiceProblems[4]', kind: 'qualitative', expectQuestionIncludes: 'Bright red light releases no electrons',
+    expectAnswerIncludes: 'Each red photon has too little energy',
+  },
+  {
+    lesson: 'quantum', where: 'practiceProblems[5]', expectQuestionIncludes: 'An electron has momentum $1.0 \\times 10^{-24}$ kg m/s',
+    stated: 'About $6.6 \\times 10^{-10}$ m', note: '6.63e-34 / 1.0e-24 = 6.63e-10 m.',
+    compute: () => Q.H / 1.0e-24, expected: 6.63e-10, relTolerance: 0.01, unit: 'm',
+  },
+  {
+    lesson: 'quantum', where: 'practiceProblems[5] (atom spacing)', kind: 'claim', expectQuestionIncludes: 'An electron has momentum $1.0 \\times 10^{-24}$ kg m/s',
+    claimIncludes: 'similar to the spacing of atoms in a crystal',
+    note: 'Atom spacings in crystals are roughly 1e-10 to 5e-10 m (graphite layers 3.35e-10 m).',
+    verify: () => {
+      const lambda = Q.H / 1.0e-24;
+      return { holds: lambda > 1e-10 && lambda < 1e-9, detail: `λ = ${lambda.toExponential(2)} m, same order as 1e-10 m` };
+    },
+  },
+];
+
+export const ENTRIES: Entry[] = [...PRISM, ...STATISTICS, ...ELECTROMAGNETISM, ...QUANTUM];
