@@ -1463,58 +1463,57 @@ The topics in these notes follow the Department for Education document below.
     variables: [
       {
         symbol: '\\theta',
-        name: 'Viewing Angle',
-        unit: 'Degrees',
-        description: 'The angle between the observer\'s horizon and the satellite.',
+        name: 'Angle',
+        unit: 'degrees (°)',
+        description: 'One of the two angles in the triangle that is not the right angle.',
         color: 'text-amber-400'
       },
       {
         symbol: 'O',
-        name: 'Opposite (Altitude)',
-        unit: 'km',
-        description: 'The vertical height of the satellite above the ground.',
+        name: 'Opposite side',
+        unit: 'a length, such as metres (m)',
+        description: 'The side facing the angle $\\theta$.',
         color: 'text-orange-400'
       },
       {
         symbol: 'H',
-        name: 'Hypotenuse (Line of Sight)',
-        unit: 'km',
-        description: 'The direct distance from the observer to the satellite.',
+        name: 'Hypotenuse',
+        unit: 'a length, such as metres (m)',
+        description: 'The longest side, opposite the right angle.',
         color: 'text-yellow-400'
       }
     ],
     conceptSteps: [
       {
         stepNumber: 1,
-        title: "Right Triangles in Space",
-        content: "Trigonometry allows us to find unknown distances in space by forming imaginary right triangles between planets, observers, and satellites. This builds upon the idea of breaking diagonal paths down into horizontal and vertical components, much like in [Vectors](/study/vectors).",
-        keyInsight: "Angles and side lengths are deeply connected.",
-        relatedVariables: []
+        title: "Naming the sides",
+        content: "In a right-angled triangle, pick one of the two angles that is not the right angle and call it $\\theta$. The longest side, opposite the right angle, is the hypotenuse. The side facing $\\theta$ is the opposite side. The third side, next to $\\theta$, is the adjacent side.",
+        keyInsight: "Which side is opposite and which is adjacent depends on the angle you pick. The hypotenuse is always the same side.",
+        relatedVariables: ["\\theta", "O", "H"]
       },
       {
         stepNumber: 2,
-        title: "SOH CAH TOA",
-        content: "The Sine ratio (SOH) connects the angle of observation with the Opposite side (altitude) and Hypotenuse (direct distance). When working with rotated coordinate systems, we use similar sine and cosine ratios in [Matrices](/study/matrices).",
-        keyInsight: "Sine is Opposite divided by Hypotenuse.",
+        title: "The three ratios",
+        content: "For a given angle, each ratio of two sides is the same however big the triangle is: $\\sin\\theta = \\dfrac{\\text{opposite}}{\\text{hypotenuse}}$, $\\cos\\theta = \\dfrac{\\text{adjacent}}{\\text{hypotenuse}}$ and $\\tan\\theta = \\dfrac{\\text{opposite}}{\\text{adjacent}}$. The letters SOH CAH TOA help you remember which is which.",
+        keyInsight: "To find a side, choose the ratio that contains the side you know and the side you want.",
         relatedVariables: ["\\theta", "O", "H"]
       },
       {
         stepNumber: 3,
-        title: "Tracking Satellites",
-        content: "Ground stations use the viewing angle and radar distance (hypotenuse) to calculate exactly how high a satellite is orbiting.",
-        keyInsight: "Radar gives us H, and sensors give us the angle, letting us find altitude.",
-        relatedVariables: ["O"]
+        title: "Finding an angle",
+        content: "If you know two sides, work out their ratio, then use the inverse function on a calculator ($\\sin^{-1}$, $\\cos^{-1}$ or $\\tan^{-1}$) to turn it back into an angle. If you know two sides and want the third side, Pythagoras' theorem does it without an angle.",
+        keyInsight: "The inverse functions take you from a ratio back to an angle.",
+        relatedVariables: ["\\theta"]
       }
     ],
     solvedExample: {
-      problem: 'A ground station tracks a satellite at a line-of-sight distance ($H$) of $1000$ km, at an angle ($\\theta$) of $30^\\circ$ above the horizon. What is its altitude ($O$)?',
+      problem: 'A tracking station measures the straight-line distance to a climbing rocket as $12$ km, at an angle of $25^\\circ$ above the horizon. How high is the rocket? Over a distance this short, treat the ground as flat.',
       steps: [
-        'Use the sine ratio: $\\sin(\\theta) = \\frac{O}{H}$.',
-        'Substitute knowns: $\\sin(30^\\circ) = \\frac{O}{1000}$.',
-        'Recall that $\\sin(30^\\circ) = 0.5$.',
-        'Multiply by 1000: $O = 0.5 \\cdot 1000$.'
+        'The straight line to the rocket is the hypotenuse, $H = 12$ km. The height is the side opposite the angle, $O$.',
+        'Opposite and hypotenuse are in the sine ratio: $\\sin 25^\\circ = \\dfrac{O}{12}$.',
+        'Multiply both sides by 12: $O = 12 \\times \\sin 25^\\circ = 12 \\times 0.4226$.'
       ],
-      resultFormula: 'O = 500 \\text{ km}'
+      resultFormula: 'O \\approx 5.07 \\text{ km}'
     },
     practiceProblems: [
       {
@@ -1548,7 +1547,7 @@ The topics in these notes follow the Department for Education document below.
         answer: "About 1.0 light-year"
       },
     ],
-    realWorldConnection: 'Parallax measurement uses trigonometry to determine the distance to nearby stars by observing them from opposite sides of Earth\'s orbit.',
+    realWorldConnection: 'Astronomers use trigonometry to measure the distance to nearby stars. They measure how far a star seems to shift against much more distant stars when Earth is on opposite sides of its orbit, six months apart.',
     textbookContent: `
 ## Trigonometry in right-angled triangles
 
@@ -1566,12 +1565,7 @@ Many people remember them as **SOH CAH TOA**.
 
 ### Finding a side
 
-Choose the ratio that contains the side you know and the side you want.
-
-*Example:* the hypotenuse is 10 m and the angle is 30°. Find the opposite side.
-
-1.  Opposite and hypotenuse are in the sine ratio: $\\sin 30° = \\dfrac{\\text{opposite}}{10}$.
-2.  Opposite $= 10 \\times \\sin 30° = 10 \\times 0.5 = 5$ m.
+Choose the ratio that contains the side you know and the side you want, then rearrange it. The worked example above finds the height of a rocket this way.
 
 ### Finding an angle
 
@@ -1602,11 +1596,15 @@ $$a^2 + b^2 = c^2$$
 
 ### Measuring the distance to a star
 
-As Earth goes round the Sun, a nearby star appears to shift slightly against the far more distant stars behind it. Half of that shift is the parallax angle, $p$. The Sun, Earth and the star make a long, thin right-angled triangle. The side opposite $p$ is the distance from Earth to the Sun, and the adjacent side is the distance $d$ to the star, so:
+As Earth goes round the Sun, a nearby star appears to shift slightly against the far more distant stars behind it. Half of that shift is the parallax angle, $p$. The Sun, Earth and the star make a long, thin right-angled triangle, with the right angle at the Sun. The side opposite $p$ is the distance from Earth to the Sun, and the adjacent side is the distance $d$ from the Sun to the star, so:
 
 $$\\tan p = \\frac{\\text{Earth to Sun}}{d}$$
 
 Measure the angle, and the distance follows.
+
+### Next on the journey
+
+A spacecraft's velocity has a size and a direction, like the long side of a triangle. How do you split it into parts, or add two of them together? That is the next lesson, on vectors.
 
 ### Sources
 
@@ -1640,55 +1638,54 @@ The topics in these notes follow the Department for Education documents below.
       {
         symbol: 'v(t)',
         name: 'Velocity',
-        unit: 'm/s',
-        description: 'The rate of change of position with respect to time.',
+        unit: 'metres per second (m/s)',
+        description: 'How fast the displacement is changing at time $t$.',
         color: 'text-emerald-400'
       },
       {
         symbol: 's(t)',
-        name: 'Position Function',
-        unit: 'm',
-        description: 'The distance of the spacecraft from a reference point as a function of time.',
+        name: 'Displacement',
+        unit: 'metres (m)',
+        description: 'How far the object is from its starting point along the line, at time $t$.',
         color: 'text-teal-400'
       },
       {
         symbol: 't',
         name: 'Time',
-        unit: 's',
-        description: 'The time elapsed.',
+        unit: 'seconds (s)',
+        description: 'The time since the start.',
         color: 'text-lime-400'
       }
     ],
     conceptSteps: [
       {
         stepNumber: 1,
-        title: "Instantaneous Change",
-        content: "While algebra gives average speed over a long trip, calculus allows us to find the exact velocity of a spacecraft at a single instant in time. This is the foundation for solving complex [Differential Equations](/study/diffeq).",
-        keyInsight: "A derivative is simply a rate of change at a specific moment.",
-        relatedVariables: ["v(t)"]
+        title: "The gradient of a curve",
+        content: "A straight line has the same gradient everywhere, but a curve's gradient changes as you move along it. The gradient at a point is the gradient of the tangent there. To find it, draw a chord to a nearby point and see what its gradient gets closer to as the nearby point slides in. That value is called the limit.",
+        keyInsight: "The gradient at a point is a rate of change at one instant, not an average over a stretch.",
+        relatedVariables: []
       },
       {
         stepNumber: 2,
-        title: "The Derivative",
-        content: "Taking the derivative of a position function gives the velocity function. Taking the derivative of velocity gives acceleration. These precise calculations allow us to model complex [Trajectories](/study/trajectory).",
-        keyInsight: "Position -> Velocity -> Acceleration.",
-        relatedVariables: ["s(t)", "v(t)"]
+        title: "The derivative",
+        content: "The derivative, written $\\dfrac{dy}{dx}$, gives the gradient at every point. For a power of $x$, multiply by the power and then take one off the power: $x^n$ becomes $nx^{n-1}$. Differentiate a sum one term at a time.",
+        keyInsight: "The derivative tells you how fast $y$ is changing compared with $x$: a rate of change.",
+        relatedVariables: []
       },
       {
         stepNumber: 3,
-        title: "Rocket Trajectories",
-        content: "As a rocket burns fuel, its mass changes constantly, and its acceleration increases. Calculus is essential to model these dynamic, continuously changing systems.",
-        keyInsight: "Calculus helps predict complex, changing motion.",
-        relatedVariables: []
+        title: "Velocity and acceleration",
+        content: "For an object moving along a line, velocity is the rate of change of displacement, $v = \\dfrac{ds}{dt}$, and acceleration is the rate of change of velocity, $a = \\dfrac{dv}{dt}$. Integrating takes you back the other way.",
+        keyInsight: "Differentiate displacement to get velocity, and velocity to get acceleration.",
+        relatedVariables: ["s(t)", "v(t)", "t"]
       }
     ],
     solvedExample: {
       problem: 'A probe\'s distance from a moon is given by $s(t) = 5t^2 + 10t$ metres. Find its velocity $v(t)$ at $t = 3$ seconds.',
       steps: [
-        'Take the derivative of position: $v(t) = \\frac{d}{dt}(5t^2 + 10t)$.',
-        'Apply the power rule: $v(t) = 10t + 10$.',
-        'Substitute $t = 3$: $v(3) = 10(3) + 10$.',
-        'Calculate the result: $30 + 10 = 40$.'
+        'Velocity is how fast the displacement changes, so differentiate $s$ with respect to $t$.',
+        'Differentiate one term at a time: $5t^2$ gives $10t$, and $10t$ gives $10$, so $v = 10t + 10$.',
+        'Substitute $t = 3$: $v(3) = 10 \\times 3 + 10 = 40$.'
       ],
       resultFormula: 'v(3) = 40 \\text{ m/s}'
     },
@@ -1724,7 +1721,7 @@ The topics in these notes follow the Department for Education documents below.
         answer: "12 m ($\\left[t^3 + 2t\\right]_0^2 = 8 + 4$)"
       },
     ],
-    realWorldConnection: 'Orbital mechanics heavily utilises differential equations (calculus) to predict the future positions of planets, moons, and artificial satellites over time.',
+    realWorldConnection: 'A speedometer shows speed at one instant: how fast the distance travelled is changing right now. That is a derivative, not an average over the whole journey.',
     textbookContent: `
 ## Differentiation and rates of change
 
@@ -1734,11 +1731,11 @@ The gradient of a straight line is the same everywhere. A curve's gradient chang
 
 ### The gradient as a limit
 
-To find the gradient of $y = x^2$ at $x = 3$, take a nearby point at $x = 3 + h$. The **chord** between them has gradient
+To find the gradient of $y = x^2$ at $x = 2$, take a nearby point at $x = 2 + h$. The **chord** between them has gradient
 
-$$\\frac{(3 + h)^2 - 3^2}{h} = \\frac{6h + h^2}{h} = 6 + h$$
+$$\\frac{(2 + h)^2 - 2^2}{h} = \\frac{4h + h^2}{h} = 4 + h$$
 
-As $h$ gets smaller, the chord gets closer to the tangent, and its gradient gets closer to 6. The gradient of the tangent is the **limit** of the chord's gradient as $h \\to 0$. Doing this for a general point is called **differentiation from first principles**.
+As $h$ gets smaller, the chord gets closer to the tangent, and its gradient gets closer to 4. The gradient of the tangent is the **limit** of the chord's gradient as $h \\to 0$. Doing this for a general point is called **differentiation from first principles**.
 
 ### The derivative
 
@@ -1748,7 +1745,7 @@ For powers of $x$:
 
 $$y = x^n \\quad \\Rightarrow \\quad \\frac{dy}{dx} = nx^{n-1}$$
 
-Multiply by the power, then take one off the power. Constants multiply through, and terms are differentiated one at a time: if $y = 5x^2 + 10x$, then $\\dfrac{dy}{dx} = 10x + 10$.
+Multiply by the power, then take one off the power. Constants multiply through, and terms are differentiated one at a time: if $y = 2x^3 + 7x$, then $\\dfrac{dy}{dx} = 6x^2 + 7$.
 
 ### Motion in a straight line
 
@@ -1759,17 +1756,13 @@ For an object moving along a line with displacement $s$ at time $t$:
 
 Going the other way, **integrate**: displacement is the integral of velocity, and velocity is the integral of acceleration.
 
-### Worked example
-
-A probe's distance from a moon is $s = 5t^2 + 10t$ metres. Find its velocity at $t = 3$ s.
-
-1.  $v = \\dfrac{ds}{dt} = 10t + 10$
-2.  $v(3) = 10 \\times 3 + 10 = 40$ m/s
-3.  The acceleration is $a = \\dfrac{dv}{dt} = 10$ m/s², the same at every moment.
-
 ### Rockets and changing motion
 
 A rocket's speed changes every instant as it burns fuel. Flight computers do not use one average speed. They track the rate of change of position and velocity moment by moment, which is exactly what derivatives describe.
+
+### Next on the journey
+
+Often you know a rule for how fast something changes, such as how quickly drag slows a falling capsule, but not the thing itself. How do you work backwards from the rate of change? That is the next lesson, on differential equations.
 
 ### Sources
 
@@ -1803,77 +1796,78 @@ The topics in these notes follow the Department for Education document below.
         symbol: "|\\vec{v}|",
         name: "Speed",
         unit: "m/s",
-        description: "The magnitude of the velocity vector: how fast the spacecraft is moving, ignoring direction.",
+        description: "The magnitude (size) of the velocity: how fast the spacecraft is moving, whatever its direction.",
         color: "text-indigo-400"
       },
       {
         symbol: "v_x",
-        name: "X-Velocity",
+        name: "Horizontal component",
         unit: "m/s",
-        description: "The horizontal component of the velocity vector.",
+        description: "The part of the velocity across, in the x direction.",
         color: "text-cyan-400"
       },
       {
         symbol: "v_y",
-        name: "Y-Velocity",
+        name: "Vertical component",
         unit: "m/s",
-        description: "The vertical component of the velocity vector.",
+        description: "The part of the velocity up, in the y direction.",
         color: "text-sky-400"
       }
     ],
     conceptSteps: [
       {
         stepNumber: 1,
-        title: "What is a Vector?",
-        content: "Imagine drawing an arrow on a map. A vector is exactly that: a mathematical arrow that has both a length (called magnitude) and a direction. Unlike a simple number like '5 kg' (a scalar), a vector tells you '5 m/s going North'.",
-        keyInsight: "A vector requires two pieces of information: how much (magnitude), and which way (direction).",
+        title: "Scalars and vectors",
+        content: "A scalar has size only, such as a mass of 5 kg. A vector has size and direction, such as a velocity of 5 m/s north. You can draw a vector as an arrow: its length shows the size, called the magnitude, and it points in the direction.",
+        keyInsight: "A vector tells you how much and which way.",
         relatedVariables: ["|\\vec{v}|"]
       },
       {
         stepNumber: 2,
-        title: "Vector Components",
-        content: "Instead of dealing with angles, it's often easier to break that diagonal arrow into a horizontal step (X) and a vertical step (Y). Any diagonal movement is just a combination of moving sideways and moving up or down.",
-        keyInsight: "You can perfectly recreate any diagonal path by moving purely horizontally then vertically.",
+        title: "Components",
+        content: "Written as a column, a vector shows its two parts, the step across on top and the step up below. For a velocity, these parts are its components, $v_x$ across and $v_y$ up. A negative part means left or down.",
+        keyInsight: "Any arrow can be made from one step across and one step up.",
         relatedVariables: ["v_x", "v_y"]
       },
       {
         stepNumber: 3,
-        title: "The Pythagorean Theorem",
-        content: "Because the X and Y steps form a 90-degree right angle, we can use the Pythagorean theorem ($a^2 + b^2 = c^2$) to find the length of the hypotenuse, which gives us the original vector's total length (magnitude).",
-        keyInsight: "Squaring the components, adding them, and taking the square root gives you the total speed.",
-        relatedVariables: ["|\\vec{v}|", "v_x", "v_y"]
-      },
-      {
-        stepNumber: 4,
-        title: "Adding Vectors",
-        content: "To add two vectors, draw them tip to tail: the second starts where the first ends. The resultant goes from the start of the first to the end of the second. In column form, add the top numbers together and the bottom numbers together.",
+        title: "Adding vectors",
+        content: "To add two vectors, draw them tip to tail: the second starts where the first ends. The resultant goes from the start of the first to the end of the second. With column vectors, add the top numbers together and the bottom numbers together.",
         keyInsight: "Adding vectors means following one journey and then the other.",
         relatedVariables: []
       },
       {
-        stepNumber: 5,
-        title: "Multiplying by a Number",
-        content: "Multiplying a vector by a number stretches it without turning it: 2a is twice as long as a and points the same way, while -a points the opposite way. Vectors that are multiples of each other are parallel.",
+        stepNumber: 4,
+        title: "Multiplying by a number",
+        content: "Multiplying a vector by a number stretches it without turning it. $2\\mathbf{a}$ is twice as long as $\\mathbf{a}$ and points the same way, while $-\\mathbf{a}$ is the same length and points the opposite way.",
         keyInsight: "If one vector is a multiple of another, they are parallel.",
         relatedVariables: []
       },
       {
+        stepNumber: 5,
+        title: "Magnitude and direction",
+        content: "The step across and the step up are at right angles, so they make a right-angled triangle with the vector as its hypotenuse. Pythagoras' theorem gives the magnitude, $|\\vec{v}| = \\sqrt{v_x^2 + v_y^2}$, and $\\tan\\theta = \\dfrac{v_y}{v_x}$ gives the angle $\\theta$ above the x direction.",
+        keyInsight: "Square the components, add them and take the square root to get the size.",
+        relatedVariables: ["|\\vec{v}|", "v_x", "v_y"]
+      },
+      {
         stepNumber: 6,
-        title: "Transformations and Thrust",
-        content: "When a spacecraft fires its thrusters, it essentially 'adds' a new thrust vector to its current velocity vector. If you want to change direction, you calculate a transformation to figure out exactly which angle to point your engines.",
-        keyInsight: "Thrusting forward adds to your magnitude (speed). Thrusting sideways changes your direction.",
+        title: "Steering with thrusters",
+        content: "When a spacecraft fires a thruster, the engine adds a new velocity to the one the spacecraft already has. The new velocity is the sum of the two vectors.",
+        keyInsight: "Firing straight ahead adds to the speed. Firing at right angles to the motion mostly turns it.",
         relatedVariables: ["|\\vec{v}|"]
       }
     ],
     solvedExample: {
-      problem: "A spacecraft is travelling with a horizontal velocity ($v_x$) of $3000$ m/s and a vertical velocity ($v_y$) of $4000$ m/s. What is its speed ($|\\vec{v}|$)?",
+      problem: "A spacecraft is travelling with a horizontal velocity ($v_x$) of $3000$ m/s and a vertical velocity ($v_y$) of $4000$ m/s. What is its speed ($|\\vec{v}|$), and at what angle above the horizontal is it moving?",
       steps: [
-        "Identify the components: $v_x = 3000$ and $v_y = 4000$.",
-        "Square both components: $3000^2 = 9,000,000$ and $4000^2 = 16,000,000$.",
-        "Add the squared values together: $9,000,000 + 16,000,000 = 25,000,000$.",
-        "Take the square root of the sum: $\\sqrt{25,000,000}$."
+        "The two components are at right angles, so they make a right-angled triangle with the velocity as its hypotenuse.",
+        "Square both components: $3000^2 = 9{,}000{,}000$ and $4000^2 = 16{,}000{,}000$.",
+        "Add them: $9{,}000{,}000 + 16{,}000{,}000 = 25{,}000{,}000$.",
+        "Take the square root: $|\\vec{v}| = \\sqrt{25{,}000{,}000} = 5000$ m/s.",
+        "For the direction, $\\tan\\theta = \\dfrac{4000}{3000}$, so $\\theta = \\tan^{-1}\\!\\left(\\dfrac{4}{3}\\right) \\approx 53.1°$."
       ],
-      resultFormula: "|\\vec{v}| = 5000 \\text{ m/s}"
+      resultFormula: "|\\vec{v}| = 5000 \\text{ m/s, at about } 53.1° \\text{ above the horizontal}"
     },
     practiceProblems: [
       {
@@ -1907,7 +1901,7 @@ The topics in these notes follow the Department for Education document below.
         answer: "5 km/s, about 36.9° north of east"
       },
     ],
-    realWorldConnection: "Navigation computers on the Apollo missions continuously calculated state vectors (position and velocity in 3D space) to ensure astronauts remained on the correct trajectory to the Moon.",
+    realWorldConnection: "The guidance computer on the Apollo spacecraft kept track of its state vector: the spacecraft's position and velocity, each a vector in three dimensions.",
     textbookContent: `
 ## Vectors
 
@@ -1927,7 +1921,7 @@ means 3 to the right and 2 up. Negative numbers mean left or down.
 
 To add vectors, draw them **tip to tail**: the second starts where the first ends. The sum, called the **resultant**, goes from the start of the first to the end of the second. In columns, add the matching numbers:
 
-$$\\begin{pmatrix} 3 \\\\ 2 \\end{pmatrix} + \\begin{pmatrix} 1 \\\\ -4 \\end{pmatrix} = \\begin{pmatrix} 4 \\\\ -2 \\end{pmatrix}$$
+$$\\begin{pmatrix} 3 \\\\ 2 \\end{pmatrix} + \\begin{pmatrix} 2 \\\\ -1 \\end{pmatrix} = \\begin{pmatrix} 5 \\\\ 1 \\end{pmatrix}$$
 
 Subtracting $\\mathbf{b}$ is the same as adding $-\\mathbf{b}$, the vector of the same size pointing the opposite way.
 
@@ -1949,21 +1943,19 @@ and trigonometry gives the direction, as an angle $\\theta$ above the x directio
 
 $$\\tan \\theta = \\frac{y}{x}$$
 
+For a velocity $\\vec{v}$ with components $v_x$ and $v_y$, the magnitude $|\\vec{v}|$ is the speed.
+
 ### Splitting a vector into parts
 
 In A-level physics you also go the other way: you **resolve** a vector into two parts at right angles. A velocity $v$ at angle $\\theta$ to the horizontal has a horizontal part $v \\cos \\theta$ and a vertical part $v \\sin \\theta$.
 
-### Worked example
-
-A spacecraft has a horizontal velocity of 3000 m/s and a vertical velocity of 4000 m/s. Its speed is
-
-$$\\sqrt{3000^2 + 4000^2} = \\sqrt{25\\,000\\,000} = 5000 \\text{ m/s}$$
-
-and it is climbing at $\\tan^{-1}\\!\\left(\\dfrac{4000}{3000}\\right) \\approx 53°$ above the horizontal.
-
 ### Steering with thrusters
 
-When a spacecraft fires a thruster, it adds a new velocity to the one it already has. Firing straight ahead adds to its speed. Firing sideways changes its direction. Mission planners add these vectors to work out exactly which way to point the engine and for how long.
+When a spacecraft fires a thruster, it adds a new velocity to the one it already has. Firing straight ahead adds to its speed. Firing sideways mostly changes its direction. Mission planners add these vectors to work out which way to point the engine and for how long.
+
+### Next on the journey
+
+So far, directions have been angles in degrees. Mathematicians and engineers often use a different unit, the radian, which ties an angle to a distance around a circle. That is the next lesson.
 
 ### Sources
 
@@ -1994,58 +1986,65 @@ The topics in these notes follow the Department for Education documents below.
     variables: [
       {
         symbol: "\\vec{v}'",
-        name: "Rotated Vector",
-        unit: "Coordinates",
-        description: "The new heading or position of the spacecraft after rotation.",
+        name: "Rotated vector",
+        unit: "a column vector",
+        description: "Where the vector ends up after the rotation.",
         color: "text-amber-400"
       },
       {
         symbol: "R(\\theta)",
-        name: "Rotation Matrix",
-        unit: "Matrix",
-        description: "A matrix containing trigonometric functions (sine and cosine) that rotates a vector by a specific angle.",
+        name: "Rotation matrix",
+        unit: "a 2 × 2 matrix",
+        description: "The matrix that turns every vector by the angle $\\theta$ anticlockwise about the origin. Its entries are sines and cosines of $\\theta$.",
         color: "text-orange-400"
       },
       {
         symbol: "\\vec{v}",
-        name: "Original Vector",
-        unit: "Coordinates",
-        description: "The initial heading or position of the spacecraft.",
+        name: "Original vector",
+        unit: "a column vector",
+        description: "The position vector of the point before the rotation.",
         color: "text-yellow-400"
       }
     ],
     conceptSteps: [
       {
         stepNumber: 1,
-        title: "Coordinate Systems",
-        content: "Imagine looking at a [Vector](/study/vectors) arrow pointing 'Up'. Now tilt your head sideways. The arrow is still pointing to the same physical place, but to your eyes, it's now pointing 'Right'. Spacecraft do this constantly, rotating their frames of reference from pointing at the Sun, to pointing at Earth.",
-        keyInsight: "To translate data between these systems without physically moving, we mathematically rotate the vectors.",
-        relatedVariables: ["\\vec{v}", "\\vec{v}'"]
+        title: "Grids of numbers",
+        content: "A matrix is a grid of numbers set out in rows and columns. You add two matrices of the same size by adding the numbers in matching positions, and multiply a matrix by a number by multiplying every entry.",
+        keyInsight: "A matrix with 2 rows and 2 columns is called a 2 × 2 matrix.",
+        relatedVariables: []
       },
       {
         stepNumber: 2,
-        title: "The Rotation Matrix",
-        content: "A rotation matrix is like a mathematical machine. You feed it your original X and Y coordinates, and it multiplies them by [Trigonometric functions](/study/trigonometry) (sines and cosines) to spit out the brand new rotated coordinates.",
-        keyInsight: "Matrix multiplication smoothly combines the old coordinates to form the new ones.",
-        relatedVariables: ["R(\\theta)"]
+        title: "Multiplying matrices",
+        content: "To multiply two matrices, take a row of the first and a column of the second, multiply them in pairs and add. That gives one entry of the answer. Repeat for every row and column.",
+        keyInsight: "Swapping the order of two matrices usually changes the product.",
+        relatedVariables: []
       },
       {
         stepNumber: 3,
-        title: "Preserving Magnitude",
-        content: "A pure rotation matrix changes the direction of a vector but preserves its magnitude (length). The spacecraft's speed or distance remains the exact same, we've just pivoted the camera.",
-        keyInsight: "Rotation matrices are orthogonal, meaning they do not stretch or squish the vector.",
-        relatedVariables: []
+        title: "Matrices move points",
+        content: "Multiply a 2 × 2 matrix by a point's position vector and you get a new point. Doing this to every point moves the whole plane. The rotation matrix $R(\\theta)$ turns every point through the angle $\\theta$ anticlockwise about the origin.",
+        keyInsight: "A rotation turns vectors without changing their length.",
+        relatedVariables: ["\\vec{v}", "R(\\theta)", "\\vec{v}'"]
+      },
+      {
+        stepNumber: 4,
+        title: "One transformation after another",
+        content: "To do one transformation and then another, multiply their matrices. The matrix written on the right acts first, because it is the one next to the vector.",
+        keyInsight: "Two transformations can be combined into a single matrix.",
+        relatedVariables: ["R(\\theta)"]
       }
     ],
     solvedExample: {
-      problem: "Rotate a position vector $\\vec{v} = (1, 0)$ by $90^\\circ$ ($\\pi/2$ radians) anticlockwise.",
+      problem: "Rotate the vector $\\vec{v} = \\begin{pmatrix} 2 \\\\ 0 \\end{pmatrix}$ by $30^\\circ$ anticlockwise about the origin.",
       steps: [
-        "Set up the rotation matrix for $90^\\circ$: $R(90^\\circ) = \\begin{bmatrix} 0 & -1 \\\\ 1 & 0 \\end{bmatrix}$.",
-        "Multiply the matrix by the vector: $\\begin{bmatrix} 0 & -1 \\\\ 1 & 0 \\end{bmatrix} \\begin{bmatrix} 1 \\\\ 0 \\end{bmatrix}$.",
-        "Calculate the new x: $0 \\cdot 1 + (-1) \\cdot 0 = 0$.",
-        "Calculate the new y: $1 \\cdot 1 + 0 \\cdot 0 = 1$."
+        "Write down the rotation matrix: $R(30^\\circ) = \\begin{pmatrix} \\cos 30^\\circ & -\\sin 30^\\circ \\\\ \\sin 30^\\circ & \\cos 30^\\circ \\end{pmatrix} = \\begin{pmatrix} 0.866 & -0.5 \\\\ 0.5 & 0.866 \\end{pmatrix}$.",
+        "Top row times the vector: $0.866 \\times 2 + (-0.5) \\times 0 = 1.732$.",
+        "Bottom row times the vector: $0.5 \\times 2 + 0.866 \\times 0 = 1$.",
+        "Check the length: $\\sqrt{1.732^2 + 1^2} = 2$, the same as before. A rotation does not stretch."
       ],
-      resultFormula: "\\vec{v}' = (0, 1)"
+      resultFormula: "\\vec{v}' \\approx \\begin{pmatrix} 1.73 \\\\ 1 \\end{pmatrix}"
     },
     practiceProblems: [
       {
@@ -2079,7 +2078,7 @@ The topics in these notes follow the Department for Education documents below.
         answer: "$\\begin{pmatrix} 0 & 1 \\\\ 1 & 0 \\end{pmatrix}$, a reflection in the line $y = x$."
       },
     ],
-    realWorldConnection: "Attitude Control Systems (ACS) use 3D rotation matrices and quaternions to continuously track and adjust a satellite's orientation in space, ensuring solar panels point at the Sun and antennas at Earth.",
+    realWorldConnection: "A satellite's control system keeps track of which way the satellite is facing, a rotation in three dimensions, so that it can keep its solar panels turned towards the Sun and its antenna towards Earth.",
     textbookContent: `
 ## Matrices
 
@@ -2089,9 +2088,9 @@ A **matrix** is a rectangular grid of numbers. A matrix with 2 rows and 3 column
 
 Matrices of the same size are added or subtracted by combining the numbers in matching positions:
 
-$$\\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix} + \\begin{pmatrix} 0 & 1 \\\\ 1 & 0 \\end{pmatrix} = \\begin{pmatrix} 1 & 3 \\\\ 4 & 4 \\end{pmatrix}$$
+$$\\begin{pmatrix} 2 & 1 \\\\ 0 & 3 \\end{pmatrix} + \\begin{pmatrix} 1 & -1 \\\\ 4 & 2 \\end{pmatrix} = \\begin{pmatrix} 3 & 0 \\\\ 4 & 5 \\end{pmatrix}$$
 
-To multiply by a number (a **scalar**), multiply every entry: $2\\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix} = \\begin{pmatrix} 2 & 4 \\\\ 6 & 8 \\end{pmatrix}$.
+To multiply by a number (a **scalar**), multiply every entry: $3\\begin{pmatrix} 1 & 0 \\\\ 2 & -1 \\end{pmatrix} = \\begin{pmatrix} 3 & 0 \\\\ 6 & -3 \\end{pmatrix}$.
 
 ### Multiplying matrices
 
@@ -2118,15 +2117,19 @@ A quick way to find a matrix: its first column is where $\\begin{pmatrix} 1 \\\\
 
 ### One transformation after another
 
-To do $\\mathbf{M}$ first and then $\\mathbf{R}$, multiply $\\mathbf{RM}$: the first transformation is on the **right**, next to the vector it acts on. Reflecting in the x-axis and then rotating 90° anticlockwise gives
+To do $\\mathbf{M}$ first and then $\\mathbf{R}$, multiply $\\mathbf{RM}$: the first transformation is on the **right**, next to the vector it acts on. Rotating 90° anticlockwise and then reflecting in the x-axis gives
 
-$$\\begin{pmatrix} 0 & -1 \\\\ 1 & 0 \\end{pmatrix}\\begin{pmatrix} 1 & 0 \\\\ 0 & -1 \\end{pmatrix} = \\begin{pmatrix} 0 & 1 \\\\ 1 & 0 \\end{pmatrix}$$
+$$\\begin{pmatrix} 1 & 0 \\\\ 0 & -1 \\end{pmatrix}\\begin{pmatrix} 0 & -1 \\\\ 1 & 0 \\end{pmatrix} = \\begin{pmatrix} 0 & -1 \\\\ -1 & 0 \\end{pmatrix}$$
 
-which is a reflection in the line $y = x$.
+which is a reflection in the line $y = -x$. Do the same two steps the other way round and you get a different matrix.
 
 ### Turning a spacecraft
 
-A spacecraft keeps track of which way it faces using matrices. A star tracker measures the directions of known stars in the spacecraft's own frame; a rotation matrix converts between that frame and a fixed one. Rotations do not change lengths, so the stars stay the same distance apart, just as a rotation matrix keeps every vector the same length.
+A spacecraft keeps track of which way it faces using matrices. A star tracker, a camera that recognises patterns of stars, measures the directions of known stars along the spacecraft's own x, y and z directions. A rotation matrix converts those directions into fixed ones. Rotations do not change lengths or angles, so the angles between the stars come out the same either way.
+
+### Next on the journey
+
+A rotation describes where a spacecraft points at one moment. But its position and speed change all the time. How do you find how fast something is changing at a single instant? That is the next lesson, on calculus.
 
 ### Sources
 
@@ -2350,55 +2353,55 @@ The topics in these notes follow the Department for Education documents below.
     variables: [
       {
         symbol: "v",
-        name: "Velocity",
-        unit: "m/s",
-        description: "The current speed of the spacecraft. Drag increases with the square of the velocity.",
+        name: "Speed",
+        unit: "metres per second (m/s)",
+        description: "How fast the capsule is moving at time $t$.",
         color: "text-indigo-400"
       },
       {
         symbol: "t",
         name: "Time",
-        unit: "s",
-        description: "The continuous progression of time.",
+        unit: "seconds (s)",
+        description: "The time since the capsule's speed was $v_0$.",
         color: "text-cyan-400"
       },
       {
         symbol: "k",
-        name: "Drag Constant",
-        unit: "1/m",
-        description: "A coefficient that factors in atmospheric density, spacecraft cross-section, and mass.",
+        name: "Drag constant",
+        unit: "per metre (1/m)",
+        description: "A fixed number for this capsule and this air. It is bigger for thicker air, a wider capsule or a lighter one.",
         color: "text-sky-400"
       }
     ],
     conceptSteps: [
       {
         stepNumber: 1,
-        title: "Rates of Change",
-        content: "If [Calculus](/study/calculus) is the study of change, Differential Equations are the formulas that use that change to predict the future. The expression $dv/dt$ represents acceleration—the exact rate at which velocity changes from moment to moment.",
-        keyInsight: "Differential equations link the current state of a system to how fast it is changing.",
+        title: "Equations about rates of change",
+        content: "A differential equation is an equation that connects a quantity with how fast it changes. Here the quantity is the capsule's speed $v$, and its rate of change, $\\dfrac{dv}{dt}$, is how fast the speed changes each second.",
+        keyInsight: "A differential equation tells you how something changes. Solving it tells you what it is at any time.",
         relatedVariables: ["v", "t"]
       },
       {
         stepNumber: 2,
-        title: "Quadratic Drag",
-        content: "When falling into an atmosphere, air resistance is brutal. It's proportional to the square of velocity. If you double your speed, the drag force doesn't double—it quadruples! This creates a massive braking force.",
-        keyInsight: "The v² term means a fast-moving re-entry vehicle experiences extreme deceleration initially.",
-        relatedVariables: ["v"]
+        title: "Drag and the square of speed",
+        content: "At high speed, the drag on a capsule, and so the rate at which it slows, is roughly proportional to the square of its speed: a constant times $v^2$. That gives $\\dfrac{dv}{dt} = -kv^2$. Double the speed and the drag is four times as big.",
+        keyInsight: "The minus sign shows the speed is falling: drag acts against the motion.",
+        relatedVariables: ["v", "k"]
       },
       {
         stepNumber: 3,
-        title: "Decay Curve",
-        content: "Because the deceleration depends on velocity, the drag force shrinks as the spacecraft slows. Solving the equation gives $v = \\frac{v_0}{1 + k v_0 t}$: the speed falls steeply at first, then more and more gently. This is not exponential decay, which belongs to drag proportional to $v$ rather than $v^2$. Drag alone never settles at a steady speed; a steady (terminal) speed only appears once gravity is included.",
-        keyInsight: "The negative sign ensures that drag opposes the direction of motion.",
-        relatedVariables: ["k"]
+        title: "Solving it",
+        content: "Separating the variables and integrating gives $v = \\dfrac{v_0}{1 + kv_0 t}$, where $v_0$ is the speed at $t = 0$. As the capsule slows, the drag shrinks, so the speed falls steeply at first and then more and more gently. This is not exponential decay, which comes from a rate proportional to $v$ rather than $v^2$.",
+        keyInsight: "Drag alone never brings the capsule to a steady speed. A steady (terminal) speed appears only once gravity is included.",
+        relatedVariables: ["v", "k", "t"]
       }
     ],
     solvedExample: {
-      problem: "Calculate the instantaneous deceleration ($\\frac{dv}{dt}$) of a capsule re-entering at $v = 5000$ m/s, where the drag constant $k = 2 \\times 10^{-6}$.",
+      problem: "A capsule re-enters at $v = 5000$ m/s, with $\\dfrac{dv}{dt} = -kv^2$ and drag constant $k = 2 \\times 10^{-6}$ per metre. How fast is it slowing down at that moment?",
       steps: [
-        "Square the velocity: $5000^2 = 25,000,000$.",
-        "Multiply by the drag constant: $(2 \\times 10^{-6}) \\times 25,000,000$.",
-        "Apply the negative sign to denote deceleration: $-50$."
+        "Square the speed: $5000^2 = 25{,}000{,}000$.",
+        "Multiply by the drag constant: $(2 \\times 10^{-6}) \\times 25{,}000{,}000 = 50$.",
+        "The minus sign shows the speed is falling: $\\dfrac{dv}{dt} = -50$ m/s². The capsule is losing 50 m/s of speed every second."
       ],
       resultFormula: "\\frac{dv}{dt} = -50 \\text{ m/s}^2"
     },
@@ -2434,7 +2437,7 @@ The topics in these notes follow the Department for Education documents below.
         answer: "About 4,545 m/s ($5000 \\div 1.1$)"
       },
     ],
-    realWorldConnection: "Mission control uses complex sets of differential equations, factoring in variable atmospheric density and gravity, to predict exactly where a returning capsule will splash down in the ocean.",
+    realWorldConnection: "A parachute's drag also grows with speed, so it brakes hardest just after it opens. The capsule then settles at a steady speed, once the drag balances its weight.",
     textbookContent: `
 ## Differential equations
 
@@ -2444,7 +2447,7 @@ A **differential equation** links a quantity to its rate of change. It describes
 
 Many models start from a sentence about a rate:
 
-*   "The population grows at a rate proportional to its size": $\\dfrac{dP}{dt} = kP$.
+*   "The amount of a radioactive substance falls at a rate proportional to the amount left": $\\dfrac{dN}{dt} = -kN$.
 *   "The body cools at a rate proportional to the difference between its temperature and the room's": $\\dfrac{dT}{dt} = -k(T - T_{\\text{room}})$.
 *   "Drag slows the capsule at a rate proportional to the square of its speed": $\\dfrac{dv}{dt} = -kv^2$.
 
@@ -2460,7 +2463,7 @@ So $y = Ae^x$. This **general solution** has an unknown constant.
 
 ### Particular solutions
 
-A **particular solution** uses a known value, such as the starting value, to find the constant. If $y = 5$ when $x = 0$, then $A = 5$ and $y = 5e^x$.
+A **particular solution** uses a known value, such as the starting value, to find the constant. If $y = 2$ when $x = 0$, then $A = 2$ and $y = 2e^x$.
 
 ### Worked example: drag on a capsule
 
@@ -2476,6 +2479,10 @@ The speed falls steeply at first, while drag is large, then more and more gently
 ### Coming home from space
 
 A capsule returning from orbit hits the top of the atmosphere at nearly 8 km/s. Drag, which grows with the square of speed, does most of the braking. Real re-entry models add gravity, the thinning of the air with height and the capsule's angle, giving equations that computers solve step by step. The simple model above shows the same shape: hard braking early, gentler later.
+
+### Next on the journey
+
+Once a spacecraft is on its way, everything on board, from its computers to its radio, runs on electricity. How are voltage, current and resistance linked? That is the next mission, starting with electric circuits.
 
 ### Sources
 
@@ -3199,24 +3206,24 @@ The topics in these notes follow the Department for Education document below.
     variables: [
       {
         symbol: 's',
-        name: 'Arc Length',
-        unit: 'm',
+        name: 'Arc length',
+        unit: 'metres (m)',
         description: 'The distance along the curved edge of a sector.',
         color: 'text-cyan-400'
       },
       {
         symbol: 'r',
         name: 'Radius',
-        unit: 'm',
+        unit: 'metres (m)',
         description: 'The straight-line distance from the centre to the edge.',
         color: 'text-rose-400',
         range: { min: 1, max: 10, default: 5 }
       },
       {
         symbol: '\\theta',
-        name: 'Angle (Radians)',
-        unit: 'rad',
-        description: 'The measure of the central angle in radians.',
+        name: 'Angle at the centre',
+        unit: 'radians (rad)',
+        description: 'The angle between the two radii, measured in radians.',
         color: 'text-amber-400',
         range: { min: 0, max: 6.28, default: 1.57 }
       }
@@ -3224,34 +3231,35 @@ The topics in these notes follow the Department for Education document below.
     conceptSteps: [
       {
         stepNumber: 1,
-        title: 'Degrees vs Radians',
-        content: 'While degrees (360 in a circle) are common, mathematicians prefer radians. A radian is the angle created when the arc length equals the radius. A full circle is 2π radians.',
-        keyInsight: 'Radians directly relate the angle to the physical distance around the circle.',
+        title: 'Degrees and radians',
+        content: 'A full turn is 360 degrees. At A-level, angles are usually measured in radians instead. An angle of one radian cuts off an arc exactly as long as the radius. The circumference is $2\\pi$ times the radius, so a full turn is $2\\pi$ radians.',
+        keyInsight: 'A radian links an angle to the distance around the circle.',
         relatedVariables: ['\\theta']
       },
       {
         stepNumber: 2,
-        title: 'Arc Length',
-        content: 'If you know the radius of a circle and the central angle in radians, the arc length is simply their product.',
-        keyInsight: 'This formula only works if the angle is in radians!',
+        title: 'Arc length',
+        content: 'An arc is part of the edge of a circle. With the angle at the centre in radians, the arc length is the radius times the angle: $s = r\\theta$.',
+        keyInsight: 'This only works with the angle in radians. In degrees you need the fraction of 360 instead.',
         relatedVariables: ['s', 'r', '\\theta']
       },
       {
         stepNumber: 3,
-        title: 'Sector Area',
-        content: 'The area of the "slice of pie" (sector) is given by A = (1/2) * r² * θ. This is directly derived from the area of a full circle.',
-        keyInsight: 'Sector area scales quadratically with radius but linearly with the angle.',
+        title: 'Sector area',
+        content: 'A sector is a pie-slice shape cut out by two radii. With $\\theta$ in radians, its area is $A = \\dfrac{1}{2} r^2 \\theta$. This is the area of the whole circle, $\\pi r^2$, times the fraction of the turn, $\\dfrac{\\theta}{2\\pi}$.',
+        keyInsight: 'Double the radius and the area is four times as big. Double the angle and the area doubles.',
         relatedVariables: ['r', '\\theta']
       }
     ],
     solvedExample: {
-      problem: 'Find the arc length of a circular sector with radius $r = 4\\text{m}$ and angle $\\theta = \\frac{\\pi}{2}$ radians.',
+      problem: 'A sector has radius $r = 4$ m and angle $\\theta = \\dfrac{\\pi}{2}$ radians. Find its arc length and its area.',
       steps: [
-        'Use the arc length formula: $s = r \\cdot \\theta$.',
-        'Substitute the given values: $s = 4 \\cdot \\frac{\\pi}{2}$.',
-        'Simplify the expression: $s = 2\\pi \\approx 6.28\\text{m}$.'
+        'Arc length: $s = r\\theta = 4 \\times \\dfrac{\\pi}{2} = 2\\pi$ m.',
+        'As a decimal, $2\\pi \\approx 6.28$ m.',
+        'Area: $A = \\dfrac{1}{2} r^2 \\theta = \\dfrac{1}{2} \\times 16 \\times \\dfrac{\\pi}{2} = 4\\pi$ m².',
+        'As a decimal, $4\\pi \\approx 12.6$ m².'
       ],
-      resultFormula: 's = 2\\pi \\text{ m}'
+      resultFormula: 's = 2\\pi \\approx 6.28 \\text{ m}, \\quad A = 4\\pi \\approx 12.6 \\text{ m}^2'
     },
     practiceProblems: [
       {
@@ -3285,7 +3293,7 @@ The topics in these notes follow the Department for Education document below.
         answer: "About 11,000 km ($42{,}164 \\times \\frac{\\pi}{12} \\approx 11{,}040$ km)"
       },
     ],
-    realWorldConnection: 'Civil engineers use arc length and central angles to design safe curves in roads and railways. The radius must be large enough (and the curve gentle enough) to prevent derailments or slipping.',
+    realWorldConnection: 'Railway curves are often laid out as arcs of circles. The length of track around a curve follows from its radius and the angle it turns through.',
     textbookContent: `
 ## Radians, arcs and sectors
 
@@ -3301,33 +3309,30 @@ At A-level, angles are usually measured in **radians**. One radian is the angle 
 
 The whole circumference is $2\\pi r$, which is $2\\pi$ radius-lengths, so
 
-$$360° = 2\\pi \\text{ radians} \\qquad 180° = \\pi \\text{ radians}$$
+$$360° = 2\\pi \\text{ radians}$$
 
-*   Degrees to radians: multiply by $\\dfrac{\\pi}{180}$. So $60° = \\dfrac{\\pi}{3}$.
+*   Degrees to radians: multiply by $\\dfrac{\\pi}{180}$. So $90° = \\dfrac{\\pi}{2}$.
 *   Radians to degrees: multiply by $\\dfrac{180}{\\pi}$. So $2 \\text{ rad} \\approx 114.6°$.
 
 ### Arcs and sectors in radians
 
-With $\\theta$ in radians, the formulas become much simpler, because the $\\dfrac{\\theta}{2\\pi}$ fraction cancels:
+With $\\theta$ in radians, the fraction of the circle is $\\dfrac{\\theta}{2\\pi}$, and the formulas become much simpler:
 
 $$s = r\\theta \\qquad A = \\frac{1}{2} r^2 \\theta$$
 
 These formulas only work with the angle in radians.
 
-### Worked example
-
-Find the arc length and sector area for $r = 4$ m and $\\theta = \\dfrac{\\pi}{2}$.
-
-1.  $s = 4 \\times \\dfrac{\\pi}{2} = 2\\pi \\approx 6.28$ m
-2.  $A = \\dfrac{1}{2} \\times 16 \\times \\dfrac{\\pi}{2} = 4\\pi \\approx 12.6$ m²
-
 ### Why radians are used
 
-In radians, an angle is a ratio of two lengths, arc over radius, so it has no unit. That is why later results, such as $\\sin\\theta \\approx \\theta$ for small angles and the derivative of $\\sin x$ being $\\cos x$, only work in radians.
+In radians, an angle is a ratio of two lengths, arc over radius, so it is a pure number. Because of this, later results such as $\\sin\\theta \\approx \\theta$ for small angles, and the derivative of $\\sin x$ being $\\cos x$, only work in radians.
 
 ### Satellites going round
 
-A satellite in a circular orbit sweeps out equal angles in equal times. A geostationary satellite, 42,164 km from the centre of the Earth, turns $2\\pi$ radians a day, which is $\\dfrac{\\pi}{12}$ radians an hour. Each hour it travels $s = r\\theta = 42{,}164 \\times \\dfrac{\\pi}{12} \\approx 11{,}000$ km.
+A satellite in a circular orbit sweeps out equal angles in equal times. A geostationary satellite, 42,164 km from the centre of the Earth, turns $2\\pi$ radians in a day (strictly 23 hours 56 minutes, the time Earth takes to spin once), so you can work out how far it goes in any part of a day.
+
+### Next on the journey
+
+As a spacecraft turns, every direction it measures turns with it. How can one calculation turn every point at once? That is the next lesson, on matrices.
 
 ### Sources
 
