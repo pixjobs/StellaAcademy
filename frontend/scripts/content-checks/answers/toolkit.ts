@@ -537,4 +537,82 @@ const FRACTION_OPS: Entry[] = [
   fv(FO, 'textbookContent: battery, half', 'Each drive uses $\\dfrac{1}{8}$ of a full battery', '= \\dfrac{4}{8} = \\dfrac{1}{2}$', frac(2), 3 / 4 - 2 / 8),
 ];
 
-export const ENTRIES: Entry[] = [...ARITHMETIC, ...NEGATIVE_NUMBERS, ...MULTIPLICATION, ...FRACTIONS, ...FRACTION_OPS];
+const DP = 'decimals-percentages';
+const DP_SOLVED = 'A £40 shirt is on sale with 25% off.';
+/** A plain numeric entry. */
+const nv = (
+  lesson: string, where: string, fragment: string, stated: string, pick: number, value: number, unit = '', tolerance = 1e-9,
+): Entry => ({
+  lesson, where,
+  ...(where.startsWith('textbookContent') || where.startsWith('conceptSteps') ? { expectNotesIncludes: fragment, expectQuestionIncludes: fragment } : { expectQuestionIncludes: fragment }),
+  stated, pick, compute: () => value, expected: value, tolerance, unit,
+});
+
+const DECIMALS_PERCENTAGES: Entry[] = [
+  // Concept steps
+  nv(DP, 'conceptSteps[0] (3 ÷ 4)', 'To turn a fraction into a decimal', '$3 \\div 4 = 0.75$', 2, 3 / 4),
+  nv(DP, 'conceptSteps[2] (20% of 50)', 'Build the percentage up from easy ones', '$0.2 \\times 50 = 10$', 2, 0.2 * 50),
+  nv(DP, 'conceptSteps[2] (20% as a decimal)', 'Build the percentage up from easy ones', '$0.2 \\times 50 = 10$', 0, 20 / 100),
+  // Worked example
+  nv(DP, 'solvedExample.steps[0]', DP_SOLVED, '$25\\% = 0.25$', 1, 25 / 100),
+  nv(DP, 'solvedExample.steps[1]', DP_SOLVED, '$40 \\times 0.25 = 10$', 2, 40 * 0.25, '£'),
+  nv(DP, 'solvedExample.steps[2]', DP_SOLVED, '$40 - 10 = 30$', 2, 40 - 40 * 0.25, '£'),
+  nv(DP, 'solvedExample.resultFormula (discount)', DP_SOLVED, '\\text{Discount} = \\pounds 10', 0, 40 * 0.25, '£'),
+  nv(DP, 'solvedExample.resultFormula (sale price)', DP_SOLVED, '\\text{ sale price} = \\pounds 30', 0, 40 * 0.75, '£'),
+  // Practice
+  nv(DP, 'practiceProblems[0]', 'Write 4/5 as a percentage.', '80% (4/5 = 80/100)', 0, (4 / 5) * 100, '%'),
+  fv(DP, 'practiceProblems[0] (hundredths)', 'Write 4/5 as a percentage.', '(4/5 = 80/100)', frac(2), 4 / 5),
+  nv(DP, 'practiceProblems[1] (percentage)', 'Write 0.35 as a percentage', '35%', 0, 0.35 * 100, '%'),
+  fv(DP, 'practiceProblems[1] (fraction)', 'Write 0.35 as a percentage', '7/20', frac(0), 0.35),
+  {
+    lesson: DP, where: 'practiceProblems[1] (simplest form)', kind: 'claim', expectQuestionIncludes: 'Write 0.35 as a percentage',
+    claimIncludes: '7/20', verify: () => ({ holds: gcd(7, 20) === 1 && gcd(35, 100) === 5, detail: '35/100 ÷ 5 = 7/20, and 7 and 20 share no factor' }),
+  },
+  nv(DP, 'practiceProblems[2]', 'What is 15% of 200?', '30 (20 + 10)', 0, 0.15 * 200),
+  nv(DP, 'practiceProblems[2] (10%)', 'What is 15% of 200?', '(20 + 10)', 0, 0.1 * 200),
+  nv(DP, 'practiceProblems[2] (5%)', 'What is 15% of 200?', '(20 + 10)', 1, 0.05 * 200),
+  {
+    lesson: DP, where: 'practiceProblems[3]', kind: 'qualitative', expectQuestionIncludes: 'Which is largest: 0.6, 5/8 or 62%?',
+    expectAnswerIncludes: '5/8, which is 62.5%',
+    verify: () => ({ holds: 5 / 8 > 0.6 && 5 / 8 > 0.62 && 5 / 8 === 0.625, detail: '0.625 > 0.62 > 0.6' }),
+  },
+  nv(DP, 'practiceProblems[3] (hint)', 'Which is largest: 0.6, 5/8 or 62%?', '5/8, which is 62.5%', 2, (5 / 8) * 100, '%'),
+  nv(DP, 'practiceProblems[4]', 'A fuel tank holds 800 litres and is 25% full.', '200 litres', 0, 800 * 0.25, 'litres'),
+  nv(DP, 'practiceProblems[5]', 'A probe sends 20 pictures and 9 of them show clouds.', '45% (9/20 = 45/100)', 0, (9 / 20) * 100, '%'),
+  fv(DP, 'practiceProblems[5] (hundredths)', 'A probe sends 20 pictures and 9 of them show clouds.', '(9/20 = 45/100)', frac(2), 9 / 20),
+  // Notes
+  fv(DP, 'textbookContent: 37%', '$37\\% = \\dfrac{37}{100} = 0.37$', '$37\\% = \\dfrac{37}{100} = 0.37$', (n) => n[3], 37 / 100),
+  ...(
+    [
+      ['1/2', '| $\\dfrac{1}{2}$ | 0.5 | 50% |', 1 / 2],
+      ['1/4', '| $\\dfrac{1}{4}$ | 0.25 | 25% |', 1 / 4],
+      ['3/4', '| $\\dfrac{3}{4}$ | 0.75 | 75% |', 3 / 4],
+      ['1/5', '| $\\dfrac{1}{5}$ | 0.2 | 20% |', 1 / 5],
+      ['1/10', '| $\\dfrac{1}{10}$ | 0.1 | 10% |', 1 / 10],
+      ['1/100', '| $\\dfrac{1}{100}$ | 0.01 | 1% |', 1 / 100],
+    ] as const
+  ).flatMap(([label, row, value]): Entry[] => [
+    fv(DP, `textbookContent: table ${label}, fraction`, row, row, frac(0), value),
+    fv(DP, `textbookContent: table ${label}, decimal`, row, row, (n) => n[2], value),
+    fv(DP, `textbookContent: table ${label}, percentage`, row, row, (n) => n[3] / 100, value),
+  ]),
+  fv(DP, 'textbookContent: 3/5 in hundredths', '**Fraction to percentage:**', '$\\dfrac{3}{5} = \\dfrac{60}{100} = 60\\%$', frac(2), 3 / 5),
+  fv(DP, 'textbookContent: 3/5 as a percentage', '**Fraction to percentage:**', '$\\dfrac{3}{5} = \\dfrac{60}{100} = 60\\%$', (n) => n[4] / 100, 3 / 5),
+  nv(DP, 'textbookContent: 3/8 as a decimal', '**Fraction to decimal:**', '$\\dfrac{3}{8} = 3 \\div 8 = 0.375$', 4, 3 / 8),
+  nv(DP, 'textbookContent: 0.65 as a percentage', '**Decimal to percentage:**', '$0.65 \\times 100 = 65\\%$', 2, 0.65 * 100, '%'),
+  nv(DP, 'textbookContent: 42% as a decimal', '**Percentage to decimal:**', '$42\\% = 42 \\div 100 = 0.42$', 3, 42 / 100),
+  nv(DP, 'textbookContent: 15% of 60, 10%', 'For 15% of 60:', '10% is 6 and 5% is 3', 1, 0.1 * 60),
+  nv(DP, 'textbookContent: 15% of 60, 5%', 'For 15% of 60:', '10% is 6 and 5% is 3', 3, 0.05 * 60),
+  nv(DP, 'textbookContent: 15% of 60', 'For 15% of 60:', '$6 + 3 = 9$', 2, 0.15 * 60),
+  {
+    lesson: DP, where: 'textbookContent: comparing', kind: 'claim', expectNotesIncludes: 'Which is biggest: 0.3, $\\dfrac{1}{4}$ or 28%?',
+    claimIncludes: 'As percentages they are 30%, 25% and 28%, so 0.3 is the biggest.',
+    verify: () => ({ holds: 0.3 * 100 === 30 && (1 / 4) * 100 === 25 && 0.3 > 0.28 && 0.3 > 0.25, detail: '0.3 = 30%, 1/4 = 25%, 30% > 28% > 25%' }),
+  },
+  fv(DP, 'textbookContent: 75% as a fraction', 'A tank showing 75% is', 'A tank showing 75% is $\\dfrac{3}{4}$ full', frac(1), 0.75),
+  nv(DP, 'textbookContent: 75% of 600 litres', 'If the full tank holds 600 litres', '$600 \\div 4 \\times 3 = 450$', 3, 0.75 * 600, 'litres'),
+];
+
+export const ENTRIES: Entry[] = [
+  ...ARITHMETIC, ...NEGATIVE_NUMBERS, ...MULTIPLICATION, ...FRACTIONS, ...FRACTION_OPS, ...DECIMALS_PERCENTAGES,
+];

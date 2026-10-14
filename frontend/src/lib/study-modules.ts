@@ -3002,60 +3002,61 @@ The topics in these notes follow the Department for Education document below.
     accentColor: 'violet',
     difficulty: 2,
     estimatedMinutes: 10,
-    formula: '\\frac{X}{100} = 0.XX = XX\\%',
+    formula: 'X\\% = \\frac{X}{100} = X \\div 100',
     formulaLayout: [
+      { type: 'variable', symbol: 'X' },
+      { type: 'static', latex: '\\%' },
+      { type: 'operator', content: '=' },
       {
         type: 'fraction',
         numerator: [{ type: 'variable', symbol: 'X' }],
         denominator: [{ type: 'static', latex: '100' }]
       },
       { type: 'operator', content: '=' },
-      { type: 'static', latex: '0.' },
       { type: 'variable', symbol: 'X' },
-      { type: 'operator', content: '=' },
-      { type: 'variable', symbol: 'X' },
-      { type: 'static', latex: '\\%' }
+      { type: 'operator', content: '\\div' },
+      { type: 'static', latex: '100' }
     ],
     variables: [
       {
         symbol: 'X',
-        name: 'The Number',
-        unit: '',
-        description: 'The numerical value representing parts per hundred.',
+        name: 'Parts per 100',
+        unit: 'no unit',
+        description: 'How many out of every 100. In 37%, $X$ is 37, so 37% is $\\dfrac{37}{100}$, or 0.37.',
         color: 'text-violet-400'
       }
     ],
     conceptSteps: [
       {
         stepNumber: 1,
-        title: 'Fractions to Decimals',
-        content: 'Fractions are just division. To convert a fraction like 3/4 to a decimal, divide the top number by the bottom number (3 ÷ 4 = 0.75).',
-        keyInsight: 'The fraction bar literally means "divided by".',
+        title: 'Three ways to write one amount',
+        content: 'Per cent means "out of 100". A fraction, a decimal and a percentage can all describe the same amount: one half is $\\dfrac{1}{2}$, 0.5 and 50%.',
+        keyInsight: 'To turn a fraction into a decimal, divide the top by the bottom: $\\dfrac{3}{4}$ is $3 \\div 4 = 0.75$.',
         relatedVariables: ['X']
       },
       {
         stepNumber: 2,
-        title: 'Decimals to Percentages',
-        content: 'Percent means "per 100". To convert a decimal to a percentage, multiply it by 100 (which shifts the decimal point two places to the right) and add a % sign. 0.75 becomes 75%.',
-        keyInsight: 'Decimals and percentages are two ways of writing the same exact value.',
+        title: 'Decimals and percentages',
+        content: 'To turn a decimal into a percentage, multiply by 100: 0.75 becomes 75%. To turn a percentage back into a decimal, divide by 100.',
+        keyInsight: 'Multiplying by 100 moves every digit two places to the left, so 0.75 becomes 75.',
         relatedVariables: ['X']
       },
       {
         stepNumber: 3,
-        title: 'Finding a Percentage of a Number',
-        content: 'To find a percentage of a number, first convert the percentage to a decimal, then multiply. For example, to find 20% of 50: convert 20% to 0.20, then multiply 0.20 × 50 = 10.',
-        keyInsight: 'The word "of" in maths often means "multiply".',
+        title: 'A percentage of an amount',
+        content: 'Build the percentage up from easy ones: 10% is a tenth, 50% is a half and 25% is a quarter. Or change the percentage into a decimal and multiply: 20% of 50 is $0.2 \\times 50 = 10$.',
+        keyInsight: 'In maths, "of" usually means multiply.',
         relatedVariables: ['X']
       }
     ],
     solvedExample: {
-      problem: 'A £40 shirt is on sale for 25% off. What is the discount amount, and what is the final price?',
+      problem: 'A £40 shirt is on sale with 25% off. How much is taken off, and what is the sale price?',
       steps: [
-        'Convert the percentage to a decimal: $25\\% = 0.25$.',
-        'Find the discount amount by multiplying the original price by the decimal: $40 \\times 0.25 = 10$. The discount is £10.',
-        'Subtract the discount from the original price to find the final price: $40 - 10 = 30$.'
+        'Change the percentage into a decimal: $25\\% = 0.25$.',
+        'Find the discount, the amount taken off: $40 \\times 0.25 = 10$. The discount is £10.',
+        'Take the discount away from the price: $40 - 10 = 30$.'
       ],
-      resultFormula: '\\text{Discount} = \\pounds 10, \\text{Final Price} = \\pounds 30'
+      resultFormula: '\\text{Discount} = \\pounds 10, \\text{ sale price} = \\pounds 30'
     },
     practiceProblems: [
       {
@@ -3089,7 +3090,7 @@ The topics in these notes follow the Department for Education document below.
         answer: "45% (9/20 = 45/100)"
       },
     ],
-    realWorldConnection: 'Financial literacy relies heavily on percentages. Interest rates on loans, tax rates on purchases, and discounts during sales are all calculated using percentages and decimals.',
+    realWorldConnection: 'Shops show discounts as percentages, and banks show interest rates as percentages. In the UK, value added tax, a tax added to the price of many things you buy, is usually 20%.',
     textbookContent: `
 ## Fractions, decimals and percentages
 
@@ -3116,7 +3117,7 @@ $37\\% = \\dfrac{37}{100} = 0.37$
 
 *   **Fraction to percentage:** make the denominator 100. $\\dfrac{3}{5} = \\dfrac{60}{100} = 60\\%$
 *   **Fraction to decimal:** divide the top by the bottom. $\\dfrac{3}{8} = 3 \\div 8 = 0.375$
-*   **Decimal to percentage:** multiply by 100. $0.45 \\times 100 = 45\\%$
+*   **Decimal to percentage:** multiply by 100. $0.65 \\times 100 = 65\\%$
 *   **Percentage to decimal:** divide by 100. $42\\% = 42 \\div 100 = 0.42$
 
 ### A percentage of an amount
@@ -3127,7 +3128,7 @@ Build it up from percentages that are easy to find:
 *   50% is a half and 25% is a quarter.
 *   1% is a hundredth: divide by 100.
 
-For 15% of 200: 10% is 20 and 5% is 10, so 15% is $20 + 10 = 30$.
+For 15% of 60: 10% is 6 and 5% is 3, so 15% is $6 + 3 = 9$.
 
 ### Comparing amounts
 
@@ -3135,7 +3136,11 @@ To compare amounts written in different ways, change them all into the same form
 
 ### Reading a fuel gauge
 
-Mission control shows how full a rocket's tanks are as a percentage. A tank showing 75% is $\\dfrac{3}{4}$ full. If the full tank holds 800 litres, 75% is $800 \\div 4 \\times 3 = 600$ litres.
+A fuel gauge often shows how full a tank is as a percentage. A tank showing 75% is $\\dfrac{3}{4}$ full. If the full tank holds 600 litres, 75% is $600 \\div 4 \\times 3 = 450$ litres.
+
+### Next on the journey
+
+A recipe for 4 people needs 300 g of flour. How much do you need for 6 people? The next lesson, on ratio and proportion, shows how to scale amounts up and down.
 
 ### Sources
 
