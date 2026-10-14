@@ -187,7 +187,8 @@ export const CURRICULUM: Record<ConceptId, CurriculumPlace> = {
     stage: "A-level mathematics",
     statements: [
       { source: 'ncMaths', where: "Key stage 3", text: "describe, interpret and compare observed distributions of a single variable through: appropriate graphical representation involving discrete, continuous and grouped data; and appropriate measures of central tendency (mean, mode, median) and spread (range, consideration of outliers)" },
-      { source: 'alMaths', where: "A-level mathematics: Data presentation and interpretation", text: "Interpret measures of central tendency and variation, extending to standard deviation. Be able to calculate standard deviation, including from summary statistics" },
+      { source: 'alMaths', where: "A-level mathematics: Data presentation and interpretation", text: "Interpret measures of central tendency and variation, extending to standard deviation" },
+      { source: 'alMaths', where: "A-level mathematics: Data presentation and interpretation", text: "Be able to calculate standard deviation, including from summary statistics" },
     ],
     note: "Mean, median, mode and range are key stage 3 work. Variance and standard deviation come in at A-level.",
   },

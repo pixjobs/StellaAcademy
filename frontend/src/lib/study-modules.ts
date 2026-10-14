@@ -4287,79 +4287,80 @@ The topics in these notes follow the Department for Education documents below.
     accentColor: 'cyan',
     difficulty: 2,
     estimatedMinutes: 15,
-    formula: '\\sigma = \\sqrt{\\frac{\\sum(x_i - \\mu)^2}{N}}',
+    formula: '\\sigma^2 = \\frac{\\sum (x - \\bar{x})^2}{n}',
     formulaLayout: [
       { type: 'variable', symbol: '\\sigma' },
       { type: 'static', latex: '^2' },
       { type: 'operator', content: '=' },
       {
         type: 'fraction',
-        numerator: [{ type: 'static', latex: '\\sum (x_i - \\mu)^2' }],
-        denominator: [{ type: 'variable', symbol: 'N' }]
+        numerator: [{ type: 'static', latex: '\\sum (x - \\bar{x})^2' }],
+        denominator: [{ type: 'variable', symbol: 'n' }]
       }
     ],
     variables: [
       {
         symbol: '\\sigma',
-        name: 'Standard Deviation',
-        unit: 'Same unit as data',
-        description: 'A measure of how spread out data values are around the mean. Small σ means data is tightly clustered; large σ means widely spread.',
+        name: 'Standard deviation',
+        unit: 'the same unit as the data',
+        description: 'How far the values typically are from the mean. Its square, $\\sigma^2$, is the variance.',
         color: 'text-cyan-400'
       },
       {
-        symbol: '\\mu',
-        name: 'Mean (Average)',
-        unit: 'Same unit as data',
-        description: 'The arithmetic average of all data points: sum of all values divided by count.',
+        symbol: '\\bar{x}',
+        name: 'Mean',
+        unit: 'the same unit as the data',
+        description: 'The total of the values divided by how many there are. Say it "x bar".',
         color: 'text-teal-400'
       },
       {
-        symbol: 'x_i',
-        name: 'Individual Data Point',
-        unit: 'Same unit as data',
-        description: 'Each single measurement or value in the dataset.',
+        symbol: 'x',
+        name: 'A data value',
+        unit: 'the same unit as the data',
+        description: 'Each single measurement in the data set. $\\sum$ (the Greek capital letter sigma) means "add up for every value".',
         color: 'text-sky-400'
       },
       {
-        symbol: 'N',
-        name: 'Number of Data Points',
-        unit: 'Count',
-        description: 'The total number of values in the dataset.',
+        symbol: 'n',
+        name: 'Number of values',
+        unit: 'no unit (a count)',
+        description: 'How many values there are in the data set.',
         color: 'text-blue-400'
       }
     ],
     conceptSteps: [
       {
         stepNumber: 1,
-        title: 'Measures of Central Tendency',
-        content: 'The **mean** (average) $\\mu = \\frac{\\sum x_i}{N}$ finds the central value. The **median** is the middle value when sorted. The **mode** is the most frequent value. Each measure has different strengths depending on the data distribution.',
-        keyInsight: 'Use median instead of mean when data has extreme outliers.',
-        relatedVariables: ['\\mu', 'x_i', 'N']
+        title: 'Three kinds of average',
+        content: 'The **mean** is the total divided by the number of values, $\\bar{x} = \\dfrac{\\sum x}{n}$. The **median** is the value in the middle once the data is sorted from smallest to largest. The **mode** is the most common value.',
+        keyInsight: 'A single extreme value can drag the mean a long way, but it hardly moves the median.',
+        relatedVariables: ['\\bar{x}', 'x', 'n']
       },
       {
         stepNumber: 2,
-        title: 'Standard Deviation & Spread',
-        content: 'Standard deviation $\\sigma$ measures how far data points typically stray from the mean. A dataset of sensor readings {100, 101, 99, 100} is much tighter than {50, 150, 80, 120} even if both have the same mean.',
-        keyInsight: 'σ tells you the "typical distance" from the average.',
-        relatedVariables: ['\\sigma', '\\mu', 'x_i']
+        title: 'Standard deviation measures spread',
+        content: 'The readings 99, 100, 100, 101 and the readings 50, 80, 120, 150 both have a mean of 100, but the second set is far more spread out. The **standard deviation**, $\\sigma$, puts a number on that spread, using every value.',
+        keyInsight: 'A small standard deviation means the values sit close to the mean. A large one means they are widely spread.',
+        relatedVariables: ['\\sigma', '\\bar{x}', 'x']
       },
       {
         stepNumber: 3,
-        title: 'The Normal Distribution',
-        content: 'In a normal (bell curve) distribution, approximately 68% of data falls within ±1σ of the mean, 95% within ±2σ, and 99.7% within ±3σ. This is the famous empirical rule used in quality control, science, and AI model evaluation.',
-        keyInsight: '68-95-99.7 rule: most data lies within 3 standard deviations of the mean.',
-        relatedVariables: ['\\sigma', '\\mu']
+        title: 'Spotting outliers',
+        content: 'An **outlier** is a value far from the rest of the data. A common rule treats a value as an outlier if it is more than 2 standard deviations from the mean.',
+        keyInsight: 'Find out why an outlier is there before you remove it. It may be a mistake, or it may be the most interesting result.',
+        relatedVariables: ['\\sigma', '\\bar{x}']
       }
     ],
     solvedExample: {
-      problem: 'Find the mean $\\mu$ and standard deviation $\\sigma$ for the dataset: $\\{2, 4, 4, 4, 5, 5, 7, 9\\}$.',
+      problem: 'Find the mean $\\bar{x}$ and the standard deviation $\\sigma$ of the data $2, 4, 4, 4, 5, 5, 7, 9$.',
       steps: [
-        'Calculate the mean: $\\mu = \\frac{2+4+4+4+5+5+7+9}{8} = \\frac{40}{8} = 5$.',
-        'Calculate each squared deviation: $(2-5)^2=9$, $(4-5)^2=1$ (×3), $(5-5)^2=0$ (×2), $(7-5)^2=4$, $(9-5)^2=16$.',
-        'Sum of squared deviations: $9 + 3 + 0 + 4 + 16 = 32$.',
-        'Variance: $\\sigma^2 = \\frac{32}{8} = 4$.'
+        'Find the mean: $\\bar{x} = \\dfrac{2+4+4+4+5+5+7+9}{8} = \\dfrac{40}{8} = 5$.',
+        'Square each distance from the mean: $(2-5)^2 = 9$, $(4-5)^2 = 1$ (three times), $(5-5)^2 = 0$ (twice), $(7-5)^2 = 4$, $(9-5)^2 = 16$.',
+        'Add them up: $9 + 3 + 0 + 4 + 16 = 32$.',
+        'Divide by $n$ to get the variance: $\\sigma^2 = \\dfrac{32}{8} = 4$.',
+        'Take the square root to get the standard deviation.'
       ],
-      resultFormula: '\\sigma = \\sqrt{4} = 2'
+      resultFormula: '\\bar{x} = 5, \\quad \\sigma = \\sqrt{4} = 2'
     },
     practiceProblems: [
       {
@@ -4393,7 +4394,7 @@ The topics in these notes follow the Department for Education documents below.
         answer: "A: its readings are spread out less."
       },
     ],
-    realWorldConnection: 'Engineers use statistics to separate real signals from sensor noise. A reading several standard deviations from the mean is unlikely to be chance, so it is flagged for a closer look.',
+    realWorldConnection: 'In July 2012 two teams at CERN announced the discovery of the Higgs boson. Each team waited until its signal was about five standard deviations away from what chance alone would give, the standard particle physicists set for claiming a discovery.',
     textbookContent: `
 ## Averages and spread
 
@@ -4401,11 +4402,11 @@ A set of data is usually summarised by two numbers: one for its centre, and one 
 
 ### Averages
 
-*   The **mean** is the total divided by the number of values: $\\bar{x} = \\dfrac{\\sum x}{n}$.
+*   The **mean** is the total divided by the number of values: $\\bar{x} = \\dfrac{\\sum x}{n}$, where $\\sum x$ means the sum of all the values.
 *   The **median** is the middle value when the data is in order. With an even number of values, it is halfway between the middle two.
 *   The **mode** is the value that occurs most often.
 
-The mean uses every value, but one extreme value can pull it a long way. The median is not affected by extreme values, so it is often better for skewed data, such as incomes.
+The mean uses every value, but one extreme value can pull it a long way. The median is not affected by extreme values, so it is often better for skewed data (data with a long tail of a few very large or very small values), such as incomes.
 
 ### Spread
 
@@ -4423,17 +4424,9 @@ An equivalent form is easier with **summary statistics**, when you are given $n$
 
 $$\\sigma^2 = \\frac{\\sum x^2}{n} - \\bar{x}^2$$
 
+For the data in the worked example, $\\sum x^2 = 232$, so $\\sigma^2 = \\dfrac{232}{8} - 5^2 = 29 - 25 = 4$: the same answer by the other route.
+
 Some calculators and textbooks divide by $n - 1$ instead of $n$ when estimating from a sample. Use the form your specification asks for.
-
-### Worked example
-
-Find the mean and standard deviation of 2, 4, 4, 4, 5, 5, 7, 9.
-
-1.  Mean: $\\bar{x} = \\dfrac{40}{8} = 5$.
-2.  Squared distances from 5: $9, 1, 1, 1, 0, 0, 4, 16$, which total 32.
-3.  Variance: $\\dfrac{32}{8} = 4$, so $\\sigma = 2$.
-
-Check with summary statistics: $\\sum x^2 = 232$, and $\\dfrac{232}{8} - 5^2 = 29 - 25 = 4$.
 
 ### Outliers
 
@@ -4442,6 +4435,10 @@ An **outlier** is a value far from the rest. Two common rules mark a value as an
 ### Sensor readings in space
 
 A spacecraft's sensors are never perfectly steady. Engineers work out the usual mean and standard deviation of each reading. A reading many standard deviations from the mean is very unlikely to be chance, so the software flags it for a closer look.
+
+### Next on the journey
+
+Light itself is an electromagnetic wave: a ripple of electric and magnetic fields. To see what that means, start with how magnets and electric currents affect each other. How can a moving magnet make a current flow? That is the next lesson.
 
 ### Sources
 

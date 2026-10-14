@@ -72,4 +72,113 @@ const PRISM: Entry[] = [
   },
 ];
 
-export const ENTRIES: Entry[] = [...PRISM];
+const mean = (xs: number[]) => xs.reduce((a, b) => a + b, 0) / xs.length;
+const variance = (xs: number[]) => mean(xs.map((x) => (x - mean(xs)) ** 2)); // divide by n, as the lesson does
+const sd = (xs: number[]) => Math.sqrt(variance(xs));
+const median = (xs: number[]) => {
+  const s = [...xs].sort((a, b) => a - b);
+  const m = s.length / 2;
+  return s.length % 2 ? s[Math.floor(m)] : (s[m - 1] + s[m]) / 2;
+};
+
+const STATS_EXAMPLE = [2, 4, 4, 4, 5, 5, 7, 9];
+const TIGHT = [99, 100, 100, 101];
+const WIDE = [50, 80, 120, 150];
+
+const STATISTICS: Entry[] = [
+  {
+    lesson: 'statistics', where: 'conceptSteps[1] (tight mean)', expectQuestionIncludes: 'The readings 99, 100, 100, 101',
+    stated: 'both have a mean of 100', compute: () => mean(TIGHT), expected: 100, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'statistics', where: 'conceptSteps[1] (wide mean)', expectQuestionIncludes: 'the readings 50, 80, 120, 150',
+    stated: 'both have a mean of 100', compute: () => mean(WIDE), expected: 100, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'statistics', where: 'conceptSteps[1] (more spread)', kind: 'claim', expectQuestionIncludes: 'The readings 99, 100, 100, 101',
+    claimIncludes: 'the second set is far more spread out',
+    verify: () => ({ holds: sd(WIDE) > 10 * sd(TIGHT), detail: `σ = ${sd(TIGHT).toFixed(2)} and ${sd(WIDE).toFixed(1)}` }),
+  },
+  {
+    lesson: 'statistics', where: 'solvedExample.steps[0]', expectQuestionIncludes: 'of the data $2, 4, 4, 4, 5, 5, 7, 9$',
+    stated: '\\dfrac{40}{8} = 5', pick: 2, compute: () => mean(STATS_EXAMPLE), expected: 5, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'statistics', where: 'solvedExample.steps[0] (total)', expectQuestionIncludes: 'of the data $2, 4, 4, 4, 5, 5, 7, 9$',
+    stated: '\\dfrac{40}{8} = 5', pick: 0, compute: () => STATS_EXAMPLE.reduce((a, b) => a + b, 0), expected: 40, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'statistics', where: 'solvedExample.steps[2]', expectQuestionIncludes: 'of the data $2, 4, 4, 4, 5, 5, 7, 9$',
+    stated: '= 32', compute: () => STATS_EXAMPLE.reduce((a, x) => a + (x - 5) ** 2, 0), expected: 32, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'statistics', where: 'solvedExample.steps[3]', expectQuestionIncludes: 'of the data $2, 4, 4, 4, 5, 5, 7, 9$',
+    stated: '= 4', compute: () => variance(STATS_EXAMPLE), expected: 4, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'statistics', where: 'solvedExample.resultFormula (mean)', expectQuestionIncludes: 'of the data $2, 4, 4, 4, 5, 5, 7, 9$',
+    stated: '\\bar{x} = 5', compute: () => mean(STATS_EXAMPLE), expected: 5, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'statistics', where: 'solvedExample.resultFormula (sd)', expectQuestionIncludes: 'of the data $2, 4, 4, 4, 5, 5, 7, 9$',
+    stated: '\\sqrt{4} = 2', pick: 1, compute: () => sd(STATS_EXAMPLE), expected: 2, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'statistics', where: 'practiceProblems[0]', expectQuestionIncludes: 'temperatures of −20, −18, −22, −19 and −21 °C',
+    stated: '−20 °C', note: 'The number reader drops the minus sign, so this compares sizes; the stated fragment pins the sign.',
+    compute: () => Math.abs(mean([-20, -18, -22, -19, -21])), expected: 20, tolerance: 0, unit: '°C below zero',
+  },
+  {
+    lesson: 'statistics', where: 'practiceProblems[1] (median)', expectQuestionIncludes: 'Find the median and the range of 3, 7, 7, 9, 12, 15',
+    stated: 'Median 8', compute: () => median([3, 7, 7, 9, 12, 15]), expected: 8, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'statistics', where: 'practiceProblems[1] (range)', expectQuestionIncludes: 'Find the median and the range of 3, 7, 7, 9, 12, 15',
+    stated: 'range 12', compute: () => 15 - 3, expected: 12, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'statistics', where: 'practiceProblems[2]', expectQuestionIncludes: 'The mean of five test scores is 80',
+    compute: () => 5 * 80 - (75 + 85 + 90 + 70), expected: 80, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'statistics', where: 'practiceProblems[3] (hint mean)', expectQuestionIncludes: 'Find the standard deviation of 4, 8, 6 and 2',
+    note: 'The hint gives the mean.', statedIn: 'question', stated: 'Find the standard deviation of 4, 8, 6 and 2',
+    combine: (ns) => mean(ns), compute: () => mean([4, 8, 6, 2]), expected: 5, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'statistics', where: 'practiceProblems[3]', expectQuestionIncludes: 'Find the standard deviation of 4, 8, 6 and 2',
+    stated: '\\approx 2.24', note: 'Squares 1, 9, 1, 9; mean 5; √5 = 2.236.',
+    compute: () => sd([4, 8, 6, 2]), expected: 2.2361, tolerance: 0.005, unit: '',
+  },
+  {
+    lesson: 'statistics', where: 'practiceProblems[4] (mean)', expectQuestionIncludes: 'For 10 readings, $\\sum x = 50$ and $\\sum x^2 = 290$',
+    stated: 'Mean 5', compute: () => 50 / 10, expected: 5, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'statistics', where: 'practiceProblems[4] (variance)', expectQuestionIncludes: 'For 10 readings, $\\sum x = 50$ and $\\sum x^2 = 290$',
+    stated: '29 − 25 = 4', pick: 2, compute: () => 290 / 10 - (50 / 10) ** 2, expected: 4, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'statistics', where: 'practiceProblems[4] (sd)', expectQuestionIncludes: 'For 10 readings, $\\sum x = 50$ and $\\sum x^2 = 290$',
+    stated: 'standard deviation 2', compute: () => Math.sqrt(290 / 10 - (50 / 10) ** 2), expected: 2, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'statistics', where: 'practiceProblems[5]', kind: 'qualitative', expectQuestionIncludes: 'Which is more precise?',
+    expectAnswerIncludes: 'A: its readings are spread out less.',
+    verify: () => ({ holds: 0.1 < 0.5, detail: 'σ_A = 0.1 °C < σ_B = 0.5 °C' }),
+  },
+  {
+    lesson: 'statistics', where: 'textbookContent: sum of squares', expectNotesIncludes: 'For the data in the worked example',
+    stated: '$\\sum x^2 = 232$', compute: () => STATS_EXAMPLE.reduce((a, x) => a + x * x, 0), expected: 232, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'statistics', where: 'textbookContent: summary-statistics variance', expectNotesIncludes: 'For the data in the worked example',
+    stated: '\\dfrac{232}{8} - 5^2 = 29 - 25 = 4', pick: 5, compute: () => 232 / 8 - 25, expected: 4, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'statistics', where: 'textbookContent: 232 / 8', expectNotesIncludes: 'For the data in the worked example',
+    stated: '\\dfrac{232}{8} - 5^2 = 29 - 25 = 4', pick: 3, compute: () => 232 / 8, expected: 29, tolerance: 0, unit: '',
+  },
+];
+
+export const ENTRIES: Entry[] = [...PRISM, ...STATISTICS];
