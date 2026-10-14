@@ -12,6 +12,11 @@ const GIGA = 1e9;
 /** Speed of radio waves and light, as the waves lesson gives it (m/s). */
 const C_LESSON = 3.0e8;
 
+/** A binary numeral (as a digit string) to its value. */
+const fromBin = (s: string): number => parseInt(s, 2);
+/** A value to its binary digits, read as a number so it compares with the stated numeral: toBin(13) = 1101. */
+const toBin = (n: number): number => Number(n.toString(2));
+
 export const ENTRIES: Entry[] = [
   // ======================================================================================== circuit
   {
@@ -139,5 +144,83 @@ export const ENTRIES: Entry[] = [
     lesson: 'waves', where: 'practiceProblems[5] (cm)', expectQuestionIncludes: 'A spacecraft sends a radio signal at 8.4 GHz',
     stated: '3.6 cm', note: '3.57 cm; 2 s.f., so ±0.05.',
     compute: () => (C_LESSON / (8.4 * GIGA)) * 100, expected: 3.571, tolerance: 0.05, unit: 'cm',
+  },
+
+  // ======================================================================================== binary
+  // Binary numerals are compared as their digit strings read as numbers: toBin(22) = 10110.
+  {
+    lesson: 'binary', where: 'solvedExample.steps[2]', expectQuestionIncludes: 'Convert the binary number $10110$ to denary',
+    stated: '= 22', compute: () => fromBin('10110'), expected: 22, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'binary', where: 'solvedExample.resultFormula', expectQuestionIncludes: 'Convert the binary number $10110$ to denary',
+    stated: '= 22', compute: () => fromBin('10110'), expected: 22, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'binary', where: 'practiceProblems[0]', expectQuestionIncludes: 'What is the binary number 100 in denary?',
+    compute: () => fromBin('100'), expected: 4, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'binary', where: 'practiceProblems[1]', expectQuestionIncludes: 'What is the binary number 1011 in denary?',
+    compute: () => fromBin('1011'), expected: 11, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'binary', where: 'practiceProblems[2]', expectQuestionIncludes: 'Write 13 in binary.',
+    compute: () => toBin(13), expected: 1101, tolerance: 0, unit: '(binary digits)',
+  },
+  {
+    lesson: 'binary', where: 'practiceProblems[3]', expectQuestionIncludes: 'Write 25 in binary.',
+    compute: () => toBin(25), expected: 11001, tolerance: 0, unit: '(binary digits)',
+  },
+  {
+    lesson: 'binary', where: 'practiceProblems[4] (sum)', expectQuestionIncludes: 'Add the binary numbers 101 and 11.',
+    stated: '1000', compute: () => toBin(fromBin('101') + fromBin('11')), expected: 1000, tolerance: 0, unit: '(binary digits)',
+  },
+  {
+    lesson: 'binary', where: 'practiceProblems[4] (check)', expectQuestionIncludes: 'Add the binary numbers 101 and 11.',
+    stated: '5 + 3 = 8', pick: [0, 1, 2], combine: (n) => (n[0] === fromBin('101') && n[1] === fromBin('11') ? n[2] : NaN),
+    compute: () => fromBin('101') + fromBin('11'), expected: 8, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'binary', where: 'practiceProblems[5] (sum)', expectQuestionIncludes: 'Add the binary numbers 1101 and 111.',
+    stated: '10100', compute: () => toBin(fromBin('1101') + fromBin('111')), expected: 10100, tolerance: 0, unit: '(binary digits)',
+  },
+  {
+    lesson: 'binary', where: 'practiceProblems[5] (check)', expectQuestionIncludes: 'Add the binary numbers 1101 and 111.',
+    stated: '13 + 7 = 20', combine: (n) => (n[0] === fromBin('1101') && n[1] === fromBin('111') ? n[2] : NaN),
+    compute: () => fromBin('1101') + fromBin('111'), expected: 20, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'binary', where: 'textbookContent: byte', expectNotesIncludes: 'Eight bits make a **byte**',
+    stated: 'any whole number from 0 to 255', pick: 1, compute: () => 2 ** 8 - 1, expected: 255, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'binary', where: 'textbookContent: place values', kind: 'claim', expectNotesIncludes: '| 128 | 64 | 32 | 16 | 8 | 4 | 2 | 1 |',
+    claimIncludes: '| 128 | 64 | 32 | 16 | 8 | 4 | 2 | 1 |',
+    verify: () => {
+      const row = [7, 6, 5, 4, 3, 2, 1, 0].map((i) => 2 ** i).join(' | ');
+      return { holds: row === '128 | 64 | 32 | 16 | 8 | 4 | 2 | 1', detail: `powers of 2 from 2^7 down: ${row}` };
+    },
+  },
+  {
+    lesson: 'binary', where: 'textbookContent: 19 to binary', expectNotesIncludes: 'So $19 = 10011$ in binary',
+    stated: 'So $19 = 10011$', pick: 1, compute: () => toBin(19), expected: 10011, tolerance: 0, unit: '(binary digits)',
+  },
+  {
+    lesson: 'binary', where: 'textbookContent: 19 to binary, step 1', expectNotesIncludes: '16 fits into 19: write 1 in the 16s place, leaving 3',
+    stated: '16 fits into 19: write 1 in the 16s place, leaving 3', pick: 4, compute: () => 19 - 16, expected: 3, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'binary', where: 'textbookContent: 19 to binary, step 4', expectNotesIncludes: '2 fits into 3: write 1 in the 2s place, leaving 1',
+    stated: '2 fits into 3: write 1 in the 2s place, leaving 1', pick: 4, compute: () => 19 - 16 - 2, expected: 1, tolerance: 0, unit: '',
+  },
+  {
+    lesson: 'binary', where: 'textbookContent: 110 + 11', expectNotesIncludes: 'For $110 + 11$',
+    stated: 'The answer is $1001$', compute: () => toBin(fromBin('110') + fromBin('11')), expected: 1001, tolerance: 0, unit: '(binary digits)',
+  },
+  {
+    lesson: 'binary', where: 'textbookContent: 110 + 11, check', expectNotesIncludes: 'For $110 + 11$',
+    stated: 'Check in denary: $6 + 3 = 9$', combine: (n) => (n[0] === fromBin('110') && n[1] === fromBin('11') ? n[2] : NaN),
+    compute: () => fromBin('110') + fromBin('11'), expected: 9, tolerance: 0, unit: '',
   },
 ];

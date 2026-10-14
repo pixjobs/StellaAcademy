@@ -1292,29 +1292,36 @@ The topics in these notes follow the Department for Education document below.
     variables: [
       {
         symbol: 'b_i',
-        name: 'Binary Digit (Bit)',
+        name: 'Bit (binary digit)',
         unit: '0 or 1',
-        description: 'A single digit in a binary number, representing a power of 2.',
+        description: 'One digit of a binary number. Counting from the right and starting at 0, the bit in place $i$ is worth $2^i$ if it is a 1, and nothing if it is a 0.',
         color: 'text-emerald-400'
       }
     ],
     conceptSteps: [
       {
         stepNumber: 1,
-        title: 'Base-2 System',
-        content: 'Unlike our normal Base-10 system which uses digits 0-9, binary only uses 0 and 1. Each position represents a power of 2 instead of a power of 10.',
-        keyInsight: 'Computers use binary because it perfectly maps to electrical switches being OFF (0) or ON (1).',
-        relatedVariables: []
+        title: 'Only two digits',
+        content: 'Binary numbers are written with just two digits, 0 and 1. Each one is called a bit. A computer can store a bit in anything that has two states, such as a tiny switch that is off (0) or on (1).',
+        keyInsight: 'Two states are easy to build and hard to mix up, which is why computers use binary.',
+        relatedVariables: ['b_i']
+      },
+      {
+        stepNumber: 2,
+        title: 'Place values double',
+        content: 'In our everyday denary numbers (base 10, also called decimal), each place is worth ten times the place to its right. In binary each place is worth two times the place to its right: 1, 2, 4, 8, 16 and so on, which are the powers of 2.',
+        keyInsight: 'Read a binary number by adding the place values that hold a 1.',
+        relatedVariables: ['b_i']
       }
     ],
     solvedExample: {
-      problem: 'Convert the binary number $1011_2$ to decimal.',
+      problem: 'Convert the binary number $10110$ to denary.',
       steps: [
-        'Write out the powers of 2 for each position from right to left: $2^3, 2^2, 2^1, 2^0$',
-        'Multiply each bit by its corresponding power of 2: $1 \\cdot 8 + 0 \\cdot 4 + 1 \\cdot 2 + 1 \\cdot 1$',
-        'Add them up: $8 + 0 + 2 + 1 = 11$'
+        'Write the place values over the bits, from the right: $1, 2, 4, 8, 16$.',
+        'The 1s are in the 16s, 4s and 2s places.',
+        'Add those place values: $16 + 4 + 2 = 22$.'
       ],
-      resultFormula: '1011_2 = 11_{10}'
+      resultFormula: '10110 \\text{ in binary} = 22 \\text{ in denary}'
     },
     practiceProblems: [
       {
@@ -1348,15 +1355,15 @@ The topics in these notes follow the Department for Education document below.
         answer: "10100 (13 + 7 = 20)"
       },
     ],
-    realWorldConnection: 'Every piece of data on your computer, from this text to images and videos, is stored as a massive sequence of binary 1s and 0s.',
+    realWorldConnection: 'Every command sent up to a spacecraft, and every reading and photo it sends back, travels as a stream of 0s and 1s.',
     textbookContent: `
 ## Binary numbers
 
-Computers store everything as **binary**: numbers written with only two digits, 0 and 1. A 0 or a 1 is called a **bit**. Inside a computer each bit is a tiny switch that is either off (0) or on (1).
+Computers store everything as **binary**: numbers written with only two digits, 0 and 1. A 0 or a 1 is called a **bit**. Inside a computer each bit is held by something with two states, like a tiny switch that is either off (0) or on (1).
 
 ### Place values
 
-Our everyday numbers are **denary** (base 10). Each place is worth ten times the place to its right: ones, tens, hundreds.
+Our everyday numbers are **denary** (base 10, also called decimal). Each place is worth ten times the place to its right: ones, tens, hundreds.
 
 In binary each place is worth **two** times the place to its right:
 
@@ -1367,24 +1374,19 @@ Eight bits make a **byte**, which can hold any whole number from 0 to 255.
 
 ### Binary to denary
 
-Add up the place values where there is a 1. For $1011$:
-
-| 8 | 4 | 2 | 1 |
-| --- | --- | --- | --- |
-| 1 | 0 | 1 | 1 |
-
-$8 + 2 + 1 = 11$.
+Add up the place values where there is a 1, and ignore the places with a 0. The worked example does this for $10110$.
 
 ### Denary to binary
 
-Take away the biggest place value that fits, write a 1 there, and repeat with what is left. For 13:
+Take away the biggest place value that fits, write a 1 there, and repeat with what is left. Write a 0 in every place that does not fit. For 19:
 
-1.  8 fits into 13: write 1 in the 8s place, leaving 5.
-2.  4 fits into 5: write 1 in the 4s place, leaving 1.
-3.  2 does not fit into 1: write 0 in the 2s place.
-4.  1 fits: write 1 in the 1s place, leaving 0.
+1.  16 fits into 19: write 1 in the 16s place, leaving 3.
+2.  8 does not fit into 3: write 0 in the 8s place.
+3.  4 does not fit into 3: write 0 in the 4s place.
+4.  2 fits into 3: write 1 in the 2s place, leaving 1.
+5.  1 fits: write 1 in the 1s place, leaving 0.
 
-So $13 = 1101$ in binary.
+So $19 = 10011$ in binary.
 
 ### Adding in binary
 
@@ -1395,11 +1397,15 @@ Add column by column from the right, as in denary, but remember:
 *   $1 + 1 = 10$: write 0 and carry 1
 *   $1 + 1 + 1 = 11$: write 1 and carry 1
 
-For $101 + 11$: the right column is $1 + 1 = 10$ (write 0, carry 1); the middle column is $0 + 1 + 1 = 10$ (write 0, carry 1); the left column is $1 + 1 = 10$. The answer is $1000$. Check in denary: $5 + 3 = 8$.
+For $110 + 11$: the right column is $0 + 1 = 1$; the middle column is $1 + 1 = 10$ (write 0, carry 1); the left column is $1 + 0 + 1 = 10$ (write 0, carry 1), and the carried 1 goes in a new place on the left. The answer is $1001$. Check in denary: $6 + 3 = 9$.
 
 ### Pictures from Mars
 
-Every photo a Mars rover takes is stored as numbers, one for the brightness of each colour in each tiny dot, and those numbers are sent to Earth as a long stream of 0s and 1s by radio. Back on Earth, computers turn the bits back into numbers and the numbers back into a picture.
+Every photo a Mars rover takes is stored as numbers that give the brightness of each tiny dot in the picture. Those numbers are sent to Earth by radio as a long stream of 0s and 1s, usually passed on by a spacecraft orbiting Mars. Back on Earth, computers turn the bits back into numbers and the numbers back into a picture.
+
+### Next on the journey
+
+A spacecraft far from Earth cannot be repaired. If its computer fails, the stream of bits stops. How likely is that, and how do engineers make it less likely? That is the next lesson, on probability.
 
 ### Sources
 
