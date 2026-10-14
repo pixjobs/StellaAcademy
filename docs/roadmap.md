@@ -132,7 +132,8 @@ answers the "written with AI" doubt directly.
 - Done 12 October 2026: new interactive models for circuits, trigonometry, gears, momentum, gases and transfer orbits
   (`frontend/src/components/lesson-models/`). Their labels are small on phones and need a pass.
 - Done 14 October 2026: key stage 2 notes and practice rewritten in wording for ages 9 to 11.
-- Publish a privacy policy (needs a named owner and a contact email).
+- Publish a privacy policy (needs a named owner and a contact email). Drafted 14 October 2026 with a record of
+  processing and a DPIA for the report form: `docs/privacy/`, which lists the open actions.
 - Read the first month of Analytics.
 
 **Test:** we know baseline traffic and which lessons people finish.

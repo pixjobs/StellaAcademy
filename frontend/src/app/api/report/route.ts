@@ -1,14 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { clientAddress, createRateLimiter } from '@/lib/rate-limit';
-import { REPORT_KINDS, type ReportKind } from '@/lib/report';
+import { REPORT_KINDS, redactReport, type ReportKind } from '@/lib/report';
 import { studyModules } from '@/lib/study-modules';
 
 /**
  * "Report a problem" on a lesson. Each report becomes one structured log line
  * in Cloud Logging (Cloud Run turns JSON on stdout into jsonPayload); nothing
- * is stored anywhere else. The caller's address is used only for the rate
- * limit and is not written to the report. Read reports with the command in
- * DEPLOYMENT.md.
+ * is stored anywhere else. Email addresses and phone numbers are removed from
+ * the text first. The caller's address is used only for the rate limit (held
+ * in memory for at most ten minutes) and is not written to the report. Read
+ * reports with the command in DEPLOYMENT.md.
  */
 const rateLimited = createRateLimiter(10 * 60_000, 5);
 
@@ -54,7 +55,7 @@ export async function POST(req: NextRequest) {
 
   const lesson = typeof body.lesson === 'string' && LESSONS.has(body.lesson) ? body.lesson : null;
   const kind = typeof body.kind === 'string' && Object.hasOwn(REPORT_KINDS, body.kind) ? (body.kind as ReportKind) : null;
-  const text = typeof body.text === 'string' ? body.text.trim().slice(0, MAX_TEXT) : '';
+  const text = typeof body.text === 'string' ? redactReport(body.text.trim().slice(0, MAX_TEXT)) : '';
   if (!lesson || !kind || !text) {
     return NextResponse.json({ error: 'Choose what kind of problem it is and describe it.' }, { status: 400 });
   }

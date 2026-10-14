@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, type FormEvent } from 'react';
-import { REPORT_KINDS, type ReportKind } from '@/lib/report';
+import { REPORT_KINDS, REPORT_RETENTION_DAYS, type ReportKind } from '@/lib/report';
 import { track } from '@/lib/track';
 
 /** "Report a problem" at the foot of a lesson. Sends to /api/report; no name or email is asked for. */
@@ -52,6 +52,7 @@ export default function ReportProblem({ lesson }: { lesson: string }) {
         <form onSubmit={submit} className="mt-4 space-y-4">
           <p className="text-[15px] leading-relaxed text-[var(--ink-soft)]">
             Please do not include your name, email or anything else about yourself. We only need to know what is wrong.
+            We use reports only to put mistakes right, and delete them after {REPORT_RETENTION_DAYS} days.
           </p>
           <label className="block text-[var(--ink)]">
             What kind of problem is it?
