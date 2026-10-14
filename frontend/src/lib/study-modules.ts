@@ -3493,40 +3493,40 @@ The topics in these notes follow the Department for Education document below.
       }
     ],
     variables: [
-      { symbol: 'a', name: 'Numerator 1', unit: 'Integer', description: 'Top of the first fraction.', color: 'text-violet-400' },
-      { symbol: 'b', name: 'Denominator 1', unit: 'Integer ≠ 0', description: 'Bottom of the first fraction.', color: 'text-purple-400' },
-      { symbol: 'c', name: 'Numerator 2', unit: 'Integer', description: 'Top of the second fraction.', color: 'text-fuchsia-400' },
-      { symbol: 'd', name: 'Denominator 2', unit: 'Integer ≠ 0', description: 'Bottom of the second fraction.', color: 'text-pink-400' }
+      { symbol: 'a', name: 'Top of the first fraction', unit: 'no unit', description: 'The numerator of the first fraction.', color: 'text-violet-400' },
+      { symbol: 'b', name: 'Bottom of the first fraction', unit: 'no unit', description: 'The denominator of the first fraction. It cannot be 0.', color: 'text-purple-400' },
+      { symbol: 'c', name: 'Top of the second fraction', unit: 'no unit', description: 'The numerator of the second fraction.', color: 'text-fuchsia-400' },
+      { symbol: 'd', name: 'Bottom of the second fraction', unit: 'no unit', description: 'The denominator of the second fraction. It cannot be 0.', color: 'text-pink-400' }
     ],
     conceptSteps: [
       {
         stepNumber: 1,
-        title: 'Adding & Subtracting',
-        content: 'To add or subtract fractions, they must share a common denominator. Find a common multiple of the denominators, convert both fractions, then add or subtract the numerators.',
-        keyInsight: 'You can only add like parts — you cannot add thirds and quarters directly.',
+        title: 'Adding and subtracting',
+        content: 'You can only add or subtract fractions when their denominators are the same. If they are different, change both fractions into equivalent fractions with a common multiple of the denominators. Then add or subtract the tops and keep the bottom.',
+        keyInsight: 'Multiplying the two denominators, $b \\times d$, always gives a common multiple. That is where the formula comes from.',
         relatedVariables: ['a', 'b', 'c', 'd']
       },
       {
         stepNumber: 2,
         title: 'Multiplying',
-        content: 'To multiply two fractions, multiply the numerators together and the denominators together: $\\frac{a}{b} \\times \\frac{c}{d} = \\frac{ac}{bd}$.',
-        keyInsight: 'No common denominator needed — multiplication is simpler than addition!',
-        relatedVariables: []
+        content: 'To multiply two fractions, multiply the tops together and the bottoms together: $\\dfrac{a}{b} \\times \\dfrac{c}{d} = \\dfrac{a \\times c}{b \\times d}$. Then simplify if you can.',
+        keyInsight: 'You do not need a common denominator to multiply.',
+        relatedVariables: ['a', 'b', 'c', 'd']
       },
       {
         stepNumber: 3,
-        title: 'Dividing by a Whole Number',
-        content: 'To divide a fraction by a whole number, keep the numerator and multiply the denominator by the whole number: $\\frac{1}{2} \\div 3 = \\frac{1}{6}$. Dividing by another fraction comes in key stage 3.',
-        keyInsight: 'Dividing by 3 shares the fraction into 3 equal parts, so each part is smaller.',
-        relatedVariables: []
+        title: 'Dividing by a whole number',
+        content: 'To divide a fraction by a whole number, you share it into equal parts. Keep the top the same and multiply the bottom by the whole number.',
+        keyInsight: 'Sharing into more parts makes each part smaller, so the bottom number gets bigger.',
+        relatedVariables: ['a', 'b']
       }
     ],
     solvedExample: {
-      problem: 'Calculate $\\frac{1}{3} + \\frac{1}{4}$.',
+      problem: 'Work out $\\dfrac{1}{3} + \\dfrac{1}{4}$.',
       steps: [
         'Find a number that 3 and 4 both divide into: 12.',
-        'Convert: $\\frac{1}{3} = \\frac{4}{12}$ and $\\frac{1}{4} = \\frac{3}{12}$.',
-        'Add the numerators: $\\frac{4}{12} + \\frac{3}{12} = \\frac{7}{12}$.'
+        'Change both fractions into twelfths: $\\dfrac{1}{3} = \\dfrac{4}{12}$ and $\\dfrac{1}{4} = \\dfrac{3}{12}$.',
+        'Add the tops and keep the bottom: $\\dfrac{4}{12} + \\dfrac{3}{12} = \\dfrac{7}{12}$.'
       ],
       resultFormula: '\\frac{1}{3} + \\frac{1}{4} = \\frac{7}{12}'
     },
@@ -3562,7 +3562,7 @@ The topics in these notes follow the Department for Education document below.
         answer: "1/6 (2/12 simplified)"
       },
     ],
-    realWorldConnection: 'Engineers use fraction arithmetic constantly when scaling recipes, mixing materials in ratios, or dividing resources across teams.',
+    realWorldConnection: 'Recipes use fractions. To make twice as much of a recipe that needs $\\dfrac{3}{4}$ of a litre of water, you need $2 \\times \\dfrac{3}{4} = 1\\tfrac{1}{2}$ litres.',
     textbookContent: `
 ## Calculating with fractions
 
@@ -3574,11 +3574,11 @@ $\\dfrac{2}{7} + \\dfrac{3}{7} = \\dfrac{5}{7}$
 
 When the denominators are different, first change the fractions into **equivalent fractions** with the same denominator. Use a number that both denominators divide into, called a **common multiple**:
 
-$\\dfrac{1}{3} + \\dfrac{1}{4} = \\dfrac{4}{12} + \\dfrac{3}{12} = \\dfrac{7}{12}$
+$\\dfrac{1}{2} + \\dfrac{1}{5} = \\dfrac{5}{10} + \\dfrac{2}{10} = \\dfrac{7}{10}$
 
 Subtracting works the same way:
 
-$\\dfrac{3}{4} - \\dfrac{1}{6} = \\dfrac{9}{12} - \\dfrac{2}{12} = \\dfrac{7}{12}$
+$\\dfrac{3}{4} - \\dfrac{1}{3} = \\dfrac{9}{12} - \\dfrac{4}{12} = \\dfrac{5}{12}$
 
 ### Mixed numbers
 
@@ -3594,7 +3594,7 @@ $3\\tfrac{1}{4} - 1\\tfrac{1}{2} = \\dfrac{13}{4} - \\dfrac{6}{4} = \\dfrac{7}{4
 
 To multiply two fractions, multiply the numerators together and the denominators together, then simplify:
 
-$\\dfrac{2}{3} \\times \\dfrac{3}{4} = \\dfrac{6}{12} = \\dfrac{1}{2}$
+$\\dfrac{4}{5} \\times \\dfrac{1}{2} = \\dfrac{4}{10} = \\dfrac{2}{5}$
 
 Multiplying by a fraction is like finding a fraction **of** something. Half of a quarter is $\\dfrac{1}{2} \\times \\dfrac{1}{4} = \\dfrac{1}{8}$.
 
@@ -3612,11 +3612,15 @@ Dividing one fraction by another fraction comes later, in key stage 3.
 
 ### A rover's battery
 
-A Mars rover's battery is $\\dfrac{3}{4}$ full. Each drive uses $\\dfrac{1}{8}$ of a full battery. After two drives the battery holds
+Imagine a Mars rover whose battery is $\\dfrac{3}{4}$ full. Each drive uses $\\dfrac{1}{8}$ of a full battery. After two drives the battery holds
 
 $\\dfrac{3}{4} - \\dfrac{2}{8} = \\dfrac{6}{8} - \\dfrac{2}{8} = \\dfrac{4}{8} = \\dfrac{1}{2}$
 
 so it is half full.
+
+### Next on the journey
+
+A fraction is one way to write part of a whole. Decimals and percentages are two more. How are $\\dfrac{3}{4}$, 0.75 and 75% the same amount? That is the next lesson.
 
 ### Sources
 

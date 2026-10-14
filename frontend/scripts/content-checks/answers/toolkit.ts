@@ -475,4 +475,66 @@ const FRACTIONS: Entry[] = [
   },
 ];
 
-export const ENTRIES: Entry[] = [...ARITHMETIC, ...NEGATIVE_NUMBERS, ...MULTIPLICATION, ...FRACTIONS];
+/** A mixed number "w a/b" (three numbers from index i) as a value. */
+const mixed = (i: number) => (n: number[]) => n[i] + n[i + 1] / n[i + 2];
+const lcm = (x: number, y: number) => (x * y) / gcd(x, y);
+
+/** One fraction-valued entry: `read` turns the numbers of `stated` into the value to compare. */
+const fv = (
+  lesson: string, where: string, fragment: string, stated: string, read: (n: number[]) => number, value: number,
+): Entry => ({
+  lesson, where,
+  ...(where.startsWith('textbookContent') ? { expectNotesIncludes: fragment } : { expectQuestionIncludes: fragment }),
+  stated, combine: read, compute: () => value, expected: value, tolerance: 1e-9, unit: '',
+});
+
+const FO = 'fraction-ops';
+const FO_SOLVED = 'Work out $\\dfrac{1}{3} + \\dfrac{1}{4}$.';
+const FRACTION_OPS: Entry[] = [
+  // Worked example: 1/3 + 1/4
+  {
+    lesson: FO, where: 'solvedExample.steps[0]', expectQuestionIncludes: FO_SOLVED,
+    stated: 'Find a number that 3 and 4 both divide into: 12.', pick: 2, compute: () => lcm(3, 4), expected: 12, tolerance: 0, unit: '',
+  },
+  fv(FO, 'solvedExample.steps[1] (1/3)', FO_SOLVED, '$\\dfrac{1}{3} = \\dfrac{4}{12}$', frac(2), 1 / 3),
+  fv(FO, 'solvedExample.steps[1] (1/4)', FO_SOLVED, '$\\dfrac{1}{4} = \\dfrac{3}{12}$', frac(2), 1 / 4),
+  fv(FO, 'solvedExample.steps[2]', FO_SOLVED, '$\\dfrac{4}{12} + \\dfrac{3}{12} = \\dfrac{7}{12}$', frac(4), 4 / 12 + 3 / 12),
+  fv(FO, 'solvedExample.resultFormula', FO_SOLVED, '= \\frac{7}{12}', frac(0), 1 / 3 + 1 / 4),
+  // Practice
+  fv(FO, 'practiceProblems[0]', 'Work out 1/2 + 1/3.', '5/6', frac(0), 1 / 2 + 1 / 3),
+  fv(FO, 'practiceProblems[1]', 'Work out 5/6 − 1/4.', '7/12', frac(0), 5 / 6 - 1 / 4),
+  fv(FO, 'practiceProblems[1] (5/6 in twelfths)', 'Work out 5/6 − 1/4.', '(10/12 − 3/12)', frac(0), 5 / 6),
+  fv(FO, 'practiceProblems[1] (1/4 in twelfths)', 'Work out 5/6 − 1/4.', '(10/12 − 3/12)', frac(2), 1 / 4),
+  fv(FO, 'practiceProblems[2]', 'Work out 2 1/4 + 1 2/3.', '3 11/12', mixed(0), 2 + 1 / 4 + 1 + 2 / 3),
+  fv(FO, 'practiceProblems[3]', 'Work out 2/3 × 3/4', '1/2', frac(0), (2 / 3) * (3 / 4)),
+  fv(FO, 'practiceProblems[3] (before simplifying)', 'Work out 2/3 × 3/4', '(6/12 simplified)', frac(0), (2 * 3) / (3 * 4)),
+  fv(FO, 'practiceProblems[4]', 'Work out 3/5 × 1/2.', '3/10', frac(0), (3 / 5) * (1 / 2)),
+  fv(FO, 'practiceProblems[5]', 'Two thirds of a water supply is shared equally between 4 astronauts.', '1/6', frac(0), 2 / 3 / 4),
+  fv(FO, 'practiceProblems[5] (before simplifying)', 'Two thirds of a water supply is shared equally between 4 astronauts.', '(2/12 simplified)', frac(0), 2 / (3 * 4)),
+  // Notes
+  fv(FO, 'textbookContent: 2/7 + 3/7', 'When the denominators are the same', '$\\dfrac{2}{7} + \\dfrac{3}{7} = \\dfrac{5}{7}$', frac(4), 2 / 7 + 3 / 7),
+  fv(FO, 'textbookContent: 1/2 in tenths', 'called a **common multiple**', '$\\dfrac{1}{2} + \\dfrac{1}{5} = \\dfrac{5}{10} + \\dfrac{2}{10} = \\dfrac{7}{10}$', frac(4), 1 / 2),
+  fv(FO, 'textbookContent: 1/5 in tenths', 'called a **common multiple**', '$\\dfrac{1}{2} + \\dfrac{1}{5} = \\dfrac{5}{10} + \\dfrac{2}{10} = \\dfrac{7}{10}$', frac(6), 1 / 5),
+  fv(FO, 'textbookContent: 1/2 + 1/5', 'called a **common multiple**', '$\\dfrac{1}{2} + \\dfrac{1}{5} = \\dfrac{5}{10} + \\dfrac{2}{10} = \\dfrac{7}{10}$', frac(8), 1 / 2 + 1 / 5),
+  fv(FO, 'textbookContent: 3/4 in twelfths', 'Subtracting works the same way', '$\\dfrac{3}{4} - \\dfrac{1}{3} = \\dfrac{9}{12} - \\dfrac{4}{12} = \\dfrac{5}{12}$', frac(4), 3 / 4),
+  fv(FO, 'textbookContent: 1/3 in twelfths', 'Subtracting works the same way', '$\\dfrac{3}{4} - \\dfrac{1}{3} = \\dfrac{9}{12} - \\dfrac{4}{12} = \\dfrac{5}{12}$', frac(6), 1 / 3),
+  fv(FO, 'textbookContent: 3/4 - 1/3', 'Subtracting works the same way', '$\\dfrac{3}{4} - \\dfrac{1}{3} = \\dfrac{9}{12} - \\dfrac{4}{12} = \\dfrac{5}{12}$', frac(8), 3 / 4 - 1 / 3),
+  fv(FO, 'textbookContent: mixed, 1/2 in sixths', 'To add mixed numbers', '$1\\tfrac{1}{2} + 2\\tfrac{1}{3} = 3 + \\dfrac{3}{6} + \\dfrac{2}{6} = 3\\tfrac{5}{6}$', frac(7), 1 / 2),
+  fv(FO, 'textbookContent: mixed, 1/3 in sixths', 'To add mixed numbers', '$1\\tfrac{1}{2} + 2\\tfrac{1}{3} = 3 + \\dfrac{3}{6} + \\dfrac{2}{6} = 3\\tfrac{5}{6}$', frac(9), 1 / 3),
+  fv(FO, 'textbookContent: mixed, sum', 'To add mixed numbers', '$1\\tfrac{1}{2} + 2\\tfrac{1}{3} = 3 + \\dfrac{3}{6} + \\dfrac{2}{6} = 3\\tfrac{5}{6}$', mixed(11), 1 + 1 / 2 + 2 + 1 / 3),
+  fv(FO, 'textbookContent: 3 1/4 as quarters', 'turn each mixed number into an **improper fraction**', '$3\\tfrac{1}{4} - 1\\tfrac{1}{2} = \\dfrac{13}{4} - \\dfrac{6}{4} = \\dfrac{7}{4} = 1\\tfrac{3}{4}$', frac(6), 3 + 1 / 4),
+  fv(FO, 'textbookContent: 1 1/2 as quarters', 'turn each mixed number into an **improper fraction**', '$3\\tfrac{1}{4} - 1\\tfrac{1}{2} = \\dfrac{13}{4} - \\dfrac{6}{4} = \\dfrac{7}{4} = 1\\tfrac{3}{4}$', frac(8), 1 + 1 / 2),
+  fv(FO, 'textbookContent: 13/4 - 6/4', 'turn each mixed number into an **improper fraction**', '$3\\tfrac{1}{4} - 1\\tfrac{1}{2} = \\dfrac{13}{4} - \\dfrac{6}{4} = \\dfrac{7}{4} = 1\\tfrac{3}{4}$', frac(10), 3 + 1 / 4 - (1 + 1 / 2)),
+  fv(FO, 'textbookContent: 1 3/4', 'turn each mixed number into an **improper fraction**', '$3\\tfrac{1}{4} - 1\\tfrac{1}{2} = \\dfrac{13}{4} - \\dfrac{6}{4} = \\dfrac{7}{4} = 1\\tfrac{3}{4}$', mixed(12), 7 / 4),
+  fv(FO, 'textbookContent: 4/5 × 1/2', 'To multiply two fractions, multiply the numerators', '$\\dfrac{4}{5} \\times \\dfrac{1}{2} = \\dfrac{4}{10} = \\dfrac{2}{5}$', frac(4), (4 / 5) * (1 / 2)),
+  fv(FO, 'textbookContent: 4/5 × 1/2 simplified', 'To multiply two fractions, multiply the numerators', '$\\dfrac{4}{5} \\times \\dfrac{1}{2} = \\dfrac{4}{10} = \\dfrac{2}{5}$', frac(6), (4 / 5) * (1 / 2)),
+  fv(FO, 'textbookContent: half of a quarter', 'Half of a quarter is', '$\\dfrac{1}{2} \\times \\dfrac{1}{4} = \\dfrac{1}{8}$', frac(4), (1 / 2) * (1 / 4)),
+  fv(FO, 'textbookContent: 1/2 ÷ 3', 'Half a bar shared between 3 people', '$\\dfrac{1}{2} \\div 3 = \\dfrac{1}{6}$', frac(3), 1 / 2 / 3),
+  fv(FO, 'textbookContent: 3/4 ÷ 2', 'Keep the numerator and multiply the denominator', '$\\dfrac{3}{4} \\div 2 = \\dfrac{3}{8}$', frac(3), 3 / 4 / 2),
+  fv(FO, 'textbookContent: battery, two drives', 'Each drive uses $\\dfrac{1}{8}$ of a full battery', '$\\dfrac{3}{4} - \\dfrac{2}{8}', frac(2), 2 * (1 / 8)),
+  fv(FO, 'textbookContent: battery, 3/4 in eighths', 'Each drive uses $\\dfrac{1}{8}$ of a full battery', '= \\dfrac{6}{8} - \\dfrac{2}{8}', frac(0), 3 / 4),
+  fv(FO, 'textbookContent: battery, 4/8', 'Each drive uses $\\dfrac{1}{8}$ of a full battery', '= \\dfrac{4}{8} = \\dfrac{1}{2}$', frac(0), 3 / 4 - 2 / 8),
+  fv(FO, 'textbookContent: battery, half', 'Each drive uses $\\dfrac{1}{8}$ of a full battery', '= \\dfrac{4}{8} = \\dfrac{1}{2}$', frac(2), 3 / 4 - 2 / 8),
+];
+
+export const ENTRIES: Entry[] = [...ARITHMETIC, ...NEGATIVE_NUMBERS, ...MULTIPLICATION, ...FRACTIONS, ...FRACTION_OPS];
