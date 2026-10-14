@@ -274,7 +274,7 @@ The topics in these notes follow the Department for Education documents below.
         symbol: 'n_1',
         name: 'Refractive index of the first material',
         unit: 'no unit (it is a ratio)',
-        description: 'How many times slower light travels in the first material than in a vacuum. For air it is about 1.0.',
+        description: 'How many times faster light travels in a vacuum than in the first material. For air it is about 1.0.',
         color: 'text-indigo-400'
       },
       {
@@ -304,7 +304,7 @@ The topics in these notes follow the Department for Education documents below.
       {
         stepNumber: 1,
         title: 'Light changes speed in a material',
-        content: 'Light is fastest in a vacuum, almost as fast in air, slower in water and slower still in glass. The **refractive index**, $n$, says how many times slower: in glass $n$ is about 1.5, so light travels at about two thirds of its speed in a vacuum.',
+        content: 'Light is fastest in a vacuum, almost as fast in air, slower in water and slower still in glass. The **refractive index**, $n$, says how many times faster light travels in a vacuum than in this material: in glass $n$ is about 1.5, so light travels at about two thirds of its speed in a vacuum.',
         keyInsight: 'A higher refractive index means light travels more slowly in that material.',
         relatedVariables: ['n_1', 'n_2']
       },
@@ -312,7 +312,7 @@ The topics in these notes follow the Department for Education documents below.
         stepNumber: 2,
         title: 'Light bends at a boundary',
         content: 'When a beam of light meets a new material at an angle, one side of the beam reaches it first and changes speed first, so the beam swings round. This is **refraction**. Angles are measured from the **normal**, a line drawn at right angles to the surface.',
-        keyInsight: 'Slowing down bends light towards the normal. Speeding up bends it away from the normal.',
+        keyInsight: 'Slowing down bends light towards the normal. Speeding up bends it away from the normal. A ray along the normal does not bend.',
         relatedVariables: ['\\theta_1', '\\theta_2']
       },
       {
@@ -336,7 +336,7 @@ The topics in these notes follow the Department for Education documents below.
     practiceProblems: [
       {
         question: "What happens to the speed of light when it passes from air into glass?",
-        hint: "Glass is a denser material for light than air.",
+        hint: "Look at the first step of The idea: where is light slower?",
         answer: "It slows down."
       },
       {
@@ -405,7 +405,7 @@ The Department for Education content describes refraction in words. Some specifi
 
 $$n_1 \\sin \\theta_1 = n_2 \\sin \\theta_2$$
 
-Here $n$ is the **refractive index** of each material (how many times slower light travels in it than in a vacuum) and $\\theta$ is the angle to the normal. The worked example shows how to use it. Notice that the angle in the glass comes out smaller than the angle in the air: the ray has bent towards the normal, just as the rule in words says.
+Here $n$ is the **refractive index** of each material (how many times faster light travels in a vacuum than in that material) and $\\theta$ is the angle to the normal. The worked example shows how to use it. Notice that the angle in the glass comes out smaller than the angle in the air: the ray has bent towards the normal, just as the rule in words says.
 
 ### Reading starlight
 
@@ -413,7 +413,7 @@ Astronomers pass starlight through a prism or a similar device to spread it into
 
 ### Next on the journey
 
-A spectrum is a set of measurements, and real measurements never agree perfectly. How do scientists sum up a pile of readings and say how spread out they are? That is the next lesson.
+Measuring a spectrum means taking many readings, and real readings never agree perfectly. How do scientists sum up a pile of readings and say how spread out they are? That is the next lesson.
 
 ### Sources
 
@@ -4375,7 +4375,7 @@ The topics in these notes follow the Department for Education documents below.
       {
         stepNumber: 2,
         title: 'Standard deviation measures spread',
-        content: 'The readings 99, 100, 100, 101 and the readings 50, 80, 120, 150 both have a mean of 100, but the second set is far more spread out. The **standard deviation**, $\\sigma$, puts a number on that spread, using every value.',
+        content: 'The readings 99, 100, 100, 101 and the readings 50, 80, 120, 150 both have a mean of 100, but the second set is far more spread out. The simplest measure of spread is the range: the largest value minus the smallest. The **standard deviation**, $\\sigma$, puts a number on that spread, using every value.',
         keyInsight: 'A small standard deviation means the values sit close to the mean. A large one means they are widely spread.',
         relatedVariables: ['\\sigma', '\\bar{x}', 'x']
       },
@@ -4442,12 +4442,12 @@ A set of data is usually summarised by two numbers: one for its centre, and one 
 *   The **median** is the middle value when the data is in order. With an even number of values, it is halfway between the middle two.
 *   The **mode** is the value that occurs most often.
 
-The mean uses every value, but one extreme value can pull it a long way. The median is not affected by extreme values, so it is often better for skewed data (data with a long tail of a few very large or very small values), such as incomes.
+The mean uses every value, but one extreme value can pull it a long way. The median is hardly affected by extreme values, so it is often better for skewed data (data with a long tail of a few very large or very small values), such as incomes.
 
 ### Spread
 
 *   The **range** is the largest value minus the smallest. It depends only on the two extremes.
-*   The **interquartile range** is the upper quartile minus the lower quartile: the spread of the middle half of the data.
+*   The **interquartile range** is the upper quartile (three quarters of the way through the ordered data) minus the lower quartile (one quarter of the way): the spread of the middle half of the data.
 *   The **standard deviation** measures how far values typically are from the mean, using every value.
 
 ### Standard deviation
@@ -4525,7 +4525,7 @@ The topics in these notes follow the Department for Education documents below.
         symbol: 'N',
         name: 'Number of turns',
         unit: 'no unit (a count)',
-        description: 'How many loops of wire the coil has. Twice as many turns gives twice the emf.',
+        description: 'How many loops of wire the coil has.',
         color: 'text-teal-400',
         range: { min: 1, max: 100, default: 10 }
       },
@@ -4533,7 +4533,7 @@ The topics in these notes follow the Department for Education documents below.
         symbol: '\\Phi',
         name: 'Magnetic flux',
         unit: 'webers (Wb)',
-        description: 'How much magnetic field passes through the coil. For a field $B$ at right angles to an area $A$, $\\Phi = BA$.',
+        description: 'How much magnetic field passes through the coil. For a magnetic field $B$, measured in teslas (T), at right angles to an area $A$, $\\Phi = BA$.',
         color: 'text-sky-400'
       },
       {
@@ -4549,7 +4549,7 @@ The topics in these notes follow the Department for Education documents below.
         stepNumber: 1,
         title: 'A changing field makes a voltage',
         content: 'Move a magnet into or out of a coil, turn a coil in a magnetic field, or change the current in a nearby electromagnet, and a voltage appears across the coil. This is **electromagnetic induction**. Connect the coil into a complete circuit and that voltage pushes a current round it.',
-        keyInsight: 'Only change counts. A magnet resting still beside a coil induces no voltage at all.',
+        keyInsight: 'Only change counts.',
         relatedVariables: ['\\mathcal{E}', '\\Phi']
       },
       {
@@ -4563,7 +4563,7 @@ The topics in these notes follow the Department for Education documents below.
         stepNumber: 3,
         title: 'The minus sign is Lenz\'s law',
         content: 'The induced current always flows in the direction that opposes the change causing it. So when you push a magnet into a coil that is part of a circuit, the coil pushes back, and you have to do work. That work is where the electrical energy comes from.',
-        keyInsight: 'Lenz\'s law is the conservation of energy: you never get electrical energy for nothing.',
+        keyInsight: 'Lenz\'s law follows from the conservation of energy: you never get electrical energy for nothing.',
         relatedVariables: ['\\mathcal{E}']
       }
     ],
@@ -4609,7 +4609,7 @@ The topics in these notes follow the Department for Education documents below.
         answer: "A north pole, which repels the magnet and opposes its approach (Lenz's law)."
       },
     ],
-    realWorldConnection: 'An electric guitar pickup is a small magnet wrapped in a coil of fine wire. A vibrating steel string changes the magnetic field through the coil, and that induces a small voltage which the amplifier turns into sound.',
+    realWorldConnection: 'An electric guitar pickup is a small magnet wrapped in a coil of fine wire. A vibrating steel string changes the magnetic field through the coil, and that induces a small voltage, which an amplifier and loudspeaker turn into sound.',
     textbookContent: `
 ## Electromagnetic induction
 
@@ -4623,11 +4623,11 @@ A voltage is induced when:
 *   a coil moves or turns in a magnetic field, or
 *   the current in a nearby electromagnet changes.
 
-The key is **change**. A magnet sitting still next to a coil induces nothing.
+The key is **change**.
 
 ### Magnetic flux
 
-**Magnetic flux** $\\Phi$ measures how much magnetic field passes through an area. For a field $B$ at right angles to an area $A$:
+**Magnetic flux** $\\Phi$ measures how much magnetic field passes through an area. For a magnetic field $B$, measured in teslas (T), at right angles to an area $A$:
 
 $$\\Phi = BA$$
 
@@ -4643,15 +4643,15 @@ More turns, a stronger field, or a faster change all give a larger emf.
 
 ### Lenz's law
 
-The minus sign is **Lenz's law**: the induced current flows in the direction that **opposes** the change causing it. Push the north pole of a magnet into a coil that is part of a circuit, and the coil's near end becomes a north pole, pushing back. You have to do work to move the magnet, and that work becomes electrical energy. Lenz's law is the conservation of energy at work.
+The minus sign is **Lenz's law**: the induced current flows in the direction that **opposes** the change causing it. Push a magnet into a coil that is part of a circuit, and the coil pushes back on it. You have to do work to move the magnet, and that work becomes electrical energy. Lenz's law is the conservation of energy at work.
 
 ### Where it is used
 
-Generators in power stations turn coils in magnetic fields. Transformers change voltages using a changing current in one coil to induce a voltage in another. Wireless chargers and induction hobs work the same way.
+Generators in power stations spin a magnet inside coils of wire (or a coil inside a magnet). Transformers change voltages using a changing current in one coil to induce a voltage in another. Wireless chargers and induction hobs work the same way.
 
 ### A tether in orbit
 
-In 1996 the Space Shuttle unreeled a conducting cable about 20 km long. Moving at orbital speed through the Earth's magnetic field, the cable had an emf of about 3,500 volts induced along it, just as Faraday's law predicts for a conductor cutting through a field.
+In 1996 the Space Shuttle unreeled a conducting cable about 20 km long. Moving at orbital speed through the Earth's magnetic field, the cable had an emf of about 3,500 volts induced along it, just as Faraday's law predicts for a conductor moving through a magnetic field.
 
 ### Next on the journey
 
@@ -4757,7 +4757,7 @@ The topics in these notes follow the Department for Education documents below.
       },
       {
         question: "Light with photons of 3.0 eV falls on a metal whose work function is 2.3 eV. What is the greatest kinetic energy of the electrons released?",
-        hint: "Each photon gives all its energy to one electron, which must pay the work function to escape.",
+        hint: "Kinetic energy = photon energy − work function.",
         answer: "0.7 eV"
       },
       {
@@ -4771,7 +4771,7 @@ The topics in these notes follow the Department for Education documents below.
         answer: "About $6.6 \\times 10^{-10}$ m, similar to the spacing of atoms in a crystal, so the electrons can be diffracted."
       },
     ],
-    realWorldConnection: 'The light sensors in digital cameras, and in telescope cameras such as those on the Hubble Space Telescope, work because a photon landing on a pixel can free an electron in the silicon. Counting those electrons measures the light.',
+    realWorldConnection: 'The light sensors in digital cameras, and in the visible-light cameras on the Hubble Space Telescope, work because a photon landing on a pixel can free an electron in the silicon. Counting those electrons measures the light.',
     textbookContent: `
 ## Photons
 
@@ -4801,11 +4801,11 @@ where $E_{k(\\text{max})}$ is the greatest kinetic energy an escaping electron c
 
 ### Evidence: line spectra
 
-A hot gas gives out light at only certain sharp frequencies. Electrons in atoms can only have certain energy levels. When an electron drops between two levels it gives out one photon, whose energy $hf$ equals the difference between the levels. Each element has its own set of levels, so its own set of lines.
+A hot, thin gas gives out light at only certain sharp frequencies. Electrons in atoms can only have certain energy levels. When an electron drops between two levels it gives out one photon, whose energy $hf$ equals the difference between the levels. Each element has its own set of levels, so its own set of lines.
 
 ### Wave-particle duality
 
-Light behaves as a wave when it travels and as a particle when it is absorbed. Matter does the same in reverse: particles such as electrons can behave as waves. Their **de Broglie wavelength** is
+Light behaves as a wave when it travels and as a particle when it is absorbed. Matter has the same double nature: particles such as electrons can behave as waves. Their **de Broglie wavelength** is
 
 $$\\lambda = \\frac{h}{p}$$
 

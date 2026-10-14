@@ -41,7 +41,7 @@ export const INTROS: Partial<Record<ConceptId, LessonIntro>> = {
   },
   prism: {
     caption:
-      'Sunrise from the International Space Station. The thin glowing line is the atmosphere seen edge-on. As sunlight passes through it, the air bends the light and scatters it into bands of colour.',
+      'Sunrise from the International Space Station. The thin glowing line is the atmosphere seen edge-on. As sunlight passes through it, the air scatters some colours more than others, so each layer glows a different colour: orange low down, blue higher up.',
     alt: 'City lights on a dark Earth, then a thin arc of blue and white light spreading along the horizon as the Sun rises.',
     credit: 'NASA',
   },
