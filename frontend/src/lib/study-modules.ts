@@ -797,22 +797,22 @@ The topics in these notes follow the Department for Education documents below.
       {
         symbol: 'I',
         name: 'Current',
-        unit: 'Amperes (A)',
-        description: 'The rate of flow of electrical charge. Think of it as the amount of water flowing through a pipe.',
+        unit: 'amperes (A)',
+        description: 'The rate at which electric charge flows round the circuit.',
         color: 'text-emerald-400'
       },
       {
         symbol: 'V',
-        name: 'Voltage',
-        unit: 'Volts (V)',
-        description: 'The electrical potential difference that pushes electrons through a circuit. Think of it as water pressure.',
+        name: 'Potential difference',
+        unit: 'volts (V)',
+        description: 'Often called voltage. It is what drives the charge round the circuit.',
         color: 'text-teal-400'
       },
       {
         symbol: 'R',
         name: 'Resistance',
-        unit: 'Ohms (Ω)',
-        description: 'A material\'s opposition to the flow of electric current. Think of it as the narrowness of the pipe.',
+        unit: 'ohms (Ω)',
+        description: 'How hard it is for the current to flow through a component.',
         color: 'text-lime-400',
         range: { min: 10, max: 1000, default: 100 }
       }
@@ -820,34 +820,34 @@ The topics in these notes follow the Department for Education documents below.
     conceptSteps: [
       {
         stepNumber: 1,
-        title: 'The Driving Force',
-        content: 'Voltage is the push that causes electrons to move. A battery provides this potential difference across a closed circuit.',
-        keyInsight: 'Without voltage, there is no current.',
-        relatedVariables: ['V']
+        title: 'Potential difference drives the current',
+        content: 'A battery provides a potential difference. It drives charge round the circuit, but only if the circuit is a complete loop with no gaps. Around a single loop, the current is the same everywhere.',
+        keyInsight: 'No potential difference, or a gap in the circuit, means no current.',
+        relatedVariables: ['V', 'I']
       },
       {
         stepNumber: 2,
-        title: 'Resistance Limits Flow',
-        content: 'Every component and wire has some resistance. Resistors are used specifically to limit current to safe levels for sensitive components like LEDs.',
-        keyInsight: 'Higher resistance means less current flows for a given voltage.',
+        title: 'Resistance limits the current',
+        content: 'Every component and wire has some resistance. With the same potential difference across it, a component with more resistance lets less current through. Resistors are often added to a circuit to keep the current low enough for a delicate component such as an LED.',
+        keyInsight: 'More resistance means less current for the same potential difference.',
         relatedVariables: ['R', 'I']
       },
       {
         stepNumber: 3,
-        title: 'Ohm\'s Law',
-        content: 'Current is directly proportional to voltage and inversely proportional to resistance. This fundamental relationship governs all basic electrical circuits.',
-        keyInsight: 'I = V / R',
+        title: 'How the three are linked',
+        content: 'The three are linked by $V = IR$, which rearranges to $I = \\dfrac{V}{R}$ and $R = \\dfrac{V}{I}$. For a fixed resistor at a steady temperature the resistance stays the same, so doubling the potential difference doubles the current. For some components, such as a filament lamp, the resistance changes as the current changes.',
+        keyInsight: 'Resistance is the ratio of potential difference to current: $R = V \\div I$.',
         relatedVariables: ['I', 'V', 'R']
       }
     ],
     solvedExample: {
-      problem: 'Determine current ($I$) in a $12$V loop with a $150 \\Omega$ resistor.',
+      problem: 'A $150$ Ω resistor is connected to a $12$ V battery. Find the current through it.',
       steps: [
-        'Apply Ohm\'s Law: $I = \\frac{V}{R}$.',
-        'Substitute values: $I = \\frac{12}{150}$.',
-        'Calculate the result in Amperes.'
+        'Use $I = \\dfrac{V}{R}$.',
+        'Substitute: $I = \\dfrac{12}{150}$.',
+        'Work it out: $I = 0.08$ A. A milliampere (mA) is a thousandth of an ampere, so this is $80$ mA.'
       ],
-      resultFormula: 'I = 0.08 \\text{ A (80 mA)}'
+      resultFormula: 'I = 0.08 \\text{ A, or } 80 \\text{ mA}'
     },
     practiceProblems: [
       {
@@ -881,7 +881,7 @@ The topics in these notes follow the Department for Education documents below.
         answer: "The total resistance goes down, so the current from the battery goes up."
       },
     ],
-    realWorldConnection: 'Spacecraft engineers use these calculations to ensure solar panels and batteries safely power onboard computers without burning them out.',
+    realWorldConnection: 'A spacecraft runs on electricity from its solar panels and batteries. Engineers use these relationships to work out the current each part will draw, and to choose wires and fuses that can carry it.',
     textbookContent: `
 ## Current, potential difference and resistance
 
@@ -942,7 +942,11 @@ The power a component transfers is:
 
 $$P = VI = I^2 R$$
 
-A spacecraft's heaters are resistors chosen to turn a known amount of electrical power into heat.
+Power is measured in watts (W). A spacecraft's heaters are resistors chosen to transfer a known amount of electrical power to heating.
+
+### Next on the journey
+
+The spacecraft now has power. But how does it send word home across millions of kilometres of space? It sends waves, the subject of the next lesson.
 
 ### Sources
 
@@ -975,22 +979,22 @@ The topics in these notes follow the Department for Education documents below.
       {
         symbol: '\\lambda',
         name: 'Wavelength',
-        unit: 'Metres (m)',
-        description: 'The physical distance between two consecutive peaks of a wave.',
+        unit: 'metres (m)',
+        description: 'The distance from one point on a wave to the same point on the next one, for example from crest to crest.',
         color: 'text-emerald-400'
       },
       {
         symbol: 'v',
-        name: 'Wave Velocity',
+        name: 'Wave speed',
         unit: 'm/s',
-        description: 'The speed at which the wave travels through space. For electromagnetic waves like radio, this is the speed of light.',
+        description: 'How fast the wave travels. It is set by what the wave travels through. Radio waves and light travel at $3.0 \\times 10^8$ m/s in space.',
         color: 'text-teal-400'
       },
       {
         symbol: 'f',
         name: 'Frequency',
-        unit: 'Hertz (Hz)',
-        description: 'The number of wave cycles that pass a fixed point per second.',
+        unit: 'hertz (Hz)',
+        description: 'The number of complete waves passing a point each second.',
         color: 'text-lime-400',
         range: { min: 1, max: 10, default: 2 }
       }
@@ -998,35 +1002,34 @@ The topics in these notes follow the Department for Education documents below.
     conceptSteps: [
       {
         stepNumber: 1,
-        title: 'Oscillation',
-        content: 'Signals, from sound to radio waves, travel as oscillating fields or pressures. A sine wave is the purest form of oscillation.',
-        keyInsight: 'Frequency measures how rapidly the wave oscillates.',
+        title: 'What a wave is',
+        content: 'A wave carries energy and information from place to place. The water, air or rope it passes through only moves back and forth about where it started. Frequency counts how many waves pass each second; the period, $T = \\dfrac{1}{f}$, is how long one wave takes.',
+        keyInsight: 'The wave moves on, but the material it passes through stays where it is.',
         relatedVariables: ['f']
       },
       {
         stepNumber: 2,
-        title: 'Speed of Propagation',
-        content: 'Waves travel at a specific speed depending on the medium. In a vacuum, radio waves and light travel at approximately 300,000 km/s (c).',
-        keyInsight: 'Wave speed connects time (frequency) to space (wavelength).',
-        relatedVariables: ['v']
+        title: 'The wave equation',
+        content: 'Each second, $f$ waves pass a point, and each one is $\\lambda$ long. So in one second the wave travels $f \\times \\lambda$: that is its speed, $v = f\\lambda$.',
+        keyInsight: 'Wave speed = frequency × wavelength.',
+        relatedVariables: ['v', 'f', '\\lambda']
       },
       {
         stepNumber: 3,
-        title: 'Inverse Relationship',
-        content: 'Because the speed of light is constant, higher frequency waves must have shorter wavelengths. They are inversely proportional.',
-        keyInsight: 'High frequency = short wavelength. Low frequency = long wavelength.',
+        title: 'Higher frequency, shorter wavelength',
+        content: 'Radio waves of every frequency travel through space at the same speed. Sound of every pitch travels through air at the same speed. When the speed stays the same, doubling the frequency halves the wavelength.',
+        keyInsight: 'At a fixed speed, high frequency means short wavelength and low frequency means long wavelength.',
         relatedVariables: ['\\lambda', 'f']
       }
     ],
     solvedExample: {
-      problem: 'Find the wavelength ($\\lambda$) of a radio wave transmitting at $f = 100$ MHz ($10^8$ Hz).',
+      problem: 'A radio station broadcasts at $100$ MHz. Taking the speed of radio waves as $3.0 \\times 10^8$ m/s, what is the wavelength?',
       steps: [
-        'Convert the frequency to hertz: $100\\text{ MHz} = 100 \\times 10^6\\text{ Hz} = 10^8\\text{ Hz}$ (see [Converting Units](/study/units)).',
-        'Note the speed of light $v = c \\approx 3 \\times 10^8$ m/s.',
-        'Use the formula: $\\lambda = \\frac{v}{f}$.',
-        'Substitute the numbers: $\\lambda = \\frac{3 \\times 10^8}{10^8}$.'
+        'Write the frequency in hertz: $100\\text{ MHz} = 100 \\times 10^6\\text{ Hz} = 1.0 \\times 10^8\\text{ Hz}$ (see [Converting Units](/study/units)).',
+        'Use $\\lambda = \\dfrac{v}{f}$.',
+        'Substitute: $\\lambda = \\dfrac{3.0 \\times 10^8}{1.0 \\times 10^8}$.'
       ],
-      resultFormula: '\\lambda = 3.0 \\text{ metres}'
+      resultFormula: '\\lambda = 3.0 \\text{ m}'
     },
     practiceProblems: [
       {
@@ -1060,7 +1063,7 @@ The topics in these notes follow the Department for Education documents below.
         answer: "About 0.036 m, or 3.6 cm"
       },
     ],
-    realWorldConnection: 'Deep Space Network antennas must be precisely sized and shaped based on the wavelengths of the radio signals used to communicate with probes like Voyager.',
+    realWorldConnection: "NASA's Deep Space Network keeps in touch with distant spacecraft, such as Voyager 1, using radio dishes up to 70 metres across in California, Spain and Australia. Radio waves need nothing to travel through, so the signals cross billions of kilometres of empty space.",
     textbookContent: `
 ## Describing a wave
 
@@ -1085,26 +1088,22 @@ $$v = f\\lambda$$
 
 It rearranges to $\\lambda = \\dfrac{v}{f}$ and $f = \\dfrac{v}{\\lambda}$.
 
-The speed is set by what the wave is travelling through. So for waves in the same material, a higher frequency always means a shorter wavelength.
+The speed is set by what the wave is travelling through. For sound in air, and for radio waves and light in space, the speed is the same whatever the frequency, so a higher frequency means a shorter wavelength.
 
 ### Transverse and longitudinal waves
 
 *   In a **transverse** wave the vibrations are at right angles to the direction the wave travels. Ripples on water are transverse, and so are light and radio waves.
 *   In a **longitudinal** wave the vibrations are along the direction the wave travels. Sound in air is longitudinal: the air is squashed together and stretched apart as the wave passes.
 
-### Worked example
-
-A radio station broadcasts at 100 MHz. Radio waves travel at $3.0 \\times 10^8$ m/s. What is the wavelength?
-
-1.  Write the frequency in hertz: $100 \\text{ MHz} = 1.0 \\times 10^8 \\text{ Hz}$.
-2.  Use $\\lambda = \\dfrac{v}{f} = \\dfrac{3.0 \\times 10^8}{1.0 \\times 10^8}$.
-3.  $\\lambda = 3.0$ m.
-
 ### Waves and spacecraft
 
 Radio waves and light are electromagnetic waves. They need nothing to travel through, which is why a spacecraft can send signals across empty space. Sound cannot make that journey, because it needs particles to pass the vibration along.
 
 Every radio wave travels at the same speed in space, so the frequency a spacecraft uses fixes the wavelength of its signal, and the wavelength decides how its antenna has to be built.
+
+### Next on the journey
+
+A radio wave can carry a message home, but how is the message written? Spacecraft send everything as a long string of 1s and 0s. That is the next lesson.
 
 ### Sources
 
@@ -1300,29 +1299,36 @@ The topics in these notes follow the Department for Education document below.
     variables: [
       {
         symbol: 'b_i',
-        name: 'Binary Digit (Bit)',
+        name: 'Bit (binary digit)',
         unit: '0 or 1',
-        description: 'A single digit in a binary number, representing a power of 2.',
+        description: 'One digit of a binary number. Counting from the right and starting at 0, the bit in place $i$ is worth $2^i$ if it is a 1, and nothing if it is a 0.',
         color: 'text-emerald-400'
       }
     ],
     conceptSteps: [
       {
         stepNumber: 1,
-        title: 'Base-2 System',
-        content: 'Unlike our normal Base-10 system which uses digits 0-9, binary only uses 0 and 1. Each position represents a power of 2 instead of a power of 10.',
-        keyInsight: 'Computers use binary because it perfectly maps to electrical switches being OFF (0) or ON (1).',
-        relatedVariables: []
+        title: 'Only two digits',
+        content: 'Binary numbers are written with just two digits, 0 and 1. Each one is called a bit. A computer can store a bit in anything that has two states, such as a tiny switch that is off (0) or on (1).',
+        keyInsight: 'Two states are easy to build and hard to mix up, which is why computers use binary.',
+        relatedVariables: ['b_i']
+      },
+      {
+        stepNumber: 2,
+        title: 'Place values double',
+        content: 'In our everyday denary numbers (base 10, also called decimal), each place is worth ten times the place to its right. In binary each place is worth two times the place to its right: 1, 2, 4, 8, 16 and so on, which are the powers of 2.',
+        keyInsight: 'Read a binary number by adding the place values that hold a 1.',
+        relatedVariables: ['b_i']
       }
     ],
     solvedExample: {
-      problem: 'Convert the binary number $1011_2$ to decimal.',
+      problem: 'Convert the binary number $10110$ to denary.',
       steps: [
-        'Write out the powers of 2 for each position from right to left: $2^3, 2^2, 2^1, 2^0$',
-        'Multiply each bit by its corresponding power of 2: $1 \\cdot 8 + 0 \\cdot 4 + 1 \\cdot 2 + 1 \\cdot 1$',
-        'Add them up: $8 + 0 + 2 + 1 = 11$'
+        'Write the place values over the bits, from the right: $1, 2, 4, 8, 16$.',
+        'The 1s are in the 16s, 4s and 2s places.',
+        'Add those place values: $16 + 4 + 2 = 22$.'
       ],
-      resultFormula: '1011_2 = 11_{10}'
+      resultFormula: '10110 \\text{ in binary} = 22 \\text{ in denary}'
     },
     practiceProblems: [
       {
@@ -1356,15 +1362,15 @@ The topics in these notes follow the Department for Education document below.
         answer: "10100 (13 + 7 = 20)"
       },
     ],
-    realWorldConnection: 'Every piece of data on your computer, from this text to images and videos, is stored as a massive sequence of binary 1s and 0s.',
+    realWorldConnection: 'Every command sent up to a spacecraft, and every reading and photo it sends back, travels as a stream of 0s and 1s.',
     textbookContent: `
 ## Binary numbers
 
-Computers store everything as **binary**: numbers written with only two digits, 0 and 1. A 0 or a 1 is called a **bit**. Inside a computer each bit is a tiny switch that is either off (0) or on (1).
+Computers store everything as **binary**: numbers written with only two digits, 0 and 1. A 0 or a 1 is called a **bit**. Inside a computer each bit is held by something with two states, like a tiny switch that is either off (0) or on (1).
 
 ### Place values
 
-Our everyday numbers are **denary** (base 10). Each place is worth ten times the place to its right: ones, tens, hundreds.
+Our everyday numbers are **denary** (base 10, also called decimal). Each place is worth ten times the place to its right: ones, tens, hundreds.
 
 In binary each place is worth **two** times the place to its right:
 
@@ -1375,24 +1381,19 @@ Eight bits make a **byte**, which can hold any whole number from 0 to 255.
 
 ### Binary to denary
 
-Add up the place values where there is a 1. For $1011$:
-
-| 8 | 4 | 2 | 1 |
-| --- | --- | --- | --- |
-| 1 | 0 | 1 | 1 |
-
-$8 + 2 + 1 = 11$.
+Add up the place values where there is a 1, and ignore the places with a 0. The worked example does this for $10110$.
 
 ### Denary to binary
 
-Take away the biggest place value that fits, write a 1 there, and repeat with what is left. For 13:
+Take away the biggest place value that fits, write a 1 there, and repeat with what is left. Write a 0 in every place that does not fit. For 19:
 
-1.  8 fits into 13: write 1 in the 8s place, leaving 5.
-2.  4 fits into 5: write 1 in the 4s place, leaving 1.
-3.  2 does not fit into 1: write 0 in the 2s place.
-4.  1 fits: write 1 in the 1s place, leaving 0.
+1.  16 fits into 19: write 1 in the 16s place, leaving 3.
+2.  8 does not fit into 3: write 0 in the 8s place.
+3.  4 does not fit into 3: write 0 in the 4s place.
+4.  2 fits into 3: write 1 in the 2s place, leaving 1.
+5.  1 fits: write 1 in the 1s place, leaving 0.
 
-So $13 = 1101$ in binary.
+So $19 = 10011$ in binary.
 
 ### Adding in binary
 
@@ -1403,11 +1404,15 @@ Add column by column from the right, as in denary, but remember:
 *   $1 + 1 = 10$: write 0 and carry 1
 *   $1 + 1 + 1 = 11$: write 1 and carry 1
 
-For $101 + 11$: the right column is $1 + 1 = 10$ (write 0, carry 1); the middle column is $0 + 1 + 1 = 10$ (write 0, carry 1); the left column is $1 + 1 = 10$. The answer is $1000$. Check in denary: $5 + 3 = 8$.
+For $110 + 11$: the right column is $0 + 1 = 1$; the middle column is $1 + 1 = 10$ (write 0, carry 1); the left column is $1 + 0 + 1 = 10$ (write 0, carry 1), and the carried 1 goes in a new place on the left. The answer is $1001$. Check in denary: $6 + 3 = 9$.
 
 ### Pictures from Mars
 
-Every photo a Mars rover takes is stored as numbers, one for the brightness of each colour in each tiny dot, and those numbers are sent to Earth as a long stream of 0s and 1s by radio. Back on Earth, computers turn the bits back into numbers and the numbers back into a picture.
+Every photo a Mars rover takes is stored as numbers that give the brightness of each tiny dot in the picture. Those numbers are sent to Earth by radio as a long stream of 0s and 1s, usually passed on by a spacecraft orbiting Mars. Back on Earth, computers turn the bits back into numbers and the numbers back into a picture.
+
+### Next on the journey
+
+A spacecraft far from Earth cannot be repaired. If its computer fails, the stream of bits stops. How likely is that, and how do engineers make it less likely? That is the next lesson, on probability.
 
 ### Sources
 
@@ -2135,57 +2140,57 @@ The topics in these notes follow the Department for Education document below.
     variables: [
       {
         symbol: "P_{sys}",
-        name: "System Reliability",
-        unit: "Probability (0 to 1)",
-        description: "The overall probability that the redundant system will function successfully.",
+        name: "Probability the system works",
+        unit: "no unit (0 to 1)",
+        description: "The probability that at least one of the copies works, so the system keeps going.",
         color: "text-emerald-400"
       },
       {
         symbol: "p",
-        name: "Component Reliability",
-        unit: "Probability (0 to 1)",
-        description: "The probability that a single independent component functions successfully.",
+        name: "Probability one copy works",
+        unit: "no unit (0 to 1)",
+        description: "The probability that a single copy, such as one flight computer, works. Its chance of failing is $1 - p$.",
         color: "text-teal-400"
       },
       {
         symbol: "n",
-        name: "Redundant Components",
-        unit: "Count",
-        description: "The total number of parallel, independent backup components.",
+        name: "Number of copies",
+        unit: "a whole number",
+        description: "How many copies work side by side as backups for each other. Their failures are assumed to be independent.",
         color: "text-lime-400"
       }
     ],
     conceptSteps: [
       {
         stepNumber: 1,
-        title: "The Risk of Failure",
-        content: "In spaceflight, components fail. If a critical system relies on a single component with a 90% success rate, there is a 10% chance of complete mission failure. We express these chances as [Fractions](/study/fractions) or decimals (e.g. 0.10).",
-        keyInsight: "For single-point failures, the system reliability equals the component reliability.",
+        title: "From impossible to certain",
+        content: "A probability is a number from 0, for something impossible, to 1, for something certain. It can be a fraction, a decimal or a percentage (see [fractions](/study/fractions)). Something either happens or it does not, so $P(\\text{not } A) = 1 - P(A)$.",
+        keyInsight: "Add up the probabilities of every possible outcome and you always get 1.",
         relatedVariables: ["p"]
       },
       {
         stepNumber: 2,
-        title: "Adding Redundancy",
-        content: "To increase reliability, engineers add backup components in parallel. The system only fails if ALL of the redundant components fail at the exact same time.",
-        keyInsight: "The probability of all n components failing is the failure probability of one component raised to the power n.",
-        relatedVariables: ["n"]
+        title: "Both events: multiply",
+        content: "If one event does not change the chance of the other, the two are independent, and the probability that both happen is $P(A) \\times P(B)$. If the first event does change the chances, as when a counter is taken from a bag and not put back, the events are dependent and the second probability must be worked out again.",
+        keyInsight: "Multiply for both, but only use the plain product when the events are independent.",
+        relatedVariables: ["p"]
       },
       {
         stepNumber: 3,
-        title: "Calculating System Success",
-        content: "First, calculate the probability of a single failure (1 - p). Then, calculate the probability that all n components fail: (1 - p)^n. Finally, subtract that from 1 to find the probability of at least one success.",
-        keyInsight: "Even with low-reliability parts, high redundancy can create an ultra-reliable system.",
+        title: "Backups make a system reliable",
+        content: "A system with $n$ copies working side by side fails only if every copy fails. If each copy fails with probability $1 - p$, independently, all $n$ fail with probability $(1 - p)^n$. So the system works with probability $P_{sys} = 1 - (1 - p)^n$.",
+        keyInsight: "A few backups can make a system far more reliable than any one part, as long as the parts fail independently.",
         relatedVariables: ["P_{sys}", "p", "n"]
       }
     ],
     solvedExample: {
-      problem: "A spacecraft's primary flight computer has a reliability of $0.90$ (90%). If the spacecraft has $n = 3$ identical, independent computers, what is the overall system reliability ($P_{sys}$)?",
+      problem: "Each of a spacecraft's flight computers works with probability $0.9$ (90%). The spacecraft carries $n = 3$ of them, and their failures are independent. What is the probability $P_{sys}$ that at least one works?",
       steps: [
-        "Find the failure rate of one computer: $1 - 0.90 = 0.10$.",
-        "Calculate the probability that ALL three fail: $0.10^3 = 0.10 \\times 0.10 \\times 0.10 = 0.001$.",
-        "Subtract the total failure probability from 1 to find the success probability: $1 - 0.001$."
+        "The probability that one computer fails: $1 - 0.9 = 0.1$.",
+        "The probability that all three fail: $0.1 \\times 0.1 \\times 0.1 = 0.001$.",
+        "The probability that the system works: $P_{sys} = 1 - 0.001$."
       ],
-      resultFormula: "P_{sys} = 0.999 \\text{ (99.9\\%)}"
+      resultFormula: "P_{sys} = 0.999 \\text{, or } 99.9\\%"
     },
     practiceProblems: [
       {
@@ -2219,7 +2224,7 @@ The topics in these notes follow the Department for Education document below.
         answer: "3 valves (1 − 0.5³ = 0.875)"
       },
     ],
-    realWorldConnection: "The Space Shuttle flew with four redundant flight computers processing the same data, plus a fifth backup computer running independently written software, so that no single computer failure could endanger the vehicle.",
+    realWorldConnection: "The Space Shuttle flew with five flight computers. Four ran the same software and checked each other's results, and the fifth ran separately written backup software, so that one computer failing would not put the crew in danger.",
     textbookContent: `
 ## Probability
 
@@ -2231,7 +2236,7 @@ When all the outcomes are equally likely:
 
 $$P(\\text{event}) = \\frac{\\text{number of outcomes in the event}}{\\text{total number of outcomes}}$$
 
-A bag holds 3 red and 5 blue counters. $P(\\text{red}) = \\dfrac{3}{8}$.
+A bag holds 2 green and 7 yellow counters. $P(\\text{green}) = \\dfrac{2}{9}$.
 
 ### All the outcomes add up to 1
 
@@ -2239,7 +2244,7 @@ The probabilities of all the possible outcomes add up to 1. So the probability t
 
 $$P(\\text{not } A) = 1 - P(A)$$
 
-If the chance of rain is 0.3, the chance of no rain is 0.7.
+If the chance that a radio message is lost is 0.05, the chance that it gets through is 0.95.
 
 ### Either one or the other: add
 
@@ -2265,11 +2270,11 @@ A tree diagram shows two or more events one after another. Each event branches i
 
 If you take a counter and do not put it back, the second pick depends on the first. These events are **dependent**: the probabilities on the second branches change.
 
-With 3 red and 5 blue counters, taking two without replacement:
+With 2 green and 7 yellow counters, taking two without replacement:
 
-$$P(\\text{red, then red}) = \\frac{3}{8} \\times \\frac{2}{7} = \\frac{6}{56} = \\frac{3}{28}$$
+$$P(\\text{green, then green}) = \\frac{2}{9} \\times \\frac{1}{8} = \\frac{2}{72} = \\frac{1}{36}$$
 
-After the first red there are 2 reds left out of 7 counters.
+After the first green there is 1 green left out of 8 counters.
 
 ### Assumptions
 
@@ -2277,12 +2282,15 @@ Calculations like these assume things: that a coin is fair, that picks are rando
 
 ### Backups in spacecraft
 
-Engineers make spacecraft reliable by adding backups that work in parallel. The system fails only if **every** copy fails. If one flight computer fails with probability 0.1, and three independent computers are fitted:
+Engineers make spacecraft reliable by fitting backups that work side by side (in parallel). The system fails only if every copy fails. With $n$ copies that each work with probability $p$, and fail independently:
 
-1.  $P(\\text{all three fail}) = 0.1 \\times 0.1 \\times 0.1 = 0.001$
-2.  $P(\\text{the system works}) = 1 - 0.001 = 0.999$
+$$P_{sys} = 1 - (1 - p)^n$$
 
-Three computers that are each 90% reliable together give a system that is 99.9% reliable, as long as their failures are independent.
+The worked example shows three computers that are each 90% reliable giving a system that is 99.9% reliable. That only holds if their failures really are independent. Copies that share a power supply, or the same fault in their software, can fail together.
+
+### Next on the journey
+
+The spacecraft now has power, can send its data home, and is built to keep working. Next it looks outwards. What can the light from a distant star tell us? The next mission begins by splitting light with a prism.
 
 ### Sources
 
