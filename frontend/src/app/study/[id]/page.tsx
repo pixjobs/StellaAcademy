@@ -9,13 +9,15 @@ import { Rich, Tex } from '@/components/paper/maths';
 import { SkyBand } from '@/components/Sky';
 import LessonIntro from '@/components/study/LessonIntro';
 import LessonModel from '@/components/study/LessonModel';
+import ReportProblem from '@/components/study/ReportProblem';
 import TrackedDetails from '@/components/study/TrackedDetails';
 import SupportLink from '@/components/SupportLink';
 import { MarkDone } from '@/components/journey/MissionSteps';
 import { summaryOf } from '@/lib/lessons';
 import { INTROS } from '@/lib/intros';
 import { placeOf, stepAfter } from '@/lib/missions';
-import { levelAges, levelLabel, subjectOf, SUBJECT_LABEL } from '@/lib/levels';
+import { CURRICULUM, CURRICULUM_CHECKED, CURRICULUM_SOURCES } from '@/lib/curriculum';
+import { levelAges, levelLabel, searchLabel, subjectOf, SUBJECT_LABEL } from '@/lib/levels';
 import { PAPER_SUBJECT } from '@/lib/paper';
 import { SITE_NAME, SITE_URL, supportEnabled } from '@/lib/site';
 import { studyModules, type ConceptId } from '@/lib/study-modules';
@@ -32,12 +34,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const mod = studyModules.find((m) => m.id === id);
   if (!mod) return {};
-  const description = `${mod.subtitle} Free ${levelLabel(mod.id as ConceptId)} lesson with an interactive model, a worked example and practice questions (about ${mod.estimatedMinutes} minutes).`;
+  // The topic and level people search for come first; the site name last.
+  const kind = searchLabel(mod.id as ConceptId, mod.category);
+  const title = `${mod.title} | ${kind.charAt(0).toUpperCase()}${kind.slice(1)}`;
+  const description = `${mod.subtitle} Free interactive ${kind}: a model to try, a worked example and practice questions.`;
+  // Search results cut titles at about 60 characters, so the site name goes on only where there is room.
+  const withSite = `${title} | ${SITE_NAME}`;
+  const image = { url: '/opengraph-image.png', width: 1200, height: 630, alt: SITE_NAME };
   return {
-    title: { absolute: `${mod.title} | ${SITE_NAME}` },
+    title: { absolute: withSite.length <= 62 ? withSite : title },
     description,
     alternates: { canonical: `/study/${mod.id}` },
-    openGraph: { title: `${mod.title} | ${SITE_NAME}`, description, url: `${SITE_URL}/study/${mod.id}`, type: 'article' },
+    openGraph: { title, description, url: `${SITE_URL}/study/${mod.id}`, type: 'article', siteName: SITE_NAME, locale: 'en_GB', images: [image] },
+    twitter: { card: 'summary_large_image', title, description, images: [image.url] },
   };
 }
 
@@ -64,6 +73,8 @@ export default async function LessonPage({ params }: Props) {
   const next = after ? summaryOf(after.lesson) : null;
   const accent = { '--diagram-accent': subject.ink } as CSSProperties;
   const intro = INTROS[lesson.id];
+  const curriculum = CURRICULUM[lesson.id];
+  const sources = [...new Set(curriculum.statements.map((s) => s.source))];
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -77,6 +88,24 @@ export default async function LessonPage({ params }: Props) {
     educationalLevel: level,
     timeRequired: `PT${lesson.estimatedMinutes}M`,
     provider: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL },
+    teaches: lesson.title,
+    educationalAlignment: sources.map((key) => ({
+      '@type': 'AlignmentObject',
+      alignmentType: 'educationalLevel',
+      educationalFramework: 'National curriculum and subject content for England (Department for Education)',
+      targetName: curriculum.stage,
+      targetUrl: CURRICULUM_SOURCES[key].url,
+    })),
+    about: { '@type': 'Thing', name: SUBJECT_LABEL[subjectOf(lesson.category)] },
+    ...(place ? { isPartOf: { '@type': 'Course', name: `${place.mission.title} (Stella's journey)`, url: `${SITE_URL}/journey#${place.mission.id}`, provider: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL }, description: place.mission.goal } } : {}),
+  };
+  const breadcrumbLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Lessons', item: `${SITE_URL}/study` },
+      { '@type': 'ListItem', position: 2, name: lesson.title, item: `${SITE_URL}/study/${lesson.id}` },
+    ],
   };
 
   const jump = [
@@ -84,13 +113,14 @@ export default async function LessonPage({ params }: Props) {
     { href: '#example', label: 'Worked example' },
     { href: '#practice', label: 'Practice' },
     ...(lesson.textbookContent ? [{ href: '#notes', label: 'Notes' }] : []),
+    { href: '#curriculum', label: 'Curriculum' },
   ];
 
   return (
     <article>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify([jsonLd, breadcrumbLd]).replace(/</g, '\\u003c') }}
       />
 
       <SkyBand>
@@ -251,6 +281,41 @@ export default async function LessonPage({ params }: Props) {
                 <MarkdownRenderer>{lesson.textbookContent}</MarkdownRenderer>
               </Section>
             )}
+
+            <Section id="curriculum" title="Where this fits in the curriculum">
+              <p className="text-lg text-[var(--ink)]">
+                <strong>{curriculum.stage}</strong> in the curriculum for England.
+              </p>
+              <p className="mt-2 text-[var(--ink-soft)]">The Department for Education says pupils should be taught to:</p>
+              <ul className="mt-4 space-y-3">
+                {curriculum.statements.map((statement, i) => (
+                  <li key={i} className="rounded-2xl border border-[var(--rule)] bg-[var(--paper)] p-4">
+                    <p className="text-sm font-semibold" style={{ color: subject.ink }}>{statement.where}</p>
+                    <blockquote className="mt-1 text-[var(--ink)]">&ldquo;{statement.text}&rdquo;</blockquote>
+                  </li>
+                ))}
+              </ul>
+              {curriculum.note && <p className="mt-4 leading-relaxed text-[var(--ink)]">{curriculum.note}</p>}
+              <p className="mt-4 text-[15px] leading-relaxed text-[var(--ink-soft)]">
+                Quoted from{' '}
+                {sources.map((key, i) => (
+                  <span key={key}>
+                    {i > 0 && (i === sources.length - 1 ? ' and ' : ', ')}
+                    <a
+                      href={CURRICULUM_SOURCES[key].url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-semibold text-[var(--action)] underline decoration-2 underline-offset-4 hover:text-[var(--action-hover)]"
+                    >
+                      {CURRICULUM_SOURCES[key].title}
+                    </a>
+                  </span>
+                ))}{' '}
+                (Department for Education, gov.uk), checked on {CURRICULUM_CHECKED}. This is the content every exam
+                board has to cover. It is not one board&rsquo;s specification, so use your own for exactly what is
+                examined.
+              </p>
+            </Section>
           </div>
         </div>
 
@@ -290,6 +355,7 @@ export default async function LessonPage({ params }: Props) {
               This lesson was written with AI assistance. Check formulas and figures against your textbook or exam
               board&rsquo;s specification before relying on them in assessed work.
             </p>
+            <ReportProblem lesson={lesson.id} />
           </div>
         </div>
       </div>

@@ -3,7 +3,8 @@ import type { ReactNode } from 'react';
 
 export const metadata: Metadata = {
   title: 'NASA image gallery',
-  description: 'Search the NASA image library and see the Astronomy Picture of the Day.',
+  description:
+    'Search the NASA Image and Video Library: nebulae, rockets, rovers, planets and the people who fly to them, each with NASA\u2019s own description.',
   alternates: { canonical: '/gallery' },
 };
 

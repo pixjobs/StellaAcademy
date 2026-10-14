@@ -8,8 +8,9 @@ space.
 
 ## What is on the site
 
-- **29 lessons** in three levels: Foundations (ages 9 to 13), GCSE (ages 14 to 16) and A-level (ages 16 and up). The
-  levels are an editorial guide and are not aligned to any exam board. Each lesson has a short explanation, a model to
+- **29 lessons** in four stages: key stage 2 (ages 9 to 11), key stage 3 (11 to 14), GCSE (14 to 16) and A-level
+  (16 to 18). Each lesson quotes the Department for Education curriculum statements it covers
+  (`frontend/src/lib/curriculum.ts`); it is not matched to one exam board. Each lesson has a short explanation, a model to
   play with, a worked example and practice questions.
 - **Stella's journey** (`/journey`): the lessons arranged as five missions, from number skills to reading starlight.
   Progress is ticked off by the learner and kept in their own browser.
@@ -17,7 +18,7 @@ space.
   lesson. Six other lessons have a short piece of real footage behind a "See it for real" button.
 - **NASA image gallery** (`/gallery`): a search of the NASA Image and Video Library.
 
-There are no accounts and no AI tutor at present. (`docs/roadmap.md` dates from the earlier build and is out of date.)
+There are no accounts and no AI tutor at present. Both are planned: see `docs/roadmap.md`.
 
 The lessons were drafted with AI and have been checked for arithmetic and for errors of explanation
 (`docs/content-audit.md`), but they have not yet been reviewed by a teacher.

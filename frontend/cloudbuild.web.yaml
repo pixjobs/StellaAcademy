@@ -44,12 +44,13 @@ steps:
       - --project=${PROJECT_ID}
       - --region=${_REGION}
       - --allow-unauthenticated
-      - --set-env-vars=USE_APOD_BG=true,NODE_ENV=production
+      - --set-env-vars=NODE_ENV=production
       - --cpu=1
       - --memory=512Mi
       - --concurrency=40
-      - --max-instances=10
-      - --timeout=600
+      # Three instances serve 120 visitors at once, and cap the bill if the site is flooded.
+      - --max-instances=3
+      - --timeout=60
       - --cpu-boost
       - --execution-environment=gen2
 images:

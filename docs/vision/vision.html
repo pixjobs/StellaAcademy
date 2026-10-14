@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<title>Stella Academy: the vision</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inclusive+Sans:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  :root {
+    --night: #05081a; --navy: #0b1026; --sheet: #111a3b; --rule: #2a3566;
+    --ink: #eef1fb; --soft: #b9c2e4; --gold: #f6c453; --peri: #a5b4fc; --sky: #7dd3fc;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { font-family: 'Inclusive Sans', sans-serif; color: var(--ink); background: var(--night); font-size: 13.5pt; line-height: 1.5; }
+  .page { width: 297mm; height: 210mm; position: relative; overflow: hidden; page-break-after: always; background: #070b1d; padding: 17mm 20mm 16mm; }
+  .page:last-child { page-break-after: auto; }
+  h1, h2, h3 { font-family: 'Fraunces', serif; font-weight: 600; letter-spacing: -0.02em; line-height: 1.08; color: #fff; }
+  h2 { font-size: 30pt; max-width: 200mm; }
+  h3 { font-size: 15pt; letter-spacing: -0.01em; line-height: 1.2; }
+  p { max-width: 62ch; }
+  .lead { font-size: 15.5pt; color: var(--ink); margin-top: 6mm; max-width: 58ch; }
+  .soft { color: var(--soft); }
+  .gold { color: var(--gold); }
+  .foot { position: absolute; left: 20mm; right: 20mm; bottom: 8mm; display: flex; justify-content: space-between; font-size: 9.5pt; color: #8490bd; }
+  .cols { display: grid; gap: 10mm; margin-top: 8mm; }
+  .two { grid-template-columns: 1fr 1fr; }
+  .shot { border-radius: 4mm; border: 0.3mm solid var(--rule); display: block; width: 100%; }
+  .cap { font-size: 10pt; color: #8490bd; margin-top: 2mm; }
+  ul.plain { list-style: none; padding: 0; }
+  ul.plain li { padding: 3.2mm 0; border-top: 0.25mm solid var(--rule); }
+  ul.plain li:first-child { border-top: 0; padding-top: 0; }
+  ul.plain b { color: #fff; font-weight: 400; font-family: 'Fraunces', serif; font-size: 14.5pt; display: block; margin-bottom: 0.6mm; }
+  .card { background: var(--sheet); border: 0.3mm solid var(--rule); border-radius: 4mm; padding: 6mm 6.5mm; }
+  .card p { font-size: 12pt; color: var(--soft); margin-top: 2mm; }
+
+  /* cover */
+  .cover { background: linear-gradient(180deg, #05081a 0%, #0b1026 58%, #1a2060 100%); padding: 0; }
+  .cover svg.sky { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .cover .inner { position: absolute; left: 24mm; right: 24mm; top: 40mm; }
+  .cover .mark { display: flex; align-items: center; gap: 5mm; font-family: 'Fraunces', serif; font-weight: 600; font-size: 20pt; color: #fff; }
+  .cover h1 { font-size: 52pt; margin-top: 16mm; max-width: 250mm; line-height: 1.02; letter-spacing: -0.028em; }
+  .cover .sub { font-size: 17pt; color: #e2e8f0; margin-top: 8mm; max-width: 50ch; }
+  .cover .date { position: absolute; left: 24mm; bottom: 42mm; font-size: 12pt; color: #cbd5f5; }
+
+  /* route */
+  .route { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5mm; margin-top: 9mm; }
+  .stop { background: var(--sheet); border: 0.3mm solid var(--rule); border-radius: 4mm; padding: 5mm 5mm 5.5mm; }
+  .stop .n { width: 11mm; height: 11mm; border-radius: 50%; border: 0.5mm solid rgba(255,255,255,.5); display: grid; place-items: center; font-family: 'Fraunces', serif; font-size: 14pt; color: #fff; }
+  .stop:first-child .n { background: var(--gold); border-color: var(--gold); color: var(--navy); }
+  .stop h3 { margin-top: 4mm; }
+  .stop p { font-size: 11pt; color: var(--soft); margin-top: 1.5mm; }
+  .stop .count { font-size: 10.5pt; color: var(--gold); margin-top: 3mm; }
+
+  table { border-collapse: collapse; width: 100%; margin-top: 8mm; font-size: 12pt; }
+  th { text-align: left; font-weight: 400; color: #8490bd; font-size: 10.5pt; padding: 0 4mm 2.5mm 0; border-bottom: 0.3mm solid var(--rule); }
+  td { vertical-align: top; padding: 3.4mm 4mm 3.4mm 0; border-bottom: 0.25mm solid var(--rule); color: var(--soft); }
+  td:first-child { color: #fff; font-family: 'Fraunces', serif; font-size: 13.5pt; white-space: nowrap; }
+  td.when { white-space: nowrap; color: var(--gold); }
+</style>
+</head>
+<body>
+
+<!-- 1. Cover -->
+<section class="page cover">
+  <svg class="sky" viewBox="0 0 1188 840" preserveAspectRatio="none" aria-hidden="true">
+    <g id="stars"></g>
+    <path d="M0 840 V770 Q594 640 1188 770 V840 Z" fill="#070b1d"/>
+    <path d="M0 770 Q594 640 1188 770" fill="none" stroke="#7dd3fc" stroke-opacity="0.55" stroke-width="2"/>
+    <path d="M0 763 Q594 633 1188 763" fill="none" stroke="#7dd3fc" stroke-opacity="0.16" stroke-width="10"/>
+  </svg>
+  <div class="inner">
+    <div class="mark">
+      <svg width="54" height="54" viewBox="0 0 48 48"><circle cx="24" cy="24" r="22" fill="#F6C453"/><path d="M41.5 24C33 25 25 33 24 41.5C23 33 15 25 6.5 24C15 23 23 15 24 6.5C25 15 33 23 41.5 24Z" fill="#0B1026"/></svg>
+      Stella Academy
+    </div>
+    <h1>Learn the physics and maths<br>it takes to get to space</h1>
+    <p class="sub">What we have built, where it is going, and how teachers and partners can shape it.</p>
+  </div>
+  <p class="date">The vision, October 2026 &nbsp;·&nbsp; www.stella-academy.org</p>
+</section>
+
+<!-- 2. The idea -->
+<section class="page">
+  <h2>Most children meet physics as a list of topics. We give it a destination.</h2>
+  <div class="cols two">
+    <div>
+      <p class="lead" style="margin-top:0">Stella Academy teaches physics and maths as one journey: from first number skills to reading the light of distant stars. Every lesson answers a question a real space mission has to answer.</p>
+      <p class="soft" style="margin-top:5mm">How fast must a rocket go to stay up? Why does a spacecraft need trigonometry to know where it is? How does a signal cross the solar system? What can a rainbow tell you about a star?</p>
+      <p class="soft" style="margin-top:5mm">The syllabus is the same one schools already teach. What changes is the reason to care about it.</p>
+    </div>
+    <div>
+      <img class="shot" src="shots/journey.png" alt="Stella's journey: five missions shown as a route across the night sky">
+      <p class="cap">Stella&rsquo;s journey, as a learner sees it: five missions in order.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Stella Academy: the vision</span><span>2</span></div>
+</section>
+
+<!-- 3. The five missions -->
+<section class="page">
+  <h2>Five missions, 29 lessons</h2>
+  <p class="lead">For ages 9 and up. Each mission is a short run of lessons in order, and each lesson takes 10 to 20 minutes.</p>
+  <div class="route">
+    <div class="stop"><div class="n">1</div><h3>Build your toolkit</h3><p>The number skills every other mission relies on.</p><p class="count">9 lessons</p></div>
+    <div class="stop"><div class="n">2</div><h3>Get to orbit</h3><p>What it takes to leave the ground and stay up.</p><p class="count">6 lessons</p></div>
+    <div class="stop"><div class="n">3</div><h3>Navigate</h3><p>The maths of knowing where you are and where you are heading.</p><p class="count">6 lessons</p></div>
+    <div class="stop"><div class="n">4</div><h3>Talk to the spacecraft</h3><p>How a spacecraft is powered, and how it sends word home.</p><p class="count">4 lessons</p></div>
+    <div class="stop"><div class="n">5</div><h3>Read the starlight</h3><p>What light and data tell us about things too far away to visit.</p><p class="count">4 lessons</p></div>
+  </div>
+  <div class="cols two" style="margin-top:9mm">
+    <p class="soft">Lessons follow the stages of the curriculum for England: key stage 2 (ages 9 to 11), key stage 3 (11 to 14), GCSE (14 to 16) and A-level (16 to 18). Each one quotes the Department for Education statements it covers. They are not matched to a single exam board.</p>
+    <p class="soft">Learners tick lessons off as they go, and the star moves along the route. Progress is kept in their own browser; there are no accounts.</p>
+  </div>
+  <div class="foot"><span>Stella Academy: the vision</span><span>3</span></div>
+</section>
+
+<!-- 4. What a lesson is -->
+<section class="page">
+  <h2>Every idea is something you can try</h2>
+  <div class="cols two">
+    <div>
+      <img class="shot" src="shots/waves-top.png" alt="A lesson page: a wave model with sliders beside the explanation and formula">
+      <p class="cap">A GCSE lesson on waves. The model on the left responds as you change it.</p>
+    </div>
+    <div>
+      <ul class="plain">
+        <li><b>A model to play with</b><span class="soft">Change one thing and watch the rest: a wave, a circuit, a prism, an orbit.</span></li>
+        <li><b>A short explanation</b><span class="soft">The idea and its formula, in plain words, with the maths set properly.</span></li>
+        <li><b>A worked example</b><span class="soft">One problem solved step by step.</span></li>
+        <li><b>Practice questions</b><span class="soft">With hints and answers to check against.</span></li>
+        <li><b>Real footage where it helps</b><span class="soft">Eight short NASA clips, each credited: a launch, a booster separating, parachutes opening, a rover driving on Mars.</span></li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot"><span>Stella Academy: the vision</span><span>4</span></div>
+</section>
+
+<!-- 5. Honest position -->
+<section class="page">
+  <h2>Small on purpose</h2>
+  <div class="cols two">
+    <div>
+      <p class="lead" style="margin-top:0">We are not trying to be Brilliant, Bitesize or Isaac Physics. They cover everything, with teams and budgets to match. We cover one theme and try to do it well.</p>
+      <p class="soft" style="margin-top:5mm">That makes Stella a companion to what schools already use: the thing a teacher shows at the start of a topic, or a parent hands to a child who has asked how rockets work.</p>
+      <img class="shot" src="shots/home-orbit.png" alt="The orbit simulator on the home page" style="margin-top:7mm; width:86%">
+      <p class="cap">The home page: choose a speed, launch, and see whether you reach orbit.</p>
+    </div>
+    <div>
+      <h3 class="gold" style="margin-bottom:4mm">Where things stand today</h3>
+      <ul class="plain">
+        <li><b>Live and free to use</b><span class="soft">29 lessons at www.stella-academy.org, open to anyone.</span></li>
+        <li><b>Drafted with AI, then checked</b><span class="soft">Every lesson has been audited for arithmetic and for errors of explanation, and corrected. Each lesson says so.</span></li>
+        <li><b>Not yet reviewed by a teacher</b><span class="soft">This is the biggest gap, and the main reason for this document.</span></li>
+        <li><b>Run by one person</b><span class="soft">Independent, with no company or charity behind it yet. Not part of NASA and not endorsed by it.</span></li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot"><span>Stella Academy: the vision</span><span>5</span></div>
+</section>
+
+<!-- 6. Where it goes -->
+<section class="page">
+  <h2>Where it goes from here</h2>
+  <p class="lead">Slowly, and only as far as each step earns. Nothing is built until the step before it has shown it is wanted.</p>
+  <table>
+    <tr><th>Step</th><th>What happens</th><th>We move on when</th></tr>
+    <tr><td>1. Written with teachers</td><td>Teachers review the lessons at their level. A reviewed lesson names its reviewer; the rest keep the AI notice.</td><td class="when">lessons carry a teacher&rsquo;s name</td></tr>
+    <tr><td>2. Used in a classroom</td><td>One mission tried with a class or club, with a pack to go with it: lesson plan, worksheet, slides.</td><td class="when">a teacher would use it again</td></tr>
+    <tr><td>3. Somewhere to keep progress</td><td>Optional accounts, created by an adult for younger children, so progress follows a learner between devices.</td><td class="when">families ask for it</td></tr>
+    <tr><td>4. Paying its own way</td><td>The lessons stay free. Income comes from voluntary support, teaching packs, and later a paid tier for saved progress, marking and a tutor.</td><td class="when">it covers its costs</td></tr>
+  </table>
+  <p class="soft" style="margin-top:7mm; max-width:90ch">We charge only for our own work. NASA&rsquo;s photographs and footage stay in the free lessons, credited to their source.</p>
+  <div class="foot"><span>Stella Academy: the vision</span><span>6</span></div>
+</section>
+
+<!-- 7. How you can help -->
+<section class="page">
+  <h2>How you can help shape it</h2>
+  <div class="cols" style="grid-template-columns: repeat(3, 1fr); margin-top: 10mm">
+    <div class="card"><h3>If you teach physics or maths</h3><p>Read two or three lessons at your level and tell us what is wrong, what is pitched badly and what is missing. About 20 minutes a lesson. Your name goes on the lessons you review, if you want it there.</p></div>
+    <div class="card"><h3>If you run a class or a club</h3><p>Try one mission with your group and tell us what happened. &ldquo;Get to orbit&rdquo; is six lessons and ends with a launch simulator.</p></div>
+    <div class="card"><h3>If you work in outreach</h3><p>We are looking for a university or school partner to apply with for public-engagement funding, with Stella as the delivery partner.</p></div>
+  </div>
+  <div class="cols two" style="margin-top: 11mm; align-items: end">
+    <div>
+      <h3 class="gold">What you get back</h3>
+      <p class="soft" style="margin-top:2.5mm">A named credit, a say in what is built next, and every teaching pack free. There is no budget for fees yet; review time is the first thing a grant would pay for.</p>
+    </div>
+    <div>
+      <h3 class="gold">Start here</h3>
+      <p style="margin-top:2.5mm; font-size:16pt; color:#fff">www.stella-academy.org</p>
+      <p class="soft" style="font-size:11.5pt; margin-top:1mm">Try the journey at /journey, then get in touch: <span style="color:#fff">hello@pixjobs.com</span></p>
+    </div>
+  </div>
+  <div class="foot"><span>Stella Academy is an independent project. It is not part of NASA and is not endorsed by it.</span><span>7</span></div>
+</section>
+
+<script>
+  // The same seeded sky as the site.
+  let seed = 20261011; const r = () => (seed = (seed * 1664525 + 1013904223) % 4294967296) / 4294967296;
+  let s = '';
+  for (let i = 0; i < 190; i++) { const big = r() > 0.9; s += `<circle cx="${(r() * 1188).toFixed(1)}" cy="${(r() * 700).toFixed(1)}" r="${(big ? 1.5 + r() : 0.5 + r() * 0.8).toFixed(2)}" fill="${r() > 0.82 ? '#fde9b0' : '#fff'}" opacity="${(0.35 + r() * 0.6).toFixed(2)}"/>`; }
+  document.getElementById('stars').innerHTML = s;
+</script>
+</body>
+</html>

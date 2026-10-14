@@ -19,14 +19,24 @@ export default async function HomePage() {
   // getApod falls back to a local image when NASA has no real picture; only name the picture when it is real.
   const apodTitle = apod && apod.bgUrl !== '/bg.jpg' ? apod.title : null;
 
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'WebSite',
-    name: SITE_NAME,
-    url: SITE_URL,
-    description: SITE_DESCRIPTION,
-    inLanguage: 'en-GB',
-  };
+  const jsonLd = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: SITE_NAME,
+      url: SITE_URL,
+      description: SITE_DESCRIPTION,
+      inLanguage: 'en-GB',
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'EducationalOrganization',
+      name: SITE_NAME,
+      url: SITE_URL,
+      logo: `${SITE_URL}/apple-icon.png`,
+      description: SITE_DESCRIPTION,
+    },
+  ];
 
   return (
     <>
@@ -82,8 +92,8 @@ export default async function HomePage() {
             Or pick by level
           </h2>
           <p className="mt-3 max-w-2xl text-lg leading-relaxed text-[var(--ink-soft)]">
-            Pick the level that suits you, whatever your age. The levels are our guide to difficulty and are not
-            matched to one exam board, so check your own specification if you are revising for an exam.
+            Pick the stage that suits you, whatever your age. Each lesson is matched to the national curriculum
+            for England, not to one exam board, so check your own specification if you are revising for an exam.
           </p>
           <div className="mt-8">
             <LevelCards lessons={lessonSummaries} />

@@ -6,7 +6,7 @@ import { summaryOf } from '@/lib/lessons';
 import { MISSIONS } from '@/lib/missions';
 
 export const metadata: Metadata = {
-  title: "Stella's journey",
+  title: "Stella's journey: physics and maths in five space missions",
   description:
     'Follow five missions through physics and maths, from first number skills to reading starlight. Each mission is a short run of interactive lessons in order.',
   alternates: { canonical: '/journey' },

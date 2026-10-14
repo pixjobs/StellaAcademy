@@ -38,6 +38,43 @@ gcloud run services describe stella-web --project=stella-academy --region=europe
 curl -s https://www.stella-academy.org/api/health
 ```
 
+## Read problem reports
+
+The "Report a problem" form on each lesson writes one log line per report to Cloud Logging (`/api/report`), routed
+to the `stella-reports` bucket in europe-west1 (see "Privacy set-up for reports" below). Nothing else stores them.
+List the last 30 days with the command at the end of that section.
+
+Logs are kept for 30 days, so copy anything worth keeping into Jira (project KAN), without any personal details a
+reader may have typed.
+
+### Privacy set-up for reports (applied 14 October 2026)
+
+`docs/privacy/dpia-report-form.md` asks for these two changes to logging. They were applied on 14 October 2026; they
+are kept here so they can be re-created:
+
+```bash
+# 1. Keep Cloud Run's request log (IP address, browser) for /api/report out of Cloud Logging,
+#    so a report cannot be matched to the address that sent it.
+gcloud logging sinks update _Default --project=stella-academy \
+  --add-exclusion=name=no-report-requests,filter='logName="projects/stella-academy/logs/run.googleapis.com%2Frequests" AND httpRequest.requestUrl:"/api/report"'
+
+# 2. Keep reports in a bucket in Europe for 30 days, and out of the global _Default bucket.
+gcloud logging buckets create stella-reports --project=stella-academy --location=europe-west1 --retention-days=30
+gcloud logging sinks create stella-reports \
+  logging.googleapis.com/projects/stella-academy/locations/europe-west1/buckets/stella-reports \
+  --project=stella-academy --log-filter='jsonPayload.type="lesson_report"'
+gcloud logging sinks update _Default --project=stella-academy \
+  --add-exclusion=name=no-lesson-reports,filter='jsonPayload.type="lesson_report"'
+```
+
+After step 2, read reports from the new bucket:
+
+```bash
+gcloud logging read 'jsonPayload.type="lesson_report"' --project=stella-academy --freshness=30d \
+  --bucket=stella-reports --location=europe-west1 --view=_AllLogs \
+  --format='table(timestamp, jsonPayload.lesson, jsonPayload.kind, jsonPayload.text)'
+```
+
 ## Roll back
 
 ```bash

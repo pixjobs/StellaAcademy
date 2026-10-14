@@ -42,8 +42,10 @@ export default function AboutPage() {
                   ))}
                 </ul>
                 <p>
-                  The ages are a guide, not a rule. The levels are our own judgement of difficulty and are not matched
-                  to one exam board, so your own specification is the authority on what you need to know.
+                  The ages are the usual ones for each stage, not a rule. Every lesson is matched to the Department
+                  for Education&rsquo;s national curriculum or its GCSE and A-level subject content, and quotes the
+                  statements it covers. That is the content every exam board must include; it is not one
+                  board&rsquo;s specification, so your own remains the authority on what you need to know.
                 </p>
               </div>
             </section>
@@ -97,7 +99,11 @@ export default function AboutPage() {
             <Block title="Cost and privacy">
               <p>
                 The lessons are free to use. We use Google Analytics to see which lessons are useful, and it only sets
-                cookies if you accept them in the banner.
+                cookies if you accept them in the banner.{' '}
+                <Link href="/privacy" className={linkClass}>
+                  Read the privacy policy
+                </Link>
+                .
               </p>
               {supportEnabled && (
                 <>
