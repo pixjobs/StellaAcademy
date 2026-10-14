@@ -29,7 +29,7 @@ export const INTROS: Partial<Record<ConceptId, LessonIntro>> = {
   },
   gears: {
     caption:
-      'Mars, July 2021. The Perseverance rover’s navigation camera during a drive across Jezero Crater, sped up. Each of its six wheels has its own motor, geared right down: plenty of torque to climb rocks, and a top speed of about 150 metres an hour.',
+      'Mars, July 2021. The Perseverance rover’s navigation camera during a drive across Jezero Crater, sped up. Each of its six wheels has its own motor, geared right down: plenty of turning force to climb rocks, and a top speed of about 150 metres an hour.',
     alt: 'A black and white view of a rocky Martian plain moving past as the rover drives.',
     credit: 'NASA/JPL-Caltech',
   },

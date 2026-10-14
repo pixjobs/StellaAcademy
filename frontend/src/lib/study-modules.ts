@@ -113,7 +113,7 @@ export const studyModules: StudyModule[] = [
       {
         stepNumber: 1,
         title: 'Every mass attracts every other mass',
-        content: 'Any two masses pull on each other. The pull is bigger when either mass is bigger: double one of the masses and the force doubles.',
+        content: 'Any two masses pull on each other. The pull is bigger when either mass is bigger: the force is proportional to each mass.',
         keyInsight: 'Gravity only ever pulls. It never pushes masses apart.',
         relatedVariables: ['M', 'm']
       },
@@ -127,9 +127,16 @@ export const studyModules: StudyModule[] = [
       {
         stepNumber: 3,
         title: 'Orbiting is falling',
-        content: 'A satellite in orbit is falling towards Earth the whole time, but it moves sideways so fast that the ground curves away beneath it as quickly as it falls.',
+        content: 'A satellite in orbit is falling towards Earth the whole time, but it moves sideways so fast that the ground curves away beneath it as quickly as it falls. The speed needed for a circular orbit of radius $r$ is $v = \\sqrt{GM/r}$.',
         keyInsight: 'An orbit is a fall that never reaches the ground.',
         relatedVariables: ['F']
+      },
+      {
+        stepNumber: 4,
+        title: 'Field strength and weight',
+        content: 'Field strength, $g$, is the pull of gravity on each kilogram. At Earth\'s surface it is 9.81 N/kg, so an object of mass $m$ has a weight of $W = mg$.',
+        keyInsight: 'Weight is a force, in newtons. Mass is in kilograms.',
+        relatedVariables: ['F', 'm']
       }
     ],
     solvedExample: {
@@ -195,7 +202,7 @@ $$F = \\frac{GMm}{r^2}$$
 *   $r$ is the distance between their **centres**, in metres.
 *   $G = 6.67 \\times 10^{-11}$ N m² kg⁻² is the gravitational constant.
 
-The force is always attractive. It follows an **inverse square law**: double the distance and the force falls to a quarter; triple it and the force falls to a ninth.
+The force is always attractive. It follows an **inverse square law**: double the distance and the force falls to a quarter.
 
 ### Field strength around a planet
 
@@ -207,7 +214,7 @@ $$g = \\frac{GM}{r^2}$$
 
 $$g = \\frac{6.67 \\times 10^{-11} \\times 5.97 \\times 10^{24}}{(6.37 \\times 10^6)^2} = 9.81 \\text{ N/kg}$$
 
-At the height of the International Space Station, about 400 km up, $r = 6.77 \\times 10^6$ m and $g$ is still 8.7 N/kg. Gravity has hardly weakened. Astronauts float because they and the station are falling together, not because gravity has gone.
+At the height of the International Space Station, about 400 km up, $r = 6.77 \\times 10^6$ m and $g$ is still 8.7 N/kg. Gravity has hardly weakened, so why do astronauts float? Practice question 6 asks exactly that.
 
 ### Why a satellite stays up
 
@@ -456,14 +463,14 @@ The topics in these notes follow the Department for Education documents below.
       {
         symbol: 'N_{\\text{driven}}',
         name: 'Teeth on the driven gear',
-        unit: 'a count',
+        unit: 'teeth',
         description: 'The gear that is turned by the other one.',
         color: 'text-orange-400'
       },
       {
         symbol: 'N_{\\text{driver}}',
         name: 'Teeth on the driver gear',
-        unit: 'a count',
+        unit: 'teeth',
         description: 'The gear turned by the motor, the pedals or your hand.',
         color: 'text-yellow-400'
       },
@@ -487,7 +494,7 @@ The topics in these notes follow the Department for Education documents below.
         stepNumber: 1,
         title: 'Meshing gears pass on a turning effect',
         content: 'A gear is a wheel with teeth around its edge. When two gears mesh and the driver gear turns, its teeth push on the teeth of the driven gear, so the turning effect passes from one shaft to the next.',
-        keyInsight: 'Meshing gears always turn in opposite ways.',
+        keyInsight: 'The driver gear pushes; the driven gear is pushed.',
         relatedVariables: ['\\text{Ratio}']
       },
       {
@@ -500,8 +507,8 @@ The topics in these notes follow the Department for Education documents below.
       {
         stepNumber: 3,
         title: 'Speed or turning force, not both',
-        content: 'The turning effect of a force is its moment: the force times its distance from the pivot, in newton metres (N m). When a small gear drives a large one, the large gear turns more slowly but with a larger moment.',
-        keyInsight: 'Ignoring friction, the moment is multiplied by the gear ratio and the speed is divided by it. Gears never give more of both.',
+        content: 'The turning effect of a force is its moment: the force times its distance from the pivot, measured at right angles to the force, in newton metres (N m). When a small gear drives a large one, the large gear turns more slowly but with a larger moment.',
+        keyInsight: 'Slower but stronger, or faster but weaker.',
         relatedVariables: ['\\omega_{\\text{driver}}', '\\omega_{\\text{driven}}']
       }
     ],
@@ -567,7 +574,7 @@ Gears are wheels with teeth that fit together, or **mesh**. When one gear turns,
 *   Where the teeth touch, each gear pushes on the other with the same size of force.
 *   On a larger gear that force acts further from the centre, so its moment is larger.
 *   Teeth pass the meeting point one at a time on both gears, so the gear with more teeth takes longer to go round once.
-*   Two meshing gears always turn in opposite directions.
+*   Two meshing gears with teeth on the outside turn in opposite directions.
 
 ### Gear ratio
 
@@ -586,7 +593,7 @@ A gear ratio bigger than 1 gives a larger moment but a slower turn. A ratio smal
 
 ### Where gears matter
 
-A bicycle's low gear lets you climb a hill with less push on the pedals, in exchange for more turns of them. Engineers use the same trade wherever a small motor has to move something heavy, from a car's gearbox to the wheels of a rover.
+A bicycle's low gear lets you climb a hill with less push on the pedals, in exchange for more turns of them. Engineers use the same trade wherever a small motor has to move something heavy, such as a car's gearbox.
 
 ### Sources
 
@@ -649,7 +656,7 @@ The topics in these notes follow the Department for Education documents below.
         stepNumber: 1,
         title: 'Changing orbit takes two burns',
         content: 'To climb to a higher circular orbit, a spacecraft usually makes two short engine burns, with a long coast in between. This is called a Hohmann transfer.',
-        keyInsight: 'One burn starts the climb. A second burn keeps the spacecraft at its new height.',
+        keyInsight: 'Speed up, coast, then speed up again.',
         relatedVariables: []
       },
       {
@@ -662,13 +669,13 @@ The topics in these notes follow the Department for Education documents below.
       {
         stepNumber: 3,
         title: 'The second burn',
-        content: 'At the top of the ellipse the spacecraft is moving too slowly for a circular orbit at that height. The second burn speeds it up to the right speed.',
+        content: 'At the top of the ellipse the spacecraft is moving too slowly for a circular orbit at that height. The second burn speeds it up to the right speed. Remember from gravity that lower orbits are faster: $v = \\sqrt{GM/r}$.',
         keyInsight: 'Without the second burn, the spacecraft swings back down to where it started.',
         relatedVariables: []
       }
     ],
     solvedExample: {
-      problem: 'A spacecraft is to move from a low orbit of radius 6,700 km to geostationary orbit, of radius 42,000 km. Find the semi-major axis of the transfer ellipse.',
+      problem: 'A spacecraft is to move from a low orbit of radius 6,700 km to geostationary orbit, of radius 42,000 km (about 36,000 km above the ground), where a satellite stays above one spot on the equator. Find the semi-major axis of the transfer ellipse.',
       steps: [
         'Add the radii: $6{,}700 + 42{,}000 = 48{,}700$ km.',
         'Halve the total: $a = 48{,}700 \\div 2$.'
@@ -707,7 +714,7 @@ The topics in these notes follow the Department for Education documents below.
         answer: "It becomes 8 times longer."
       },
     ],
-    realWorldConnection: 'Communications satellites that sit above one spot on the equator, about 36,000 km up, reach that height along a transfer ellipse like this one.',
+    realWorldConnection: 'Many communications satellites are launched onto a transfer ellipse like this one, then fire their own engine at its highest point to settle into geostationary orbit.',
     textbookContent: `
 ## Changing orbit
 
@@ -729,7 +736,7 @@ A spacecraft in a low orbit cannot simply point at a higher orbit and fire its e
 
 1.  **Burn 1.** The spacecraft speeds up. It is now moving too fast for its circular orbit, so it climbs away along an ellipse.
 2.  **Coast.** It travels half way round that ellipse, slowing down as it climbs, until it reaches the height of the target orbit.
-3.  **Burn 2.** At the top it is moving too slowly to stay there, so it speeds up again to match the circular speed of the new orbit.
+3.  **Burn 2.** At the top it is moving too slowly for a circular orbit at that height, so it speeds up again to match the circular speed of the new orbit.
 
 ### The transfer ellipse
 
@@ -3946,7 +3953,7 @@ The topics in these notes follow the Department for Education document below.
         symbol: 'V',
         name: 'Volume',
         unit: 'cubic metres (m³)',
-        description: 'The space the gas fills.',
+        description: 'The space the gas fills. One litre is 0.001 m³.',
         color: 'text-orange-400',
         range: { min: 1, max: 10, default: 5 }
       },
@@ -3978,33 +3985,33 @@ The topics in these notes follow the Department for Education document below.
         stepNumber: 1,
         title: 'The ideal gas model',
         content: 'Picture a gas as a huge number of tiny particles moving at random. They take up almost no room and only affect each other when they collide. Pressure is the push of these particles hitting the walls of their container.',
-        keyInsight: 'Pressure goes up when the particles hit the walls more often, or harder.',
+        keyInsight: 'Hotter gas means faster particles: their average kinetic energy is proportional to the temperature in kelvin.',
         relatedVariables: ['p', 'V']
       },
       {
         stepNumber: 2,
         title: 'One equation for pressure, volume and temperature',
         content: 'The equation $pV = nRT$ links the pressure, volume and temperature of an amount of gas. Hold one quantity steady and the others follow simple rules: at a steady temperature, $pV$ stays the same; in a fixed volume, pressure is proportional to the temperature in kelvin.',
-        keyInsight: 'Always use kelvin. Zero kelvin, absolute zero, is the lowest temperature there can be.',
+        keyInsight: 'Always use kelvin, never degrees Celsius.',
         relatedVariables: ['p', 'V', 'n', 'T']
       },
       {
         stepNumber: 3,
         title: 'Hot gas drives a rocket engine',
-        content: 'A rocket engine burns fuel in a small chamber. The gas it makes is extremely hot, and hot gas in a small space has a very high pressure. That pressure forces the gas out of the nozzle at great speed.',
-        keyInsight: 'Heat a gas without letting it expand and its pressure rises.',
+        content: 'A rocket engine burns fuel in a small chamber. Burning makes a lot of extremely hot gas in a small space, so its pressure is very high. That pressure forces the gas out of the nozzle at great speed.',
+        keyInsight: 'A lot of hot gas in a small space means a high pressure.',
         relatedVariables: ['p', 'T']
       }
     ],
     solvedExample: {
-      problem: 'A sealed tank holds 2 mol of gas at 300 K in a volume of 0.05 m³. Find the pressure. Take $R = 8.31$ J mol⁻¹ K⁻¹.',
+      problem: 'A sealed tank holds 2 mol of gas at 400 K in a volume of 0.1 m³. Find the pressure. Take $R = 8.31$ J mol⁻¹ K⁻¹.',
       steps: [
         'Rearrange $pV = nRT$ to give $p = \\dfrac{nRT}{V}$.',
-        'Substitute: $p = \\dfrac{2 \\times 8.31 \\times 300}{0.05}$.',
-        'Top line: $2 \\times 8.31 \\times 300 = 4986$.',
-        'Divide: $4986 \\div 0.05 = 99\\,720$ Pa.'
+        'Substitute: $p = \\dfrac{2 \\times 8.31 \\times 400}{0.1}$.',
+        'Top line: $2 \\times 8.31 \\times 400 = 6648$.',
+        'Divide: $6648 \\div 0.1 = 66\\,480$ Pa.'
       ],
-      resultFormula: 'p = 99\\,720 \\text{ Pa, about } 99.7 \\text{ kPa}'
+      resultFormula: 'p = 66\\,480 \\text{ Pa, about } 66.5 \\text{ kPa}'
     },
     practiceProblems: [
       {
@@ -4038,7 +4045,7 @@ The topics in these notes follow the Department for Education document below.
         answer: "The Celsius scale has an arbitrary zero and can be negative, which would give zero or negative pressures. The kelvin scale starts at absolute zero, so pressure is proportional to it."
       },
     ],
-    realWorldConnection: 'The RS-25 engines that flew on the Space Shuttle, and now power NASA’s Artemis rockets, burn liquid hydrogen and oxygen at more than 3,000 °C.',
+    realWorldConnection: 'The four RS-25 engines on NASA’s SLS Moon rocket, the same type that flew on the Space Shuttle, burn liquid hydrogen and oxygen at up to about 3,300 °C.',
     textbookContent: `
 ## Ideal gases
 
@@ -4082,7 +4089,7 @@ Zero kelvin is **absolute zero**, the lowest temperature there can be. It is the
 ### Three special cases
 
 *   **Constant temperature:** $pV$ stays the same. Halve the volume and the pressure doubles.
-*   **Constant volume:** $p$ is proportional to $T$. Double the kelvin temperature and the pressure doubles.
+*   **Constant volume:** $p$ is proportional to $T$.
 *   **Constant pressure:** $V$ is proportional to $T$.
 
 ### Temperature and the energy of molecules
@@ -4813,14 +4820,14 @@ The topics in these notes follow the Department for Education document below.
       {
         symbol: 'x_{\\text{base}}',
         name: 'Value in the base unit',
-        unit: 'e.g. m, A, Hz',
-        description: 'The same quantity written with no prefix, ready to use in a formula.',
+        unit: 'for example m, A, Hz',
+        description: 'The same quantity in the SI unit, ready to use in a formula.',
         color: 'text-cyan-400'
       },
       {
         symbol: 'x',
         name: 'Value with a prefix',
-        unit: 'e.g. km, mA, MHz',
+        unit: 'for example km, mA, MHz',
         description: 'The number as you were given it, in a unit that carries a prefix.',
         color: 'text-indigo-400'
       },
@@ -4857,7 +4864,7 @@ The topics in these notes follow the Department for Education document below.
       {
         stepNumber: 4,
         title: 'Areas and volumes',
-        content: 'Because $1\\text{ m} = 100\\text{ cm}$, a square metre is $100 \\times 100 = 10\\,000\\text{ cm}^2$ and a cubic metre is $100 \\times 100 \\times 100 = 1\\,000\\,000\\text{ cm}^3$. A common mistake is to use 100 for all three.',
+        content: 'Because $1\\text{ m} = 100\\text{ cm}$, a square metre is $100 \\times 100 = 10\\,000\\text{ cm}^2$ and a cubic metre is $100 \\times 100 \\times 100 = 1\\,000\\,000\\text{ cm}^3$. A common mistake is to use 100 for areas and volumes as well as lengths.',
         keyInsight: 'For an area, square the length factor. For a volume, cube it.',
         relatedVariables: ['10^{n}']
       }
@@ -4910,8 +4917,6 @@ The topics in these notes follow the Department for Education document below.
 
 A physics formula only gives the right answer if every quantity is in units that fit together, normally the SI units: metres, kilograms, seconds, amperes and so on. Convert first, then put the numbers into the formula.
 
-Converting never changes the quantity itself. A smaller unit needs a bigger number: 2 km and 2000 m are the same distance.
-
 ### Prefixes
 
 A prefix in front of a unit stands for a power of ten:
@@ -4927,15 +4932,11 @@ A prefix in front of a unit stands for a power of ten:
 | micro | μ | $10^{-6}$ | 1 μm = 0.000 001 m |
 | nano | n | $10^{-9}$ | 1 nm = 0.000 000 001 m |
 
-To reach the base unit, replace the prefix with its factor: $250 \\text{ mA} = 250 \\times 10^{-3} \\text{ A} = 0.25 \\text{ A}$. Take care with capitals: m is milli but M is mega.
+To reach the base unit, replace the prefix with its factor. Take care with capitals: m is milli but M is mega.
 
 ### Units made of two units
 
-For a unit such as km/h, convert each part separately. For 36 km/h:
-
-1.  $36 \\text{ km} = 36\\,000 \\text{ m}$
-2.  $1 \\text{ h} = 3600 \\text{ s}$
-3.  $36\\,000 \\div 3600 = 10$ m/s
+For a unit such as km/h, convert each part separately, as in the 72 km/h example in the idea above.
 
 The shortcut: divide km/h by 3.6 to get m/s, and multiply m/s by 3.6 to get km/h.
 
@@ -4946,7 +4947,7 @@ Because $1 \\text{ m} = 100 \\text{ cm}$:
 *   $1 \\text{ m}^2 = 100 \\times 100 = 10\\,000 \\text{ cm}^2$
 *   $1 \\text{ m}^3 = 100 \\times 100 \\times 100 = 1\\,000\\,000 \\text{ cm}^3$
 
-Square the length factor for an area and cube it for a volume. Using 100 for all three is a common mistake. Volumes of liquid are often in litres: $1 \\text{ litre} = 1000 \\text{ cm}^3$, and $1 \\text{ m}^3 = 1000$ litres.
+Square the length factor for an area and cube it for a volume. Volumes of liquid are often in litres: $1 \\text{ litre} = 1000 \\text{ cm}^3$, and $1 \\text{ m}^3 = 1000$ litres.
 
 ### Standard form
 
@@ -4956,7 +4957,7 @@ $$384\\,000 \\text{ km} = 3.84 \\times 10^8 \\text{ m}$$
 
 ### A spacecraft lost to units
 
-In 1999 NASA lost the Mars Climate Orbiter. One team's software reported thruster readings in pound-force seconds; the navigation software expected newton seconds. Nobody converted, the spacecraft came in far too low over Mars, and it was lost. Writing the unit with every number, every time, is how engineers avoid this.
+Writing the unit with every number, every time, is how engineers avoid mistakes like the one that lost the Mars Climate Orbiter.
 
 ### Sources
 

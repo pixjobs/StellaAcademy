@@ -49,7 +49,7 @@ const PROPER_NOUNS: string[] = [
 
 /** Words of 3+ capital letters that are acronyms, not emphasis. */
 const ACRONYMS: string[] = [
-  'NASA', 'ISS', 'LEO', 'GEO', 'GCSE', 'GCSEs', 'SI', 'DNA', 'RPM', 'ESA', 'UK', 'USA', 'GPS', 'DfE',
+  'NASA', 'SLS', 'ISS', 'LEO', 'GEO', 'GCSE', 'GCSEs', 'SI', 'DNA', 'RPM', 'ESA', 'UK', 'USA', 'GPS', 'DfE',
   'LED', 'LEDs', 'GCE', 'LDR', 'LDRs', 'ACS', 'VIP', 'SOH', 'CAH', 'TOA', 'SOHCAHTOA', 'BIDMAS', 'BODMAS', 'AND', 'OR', 'NOT', 'XOR', 'NAND', 'NOR',
   'ASCII', 'CPU', 'RAM', 'ROM', 'USB', 'HTML', 'JPL', 'GMT', 'UTC', 'EMF', 'FM', 'AM', 'UV', 'SUVAT',
   'CMB', 'LHC', 'CERN', 'JWST', 'MRI', 'PET', 'CT', 'ECG', 'III', 'II', 'IV', 'VI',

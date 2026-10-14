@@ -215,18 +215,6 @@ const MISSION_2_TABLE: Entry[] = [
     unit: '× base unit',
   })),
   {
-    lesson: 'units', where: 'textbookContent: 250 mA', expectNotesIncludes: '$250 \\text{ mA} = 250 \\times 10^{-3}',
-    stated: '= 0.25 \\text{ A}', compute: () => 250 * C.PREFIX.m, expected: 0.25, tolerance: 1e-9, unit: 'A',
-  },
-  {
-    lesson: 'units', where: 'textbookContent: 36 km in m', expectNotesIncludes: 'For 36 km/h:',
-    stated: '$36 \\text{ km} = 36\\,000 \\text{ m}$', pick: 1, compute: () => 36 * C.M_PER_KM, expected: 36000, tolerance: 0, unit: 'm',
-  },
-  {
-    lesson: 'units', where: 'textbookContent: 36 km/h in m/s', expectNotesIncludes: 'For 36 km/h:',
-    stated: '$36\\,000 \\div 3600 = 10$ m/s', pick: 2, compute: () => (36 * C.M_PER_KM) / C.S_PER_H, expected: 10, tolerance: 1e-9, unit: 'm/s',
-  },
-  {
     lesson: 'units', where: 'textbookContent: 1 m² in cm²', expectNotesIncludes: 'Because $1 \\text{ m} = 100 \\text{ cm}$',
     stated: '$1 \\text{ m}^2 = 100 \\times 100 = 10\\,000 \\text{ cm}^2$', pick: 3, compute: () => C.CM_PER_M ** 2, expected: 10000, tolerance: 0, unit: 'cm²',
   },
@@ -357,8 +345,8 @@ const MISSION_2_TABLE: Entry[] = [
 
   // ======================================================================================== thermodynamics
   {
-    lesson: 'thermodynamics', where: 'solvedExample.steps[2]', expectQuestionIncludes: 'A sealed tank holds 2 mol of gas at 300 K in a volume of 0.05 m³',
-    stated: '= 4986$', compute: () => 2 * C.R_NOTES_THERMO * 300, expected: 4986, tolerance: 0.05, unit: '',
+    lesson: 'thermodynamics', where: 'solvedExample.steps[2]', expectQuestionIncludes: 'A sealed tank holds 2 mol of gas at 400 K in a volume of 0.1 m³',
+    stated: '= 6648$', compute: () => 2 * C.R_NOTES_THERMO * 400, expected: 6648, tolerance: 0.05, unit: '',
   },
   {
     lesson: 'thermodynamics', where: 'practiceProblems[0]', expectQuestionIncludes: 'Convert 27 °C to kelvin',
@@ -400,13 +388,13 @@ const MISSION_2_TABLE: Entry[] = [
     stated: '= 6.21 \\times 10^{-21}$ J', compute: () => 1.5 * C.K_BOLTZMANN_LESSON * 300, expected: 6.21e-21, relTolerance: 0.001, unit: 'J',
   },
   {
-    lesson: 'thermodynamics', where: 'solvedExample.steps[3]', expectQuestionIncludes: 'A sealed tank holds 2 mol of gas at 300 K in a volume of 0.05 m³',
-    stated: '= 99\\,720$ Pa',
-    compute: () => (2 * C.R_NOTES_THERMO * 300) / 0.05, expected: 99720, tolerance: 0.5, unit: 'Pa',
+    lesson: 'thermodynamics', where: 'solvedExample.steps[3]', expectQuestionIncludes: 'A sealed tank holds 2 mol of gas at 400 K in a volume of 0.1 m³',
+    stated: '= 66\\,480$ Pa',
+    compute: () => (2 * C.R_NOTES_THERMO * 400) / 0.1, expected: 66480, tolerance: 0.5, unit: 'Pa',
   },
   {
-    lesson: 'thermodynamics', where: 'solvedExample.resultFormula (kPa)', expectQuestionIncludes: 'A sealed tank holds 2 mol of gas at 300 K in a volume of 0.05 m³',
-    stated: 'about } 99.7', compute: () => (2 * C.R_NOTES_THERMO * 300) / 0.05 / 1000, expected: 99.72, tolerance: 0.05, unit: 'kPa',
+    lesson: 'thermodynamics', where: 'solvedExample.resultFormula (kPa)', expectQuestionIncludes: 'A sealed tank holds 2 mol of gas at 400 K in a volume of 0.1 m³',
+    stated: 'about } 66.5', compute: () => (2 * C.R_NOTES_THERMO * 400) / 0.1 / 1000, expected: 66.48, tolerance: 0.05, unit: 'kPa',
   },
 
   // ======================================================================================== gravity
@@ -471,10 +459,6 @@ const MISSION_2_TABLE: Entry[] = [
   {
     lesson: 'gravity', where: 'textbookContent: inverse square, double', expectNotesIncludes: 'inverse square law',
     stated: 'double the distance and the force falls to a quarter', pick: 1, compute: () => 1 / 2 ** 2, expected: 0.25, tolerance: 1e-9, unit: '× force',
-  },
-  {
-    lesson: 'gravity', where: 'textbookContent: inverse square, triple', expectNotesIncludes: 'inverse square law',
-    stated: 'triple it and the force falls to a ninth', pick: 1, compute: () => 1 / 3 ** 2, expected: 1 / 9, tolerance: 1e-9, unit: '× force',
   },
   {
     lesson: 'gravity', where: 'textbookContent: g at surface (worked)', expectNotesIncludes: '$M = 5.97 \\times 10^{24}$ kg and $r = 6.37 \\times 10^6$ m',
