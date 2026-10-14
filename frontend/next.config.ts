@@ -36,6 +36,9 @@ const nextConfig: NextConfig = {
    */
   output: "standalone",
 
+  /** Firestore loads gRPC protos from disk at runtime, so it must not be bundled. */
+  serverExternalPackages: ["@google-cloud/firestore"],
+
   /** Allow local network IPs during development */
   allowedDevOrigins: ['192.168.50.190', 'localhost', '127.0.0.1'],
 

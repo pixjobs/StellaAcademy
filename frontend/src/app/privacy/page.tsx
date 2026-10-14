@@ -1,6 +1,7 @@
 import CookieChoice from '@/components/CookieChoice';
 import { SkyTitle } from '@/components/Sky';
 import { REPORT_RETENTION_DAYS } from '@/lib/report';
+import { VOLUNTEER_RETENTION_MONTHS } from '@/lib/volunteer';
 import { CONTROLLER_NAME, PRIVACY_EMAIL, PRIVACY_UPDATED } from '@/lib/site';
 
 // Keep in step with docs/privacy/processing.md.
@@ -48,6 +49,10 @@ export default function PrivacyPage() {
                   If you report a problem with a lesson, please do not include your name or anything about yourself.
                   We use reports only to fix mistakes, and delete them after {REPORT_RETENTION_DAYS} days.
                 </li>
+                <li>
+                  If an adult offers to help test Stella, we keep their name and email only to contact them about
+                  testing, and delete them after {VOLUNTEER_RETENTION_MONTHS} months.
+                </li>
                 <li>We do not show adverts and we do not sell anyone&rsquo;s information.</li>
               </ul>
             </section>
@@ -66,8 +71,9 @@ export default function PrivacyPage() {
                 it is deleted after 30 days.
               </p>
               <p>
-                When you search the gallery, or send a problem report, your IP address is also held in our server&rsquo;s
-                memory for up to 10 minutes to stop anyone sending too many requests. It is never written down.
+                When you search the gallery, send a problem report or offer to help test, your IP address is also held
+                in our server&rsquo;s memory for up to an hour to stop anyone sending too many requests. It is never
+                written down.
               </p>
             </Block>
 
@@ -96,6 +102,19 @@ export default function PrivacyPage() {
               </p>
             </Block>
 
+            <Block id="helpers" title="If you offer to help test Stella">
+              <p>
+                The form on our Help page is for adults only. We keep what you enter (your name, email address, role,
+                subject and any note) in Google Cloud&rsquo;s Firestore database in Europe. Once a week the new names,
+                email addresses and notes are copied into our project tracker, Atlassian&rsquo;s Jira, so we can follow
+                up. We use them only to contact you about testing, never for marketing, and never share them.
+              </p>
+              <p>
+                Sign-ups are deleted from Firestore {VOLUNTEER_RETENTION_MONTHS} months after they arrive, and the Jira
+                copy is deleted at the same time. To be removed sooner, or to see what we hold, email {email}.
+              </p>
+            </Block>
+
             <Block title="Gallery searches and NASA pictures">
               <p>
                 The words you type in the gallery search are sent to NASA&rsquo;s image library to find pictures. We do
@@ -115,14 +134,16 @@ export default function PrivacyPage() {
             <Block title="Our reasons">
               <p>
                 Running and securing the site, problem reports and limiting abuse: our legitimate interest in providing
-                accurate, safe lessons. Analytics cookies: your consent.
+                accurate, safe lessons. Analytics cookies and offers to help test: your consent, which you can withdraw at any
+                time.
               </p>
             </Block>
 
             <Block title="Who else is involved">
               <p>
                 Google provides our hosting, logging and analytics, and acts on our instructions under its data
-                protection terms. Google may process some information outside the UK. If you press &ldquo;Support
+                protection terms. Atlassian provides our project tracker (Jira), which holds the details of people who offer to
+                help test. Google and Atlassian may process some information outside the UK. If you press &ldquo;Support
                 Stella&rdquo;, you leave this site for Ko-fi, and Ko-fi&rsquo;s own privacy policy applies there.
               </p>
             </Block>
@@ -130,8 +151,8 @@ export default function PrivacyPage() {
             <Block title="Your rights">
               <p>
                 You can ask to see, correct or delete information about you, object to how we use it, or withdraw your
-                consent. Because we do not collect names or accounts, we usually cannot tell which information is
-                yours, but email {email} and we will help where we can.
+                consent. Apart from offers to help test, we do not collect names or accounts, so we usually cannot tell which
+                other information is yours, but email {email} and we will help where we can.
               </p>
               <p>
                 You can also complain to the Information Commissioner&rsquo;s Office at{' '}

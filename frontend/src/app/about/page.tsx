@@ -71,6 +71,16 @@ export default function AboutPage() {
               </p>
             </Block>
 
+            <Block title="Help test Stella">
+              <p>
+                Teachers, scientists and parents can help put the lessons right: try a mission and tell us what is wrong
+                or missing, and be credited by name if you wish.{' '}
+                <Link href="/help" className={linkClass}>
+                  Register your interest
+                </Link>
+              </p>
+            </Block>
+
             <Block title="Space pictures">
               <p>
                 The{' '}
