@@ -45,6 +45,8 @@ steps:
       - --region=${_REGION}
       - --allow-unauthenticated
       - --set-env-vars=NODE_ENV=production
+      # The weekly "Help test Stella" digest (app/api/volunteer/digest) posts to Jira.
+      - --update-secrets=JIRA_API_TOKEN=JIRA_API_TOKEN:latest,VOLUNTEER_DIGEST_KEY=VOLUNTEER_DIGEST_KEY:latest
       - --cpu=1
       - --memory=512Mi
       - --concurrency=40

@@ -93,6 +93,8 @@ To go back to following the newest revision afterwards, use `--to-latest`.
 | `APOD_REVALIDATE_SEC` | Runtime | How long the picture of the day is cached. Optional, defaults to one day. |
 | `NEXT_PUBLIC_GA_ID` | Build | Google Analytics measurement ID. Optional, has a default in `src/lib/site.ts`. |
 | `NEXT_PUBLIC_SUPPORT_URL` | Build | Address the "Support Stella" button opens. Optional, defaults to the Ko-fi page in `src/lib/site.ts`. |
+| `JIRA_API_TOKEN` | Runtime (Secret Manager) | Atlassian API token for hello@pixjobs.com, used by the weekly "Help test Stella" digest. Tokens expire (a year at most): when the digest starts failing, make a new one at id.atlassian.com and add it with `gcloud secrets versions add JIRA_API_TOKEN --data-file=- --project=stella-academy`. |
+| `VOLUNTEER_DIGEST_KEY` | Runtime (Secret Manager) | Shared key Cloud Scheduler sends to `/api/volunteer/digest`. |
 
 `NEXT_PUBLIC_` values are compiled into the pages, so they must be present when the image is built, not just when it
 runs.
@@ -119,3 +121,14 @@ a script, picture or API from a new host, add that host to the policy there or t
   `gcloud run services logs read stella-web --project=stella-academy --region=europe-west1`.
 - **A picture or script is missing on the live site only.** Look in the browser console for a Content Security Policy
   message, then see "Security headers" above.
+
+## Help test Stella sign-ups (added 14 October 2026)
+
+The form on `/help` stores sign-ups in Firestore (collection `volunteers`, eur3). A TTL policy on `expireAt` deletes
+each one 12 months after it arrives. Every Monday at 09:00 (London) the Cloud Scheduler job `volunteer-digest` calls
+`/api/volunteer/digest`, which lists new sign-ups in a Jira KAN work item labelled `volunteers` and deletes digest
+items older than 12 months. Run it by hand with:
+
+```bash
+gcloud scheduler jobs run volunteer-digest --location=europe-west1 --project=stella-academy
+```
