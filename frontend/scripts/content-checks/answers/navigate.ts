@@ -14,6 +14,14 @@ const R_EARTH_KM = 6371; // mean radius, used only to check the "treat the groun
 const near = (a: number, b: number, tol = 1e-9) => Math.abs(a - b) <= tol;
 /** A 2 × 1 column vector as the lessons write it in LaTeX. */
 const col = (top: number, bottom: number) => `\\begin{pmatrix} ${top} \\\\ ${bottom} \\end{pmatrix}`;
+/** Central-difference derivative, and Simpson's rule, as independent checks on hand differentiation and integration. */
+const numDeriv = (f: (x: number) => number, x: number, h = 1e-4) => (f(x + h) - f(x - h)) / (2 * h);
+const integrate = (f: (x: number) => number, a: number, b: number, n = 1000) => {
+  const h = (b - a) / n;
+  let s = f(a) + f(b);
+  for (let i = 1; i < n; i++) s += f(a + i * h) * (i % 2 ? 4 : 2);
+  return (s * h) / 3;
+};
 /** 2 × 2 matrices as [a, b, c, d] for (a b; c d), and 2 × 1 vectors. */
 type M2 = [number, number, number, number];
 type V2 = [number, number];
@@ -366,4 +374,71 @@ export const ENTRIES: Entry[] = [
       },
     ];
   })(),
+
+  // ======================================================================================== calculus
+  {
+    lesson: 'calculus', where: 'solvedExample.steps[1] (5t² term)', expectQuestionIncludes: '$s(t) = 5t^2 + 10t$ metres',
+    stated: '$5t^2$ gives $10t$', pick: 1, note: 'd/dt of 5t² is 2 × 5 t.', compute: () => 2 * 5, expected: 10, tolerance: 0, unit: '(coefficient of t)',
+  },
+  {
+    lesson: 'calculus', where: 'solvedExample.steps[1] (10t term)', expectQuestionIncludes: '$s(t) = 5t^2 + 10t$ metres',
+    stated: '$10t$ gives $10$', pick: 1, compute: () => 1 * 10, expected: 10, tolerance: 0, unit: 'm/s',
+  },
+  {
+    lesson: 'calculus', where: 'solvedExample.steps[2]', expectQuestionIncludes: '$s(t) = 5t^2 + 10t$ metres',
+    stated: '= 40$', compute: () => numDeriv((t) => 5 * t ** 2 + 10 * t, 3), expected: 40, tolerance: 1e-4, unit: 'm/s',
+  },
+  {
+    lesson: 'calculus', where: 'solvedExample.resultFormula', expectQuestionIncludes: '$s(t) = 5t^2 + 10t$ metres',
+    stated: '= 40', compute: () => numDeriv((t) => 5 * t ** 2 + 10 * t, 3), expected: 40, tolerance: 1e-4, unit: 'm/s',
+  },
+  {
+    lesson: 'calculus', where: 'practiceProblems[0]', expectQuestionIncludes: 'If position is $s = 4t^3$, find the velocity $v$',
+    stated: '$v = 12t^2$', note: 'Coefficient of t²; checked numerically at t = 2 (48 / 4).',
+    compute: () => numDeriv((t) => 4 * t ** 3, 2) / 2 ** 2, expected: 12, tolerance: 1e-4, unit: '',
+  },
+  {
+    lesson: 'calculus', where: 'practiceProblems[1]', expectQuestionIncludes: 'If velocity is $v = 20t$, what is the acceleration?',
+    compute: () => numDeriv((t) => 20 * t, 5), expected: 20, tolerance: 1e-4, unit: 'm/s²',
+  },
+  {
+    lesson: 'calculus', where: 'practiceProblems[2]', expectQuestionIncludes: "A probe's position is $s = 5t^2 + 10t$ metres. Find its acceleration.",
+    compute: () => numDeriv((t) => numDeriv((u) => 5 * u ** 2 + 10 * u, t), 1.7), expected: 10, tolerance: 1e-3, unit: 'm/s²',
+  },
+  {
+    lesson: 'calculus', where: 'practiceProblems[3]', expectQuestionIncludes: 'Find the gradient of the curve $y = x^2$ at the point where $x = 3$',
+    compute: () => numDeriv((x) => x ** 2, 3), expected: 6, tolerance: 1e-4, unit: '',
+  },
+  {
+    lesson: 'calculus', where: 'practiceProblems[4]', kind: 'qualitative', expectQuestionIncludes: 'the chord of $y = x^2$ from $x = 3$ to $x = 3 + h$',
+    expectAnswerIncludes: '= 6 + h$, which tends to 6',
+    verify: () => {
+      const ok = [1, 0.5, 0.01].every((h) => near(((3 + h) ** 2 - 9) / h, 6 + h, 1e-9));
+      return { holds: ok, detail: 'chord gradient equals 6 + h for h = 1, 0.5, 0.01' };
+    },
+  },
+  {
+    lesson: 'calculus', where: 'practiceProblems[5]', expectQuestionIncludes: "A rover's velocity is $v = 3t^2 + 2$ m/s",
+    stated: '12 m', compute: () => integrate((t) => 3 * t ** 2 + 2, 0, 2), expected: 12, tolerance: 1e-6, unit: 'm',
+  },
+  {
+    lesson: 'calculus', where: 'textbookContent: chord gradient', kind: 'qualitative', expectNotesIncludes: 'To find the gradient of $y = x^2$ at $x = 2$',
+    expectAnswerIncludes: '\\frac{4h + h^2}{h} = 4 + h$$',
+    verify: () => {
+      const ok = [1, 0.5, 0.01].every((h) => near(((2 + h) ** 2 - 4) / h, 4 + h, 1e-9));
+      return { holds: ok, detail: 'chord gradient equals 4 + h for h = 1, 0.5, 0.01' };
+    },
+  },
+  {
+    lesson: 'calculus', where: 'textbookContent: tangent gradient', expectNotesIncludes: 'To find the gradient of $y = x^2$ at $x = 2$',
+    stated: 'its gradient gets closer to 4', compute: () => numDeriv((x) => x ** 2, 2), expected: 4, tolerance: 1e-4, unit: '',
+  },
+  {
+    lesson: 'calculus', where: 'textbookContent: power rule example', kind: 'claim', expectNotesIncludes: 'Constants multiply through',
+    claimIncludes: 'if $y = 2x^3 + 7x$, then $\\dfrac{dy}{dx} = 6x^2 + 7$',
+    verify: () => {
+      const ok = [-1, 0.5, 2].every((x) => near(numDeriv((u) => 2 * u ** 3 + 7 * u, x), 6 * x ** 2 + 7, 1e-4));
+      return { holds: ok, detail: 'numerical derivative of 2x³ + 7x equals 6x² + 7 at x = −1, 0.5, 2' };
+    },
+  },
 ];

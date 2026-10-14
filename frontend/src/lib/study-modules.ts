@@ -1608,55 +1608,54 @@ The topics in these notes follow the Department for Education documents below.
       {
         symbol: 'v(t)',
         name: 'Velocity',
-        unit: 'm/s',
-        description: 'The rate of change of position with respect to time.',
+        unit: 'metres per second (m/s)',
+        description: 'How fast the displacement is changing at time $t$.',
         color: 'text-emerald-400'
       },
       {
         symbol: 's(t)',
-        name: 'Position Function',
-        unit: 'm',
-        description: 'The distance of the spacecraft from a reference point as a function of time.',
+        name: 'Displacement',
+        unit: 'metres (m)',
+        description: 'How far the object is from its starting point along the line, at time $t$.',
         color: 'text-teal-400'
       },
       {
         symbol: 't',
         name: 'Time',
-        unit: 's',
-        description: 'The time elapsed.',
+        unit: 'seconds (s)',
+        description: 'The time since the start.',
         color: 'text-lime-400'
       }
     ],
     conceptSteps: [
       {
         stepNumber: 1,
-        title: "Instantaneous Change",
-        content: "While algebra gives average speed over a long trip, calculus allows us to find the exact velocity of a spacecraft at a single instant in time. This is the foundation for solving complex [Differential Equations](/study/diffeq).",
-        keyInsight: "A derivative is simply a rate of change at a specific moment.",
-        relatedVariables: ["v(t)"]
+        title: "The gradient of a curve",
+        content: "A straight line has the same gradient everywhere, but a curve's gradient changes as you move along it. The gradient at a point is the gradient of the tangent there. To find it, draw a chord to a nearby point and see what its gradient gets closer to as the nearby point slides in. That value is called the limit.",
+        keyInsight: "The gradient at a point is a rate of change at one instant, not an average over a stretch.",
+        relatedVariables: []
       },
       {
         stepNumber: 2,
-        title: "The Derivative",
-        content: "Taking the derivative of a position function gives the velocity function. Taking the derivative of velocity gives acceleration. These precise calculations allow us to model complex [Trajectories](/study/trajectory).",
-        keyInsight: "Position -> Velocity -> Acceleration.",
-        relatedVariables: ["s(t)", "v(t)"]
+        title: "The derivative",
+        content: "The derivative, written $\\dfrac{dy}{dx}$, gives the gradient at every point. For a power of $x$, multiply by the power and then take one off the power: $x^n$ becomes $nx^{n-1}$. Differentiate a sum one term at a time.",
+        keyInsight: "The derivative tells you how fast $y$ is changing compared with $x$: a rate of change.",
+        relatedVariables: []
       },
       {
         stepNumber: 3,
-        title: "Rocket Trajectories",
-        content: "As a rocket burns fuel, its mass changes constantly, and its acceleration increases. Calculus is essential to model these dynamic, continuously changing systems.",
-        keyInsight: "Calculus helps predict complex, changing motion.",
-        relatedVariables: []
+        title: "Velocity and acceleration",
+        content: "For an object moving along a line, velocity is the rate of change of displacement, $v = \\dfrac{ds}{dt}$, and acceleration is the rate of change of velocity, $a = \\dfrac{dv}{dt}$. Integrating takes you back the other way.",
+        keyInsight: "Differentiate displacement to get velocity, and velocity to get acceleration.",
+        relatedVariables: ["s(t)", "v(t)", "t"]
       }
     ],
     solvedExample: {
       problem: 'A probe\'s distance from a moon is given by $s(t) = 5t^2 + 10t$ metres. Find its velocity $v(t)$ at $t = 3$ seconds.',
       steps: [
-        'Take the derivative of position: $v(t) = \\frac{d}{dt}(5t^2 + 10t)$.',
-        'Apply the power rule: $v(t) = 10t + 10$.',
-        'Substitute $t = 3$: $v(3) = 10(3) + 10$.',
-        'Calculate the result: $30 + 10 = 40$.'
+        'Velocity is how fast the displacement changes, so differentiate $s$ with respect to $t$.',
+        'Differentiate one term at a time: $5t^2$ gives $10t$, and $10t$ gives $10$, so $v = 10t + 10$.',
+        'Substitute $t = 3$: $v(3) = 10 \\times 3 + 10 = 40$.'
       ],
       resultFormula: 'v(3) = 40 \\text{ m/s}'
     },
@@ -1692,7 +1691,7 @@ The topics in these notes follow the Department for Education documents below.
         answer: "12 m ($\\left[t^3 + 2t\\right]_0^2 = 8 + 4$)"
       },
     ],
-    realWorldConnection: 'Orbital mechanics heavily utilises differential equations (calculus) to predict the future positions of planets, moons, and artificial satellites over time.',
+    realWorldConnection: 'A speedometer shows speed at one instant: how fast the distance travelled is changing right now. That is a derivative, not an average over the whole journey.',
     textbookContent: `
 ## Differentiation and rates of change
 
@@ -1702,11 +1701,11 @@ The gradient of a straight line is the same everywhere. A curve's gradient chang
 
 ### The gradient as a limit
 
-To find the gradient of $y = x^2$ at $x = 3$, take a nearby point at $x = 3 + h$. The **chord** between them has gradient
+To find the gradient of $y = x^2$ at $x = 2$, take a nearby point at $x = 2 + h$. The **chord** between them has gradient
 
-$$\\frac{(3 + h)^2 - 3^2}{h} = \\frac{6h + h^2}{h} = 6 + h$$
+$$\\frac{(2 + h)^2 - 2^2}{h} = \\frac{4h + h^2}{h} = 4 + h$$
 
-As $h$ gets smaller, the chord gets closer to the tangent, and its gradient gets closer to 6. The gradient of the tangent is the **limit** of the chord's gradient as $h \\to 0$. Doing this for a general point is called **differentiation from first principles**.
+As $h$ gets smaller, the chord gets closer to the tangent, and its gradient gets closer to 4. The gradient of the tangent is the **limit** of the chord's gradient as $h \\to 0$. Doing this for a general point is called **differentiation from first principles**.
 
 ### The derivative
 
@@ -1716,7 +1715,7 @@ For powers of $x$:
 
 $$y = x^n \\quad \\Rightarrow \\quad \\frac{dy}{dx} = nx^{n-1}$$
 
-Multiply by the power, then take one off the power. Constants multiply through, and terms are differentiated one at a time: if $y = 5x^2 + 10x$, then $\\dfrac{dy}{dx} = 10x + 10$.
+Multiply by the power, then take one off the power. Constants multiply through, and terms are differentiated one at a time: if $y = 2x^3 + 7x$, then $\\dfrac{dy}{dx} = 6x^2 + 7$.
 
 ### Motion in a straight line
 
@@ -1727,17 +1726,13 @@ For an object moving along a line with displacement $s$ at time $t$:
 
 Going the other way, **integrate**: displacement is the integral of velocity, and velocity is the integral of acceleration.
 
-### Worked example
-
-A probe's distance from a moon is $s = 5t^2 + 10t$ metres. Find its velocity at $t = 3$ s.
-
-1.  $v = \\dfrac{ds}{dt} = 10t + 10$
-2.  $v(3) = 10 \\times 3 + 10 = 40$ m/s
-3.  The acceleration is $a = \\dfrac{dv}{dt} = 10$ m/s², the same at every moment.
-
 ### Rockets and changing motion
 
 A rocket's speed changes every instant as it burns fuel. Flight computers do not use one average speed. They track the rate of change of position and velocity moment by moment, which is exactly what derivatives describe.
+
+### Next on the journey
+
+Often you know a rule for how fast something changes, such as how quickly drag slows a falling capsule, but not the thing itself. How do you work backwards from the rate of change? That is the next lesson, on differential equations.
 
 ### Sources
 
