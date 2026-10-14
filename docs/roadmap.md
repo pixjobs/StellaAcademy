@@ -141,6 +141,16 @@ answers the "written with AI" doubt directly.
   owner is an Imperial College MBA alumnus, so Imperial's alumni network and Physics department are a warm route;
   Cambridge's Institute of Astronomy is another), space-education bodies, STEM Ambassadors, and independent schools
   such as Littlegarth and Woodbridge as testers, not funders. Shortlist and drafts: `~/stella-work/outreach/`.
+- Planned (decided 14 October 2026, not built; Jira KAN-57): **volunteer review**. Volunteers choose which lessons to
+  review rather than being assigned one. (1) Signing up on `/help` gives each volunteer a personal review link, shown
+  on the thank-you message and in the Monday digest; no accounts or emails. (2) The link opens a review page listing
+  lessons by key stage with a status (not yet reviewed, being reviewed, reviewed), with unreviewed ones highlighted.
+  (3) A review panel on the lesson asks whether it is correct, pitched right and clear, has a suggestion box for each
+  part (notes, worked example, each practice question), and asks whether they want a name credit. (4) Reviews join the
+  Monday Jira digest, grouped by lesson, alongside automatic checks such as recomputing a suggested answer. (5) The
+  owner approves each suggestion before anything changes, and "Reviewed by" appears only after the owner approves the
+  review and the volunteer agrees to be named. Anyone with a link can only suggest, so bad reviews cost nothing.
+  Review statuses then show which lessons are solid and feed the roadmap.
 - Read the first month of Analytics.
 
 **Test:** we know baseline traffic and which lessons people finish.
