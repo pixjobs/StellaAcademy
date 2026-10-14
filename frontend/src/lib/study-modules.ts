@@ -2669,30 +2669,30 @@ The topics in these notes follow the Department for Education document below.
       {
         symbol: 'A',
         name: 'Area',
-        unit: 'sq units',
-        description: 'The amount of 2D space inside a closed figure.',
+        unit: 'square units, such as cm² or m²',
+        description: 'The amount of flat space inside the shape.',
         color: 'text-emerald-400'
       },
       {
         symbol: 'P',
         name: 'Perimeter',
-        unit: 'units',
-        description: 'The total distance around the outside edge of a figure.',
+        unit: 'a length, such as cm or m',
+        description: 'The distance all the way round the edge of the shape.',
         color: 'text-rose-400'
       },
       {
         symbol: 'l',
         name: 'Length',
-        unit: 'units',
-        description: 'The measurement of the longer side of a rectangle.',
+        unit: 'a length, such as cm or m',
+        description: 'How long one side of the rectangle is.',
         color: 'text-indigo-400',
         range: { min: 1, max: 20, default: 5 }
       },
       {
         symbol: 'w',
         name: 'Width',
-        unit: 'units',
-        description: 'The measurement of the shorter side of a rectangle.',
+        unit: 'a length, such as cm or m',
+        description: 'How long the side next to it is.',
         color: 'text-cyan-400',
         range: { min: 1, max: 20, default: 3 }
       }
@@ -2700,33 +2700,33 @@ The topics in these notes follow the Department for Education document below.
     conceptSteps: [
       {
         stepNumber: 1,
-        title: 'What is Area?',
-        content: 'Area is the amount of flat space a shape takes up. You can think of it as the number of 1x1 unit squares needed to completely cover the inside of the shape without overlapping.',
-        keyInsight: 'Area is measured in square units (e.g., square centimetres, square metres).',
-        relatedVariables: ['A']
+        title: 'Perimeter',
+        content: 'The perimeter is how far it is all the way round the edge of a flat shape. Add up the lengths of all the sides. A rectangle has two lengths and two widths, so $P = 2l + 2w$.',
+        keyInsight: 'A perimeter is a distance, like a piece of string laid round the edge.',
+        relatedVariables: ['P', 'l', 'w']
       },
       {
         stepNumber: 2,
-        title: 'What is Perimeter?',
-        content: 'Perimeter is the distance all the way round the edge of a shape. Find it by adding up the lengths of all the sides.',
-        keyInsight: 'Perimeter is a length, like a piece of string laid round the edge of the shape.',
-        relatedVariables: ['P']
+        title: 'Area',
+        content: 'The area is how much flat space a shape covers. Think of covering it with squares 1 cm along each side and counting them. A rectangle has $w$ rows of $l$ squares, so $A = l \\times w$.',
+        keyInsight: 'Area is measured in square units: square centimetres (cm²) or square metres (m²).',
+        relatedVariables: ['A', 'l', 'w']
       },
       {
         stepNumber: 3,
-        title: 'Formulas for Rectangles',
-        content: 'For a rectangle, the area is simply Length × Width. Because rectangles have two equal lengths and two equal widths, the perimeter is (2 × Length) + (2 × Width).',
-        keyInsight: 'These formulas are shortcuts for counting squares (area) or adding all four sides individually (perimeter).',
-        relatedVariables: ['l', 'w']
+        title: 'Same area, different perimeter',
+        content: 'Two shapes can cover the same area but have different perimeters. A long, thin rectangle has a longer perimeter than a square with the same area.',
+        keyInsight: 'Area and perimeter measure different things, so knowing one does not tell you the other.',
+        relatedVariables: ['A', 'P']
       }
     ],
     solvedExample: {
-      problem: 'Find the Area and Perimeter of a rectangular garden with length $l = 8$ metres and width $w = 3$ metres.',
+      problem: 'A rectangular garden is $l = 8$ metres long and $w = 3$ metres wide. Find its area and its perimeter.',
       steps: [
-        'To find the Area, multiply length by width: $A = l \\times w$.',
-        'Substitute the values: $A = 8 \\times 3 = 24$. The Area is 24 square metres.',
-        'To find the Perimeter, add all four sides: $P = 2l + 2w$.',
-        'Substitute the values: $P = 2(8) + 2(3) = 16 + 6 = 22$. The Perimeter is 22 metres.'
+        'Area is length times width: $A = l \\times w$.',
+        'Put in the numbers: $A = 8 \\times 3 = 24$. The area is 24 square metres.',
+        'Perimeter is all four sides added: $P = 2l + 2w$.',
+        'Put in the numbers: $P = 2 \\times 8 + 2 \\times 3 = 16 + 6 = 22$. The perimeter is 22 metres.'
       ],
       resultFormula: 'A = 24 \\text{ m}^2, P = 22 \\text{ m}'
     },
@@ -2762,7 +2762,7 @@ The topics in these notes follow the Department for Education document below.
         answer: "5 panels (each is 6 m²)"
       },
     ],
-    realWorldConnection: 'Architects and builders use area to determine how much carpet or tile is needed for a floor, and perimeter to determine how much fencing is needed to enclose a garden.',
+    realWorldConnection: 'Builders use area to work out how much carpet or how many tiles a floor needs, and perimeter to work out how much fencing goes round a garden.',
     textbookContent: `
 ## Area and perimeter
 
@@ -2809,7 +2809,11 @@ It works the other way too: shapes with the same perimeter can have different ar
 
 ### Solar panels in space
 
-Spacecraft make their electricity from sunlight with solar panels. The more area the panels have, the more sunlight they catch. A panel 3 m long and 2 m wide has an area of 6 m², so five of them cover 30 m².
+Many spacecraft make their electricity from sunlight with solar panels. The more area the panels have, the more sunlight they catch. A panel 4 m long and 2 m wide has an area of $4 \\times 2 = 8$ m², so ten of them cover 80 m².
+
+### Next on the journey
+
+A square with sides of 5 m has an area of $5 \\times 5 = 25$ m². Multiplying a number by itself is called squaring it. If you know a square's area, how do you find its side? The next lesson is about powers and roots.
 
 ### Sources
 

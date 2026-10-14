@@ -662,7 +662,59 @@ const PROPORTIONS: Entry[] = [
   nv(PR, 'textbookContent: astronaut on Mars', 'An astronaut who weighs 800 N on Earth', '$0.38 \\times 800 = 304$ N', 2, 0.38 * 800, 'N'),
 ];
 
+const BG = 'basic-geometry';
+const BG_SOLVED = 'A rectangular garden is $l = 8$ metres long and $w = 3$ metres wide.';
+const rectP = (l: number, w: number) => 2 * l + 2 * w;
+/** Perimeter of an l by w rectangle with a cl by cw rectangle cut from one corner, adding all six sides. */
+const lShapeP = (l: number, w: number, cl: number, cw: number) => l + w + (l - cl) + cw + cl + (w - cw);
+
+const BASIC_GEOMETRY: Entry[] = [
+  // Worked example
+  nv(BG, 'solvedExample.steps[1]', BG_SOLVED, '$A = 8 \\times 3 = 24$', 2, 8 * 3, 'm²'),
+  nv(BG, 'solvedExample.steps[1] (in words)', BG_SOLVED, 'The area is 24 square metres.', 0, 8 * 3, 'm²'),
+  nv(BG, 'solvedExample.steps[3] (two lengths)', BG_SOLVED, '= 16 + 6 = 22$', 0, 2 * 8, 'm'),
+  nv(BG, 'solvedExample.steps[3] (two widths)', BG_SOLVED, '= 16 + 6 = 22$', 1, 2 * 3, 'm'),
+  nv(BG, 'solvedExample.steps[3]', BG_SOLVED, '= 16 + 6 = 22$', 2, rectP(8, 3), 'm'),
+  nv(BG, 'solvedExample.steps[3] (in words)', BG_SOLVED, 'The perimeter is 22 metres.', 0, rectP(8, 3), 'm'),
+  nv(BG, 'solvedExample.resultFormula (area)', BG_SOLVED, 'A = 24', 0, 8 * 3, 'm²'),
+  nv(BG, 'solvedExample.resultFormula (perimeter)', BG_SOLVED, 'P = 22', 0, rectP(8, 3), 'm'),
+  // Practice
+  nv(BG, 'practiceProblems[0]', 'A square has sides 4 cm long.', '16 cm²', 0, 4 * 4, 'cm²'),
+  nv(BG, 'practiceProblems[1]', 'A rectangle has a perimeter of 20 m and a length of 6 m.', '4 m', 0, (20 - 2 * 6) / 2, 'm'),
+  nv(BG, 'practiceProblems[2] (area)', 'A rectangle is 7 cm long and 5 cm wide.', 'Area 35 cm²', 0, 7 * 5, 'cm²'),
+  nv(BG, 'practiceProblems[2] (perimeter)', 'A rectangle is 7 cm long and 5 cm wide.', 'perimeter 24 cm', 0, rectP(7, 5), 'cm'),
+  nv(BG, 'practiceProblems[3] (area)', 'A rectangle 10 m by 6 m has a 4 m by 2 m rectangle cut from one corner', 'Area 52 m² (60 − 8)', 0, 10 * 6 - 4 * 2, 'm²'),
+  nv(BG, 'practiceProblems[3] (big area)', 'A rectangle 10 m by 6 m has a 4 m by 2 m rectangle cut from one corner', '(60 − 8)', 0, 10 * 6, 'm²'),
+  nv(BG, 'practiceProblems[3] (cut-out)', 'A rectangle 10 m by 6 m has a 4 m by 2 m rectangle cut from one corner', '(60 − 8)', 1, 4 * 2, 'm²'),
+  nv(BG, 'practiceProblems[3] (perimeter)', 'A rectangle 10 m by 6 m has a 4 m by 2 m rectangle cut from one corner', 'perimeter 32 m', 0, lShapeP(10, 6, 4, 2), 'm'),
+  nv(BG, 'practiceProblems[4] (4 by 6 area)', 'two rectangles that each have an area of 24 cm²', '4 cm by 6 cm', 0, 24 / 6, 'cm'),
+  nv(BG, 'practiceProblems[4] (4 by 6 perimeter)', 'two rectangles that each have an area of 24 cm²', '(perimeter 20 cm)', 0, rectP(4, 6), 'cm'),
+  nv(BG, 'practiceProblems[4] (3 by 8 area)', 'two rectangles that each have an area of 24 cm²', '3 cm by 8 cm', 0, 24 / 8, 'cm'),
+  nv(BG, 'practiceProblems[4] (3 by 8 perimeter)', 'two rectangles that each have an area of 24 cm²', '(perimeter 22 cm)', 0, rectP(3, 8), 'cm'),
+  nv(BG, 'practiceProblems[5]', 'Each solar panel on a space station is 3 m by 2 m.', '5 panels', 0, 30 / (3 * 2), 'panels'),
+  nv(BG, 'practiceProblems[5] (one panel)', 'Each solar panel on a space station is 3 m by 2 m.', '(each is 6 m²)', 0, 3 * 2, 'm²'),
+  // Notes
+  nv(BG, 'textbookContent: 5 by 3 rectangle', 'A rectangle 5 squares long and 3 squares wide', '$A = l \\times w = 5 \\times 3 = 15$ cm²', 2, 5 * 3, 'cm²'),
+  nv(BG, 'textbookContent: L shape, big area', 'Take a rectangle 8 m by 6 m with a 3 m by 2 m corner removed', '$8 \\times 6 = 48$', 2, 8 * 6, 'm²'),
+  nv(BG, 'textbookContent: L shape, cut-out', 'Take a rectangle 8 m by 6 m with a 3 m by 2 m corner removed', 'take away $3 \\times 2 = 6$', 2, 3 * 2, 'm²'),
+  nv(BG, 'textbookContent: L shape, area', 'Take a rectangle 8 m by 6 m with a 3 m by 2 m corner removed', 'The area is 42 m².', 0, 8 * 6 - 3 * 2, 'm²'),
+  nv(BG, 'textbookContent: L shape, perimeter', 'Take a rectangle 8 m by 6 m with a 3 m by 2 m corner removed', '$2 \\times 8 + 2 \\times 6 = 28$ m', 4, lShapeP(8, 6, 3, 2), 'm'),
+  ...(
+    [
+      [4, 4, '| 4 cm by 4 cm | 16 cm² | 16 cm |'],
+      [2, 8, '| 2 cm by 8 cm | 16 cm² | 20 cm |'],
+      [1, 16, '| 1 cm by 16 cm | 16 cm² | 34 cm |'],
+    ] as const
+  ).flatMap(([l, w, row]): Entry[] => [
+    nv(BG, `textbookContent: ${l} by ${w}, area`, row, row, 2, l * w, 'cm²'),
+    nv(BG, `textbookContent: ${l} by ${w}, perimeter`, row, row, 3, rectP(l, w), 'cm'),
+  ]),
+  nv(BG, 'textbookContent: solar panel', 'A panel 4 m long and 2 m wide', '$4 \\times 2 = 8$ m²', 2, 4 * 2, 'm²'),
+  nv(BG, 'textbookContent: ten panels', 'A panel 4 m long and 2 m wide', 'so ten of them cover 80 m²', 0, 10 * 4 * 2, 'm²'),
+  nv(BG, 'textbookContent: 5 m square', 'A square with sides of 5 m has an area of', '$5 \\times 5 = 25$ m²', 2, 5 * 5, 'm²'),
+];
+
 export const ENTRIES: Entry[] = [
   ...ARITHMETIC, ...NEGATIVE_NUMBERS, ...MULTIPLICATION, ...FRACTIONS, ...FRACTION_OPS, ...DECIMALS_PERCENTAGES,
-  ...PROPORTIONS,
+  ...PROPORTIONS, ...BASIC_GEOMETRY,
 ];
