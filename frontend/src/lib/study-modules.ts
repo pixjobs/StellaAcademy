@@ -3989,7 +3989,7 @@ The topics in these notes follow the Department for Education document below.
       {
         symbol: '\\text{km}',
         name: 'Kilometre',
-        unit: '1 km = 1000 m',
+        unit: '1 km = 1,000 m',
         description: 'For long distances, such as from one town to the next.',
         color: 'text-emerald-400'
       },
@@ -4026,14 +4026,14 @@ The topics in these notes follow the Department for Education document below.
       {
         stepNumber: 2,
         title: 'The metric ladder',
-        content: 'Each step down the ladder, from km to m, from m to cm and from cm to mm, goes to a smaller unit, so you multiply: by 1000, by 100 and by 10. Each step back up goes to a bigger unit, so you divide by the same number.',
+        content: 'Each step down the ladder, from km to m, from m to cm and from cm to mm, goes to a smaller unit, so you multiply: by 1,000, by 100 and by 10. Each step back up goes to a bigger unit, so you divide by the same number.',
         keyInsight: 'Before you calculate, ask: is the new unit smaller or bigger? Smaller means multiply; bigger means divide.',
         relatedVariables: ['\\text{km}', '\\text{m}', '\\text{cm}', '\\text{mm}']
       },
       {
         stepNumber: 3,
         title: 'Mass and capacity work the same way',
-        content: 'Mass is how heavy something is, and capacity is how much a container holds. Kilo always means 1000, centi means one hundredth and milli means one thousandth. So 1 kilogram is 1000 grams, just as 1 kilometre is 1000 metres, and 1 litre is 1000 millilitres, just as 1 metre is 1000 millimetres.',
+        content: 'Mass is how heavy something is, and capacity is how much a container holds. Kilo always means 1,000, centi means one hundredth and milli means one thousandth. So 1 kilogram is 1,000 grams, just as 1 kilometre is 1,000 metres, and 1 litre is 1,000 millilitres, just as 1 metre is 1,000 millimetres.',
         keyInsight: 'Learn what kilo, centi and milli mean, and you know the factors for length, mass and capacity.',
         relatedVariables: ['\\text{km}', '\\text{mm}']
       },
@@ -4055,7 +4055,7 @@ The topics in these notes follow the Department for Education document below.
     solvedExample: {
       problem: 'The International Space Station flies about 400 km above the Earth. How high is that in metres, and roughly how high in miles?',
       steps: [
-        'Metres are smaller than kilometres, so the number gets bigger: multiply by 1000. $400 \\times 1000 = 400{,}000$, so that is 400,000 m.',
+        'Metres are smaller than kilometres, so the number gets bigger: multiply by 1,000. $400 \\times 1{,}000 = 400{,}000$, so that is 400,000 m.',
         'For miles, use 5 miles is about 8 km. Find how many lots of 8 km there are in 400 km: $400 \\div 8 = 50$.',
         'Each lot of 8 km is about 5 miles: $50 \\times 5 = 250$.',
         'Check: a mile is longer than a kilometre, so the number of miles should be smaller than 400. It is.'
@@ -4066,7 +4066,7 @@ The topics in these notes follow the Department for Education document below.
       {
         question: "Convert 3.5 km to metres.",
         hint: "Metres are smaller than kilometres. How many metres are in 1 km?",
-        answer: "3500 m"
+        answer: "3,500 m"
       },
       {
         question: "A pencil is 17 cm long. How long is it in millimetres?",
@@ -4079,23 +4079,23 @@ The topics in these notes follow the Department for Education document below.
         answer: "4.5 cm"
       },
       {
-        question: "Which is longer: 1.2 km or 1150 m?",
+        question: "Which is longer: 1.2 km or 1,150 m?",
         hint: "Change 1.2 km into metres first.",
-        answer: "1.2 km, which is 1200 m"
+        answer: "1.2 km, which is 1,200 m"
       },
       {
-        question: "A bag of potatoes has a mass of 2750 g. What is that in kilograms?",
+        question: "A bag of potatoes has a mass of 2,750 g. What is that in kilograms?",
         hint: "Kilograms are bigger than grams. Divide by the number of grams in 1 kg.",
         answer: "2.75 kg"
       },
       {
         question: "A water bottle holds 1.5 litres. How many millilitres is that?",
-        hint: "Milli means one thousandth, so there are 1000 ml in a litre.",
-        answer: "1500 ml"
+        hint: "Milli means one thousandth, so there are 1,000 ml in a litre.",
+        answer: "1,500 ml"
       },
       {
-        question: "Mount Everest is 8849 m high. Write its height in kilometres.",
-        hint: "Divide by 1000. Each digit moves three places to the right.",
+        question: "Mount Everest is 8,849 m high. Write its height in kilometres.",
+        hint: "Divide by 1,000. Each digit moves three places to the right.",
         answer: "8.849 km"
       },
       {
@@ -4118,13 +4118,13 @@ The topics in these notes follow the Department for Education document below.
     textbookContent: `
 ## Measures and converting units
 
-In the last lesson you multiplied and divided by 10, 100 and 1000. That is all the maths you need here. A measurement is a number and a unit together. The same length can be written with different units: 1 metre is also 100 centimetres. Converting changes the number and the unit, never the length itself.
+In the last lesson you multiplied and divided by 10, 100 and 1,000. That is all the maths you need here. A measurement is a number and a unit together. The same length can be written with different units: 1 metre is also 100 centimetres. Converting changes the number and the unit, never the length itself.
 
 ### Units of length
 
 | Unit | Symbol | How big |
 | --- | --- | --- |
-| kilometre | km | 1 km = 1000 m |
+| kilometre | km | 1 km = 1,000 m |
 | metre | m | 1 m = 100 cm |
 | centimetre | cm | 1 cm = 10 mm |
 | millimetre | mm | the gap between the smallest marks on a ruler |
@@ -4133,15 +4133,15 @@ In the last lesson you multiplied and divided by 10, 100 and 1000. That is all t
 
 Going to a **smaller** unit, multiply. Going to a **bigger** unit, divide.
 
-*   6 km to metres: metres are smaller, so multiply by 1000. $6 \\times 1000 = 6000$, so 6 km = 6000 m.
+*   6 km to metres: metres are smaller, so multiply by 1,000. $6 \\times 1{,}000 = 6{,}000$, so 6 km = 6,000 m.
 *   250 cm to metres: metres are bigger, so divide by 100. $250 \\div 100 = 2.5$, so 250 cm = 2.5 m.
 *   4.2 cm to millimetres: millimetres are smaller, so multiply by 10. $4.2 \\times 10 = 42$, so 4.2 cm = 42 mm.
 
-Multiplying by 10 moves every digit one place to the left; dividing by 10 moves every digit one place to the right. For 100 the digits move two places, and for 1000 they move three.
+Multiplying by 10 moves every digit one place to the left; dividing by 10 moves every digit one place to the right. For 100 the digits move two places, and for 1,000 they move three.
 
 ### Jumping more than one step
 
-From metres to millimetres is two steps down: $\\times 100$ and then $\\times 10$, which is $\\times 1000$ altogether. So 3 m = 3000 mm. A common mistake is to use 100 here, because 100 cm make a metre. Count the steps on the ladder before you choose the number.
+From metres to millimetres is two steps down: $\\times 100$ and then $\\times 10$, which is $\\times 1{,}000$ altogether. So 3 m = 3,000 mm. A common mistake is to use 100 here, because 100 cm make a metre. Count the steps on the ladder before you choose the number.
 
 ### Mass and capacity
 
@@ -4149,14 +4149,14 @@ Mass is how heavy something is. Capacity is how much a container holds.
 
 | Measure | Units | How big |
 | --- | --- | --- |
-| Mass | kilogram (kg) and gram (g) | 1 kg = 1000 g |
-| Capacity | litre (l) and millilitre (ml) | 1 l = 1000 ml |
+| Mass | kilogram (kg) and gram (g) | 1 kg = 1,000 g |
+| Capacity | litre (l) and millilitre (ml) | 1 l = 1,000 ml |
 
-They work like length. 3.4 kg = 3400 g, and 750 ml = 0.75 l.
+They work like length. 3.4 kg = 3,400 g, and 750 ml = 0.75 l.
 
 ### Up to three decimal places
 
-Dividing by 1000 can give three decimal places. A path 1234 m long is 1.234 km. A 5 m rope is 0.005 km: the 5 moves three places to the right, so put in zeros to hold the places.
+Dividing by 1,000 can give three decimal places. A path 1,234 m long is 1.234 km. A 5 m rope is 0.005 km: the 5 moves three places to the right, so put in zeros to hold the places.
 
 ### Imperial units
 
