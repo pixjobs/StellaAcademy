@@ -1,0 +1,2894 @@
+===== SOURCE FILE: GCSE_single_science_updated_May_2019.pdf =====
+Biology, Chemistry
+and Physics
+GCSE subject content
+
+June 2015
+
+Contents
+Subject Content
+
+4
+
+Introduction
+
+4
+
+Subject aims and learning outcomes
+
+4
+
+Working scientifically
+
+7
+
+Biology
+
+9
+
+Cell biology
+
+10
+
+Transport systems
+
+11
+
+Health, disease and the development of medicines
+
+12
+
+Coordination and control
+
+13
+
+Photosynthesis
+
+15
+
+Ecosystems
+
+16
+
+Inheritance, variation and evolution
+
+17
+
+Chemistry
+
+20
+
+Atomic structure and the Periodic Table
+
+20
+
+Structure, bonding and the properties of matter
+
+22
+
+Chemical changes
+
+23
+
+Energy changes in chemistry
+
+25
+
+The rate and extent of chemical change
+
+26
+
+Organic chemistry
+
+27
+
+Chemical analysis
+
+27
+
+Chemical and allied industries
+
+29
+
+Earth and atmospheric science
+
+31
+
+Physics
+
+33
+
+Energy
+
+34
+
+Forces
+
+35
+
+Forces and motion
+
+36
+
+Waves in matter
+
+37
+
+Light and electromagnetic waves
+
+38
+
+Electricity
+
+39
+
+Magnetism and electromagnetism
+
+41
+
+Particle model of matter
+
+42
+
+Atomic structure
+
+43
+
+Space physics
+
+44
+
+Appendix 1
+
+46
+
+Appendix 2
+
+48
+
+Appendix 3
+
+49
+
+Appendix 4
+
+50
+
+
+Subject Content
+Introduction
+These GCSE subject criteria set out the knowledge, understanding, and skills for GCSE
+specifications in biology, chemistry and physics to ensure progression from key stage 3
+national curriculum requirements and the possibility of development into A level. They
+provide the framework within which awarding organisations create the detail of the
+subject specifications.
+
+Subject aims and learning outcomes
+This document sets out the learning outcomes and content coverage required for GCSEs
+in the sciences. In subjects such as the sciences, where topics are taught in
+progressively greater depth over the course of key stage 3 and key stage 4, GCSE
+outcomes may reflect or build upon subject content which is typically taught at key stage
+3. There is no expectation that teaching of such content should be repeated during the
+GCSE course where it has already been covered at an earlier stage.
+GCSE study in the sciences provides the foundations for understanding the material
+world. Scientific understanding is changing our lives and is vital to the world’s future
+prosperity, and all students should be taught essential aspects of the knowledge,
+methods, processes and uses of science. They should be helped to appreciate how the
+complex and diverse phenomena of the natural world can be described in terms of a
+small number of key ideas relating to the sciences which are both inter-linked, and are of
+universal application. These key ideas include
+
+
+the use of conceptual models and theories to make sense of the observed
+diversity of natural phenomena
+
+
+
+the assumption that every effect has one or more cause
+
+
+
+that change is driven by differences between different objects and systems when
+they interact
+
+
+
+that many such interactions occur over a distance without direct contact
+
+
+
+that science progresses through a cycle of hypothesis, practical experimentation,
+observation, theory development and review
+
+
+
+that quantitative analysis is a central element both of many theories and of
+scientific methods of inquiry.
+
+
+These key ideas are relevant in different ways and with different emphases in the three
+subjects: examples of their relevance are given for each subject in the separate sections
+below for biology, chemistry and physics.
+GCSE specifications in the three sciences studied concurrently should enable students
+to:
+
+
+develop scientific knowledge and conceptual understanding through the specific
+disciplines of biology, chemistry and physics
+
+
+
+develop understanding of the nature, processes and methods of science, through
+different types of scientific enquiries that help them to answer scientific questions
+about the world around them
+
+
+
+develop and learn to apply observational, practical, modelling, enquiry and
+problem-solving skills, both in the laboratory, in the field and in other learning
+environments
+
+
+
+develop their ability to evaluate claims based on science through critical analysis
+of the methodology, evidence and conclusions, both qualitatively and
+quantitatively.
+
+Furthermore the sciences should be studied in ways that help students to develop
+curiosity about the natural world, insight into how science works, and appreciation of its
+relevance to their everyday lives. The scope and nature of such study should be broad,
+coherent, practical and satisfying, and thereby encourage students to be inspired,
+motivated and challenged by the subject and its achievements.
+The two main dimensions of the content
+The ways in which GCSE specifications in the three sciences should enable students to
+show their understanding of the concepts and methods of science are spelt out below in
+two main sections.
+The first section explains the main ways in which working scientifically should be
+developed and assessed. Specifications should encourage the development of
+knowledge and understanding in science through opportunities for working scientifically.
+Awarding organisations should identify in their assessment strategy how, over a cycle of
+assessments, they will ensure that working scientifically is developed and assessed
+through the subject content.
+The second section sets out the key ideas and subject contents for biology, chemistry
+and physics. These content sections also set out the depth of treatment for both teaching
+and learning. Awarding organisations’ specifications should be designed to set out the
+level of understanding which pupils are expected to acquire.
+
+
+The content sections also set out the mathematical skills required for each science
+discipline. In order to be able to develop their skills, knowledge and understanding in
+science, students need to have been taught, and demonstrate competence, to select and
+apply the appropriate areas of mathematics relevant to the subject as set out under each
+topic and the mathematical skills listed in appendix 3. The mathematics should be at
+levels up to, but not beyond, the requirements specified in GCSE mathematics for the
+appropriate tier.
+All mathematics content must be assessed within the lifetime of the specification.
+Four Appendices provide further details about (1) equations in physics; (2) units in
+science; (3) mathematical skills; and (4) gives a list of apparatus and techniques.
+.
+
+
+Working scientifically
+This second section explains, with both general and subject-specific examples, the main
+ways in which working scientifically may be developed and assessed.
+1. Development of scientific thinking
+•
+
+understand how scientific methods and theories develop over time
+
+•
+
+use a variety of models such as representational, spatial, descriptive,
+computational and mathematical to solve problems, make predictions and to
+develop scientific explanations and understanding of familiar and unfamiliar
+facts
+
+•
+
+appreciate the power and limitations of science and consider any ethical issues
+which may arise
+
+•
+
+explain everyday and technological applications of science; evaluate associated
+personal, social, economic and environmental implications; and make decisions
+based on the evaluation of evidence and arguments
+
+•
+
+evaluate risks both in practical science and the wider societal context, including
+perception of risk in relation to data and consequences
+
+•
+
+recognise the importance of peer review of results and of communicating results
+to a range of audiences.
+
+2. Experimental skills and strategies
+•
+
+use scientific theories and explanations to develop hypotheses
+
+•
+
+plan experiments or devise procedures to make observations, produce or
+characterise a substance, test hypotheses, check data or explore phenomena
+
+•
+
+apply a knowledge of a range of techniques, instruments, apparatus, and
+materials to select those appropriate to the experiment
+
+•
+
+carry out experiments appropriately having due regard to the correct
+manipulation of apparatus, the accuracy of measurements and health and
+safety considerations
+
+•
+
+recognise when to apply a knowledge of sampling techniques to ensure any
+samples collected are representative
+
+•
+
+make and record observations and measurements using a range of apparatus
+and methods
+
+•
+
+evaluate methods and suggest possible improvements and further
+
+investigations.
+3. Analysis and evaluation
+•
+
+Apply the cycle of collecting, presenting and analysing data, including:
+•
+
+presenting observations and other data using appropriate methods
+
+•
+
+translating data from one form to another
+
+•
+
+carrying out and represent mathematical and statistical analysis
+
+•
+
+representing distributions of results and make estimations of
+uncertainty
+
+•
+
+interpreting observations and other data (presented in verbal,
+diagrammatic, graphical, symbolic or numerical form), including
+identifying patterns and trends, making inferences and drawing
+conclusions
+
+•
+
+presenting reasoned explanations including relating data to
+hypotheses
+
+•
+
+being objective, evaluating data in terms of accuracy, precision,
+repeatability and reproducibility and identifying potential sources of
+random and systematic error
+
+•
+
+communicating the scientific rationale for investigations, methods
+used, findings and reasoned conclusions through paper-based and
+electronic reports and presentations using verbal, diagrammatic,
+graphical, numerical and symbolic forms.
+
+4. Scientific vocabulary, quantities, units, symbols and nomenclature
+• use scientific vocabulary, terminology and definitions
+• recognise the importance of scientific quantities and understand how they are
+determined
+• use SI units (e.g. kg, g, mg; km, m, mm; kJ, J) and IUPAC chemical
+nomenclature unless inappropriate
+• use prefixes and powers of ten for orders of magnitude (e.g. tera, giga, mega, kilo,
+centi, milli, micro and nano)
+• interconvert units
+• use an appropriate number of significant figures in calculation.
+
+Biology
+Biology is the science of living organisms (including animals, plants, fungi and
+microorganisms) and their interactions with each other and the environment. The study of
+biology involves collecting and interpreting information about the natural world to identify
+patterns and relate possible cause and effect. Biological information is used to help
+humans improve their own lives and strive to create a sustainable world for future
+generations.
+Students should be helped to understand how, through the ideas of biology, the complex
+and diverse phenomena of the natural world can be described in terms of a small number
+of key ideas which are of universal application, and which can be illustrated in the
+separate topics set out below. These ideas include:
+•
+
+life processes depend on molecules whose structure is related to their function
+
+•
+
+the fundamental units of living organisms are cells, which may be part of highly
+adapted structures including tissues, organs and organ systems, enabling living
+processes to be performed effectively
+
+•
+
+living organisms may form populations of single species, communities of many
+species and ecosystems, interacting with each other, with the environment and
+with humans in many different ways
+
+•
+
+living organisms are interdependent and show adaptations to their environment
+
+•
+
+life on Earth is dependent on photosynthesis in which green plants and algae trap
+light from the Sun to fix carbon dioxide and combine it with hydrogen from water to
+make organic compounds and oxygen
+
+•
+
+organic compounds are used as fuels in cellular respiration to allow the other
+chemical reactions necessary for life
+
+•
+
+the chemicals in ecosystems are continually cycling through the natural world
+
+•
+
+the characteristics of a living organism are influenced by its genome and its
+interaction with the environment
+
+•
+
+evolution occurs by a process of natural selection and accounts both for
+biodiversity and how organisms are all related to varying degrees.
+
+This content sets out the full range of content for GCSE Biology. Awarding
+organisations may, however, use flexibility to increase depth, breadth or context
+within the specified topics or to consolidate teaching of the subject content.
+Higher tier GCSE biology specifications must assess all the content set out below,
+whether it is underlined or is not underlined. Foundation tier GCSE biology
+specifications must assess all the content set out below, except for content which is
+underlined.
+
+GCSE biology specifications should require students to:
+
+Cell biology
+Prokaryotic and eukaryotic cells
+•
+
+explain how the main sub-cellular structures of eukaryotic cells (plants and
+animals) and prokaryotic cells are related to their functions, including the
+nucleus/genetic material, plasmids, mitochondria, chloroplasts and cell
+membranes
+
+•
+
+explain how electron microscopy has increased our understanding of sub-cellular
+structures
+
+•
+
+explain the aseptic techniques used in culturing organisms.
+
+Growth and development of cells
+•
+
+describe the process of mitosis in growth, including the cell cycle
+
+•
+
+explain the importance of cell differentiation
+
+•
+
+describe cancer as the result of changes in cells that lead to uncontrolled growth
+and division
+
+•
+
+describe the function of stem cells in embryonic and adult animals and meristems
+in plants
+
+•
+
+discuss potential benefits and risks associated with the use of stem cells in
+medicine
+
+•
+
+explain the role of meiotic cell division in halving the chromosome number to form
+gametes.
+
+Cell metabolism
+•
+
+explain the mechanism of enzyme action including the active site, enzyme
+specificity and factors affecting the rate of enzymatic reaction
+
+•
+
+describe cellular respiration as an exothermic reaction which is continuously
+occurring in all living cells
+
+•
+
+compare the processes of aerobic and anaerobic respiration
+
+•
+
+explain the importance of sugars, amino acids, fatty acids and glycerol in the
+synthesis and breakdown of carbohydrates, lipids and proteins.
+
+Use of mathematics
+
+•
+
+demonstrate an understanding of number, size and scale and the quantitative
+relationship between units (2a and 2h)
+
+•
+
+use estimations and explain when they should be used (1d)
+
+•
+
+carry out rate calculations for chemical reactions (1a and 1c)
+
+•
+
+calculate with numbers written in standard form (1b)
+
+•
+
+calculate cross-sectional areas of bacterial cultures and clear agar jelly using πr2
+(5c).
+
+Transport systems
+Transport in cells
+• explain how substances are transported into and out of cells through diffusion,
+osmosis and active transport.
+Transport systems in multicellular organisms
+• explain the need for exchange surfaces and a transport system in multicellular
+organisms in terms of surface area:volume ratio
+• describe some of the substances transported into and out of a range of organisms
+in terms of the requirements of those organisms, to include oxygen, carbon
+dioxide, water, dissolved food molecules, mineral ions and urea.
+Human circulatory system
+•
+
+describe the human circulatory system, including the relationship with the gaseous
+exchange system, and explain how the structure of the heart and the blood
+vessels are adapted to their functions
+
+•
+
+explain how red blood cells, white blood cells, platelets and plasma are adapted to
+their functions in the blood.
+
+Transport systems in plants
+•
+
+explain how the structure of xylem and phloem are adapted to their functions in
+the plant
+
+•
+
+explain how water and mineral ions are taken up by plants, relating the structure of
+the root hair cells to their function
+
+•
+
+describe the processes of transpiration and translocation, including the structure
+and function of the stomata
+
+
+•
+
+explain the effect of a variety of environmental factors on the rate of water uptake
+by a plant, to include light intensity, air movement and temperature.
+
+Use of mathematics
+•
+
+calculate surface area:volume ratios (1c)
+
+•
+
+use simple compound measures such as rate (1a, 1c)
+
+•
+
+carry out rate calculations (1a and 1c)
+
+•
+
+plot, draw and interpret appropriate graphs (4a, 4b, 4c and 4d)
+
+•
+
+use percentiles and calculate percentage gain and loss of mass (1c).
+
+Health, disease and the development of medicines
+Health and disease
+•
+
+describe the relationship between health and disease
+
+•
+
+describe different types of diseases (including communicable and noncommunicable diseases)
+
+•
+
+describe the interactions between different types of disease.
+
+Communicable diseases
+•
+
+explain how communicable diseases (caused by viruses, bacteria, protists and
+fungi) are spread in animals and plants
+
+•
+
+describe a minimum of one common human infection, one plant disease and
+sexually transmitted infections in humans including HIV/AIDS
+
+•
+
+describe the non-specific defence systems of the human body against pathogens
+
+•
+
+explain the role of the immune system of the human body in defence against
+disease
+
+•
+
+describe how monoclonal antibodies are produced
+
+•
+
+describe some of the ways in which monoclonal antibodies can be used
+
+•
+
+describe physical plant defence responses (including leaf cuticle, cell wall)
+
+•
+
+describe chemical plant defence responses (including antimicrobial substances)
+
+•
+
+describe different ways plant diseases can be detected and identified, in the lab
+and in the field.
+
+Treating, curing and preventing disease
+•
+
+explain the use of vaccines and medicines in the prevention and treatment of
+disease
+
+•
+
+describe the process of discovery and development of potential new medicines,
+including preclinical and clinical testing
+
+•
+
+explain how the spread of communicable diseases may be reduced or prevented
+in animals and plants, to include a minimum of one common human infection, one
+plant disease and sexually transmitted infections in humans including HIV/AIDS.
+
+Non-communicable diseases in humans
+•
+
+recall that many non-communicable human diseases are caused by the interaction
+of a number of factors. To include cardiovascular diseases, many forms of cancer,
+some lung and liver diseases and diseases influenced by nutrition, including type
+2 diabetes
+
+•
+
+explain the effect of lifestyle factors, including exercise, diet, alcohol and smoking,
+on the incidence of non-communicable diseases at local, national and global
+levels
+
+•
+
+evaluate some different treatments for cardiovascular disease.
+
+Use of mathematics
+•
+
+translate information between graphical and numerical forms (4a)
+
+•
+
+construct and interpret frequency tables and diagrams, bar charts and histograms
+(2c)
+
+•
+
+understand the principles of sampling as applied to scientific data (2d)
+
+•
+
+use a scatter diagram to identify a correlation between two variables (2g)
+
+•
+
+calculate cross-sectional areas of bacterial cultures and clear agar jelly using πr2
+(5c).
+
+Coordination and control
+Nervous coordination and control in humans
+•
+
+explain how the structure of the nervous system (including CNS, sensory and
+motor neurones and sensory receptors) is adapted to its functions
+
+•
+
+explain how the structure of a reflex arc is related to its function
+
+•
+
+explain how the main structures of the eye are related to their functions
+
+•
+
+describe common defects of the eye and explain how some of these problems
+may be overcome
+
+•
+
+describe the structure and function of the brain
+
+•
+
+explain some of the difficulties of investigating brain function
+
+•
+
+explain some of the limitations in treating damage and disease in the brain and
+other parts of the nervous system.
+
+Hormonal coordination and control in humans
+•
+
+describe the principles of hormonal coordination and control by the human
+endocrine system
+
+•
+
+explain the roles of thyroxine and adrenaline in the body, including thyroxine as an
+example of a negative feedback system
+
+•
+
+describe the roles of hormones in human reproduction, including the menstrual
+cycle
+
+•
+
+explain the interactions of FSH, LH, oestrogen and progesterone in the control of
+the menstrual cycle
+
+•
+
+explain the use of hormones in contraception and evaluate hormonal and nonhormonal methods of contraception
+
+•
+
+explain the use of hormones in modern reproductive technologies to treat
+infertility.
+
+Plant hormones
+•
+
+explain how plant hormones are important in the control and coordination of plant
+growth and development, with reference to the role of auxins in phototropisms and
+gravitropisms
+
+•
+
+describe some of the effects of plant hormones, relating to auxins, gibberellins and
+ethene
+
+•
+
+describe some of the different ways in which people use plant hormones to control
+plant growth.
+
+Homeostasis in humans
+• explain the importance of maintaining a constant internal environment in response
+to internal and external change
+• explain how insulin controls blood sugar levels in the body
+
+• explain how glucagon interacts with insulin to control blood sugar levels in the body
+• compare type 1 and type 2 diabetes and explain how they can be treated
+• describe the function of the skin in the control of body temperature
+• explain the effect on cells of osmotic changes in body fluids
+• describe the function of the kidneys in maintaining the water balance of the body
+• describe the effect of ADH on the permeability of the kidney tubules
+• explain the response of the body to different temperature and osmotic challenges.
+Use of mathematics
+•
+
+extract and interpret data from graphs, charts and tables (2c)
+
+•
+
+translate information between numerical and graphical forms (4a).
+
+Photosynthesis
+Importance of photosynthesis
+•
+
+describe the process of photosynthesis and describe photosynthesis as an
+endothermic reaction
+
+•
+
+describe photosynthetic organisms as the main producers of food and therefore
+biomass for life on Earth
+
+•
+
+explain the effect of temperature, light intensity and carbon dioxide concentration
+on the rate of photosynthesis
+
+•
+
+explain the interaction of these factors in limiting the rate of photosynthesis.
+
+Use of mathematics
+•
+
+understand and use simple compound measures such as the rate of a reaction
+(1a and 1c)
+
+•
+
+translate information between graphical and numerical form (4a)
+
+•
+
+plot and draw appropriate graphs, selecting appropriate scales for axes (4a and
+4c)
+
+•
+
+extract and interpret information from graphs, charts and tables (2c and 4a)
+
+•
+
+understand and use inverse proportion – the inverse square law and light intensity
+in the context of factors affecting photosynthesis.
+
+Ecosystems
+Levels of organisation within an ecosystem
+•
+
+describe different levels of organisation in an ecosystem from individual organisms
+to the whole ecosystem
+
+•
+
+explain how some abiotic and biotic factors affect communities
+
+•
+
+describe the importance of interdependence and competition in a community.
+
+The principle of material cycling
+•
+
+recall that many different materials cycle through the abiotic and biotic
+components of an ecosystem
+
+•
+
+explain the importance of the carbon cycle and the water cycle to living organisms
+
+•
+
+explain the role of microorganisms in the cycling of materials through an
+ecosystem
+
+•
+
+explain the effects of factors such as temperature and water content on rate of
+decomposition in aerobic and anaerobic environments
+
+•
+
+evaluate the evidence for the impact of environmental changes on the distribution
+of organisms, with reference to water and atmospheric gases.
+
+Pyramids of biomass and transfer through trophic levels
+•
+
+describe the differences between the trophic levels of organisms within an
+ecosystem
+
+•
+
+describe pyramids of biomass and explain, with examples, how biomass is lost
+between the different trophic levels
+
+•
+
+calculate the efficiency of biomass transfers between trophic levels and explain
+how this affects the number of organisms at each trophic level.
+
+Biodiversity
+•
+
+describe how to carry out a field investigation into the distribution and abundance
+of organisms in an ecosystem and explain how to determine their numbers in a
+given area
+
+•
+
+describe both positive and negative human interactions within ecosystems and
+explain their impact on biodiversity
+
+•
+
+explain some of the benefits and challenges of maintaining local and global
+
+biodiversity.
+Some of the biological challenges of increasing food yields using fewer resources
+•
+
+describe some of the biological factors affecting levels of food security including
+increasing human population, changing diets in wealthier populations, new pests
+and pathogens, environmental change, sustainability and cost of agricultural
+inputs
+
+•
+
+describe and explain some possible biotechnological and agricultural solutions,
+including genetic modification, to the demands of the growing human population.
+
+Use of mathematics
+•
+
+Calculate rate changes in the decay of biological material (1c)
+
+•
+
+Calculate the percentage of mass (1c)
+
+•
+
+Calculate arithmetic means (2b)
+
+•
+
+Use fractions and percentages (1c)
+
+•
+
+Plot and draw appropriate graphs selecting appropriate scales for the axes 4a and
+(4c)
+
+•
+
+Extract and interpret information from charts, graphs and tables (2c and 4a).
+
+Inheritance, variation and evolution
+Reproduction
+•
+
+explain some of the advantages and disadvantages of asexual and sexual
+reproduction in a range of organisms.
+
+The genome and gene expression
+•
+
+describe DNA as a polymer made up of two strands forming a double helix
+
+•
+
+describe the genome as the entire genetic material of an organism
+
+•
+
+explain the following terms: gamete, chromosome, gene, allele/ variant, dominant,
+recessive, homozygous, heterozygous, genotype and phenotype
+
+•
+
+describe simply how the genome, and its interaction with the environment,
+influence the development of the phenotype of an organism
+
+•
+
+discuss the potential importance for medicine of our increasing understanding of
+the human genome
+
+
+•
+
+describe DNA as a polymer made from four different nucleotides; each nucleotide
+consisting of a common sugar and phosphate group with one of four different
+bases attached to the sugar
+
+•
+
+recall a simple description of protein synthesis
+
+•
+
+explain simply how the structure of DNA affects the proteins made in protein
+synthesis
+
+•
+
+describe how genetic variants may influence phenotype; in coding DNA by altering
+the activity of a protein
+
+•
+
+describe how genetic variants may influence phenotype in non-coding DNA by
+altering how genes are expressed.
+
+Inheritance
+•
+
+explain single gene inheritance
+
+•
+
+predict the results of single gene crosses
+
+•
+
+recall that most phenotypic features are the result of multiple genes rather than
+single gene inheritance
+
+•
+
+describe sex determination in humans
+
+•
+
+describe the development of our understanding of genetics including the work of
+Mendel.
+
+Variation and evolution
+•
+
+state that there is usually extensive genetic variation within a population of a
+species
+
+•
+
+recall that all variants arise from mutations, and that most have no effect on the
+phenotype, some influence phenotype and a very few determine phenotype
+
+•
+
+describe evolution as a change in the inherited characteristics of a population over
+time through a process of natural selection which may result in the formation of
+new species
+
+•
+
+explain how evolution occurs through natural selection of variants that give rise to
+phenotypes best suited to their environment
+
+•
+
+describe the evidence for evolution, including fossils and antibiotic resistance in
+bacteria
+
+•
+
+describe the impact of developments in biology on classification systems
+
+
+•
+
+describe the work of Darwin and Wallace in the development of the theory of
+evolution by natural selection and explain the impact of these ideas on modern
+biology.
+
+Selective breeding and gene technology
+•
+
+explain the impact of the selective breeding of food plants and domesticated
+animals
+
+•
+
+describe genetic engineering as a process which involves modifying the genome
+of an organism to introduce desirable characteristics
+
+•
+
+describe the main steps in the process of genetic engineering
+
+•
+
+explain some of the possible benefits and risks, including practical and ethical
+considerations, of using gene technology in modern agriculture and medicine.
+
+Use of mathematics
+•
+
+Understand and use direct proportions and simple ratios in genetic crosses (1c)
+
+•
+
+Understand and use the concept of probability in predicting the outcome of genetic
+crosses (2e)
+
+•
+
+Extract and interpret information from charts, graphs and tables (2c and 4a).
+
+
+Chemistry
+Chemistry is the science of the composition, structure, properties and reactions of matter,
+understood in terms of atoms, atomic particles and the way they are arranged and link
+together. It is concerned with the synthesis, formulation, analysis and characteristic
+properties of substances and materials of all kinds.
+Students should be helped to appreciate the achievements of chemistry in showing how
+the complex and diverse phenomena of both the natural and man-made worlds can be
+described in terms of a small number of key ideas which are of universal application, and
+which can be illustrated in the separate topics set out below. These ideas include:
+•
+•
+•
+•
+•
+•
+•
+
+•
+
+matter is composed of tiny particles called atoms and there are about 100 different
+naturally occurring types of atoms called elements
+elements show periodic relationships in their chemical and physical properties
+these periodic properties can be explained in terms of the atomic structure of the
+elements
+atoms bond by either transferring electrons from one atom to another or by sharing
+electrons
+the shapes of molecules (groups of atoms bonded together) and the way giant
+structures are arranged is of great importance in terms of the way they behave
+there are barriers to reaction so reactions occur at different rates
+chemical reactions take place in only three different ways:
+• proton transfer
+• electron transfer
+• electron sharing
+energy is conserved in chemical reactions so can therefore be neither created or
+destroyed.
+
+This content sets out the full range of content for GCSE Chemistry. Awarding
+organisations may, however, use flexibility to increase depth, breadth or context within
+the specified topics or to consolidate teaching of the subject content.
+Bullet points in bold are common to physics.
+Higher tier GCSE chemistry specifications must assess all the content set out below,
+whether it is underlined or is not underlined. Foundation tier GCSE chemistry
+specifications must assess all the content set out below, except for content which is
+underlined.
+GCSE chemistry science specifications should require students to:
+
+Atomic structure and the Periodic Table
+A simple model of the atom, relative atomic mass, electronic charge and isotopes
+
+•
+
+describe the atom as a positively charged nucleus surrounded by negatively
+charged electrons, with the nuclear radius much smaller than that of the atom and
+with most of the mass in the nucleus
+
+•
+
+recall the typical size (order of magnitude) of atoms and small molecules
+
+•
+
+describe how and why the atomic model has changed over time
+
+•
+
+recall relative charges and approximate relative masses of protons, neutrons and
+electrons
+
+•
+
+calculate numbers of protons, neutrons and electrons in atoms and ions, given atomic
+number and mass number of isotopes.
+
+The modern Periodic Table
+• explain how the position of an element in the Periodic Table is related to the
+arrangement of electrons in its atoms and hence to its atomic number
+• explain in terms of isotopes how this changes the arrangement proposed by
+Mendeleev
+• use the names and symbols of the first 20 elements, Groups 1, 7 and 0 and other
+common elements from a supplied Periodic Table to write formulae and balanced
+chemical equations where appropriate
+• explain how the reactions of elements are related to the arrangement of electrons
+in their atoms and hence to their atomic number
+• recall the simple properties of Groups 1, 7 and 0
+• explain how observed simple properties of Groups 1,7 and 0 depend on the outer
+shell of electrons of the atoms and predict properties from given trends down the
+groups
+• predict possible reactions and probable reactivity of elements from their positions
+in the Periodic Table
+• describe metals and non-metals and explain the differences between them on the
+basis of their characteristic physical and chemical properties
+• explain how the atomic structure of metals and non-metals relates to their position
+in the Periodic Table.
+Properties of transition metals
+
+
+• recall the general properties of transition metals (melting point, density, reactivity,
+formation of coloured ions with different charges and uses as catalysts) and
+exemplify these by reference to a small number of transition metals.
+
+Structure, bonding and the properties of matter
+States of matter and change of state in terms of particle kinetics, energy transfers
+and the relative strength of chemical bonds and intermolecular forces
+• recall and explain the main features of the particle model in terms of the states of
+matter and change of state, distinguishing between physical and chemical
+changes
+• explain the limitations of the particle model in relation to changes of state when
+particles are represented by inelastic spheres
+• use ideas about energy transfers and the relative strength of chemical bonds and
+intermolecular forces to explain the different temperatures at which changes of
+state occur
+• use data to predict states of substances under given conditions.
+Different kinds of chemical bonds: ionic, covalent and metallic bonding
+• describe and compare the nature and arrangement of chemical bonds in ionic
+compounds, simple molecules, giant covalent structures, polymers and metals
+• explain chemical bonding in terms of electrostatic forces and the transfer or
+sharing of electrons
+• construct dot and cross diagrams for simple ionic and covalent substances
+• describe the limitations of particular representations and models to include dot and
+cross diagrams, ball and stick models and two and three dimensional
+representations
+• explain how the bulk properties of materials are related to the different types of
+bonds they contain, their bond strengths in relation to intermolecular forces and
+the ways in which their bonds are arranged, recognising that the atoms
+themselves do not have these properties.
+Structure and bonding of carbon
+• recall that carbon can form four covalent bonds
+• explain that the vast array of natural and synthetic organic compounds occur due
+to the ability of carbon to form families of similar compounds, chains and rings
+
+• explain the properties of diamond, graphite, fullerenes and graphene in terms of
+their structures and bonding.
+Bulk and surface properties of matter including nanoparticles
+•
+
+compare ‘nano’ dimensions to typical dimensions of atoms and molecules
+
+•
+
+describe the surface area to volume relationship for different-sized particles
+and describe how this affects properties
+
+•
+
+describe how the properties of nanoparticulate materials are related to their
+uses
+
+•
+
+explain the possible risks associated with some nanoparticulate materials.
+
+Use of mathematics
+• relate size and scale of atoms to objects in the physical world (1d)
+• translate information between diagrammatic and numerical forms (4a)
+• represent three dimensional shapes in two dimensions and vice versa when
+looking at chemical structures e.g. allotropes of carbon (5b)
+• estimate size and scale of atoms and nanoparticles (1d)
+• interpret, order and calculate with numbers written in standard form when dealing
+with nanoparticles (1b)
+• use ratios when considering relative sizes and surface area to volume
+comparisons (1c)
+• calculate surface areas and volumes of cubes (5c).
+
+Chemical changes
+Chemical symbols, formulae and equations
+• use chemical symbols to write the formulae of elements and simple covalent and
+ionic compounds
+• deduce the empirical formula of a compound from the relative numbers of atoms
+present or from a model or diagram and vice versa
+• use the names and symbols of common elements and compounds and the
+principle of conservation of mass to write formulae and balanced chemical
+equations and half equations
+• use the formulae of common ions to deduce the formula of a compound and write
+balanced ionic equations
+
+• describe the physical states of products and reactants using state symbols (s, l, g
+and aq).
+Identification of common gases
+•
+
+describe tests to identify selected gases including oxygen, hydrogen, carbon
+dioxide and chlorine.
+
+Chemistry of acids
+•
+
+recall that acids react with some metals and with carbonates and write equations
+predicting products from given reactants
+
+• recall that acids form hydrogen ions when they dissolve in water and solutions of
+alkalis contain hydroxide ions
+• recall that relative acidity and alkalinity are measured by pH
+• describe neutralisation as acid reacting with alkali to form a salt plus water
+• recognise that aqueous neutralisation reactions can be generalised to hydrogen
+ions reacting with hydroxide ions to form water
+• use and explain the terms dilute and concentrated (amount of substance) and
+weak and strong (degree of ionisation) in relation to acids
+• recall that as hydrogen ion concentration increases by a factor of ten the pH value
+of a solution decreases by a factor of one
+• describe neutrality and relative acidity and alkalinity in terms of the effect of the
+concentration of hydrogen ions on the numerical value of pH (whole numbers
+only).
+A reactivity series of metals as the tendency of a metal to form its positive ion
+• explain how the reactivity of metals with water or dilute acids is related to the
+tendency of the metal to form its positive ion
+• deduce an order of reactivity of metals based on experimental results.
+Electrolysis of various molten ionic liquids and aqueous ionic solutions
+•
+
+describe electrolysis in terms of the ions present and reactions at the electrodes
+
+•
+
+recall that metals (or hydrogen) are formed at the cathode and non-metals are
+formed at the anode in electrolysis using inert electrodes
+
+•
+
+predict the products of electrolysis of binary ionic compounds in the molten state
+
+•
+
+describe competing reactions in the electrolysis of aqueous solutions of ionic
+compounds in terms of the different species present.
+
+Redox reactions (reduction and oxidation)
+•
+
+explain reduction and oxidation in terms of loss or gain of oxygen, identifying
+which species are oxidised and which are reduced
+
+•
+
+explain reduction and oxidation in terms of gain or loss of electrons, identifying
+which species are oxidised and which are reduced.
+
+Use of mathematics
+•
+
+arithmetic computation and ratio when determining empirical formulae, balancing
+equations (1a and 1c).
+
+Energy changes in chemistry
+Exothermic and endothermic reactions, including reaction profiles
+• distinguish between endothermic and exothermic reactions on the basis of the
+temperature change of the surroundings
+• draw and label a reaction profile for an exothermic and an endothermic reaction,
+identifying activation energy
+• explain activation energy as the energy needed for a reaction to occur
+• calculate energy changes in a chemical reaction by considering bond making and
+bond breaking energies.
+Carbon compounds both as fuels and feedstock
+•
+
+recall that crude oil is a main source of hydrocarbons and is a feedstock for the
+petrochemical industry
+
+• explain how modern life is crucially dependent upon hydrocarbons and recognise
+that crude oil is a finite resource.
+Chemical cells and fuel cells
+•
+
+recall that a chemical cell produces a potential difference until the reactants are
+used up
+
+•
+
+evaluate the advantages and disadvantages of hydrogen/oxygen and other fuel
+cells for given uses.
+
+Uses of mathematics
+
+• arithmetic computation when calculating energy changes (1a)
+•
+
+interpretation of charts and graphs when dealing with reaction profiles (4a).
+
+The rate and extent of chemical change
+Factors that influence the rate of reaction, including catalysts
+•
+
+suggest practical methods for determining the rate of a given reaction
+
+•
+
+interpret rate of reaction graphs
+
+•
+
+describe the effect of changes in temperature, concentration, pressure, and
+surface area on rate of reaction
+
+•
+
+explain the effects on rates of reaction of changes in temperature, concentration
+and pressure in terms of frequency and energy of collision between particles
+
+•
+
+explain the effects on rates of reaction of changes in the size of the pieces of a
+reacting solid in terms of surface area to volume ratio
+
+•
+
+describe the characteristics of catalysts and their effect on rates of reaction
+
+•
+
+identify catalysts in reactions
+
+•
+
+explain catalytic action in terms of activation energy
+
+•
+
+recall that enzymes act as catalysts in biological systems.
+
+Reversible reactions and the concept of dynamic equilibrium
+•
+
+recall that some reactions may be reversed by altering the reaction conditions
+
+•
+
+recall that dynamic equilibrium occurs when the rates of forward and reverse
+reactions are equal
+
+•
+
+predict the effect of changing reaction conditions (concentration, temperature and
+pressure) on equilibrium position and suggest appropriate conditions to produce a
+particular product.
+
+Uses of mathematics
+• arithmetic computation, ratio when measuring rates of reaction (1a and 1c)
+• drawing and interpreting appropriate graphs from data to determine rate of
+reaction (4b and 4c)
+• determining gradients of graphs as a measure of rate of change to determine rate
+(4d and 4e)
+
+• proportionality when comparing factors affecting rate of reaction (1c).
+
+Organic chemistry
+Homologous series, including alkanes, alkenes, alcohols and carboxylic acids
+• recognise functional groups and identify members of the same homologous series
+• name and draw the structural formulae, using fully displayed formulae, of the first
+four members of the straight chain alkanes, alkenes, alcohols and carboxylic
+acids.
+Simple reactions of alkanes, alkenes and alcohols
+• predict the formulae and structures of products of reactions (combustion, addition
+across a double bond and oxidation of alcohols to carboxylic acids) of the first four
+and other given members of these homologous series.
+• recall that it is the generality of reactions of functional groups that determine the
+reactions of organic compounds.
+Synthetic and naturally occurring polymers, including DNA
+• recall the basic principles of addition polymerisation by reference to the functional
+group in the monomer and the repeating units in the polymer
+• deduce the structure of an addition polymer from a simple alkene monomer and
+vice versa
+• explain the basic principles of condensation polymerisation by reference to the
+functional groups of the monomers, the minimum number of functional groups
+within a monomer, the number of repeating units in the polymer, and simultaneous
+formation of a small molecule
+• recall that DNA is a polymer made from four different monomers called nucleotides
+and that other important naturally-occurring polymers arew based on sugars and
+amino-acids.
+
+Chemical analysis
+Assessing purity and separating mixtures
+• explain what is meant by the purity of a substance, distinguishing between the
+scientific and everyday use of the term ‘pure’
+• explain that many useful materials are formulations of mixtures
+
+• describe, explain and exemplify the processes of filtration, crystallisation, simple
+distillation, and fractional distillation
+• recall that chromatography involves a stationary and a mobile phase and that
+separation depends on the distribution between the phases
+• interpret chromatograms, including measuring Rf values
+• suggest suitable purification techniques given information about the substances
+involved
+• use melting point data to distinguish pure from impure substances
+• suggest chromatographic methods for distinguishing pure from impure
+substances.
+Conservation of mass and the quantitative interpretation of balanced equations
+•
+
+recall and use the law of conservation of mass
+
+•
+
+explain any observed changes in mass in non-enclosed systems during a
+chemical reaction and explain them using the particle model
+
+•
+
+calculate relative formula masses of species separately and in a balanced
+chemical equation.
+
+Use of amount of substance in relation to masses of pure substances
+• recall and use the definitions of the Avogadro constant (in standard form) and of
+the mole
+• explain how the mass of a given substance is related to the amount of that
+substance in moles and vice versa
+• deduce the stoichiometry of an equation from the masses of reactants and
+products and explain the effect of a limiting quantity of a reactant
+• use a balanced equation to calculate masses of reactants or products
+• explain how the mass of a solute and the volume of the solution is related to the
+concentration of the solution.
+Use the mole in relation to volumes of gases
+• describe the relationship between molar amounts of gases and their volumes and
+vice versa, and calculate the volumes of gases involved in reactions, using the
+molar gas volume at room temperature and pressure (assumed to be 24dm3)
+
+
+Principles for determining the concentrations of solutions
+• explain how the concentration of a solution in mol/dm3 is related to the mass of the
+solute and the volume of the solution
+• explain the relationship between the volume of a solution of known concentration
+of a substance and the volume or concentration of another substance that react
+completely together,
+Identification of ions by chemical and spectroscopic means
+• describe tests to identify aqueous cations and aqueous anions
+• identify species from test results
+• interpret flame tests to identify metal ions, including the ions of lithium, sodium,
+potassium, calcium and copper
+• describe the advantages of instrumental methods of analysis (sensitivity, accuracy
+and speed)
+• interpret an instrumental result given appropriate data in chart or tabular form,
+when accompanied by a reference set in the same form.
+Use of mathematics
+• arithmetic computation, ratio, percentage and multistep calculations permeates
+quantitative chemistry (1a, 1c and 1d)
+• calculations with numbers written in standard form when using the Avogadro
+constant (1b)
+• change the subject of a mathematical equation (3b and 3c)
+• provide answers to an appropriate number of significant figures (2a)
+• convert units where appropriate particularly from mass to moles (1c)
+• interpret charts, particularly in spectroscopy (4a).
+
+Chemical and allied industries
+Life cycle assessment and recycling
+• describe the basic principles in carrying out a life-cycle assessment of a material
+or product
+• interpret data from a life-cycle assessment of a material or product
+
+• describe a process where a material or product is recycled for a different use, and
+explain why this is viable
+• evaluate factors that affect decisions on recycling.
+Fractional distillation of crude oil and cracking
+• describe and explain the separation of crude oil by fractional distillation
+• describe the fractions as largely a mixture of compounds of formula CnH2n+2 which
+are members of the alkane homologous series
+• describe the production of materials that are more useful by cracking.
+Different methods of extracting and purifying metals with reference to a reactivity
+series with oxygen and the position of carbon within it
+•
+
+explain, using the position of carbon in the reactivity series, the principles of
+industrial processes used to extract metals, including extraction of a non-ferrous
+metal
+
+•
+
+explain why and how electrolysis is used to extract some metals from their ores
+
+•
+
+evaluate alternative biological methods of metal extraction (bacterial and
+phytoextraction).
+
+Using materials
+•
+
+describe the conditions which cause corrosion and the process of corrosion, and
+explain how mitigation is achieved by creating a physical barrier to oxygen and
+water and by sacrificial protection
+
+•
+
+describe the composition of some important alloys in relation to their properties
+and uses
+
+•
+
+compare quantitatively the physical properties of glass and clay ceramics,
+polymers, composites and metals
+
+•
+
+explain how the properties of materials are related to their uses and select
+appropriate materials given details of the usage required.
+
+The balance between equilibrium position and rate in industrial processes
+•
+
+interpret graphs of reaction conditions versus rate
+
+•
+
+explain the trade-off between rate of production of a desired product and position
+of equilibrium in some industrially important processes
+
+•
+
+explain how the commercially used conditions for an industrial process are related
+to the availability and cost of raw materials and energy supplies, control of
+equilibrium position and rate.
+
+Agricultural productivity and the use of nitrogen, phosphorus and potassiumbased fertilisers
+• explain the importance of the Haber process in agricultural production
+• recall the importance of nitrogen, phosphorus and potassium compounds in
+agricultural production
+• describe the industrial production of fertilisers as several integrated processes
+using a variety of raw materials and compare with laboratory syntheses.
+• compare the industrial production of fertilisers with laboratory syntheses of the
+same products.
+The comparison of yield and atom economy of chemical reactions
+•
+
+calculate the percentage yield of a reaction product from the actual yield of a
+reaction
+
+•
+
+calculate the theoretical amount of a product from a given amount of reactant
+
+•
+
+define the atom economy of a reaction
+
+•
+
+calculate the atom economy of a reaction to form a desired product from the
+balanced equation
+
+•
+
+explain why a particular reaction pathway is chosen to produce a specified product
+given appropriate data such as atom economy (if not calculated), yield, rate,
+equilibrium position and usefulness of by-products.
+
+Use of mathematics
+• arithmetic computation when calculating yields and atom economy (1a and 1c).
+
+Earth and atmospheric science
+The composition and evolution of the Earth’s atmosphere since its formation
+•
+
+interpret evidence for how it is thought the atmosphere was originally formed
+
+•
+
+describe how it is thought an oxygen-rich atmosphere developed over time.
+
+Carbon dioxide and methane as greenhouse gases
+• describe the greenhouse effect in terms of the interaction of radiation with matter
+• evaluate the evidence for additional anthropogenic causes of climate change,
+including the correlation between change in atmospheric carbon dioxide
+concentration and the consumption of fossil fuels, and describe the uncertainties in
+the evidence base
+• describe the potential effects of increased levels of carbon dioxide and methane
+on the Earth’s climate and how these effects may be mitigated, including
+consideration of scale, risk and environmental implications.
+Common atmospheric pollutants and their sources
+•
+
+describe the major sources of carbon monoxide, sulfur dioxide, oxides of nitrogen
+and particulates in the atmosphere and explain the problems caused by increased
+amounts of these substances.
+
+The Earth’s water resources and obtaining potable water
+• describe the principal methods for increasing the availability of potable water in
+terms of the separation techniques used, including ease of treatment of waste,
+ground and salt water.
+Use of mathematics
+• extract and interpret information from charts, graphs and tables (2c and 4a)
+• use orders of magnitude to evaluate the significance of data (2h).
+
+
+Physics
+Physics is the science of the fundamental concepts of field, force, radiation and particle
+structures, which are inter-linked to form unified models of the behaviour of the material
+universe. From such models, a wide range of ideas, from the broadest issue of the
+development of the universe over time to the numerous and detailed ways in which new
+technologies may be invented, have emerged. These have enriched both our basic
+understanding of, and our many adaptations to, our material environment.
+Students should be helped to understand how, through the ideas of physics, the complex
+and diverse phenomena of the natural world can be described in terms of a small number
+of key ideas which are of universal application and which can be illustrated in the
+separate topics set out below. These ideas include:
+•
+
+the use of models, as in the particle model of matter or the wave models of light
+and of sound
+
+•
+
+the concept of cause and effect in explaining such links as those between force
+and acceleration, or between changes in atomic nuclei and radioactive emissions
+
+•
+
+the phenomena of ‘action at a distance’ and the related concept of the field as the
+key to analysing electrical, magnetic and gravitational effects
+
+•
+
+that differences, for example between pressures or temperatures or electrical
+potentials, are the drivers of change
+
+•
+
+that proportionality, for example between weight and mass of an object or between
+force and extension in a spring, is an important aspect of many models in science
+
+•
+
+that physical laws and models are expressed in mathematical form
+
+This content sets out the full range of content for GCSE physics. Awarding organisations
+may, however, use flexibility to increase depth, breadth or context within the specified
+topics or to consolidate teaching of the subject content.
+Bullet points in bold are common to chemistry
+Higher tier GCSE physics specifications must assess all the content set out below,
+whether it is underlined or is not underlined. Foundation tier GCSE physics specifications
+must assess all the content set out below, except for content which is underlined.
+GCSE physics specifications should require students to:
+
+
+Energy
+Energy changes in a system, and in the ways energy is stored before and after
+such changes
+•
+
+calculate the amounts of energy associated with a moving body, a stretched
+spring, and an object raised above ground level
+
+•
+
+describe and calculate the changes in energy involved when a system is changed
+by heating (in terms of temperature change and specific heat capacity), by work
+done by forces and by work done when a current flows
+
+•
+
+explain, with reference to examples, the definition of power as the rate at which
+energy is transferred
+
+•
+
+describe all the changes involved in the way energy is stored when a system
+changes, for common situations: appropriate examples might be an object
+projected upwards or up a slope, a moving object hitting an obstacle, an object
+being accelerated by a constant force, a vehicle slowing down, bringing water to a
+boil in an electric kettle
+
+•
+
+describe, with examples, the relationship between the power ratings for domestic
+electrical appliances and the changes in stored energy when they are in use.
+
+Conservation, dissipation and national and global energy sources
+•
+
+describe with examples where there are energy transfers in a system, that there is
+no net change to the total energy of a closed system (qualitative only)
+
+•
+
+describe, with examples, how in all system changes, energy is dissipated, so that
+it is stored in less useful ways
+
+•
+
+explain ways of reducing unwanted energy transfer e.g. through lubrication,
+thermal insulation; describe the effects, on the rate of cooling of a building, of
+thickness and thermal conductivity of its walls (qualitative only)
+
+•
+
+calculate energy efficiency for any energy transfer, and describe ways to increase
+efficiency
+
+•
+
+describe the main energy sources available for use on Earth (including fossil fuels,
+nuclear fuel, bio-fuel, wind, hydro-electricity, the tides and the Sun), compare the
+ways in which they are used and distinguish between renewable and nonrenewable sources
+
+•
+
+explain patterns and trends in the use of energy resources.
+
+Uses of mathematics
+•
+
+make calculations of the energy changes associated with changes in a system,
+recalling or selecting the relevant equations for mechanical, electrical, and thermal
+processes; thereby express in quantitative form and on a common scale the
+overall redistribution of energy in the system (1a, 1c, 3c).
+
+Forces
+Forces and their interactions
+•
+
+recall examples of ways in which objects interact: by gravity, electrostatics,
+magnetism and by contact (including normal contact force and friction), and
+describe how such examples involve interactions between pairs of objects which
+produce a force on each object; represent such forces as vectors
+
+•
+
+define weight, describe how it is measured and describe the relationship between
+the weight of that body and the gravitational field strength
+
+•
+
+describe examples of the forces acting on an isolated solid object or system;
+describe, using free body diagrams, examples where several forces lead to a
+resultant force on an object and the special case of balanced forces when the
+resultant force is zero (qualitative only)
+
+•
+
+explain, with examples, that to stretch, bend or compress an object, more than
+one force has to be applied
+
+•
+
+describe the difference between elastic and inelastic distortions caused by
+stretching forces; calculate the work done in stretching; describe the relationship
+between force and extension for a spring and other simple systems; describe the
+difference between linear and non-linear relationships between force and
+extension, and calculate a spring constant in linear cases.
+
+Work done as force x distance, energy transfer
+•
+
+use the relationship between work done, force, and distance moved along the line
+of action of the force and describe the energy transfer involved.
+
+Pressure and pressure differences in fluids
+•
+
+recall that the pressure in fluids causes a force normal to any surface, and use the
+relationship between the force, the pressure, and the area in contact
+
+•
+
+describe a simple model of the Earth’s atmosphere and of atmospheric pressure,
+and explain why atmospheric pressure varies with height above the surface
+
+
+•
+
+explain why pressure in a liquid varies with depth and density and how this leads
+to an upwards force on a partially submerged object; describe the factors which
+influence floating and sinking.
+
+Moments, levers and gears
+•
+
+describe examples in which forces cause rotation; define and calculate the
+moment of the force in such examples.
+
+•
+
+explain how levers and gears transmit the rotational effects of forces.
+
+Uses of mathematics
+•
+
+use vector diagrams to illustrate resolution of forces, a net force, and equilibrium
+situations (scale drawings only) (4a, 5a, 5b)
+
+•
+
+calculate relevant values of stored energy and energy transfers; convert between
+newton-metres and joules (1c, 3c).
+
+•
+
+calculate the differences in pressure at different depths in a liquid (1c, 3c).
+
+Forces and motion
+Speed and velocity, speed as distance over time; acceleration; distance-time and
+velocity-time graphs
+•
+
+explain the vector-scalar distinction as it applies to displacement, distance, velocity
+and speed
+
+•
+
+recall typical speeds encountered in everyday experience for wind and sound, and
+for walking, running, cycling and other transportation systems; recall the
+acceleration in free fall and estimate the magnitudes of everyday accelerations
+
+•
+
+explain with examples that motion in a circular orbit involves constant speed but
+changing velocity (qualitative only)
+
+•
+
+make measurements of distances and times, calculate speeds, and make and use
+graphs of these to determine the speeds and accelerations involved.
+
+Forces, accelerations and Newton’s laws of motion
+•
+
+apply Newton’s First Law to explain the motion of objects moving with uniform
+velocity and also objects where the speed and/or direction change
+
+•
+
+apply Newton’s Second Law in calculations relating forces, masses and
+accelerations
+
+•
+
+explain that inertial mass is a measure of how difficult it is to change the velocity of
+
+an object and that it is defined as the ratio of force over acceleration
+•
+
+recall Newton’s Third Law and apply it to examples of equilibrium situations
+
+•
+
+define momentum and describe examples of momentum in collisions.
+
+Safety in public transport
+•
+
+explain methods of measuring human reaction times and recall typical results
+
+•
+
+explain the factors which affect the distance required for road transport vehicles to
+come to rest in emergencies and the implications for safety
+
+•
+
+explain the dangers caused by large decelerations and estimate the forces
+involved in typical situations on a public road.
+
+Use of mathematics
+•
+
+make calculations using ratios and proportional reasoning to convert units and to
+compute rates (1c, 3c)
+
+•
+
+relate changes and differences in motion to appropriate distance-time, and
+velocity-time graphs, and interpret lines and slopes (4a, 4b, 4c, 4d)
+
+•
+
+interpret enclosed areas in velocity-time graphs (4a, 4b, 4c, 4d, 4f)
+
+•
+
+apply formulae relating distance, time and speed, for uniform motion, and for
+motion with uniform acceleration, and calculate average speed for non-uniform
+motion (1a, 1c, 3c)
+
+•
+
+estimate how the distances required for road vehicles to stop in an emergency,
+varies over a range of typical speeds (1c, 1d, 2c, 2h, 3b, 3c)
+
+•
+
+apply formulae relating force, mass and relevant physical constants, including
+gravitational field strength, to explore how changes in these are inter-related (1c,
+3b, 3c)
+
+•
+
+apply formulae relating force, mass, velocity and acceleration to explain how the
+changes involved are inter-related (3b, 3c, 3d)
+
+•
+
+estimate, for everyday road transport, the speed, accelerations and forces
+involved in large accelerations (1d, 2b, 2h, 3c).
+
+Waves in matter
+Waves in air, fluids and solids
+•
+
+describe wave motion in terms of amplitude, wavelength, frequency and period;
+
+define wavelength and frequency and describe and apply the relationship between
+these and the wave velocity
+•
+
+describe the difference between transverse and longitudinal waves
+
+•
+
+describe how ripples on water surfaces are examples of transverse waves whilst
+sound waves in air are longitudinal waves, and how the speed of each may be
+measured; describe evidence that in both cases it is the wave and not the water or
+air itself that travels.
+
+Waves at material interfaces: applications in exploring structures
+•
+
+describe the effects of reflection, transmission, and absorption of waves at
+material interfaces
+
+•
+
+describe, with examples, processes which convert wave disturbances between
+sound waves and vibrations in solids, and explain why such processes only work
+over a limited frequency range, and the relevance of this to human audition
+
+•
+
+explain, in qualitative terms, how the differences in velocity, absorption and
+reflection between different types of waves in solids and liquids can be used both
+for detection and for exploration of structures which are hidden from direct
+observation, notably in our bodies, in the earth’s core and in deep water.
+
+Uses of mathematics
+•
+
+apply formulae relating velocity, frequency and wavelength (1c, 3c)
+
+•
+
+show how changes in velocity, frequency and wavelength, in transmission of
+sound waves from one medium to another, are inter-related (1c, 3c).
+
+Light and electromagnetic waves
+Frequency range of the spectrum
+•
+
+recall that light is an electromagnetic wave
+
+•
+
+recall that electromagnetic waves are transverse, are transmitted through space
+where all have the same velocity, and explain, with examples, that they transfer
+energy from source to absorber
+
+•
+
+describe the main groupings of the spectrum – radio, microwave, infra-red, visible
+(red to violet), ultra-violet, X-rays and gamma-rays, that these range from long to
+short wavelengths and from low to high frequencies, and that our eyes can only
+detect a limited range.
+
+Interactions of electromagnetic radiation with matter and their applications
+
+•
+
+recall that different substances may absorb, transmit, refract, or reflect these
+waves in ways that vary with wavelength; explain how some effects are related to
+differences in the velocity of the waves in different substances
+
+•
+
+recall that radio waves can be produced by or can themselves induce oscillations
+in electrical circuits
+
+•
+
+recall that changes in atoms and nuclei can also generate and absorb radiations
+over a wide frequency range
+
+•
+
+give examples of some practical uses of electromagnetic waves in the radio,
+micro-wave, infra-red, visible, ultra-violet, X-ray and gamma-ray regions and
+describe how ultra-violet waves, X-rays and gamma-rays can have hazardous
+effects, notably on human bodily tissues.
+
+Lenses
+•
+
+use ray diagrams to illustrate reflection, refraction and the similarities and
+differences between convex and concave lenses (qualitative only).
+
+Colour and frequency; differential effects in transmission, absorption and diffuse
+reflection
+•
+
+explain how colour is related to differential absorption, transmission, specular
+reflection and scattering.
+
+Black body radiation (qualitative only)
+•
+
+explain that all bodies emit radiation and that the intensity and wavelength
+distribution of any emission depends on their temperatures
+
+•
+
+explain how the temperature of a body is related to the balance between incoming
+radiation absorbed and radiation emitted; illustrate this balance using everyday
+examples and the example of the factors which determine the temperature of the
+earth.
+
+Use of mathematics
+•
+
+apply the relationships between frequency and wavelength across the
+electromagnetic spectrum: (1a, 1c, 3c)
+
+•
+
+construct two-dimensional ray diagrams to illustrate reflection and refraction
+(qualitative -equations not needed) (5a, 5b).
+
+Electricity
+Current, potential difference and resistance
+
+•
+
+recall that current is a rate of flow of charge, that for a charge to flow, a source of
+potential difference and a closed circuit are needed and that a current has the
+same value at any point in a single closed loop; recall and use the relationship
+between quantity of charge, current and time
+
+•
+
+recall that current (I) depends on both resistance (R) and potential difference (V)
+and the units in which these are measured; recall and apply the relationship
+between I, R and V, and expain that for some resistors the value of R remains
+constant but that in others it can change as the current changes; explain the
+design and use of circuits to explore such effects – including for lamps, diodes,
+thermistors and LDRs.
+
+Series and parallel circuits
+•
+
+describe the difference between series and parallel circuits, explain why, if two
+resistors are in series the net resistance is increased, whereas with two in parallel
+the net resistance is decreased (qualitative explanation only)
+
+•
+
+calculate the currents, potential differences and resistances in d.c. series circuits,
+and explain the design and use of such circuits for measurement and testing
+purposes; represent them with the conventions of positive and negative terminals,
+and the symbols that represent common circuit elements, including diodes, LDRs
+and thermistors.
+
+Domestic uses and safety
+•
+
+recall that the domestic supply in the UK is a.c., at 50Hz and about 230 volts,
+explain the difference between direct and alternating voltage
+
+•
+
+recall the differences in function between the live, neutral and earth mains wires,
+and the potential differences between these wires; hence explain that a live wire
+may be dangerous even when a switch in a mains circuit is open, and explain the
+dangers of providing any connection between the live wire and earth.
+
+Energy transfers
+•
+
+explain how the power transfer in any circuit device is related to the p.d. across it
+and the current, and to the energy changes over a given time
+
+•
+
+describe how, in different domestic devices, energy is transferred from batteries
+and the a.c. mains to the energy of motors or of heating devices
+
+•
+
+recall that, in the national grid, electrical power is transferred at high voltages from
+power stations, and then transferred at lower voltages in each locality for domestic
+use, and explain how this system is an efficient way to transfer energy.
+
+Static electricity – forces and electric fields
+
+•
+
+describe the production of static electricity, and sparking, by rubbing surfaces, and
+evidence that charged objects exert forces of attraction or repulsion on one
+another when not in contact; explain how transfer of electrons between objects
+can explain the phenomena of static electricity
+
+•
+
+explain the concept of an electric field and how it helps to explain the phenomena
+of static electricity.
+
+Use of mathematics
+•
+
+apply the equations relating p.d., current, quantity of charge, resistance, power,
+energy, and time, and solve problems for circuits which include resistors in series,
+using the concept of equivalent resistance (1c, 3b, 3c, 3d)
+
+• use graphs to explore whether circuit elements are linear or non-linear and relate
+the curves produced to their function and properties (4c, 4d).
+
+Magnetism and electromagnetism
+Permanent and induced magnetism, magnetic forces and fields
+•
+
+describe the attraction and repulsion between unlike and like poles for permanent
+magnets and describe the difference between permanent and induced magnets
+
+•
+
+describe the characteristics of the magnetic field of a magnet, showing how
+strength and direction change from one point to another
+
+•
+
+explain how the behaviour of a magnetic compass is related to evidence that the
+core of the Earth must be magnetic.
+
+Magnetic effects of currents and the motor effect
+•
+
+describe how to show that a current can create a magnetic effect and describe the
+directions of the magnetic field around a conducting wire
+
+•
+
+recall that the strength of the field depends on the current and the distance from
+the conductor, and explain how solenoid arrangements can enhance the magnetic
+effect
+
+•
+
+describe how a magnet and a current-carrying conductor exert a force on one
+another and show that Fleming’s left-hand rule represents the relative orientations
+of the force, the conductor and the magnetic field
+
+•
+
+apply the equation that links the force on a conductor to the magnetic flux density,
+the current and the length of conductor to calculate the forces involved
+
+•
+
+explain how this force is used to cause rotation in electric motors.
+
+Induced potential, transformers and the national grid
+•
+
+recall that a change in the magnetic field around a conductor can give rise to an
+induced potential difference across its ends, which could drive a current,
+generating a magnetic field that would oppose the original change; hence explain
+how this effect is used in an alternator to generate a.c., and in a dynamo to
+generate d.c.
+
+•
+
+explain how the effect of an alternating current in one circuit in inducing a current
+in another is used in transformers and how the ratio of the p.d.’s across the two
+depends on the ratio of the numbers of turns in each.
+
+Microphones and speakers; oscillating currents in detection and generation of
+radiation
+•
+
+explain the action of the microphone in converting the pressure variations in sound
+waves into variations in current in electrical circuits, and the reverse effect as used
+in loudspeakers and headphones.
+
+Uses of Mathematics
+•
+
+apply the equations linking the p.d.s and numbers of turns in the two coils of a
+transformer, to the currents and the power transfer involved, and relate these to
+the advantages of power transmission at high voltages (1c, 3b, 3c).
+
+Particle model of matter
+Changes of state and the particle model
+•
+
+define density and explain the differences in density between the different states
+of matter in terms of the arrangements of the atoms or molecules
+
+•
+
+describe how, when substances melt, freeze, evaporate, condense or sublimate,
+mass is conserved, but that these physical changes differ from chemical changes
+because the material recovers its original properties if the change is reversed.
+
+Internal energy, energy transfers and particle motions
+•
+
+describe how heating a system will change the energy stored within the system
+and raise its temperature or produce changes of state
+
+•
+
+define the term specific heat capacity and distinguish between it and and the term
+specific latent heat
+
+
+•
+
+explain how the motion of the molecules in a gas is related both to its temperature
+and its pressure: hence explain the relation between the temperature of a gas and
+its pressure at constant volume (qualitative only).
+
+Particle model and pressure
+•
+
+recall that gases can be compressed or expanded by pressure changes and that
+the pressure produces a net force at right angles to any surface
+
+•
+
+explain how increasing the volume in which a gas is contained, at constant
+temperature can lead to a decrease in pressure
+
+•
+
+explain how doing work on a gas can increase its temperature (e.g. bicycle pump).
+
+Uses of mathematics
+•
+
+apply the relationship between density mass and volume to changes where mass
+is conserved (1a, 1b, 1c, 3c)
+
+•
+
+apply the relationship between change in internal energy of a material and its
+mass, specific heat capacity and temperature change to calculate the energy
+change involved; apply the relationship between specific latent heat and mass to
+calculate the energy change involved in a change of state (1a, 3c, 3d).
+
+Atomic structure
+Nuclear atom and isotopes
+•
+
+describe the atom as a positively charged nucleus surrounded by negatively
+charged electrons, with the nuclear radius much smaller than that of the
+atom and with almost all of the mass in the nucleus
+
+•
+
+recall the typical size (order of magnitude) of atoms and small molecules
+
+•
+
+describe how and why the atomic model has changed over time
+
+•
+
+recall that atomic nuclei are composed of both protons and neutrons, that the
+nucleus of each element has a characteristic positive charge, but that atoms of the
+same elements can differ in nuclear mass by having different numbers of neutrons
+
+•
+
+relate differences between isotopes to differences in conventional representations
+of their identities, charges and masses.
+
+Absorption and emission of ionizing radiations and of electrons and nuclear
+particles
+•
+
+recall that in each atom its electrons are arranged at different distances from the
+nucleus, that such arrangements may change with absorption or emission of
+
+electromagnetic radiation and that atoms can become ions by loss of outer
+electrons
+•
+
+recall that some nuclei are unstable and may emit alpha particles, beta particles,
+or neutrons, and electromagnetic radiation as gamma rays; relate these emissions
+to possible changes in the mass or the charge of the nucleus, or both
+
+•
+
+use names and symbols of common nuclei and particles to write balanced
+equations that represent radioactive decay
+
+•
+
+explain the concept of half-life and how this is related to the random nature of
+radioactive decay
+
+•
+
+recall the differences in the penetration properties of alpha-particles, beta-particles
+and gamma-rays
+
+•
+
+recall the differences between contamination and irradiation effects and compare
+the hazards associated with these two.
+
+Hazards and uses of radioactive emissions and of background radiation
+•
+
+explain why the hazards associated with radioactive material differ according to
+the half-life involved
+
+•
+
+describe the different uses of nuclear radiations for exploration of internal organs,
+and for control or destruction of unwanted tissue.
+
+Nuclear fission and fusion
+•
+
+recall that some nuclei are unstable and may split, and relate such effects to
+radiation which might emerge, to transfer of energy to other particles and to the
+possibility of chain reactions
+
+•
+
+describe the process of nuclear fusion and recall that in this process some of the
+mass may be converted into the energy of radiation.
+
+Uses of mathematics
+•
+
+balance equations representing alpha-, beta- or gamma-radiations in terms of the
+masses, and charges of the atoms involved (1b, 1c, 3c)
+
+•
+
+calculate the net decline, expressed as a ratio, in a radioactive emission after a
+given number of half-lives (1c, 3d).
+
+Space physics
+Solar system; stability of orbital motions; satellites
+
+•
+
+recall the main features of our solar system, including the similarities and
+distinctions between the planets, their moons, and artificial satellites
+
+•
+
+explain for circular orbits how the force of gravity can lead to changing velocity of a
+planet but unchanged speed, and explain how, for a stable orbit, the radius must
+change if this speed changes (qualitative only)
+
+•
+
+recall that our sun was formed from dust and gas drawn together by gravity and
+explain how this caused fusion reactions, leading to equilibrium between
+gravitational collapse and expansion due to the fusion energy.
+
+Red-shift as sources move away; the ‘big bang’ and universal expansion
+•
+
+explain the red-shift of light from galaxies which are receding (qualitative only),
+that the change with distance of each galaxy’s speed is evidence of an expanding
+universe and hence explain the link between this evidence and the Big-Bang
+model.
+
+
+Appendix 1
+Equations in physics
+Equations required for higher tier only are underlined
+(a) In solving quantitative problems, students should be able correctly to recall, and apply
+the following relationships, using standard S.I.Units:
+force = mass x acceleration
+kinetic energy = 0.5 x mass x (speed)2
+momentum = mass x velocity
+work done = force x distance (along the line of action of the force)
+power = work done ÷time
+efficiency = output energy transfer ÷input energy transfer
+gravity force = mass x gravity constant (g)
+in a gravity field: potential energy = mass x height x gravity constant (g)
+force exerted by a spring = extension x spring constant
+moment of a force = force x distance (normal to direction of the force)
+distance travelled = speed x time
+acceleration = change in velocity ÷ time
+wave speed = frequency x wavelength
+charge flow = current x time
+potential difference = current x resistance
+power = potential difference x current = (current)2 x resistance
+energy transferred = power x time = charge flow x potential difference
+density = mass ÷volume
+pressure = force normal to a surface ÷ area of that surface
+
+
+(b) In addition, students should be able correctly to select from a list and apply the
+following relationships:
+(final velocity)2 - (initial velocity)2 = 2 x acceleration x distance
+change in thermal energy = m x specific heat capacity x change in temperature
+thermal energy for a change of state = m x specific latent heat
+energy transferred in stretching = 0.5 x spring constant x (extension)2
+force on a conductor (at right angles to a magnetic field) carrying a current: = magnetic
+flux density x current x length
+potential difference across primary coil x current in primary coil = potential difference
+across secondary coil x current in secondary coil
+potential difference across primary coil ÷potential difference across secondary coil =
+number of turns in primary coil ÷number of turns in secondary coil
+for gases: pressure x volume = constant (for a given mass of gas and at a constant
+temperature)
+pressure due to a column of liquid = height of column x density of liquid x g
+
+
+Appendix 2
+SI units in science
+The International System of Units (Système International d'Unités), which is abbreviated
+SI, is a coherent system of base units. The six which are relevant for GCSE sciences are
+listed below. We also list nine of the derived units (which have special names) selected
+from the SI list of derived units in the same source.
+Base units
+These units and their associated quantities are dimensionally independent.
+metre
+Unit symbol: m
+kilogram
+Unit symbol: kg
+second
+Unit symbol: s
+ampere
+Unit symbol: A
+kelvin
+Unit symbol: K
+mole
+Unit symbol: mol
+Some derived units with special names
+Frequency hertz Hz
+Force newton N
+Energy joule J
+Power watt W
+Pressure pascal Pa
+Electric charge coulomb C
+Electric potential difference volt V
+Electric resistance ohm Ω
+Magnetic flux density tesla T
+
+
+Appendix 3
+Mathematical skills required for biology (B), chemistry (C), physics (P) and combined
+science (CS)
+Mathematical skills
+1 Arithmetic and numerical computation
+a Recognise and use expressions in decimal form
+b Recognise and use expressions in standard form
+c Use ratios, fractions and percentages
+d Make estimates of the results of simple calculations
+2 Handling data
+a Use an appropriate number of significant figures
+b Find arithmetic means
+c Construct and interpret frequency tables and diagrams, bar charts
+and histograms
+d Understand the principles of sampling as applied to scientific data
+e Understand simple probability
+f Understand the terms mean, mode and median
+g Use a scatter diagram to identify a correlation between two
+variables
+haMake order of magnitude calculations
+3 Algebra
+a Understand and use the symbols: =, <, <<, >>, >, ∝, ~
+b Change the subject of an equation
+c Substitute numerical values into algebraic equations using
+appropriate units for physical quantities
+d Solve simple algebraic equations
+4 Graphs
+a Translate information between graphical and numeric form
+b Understand that y=mx+c represents a linear relationship
+c Plot two variables from experimental or other data
+d Determine the slope and intercept of a linear graph
+e Draw and use the slope of a tangent to a curve as a measure of rate
+of change
+f Understand the physical significance of area between a curve and
+the x-axis and measure it by counting squares as appropriate
+5 Geometry and trigonometry
+a Use angular measures in degrees
+b Visualise and represent 2D and 3D forms including two dimensional
+representations of 3D objects
+c Calculate areas of triangles and rectangles, surface areas and
+volumes of cubes.
+
+49
+
+Subject
+B
+B
+B
+B
+
+C
+C
+C
+C
+
+P
+P
+P
+P
+
+CS
+CS
+CS
+CS
+
+B C P CS
+B C P CS
+B C P CS
+B
+B
+B
+B
+
+CS
+CS
+P CS
+P CS
+
+B C P CS
+B C P CS
+C P CS
+C P CS
+B
+B
+B
+B
+B
+
+P CS
+C
+C
+C
+C
+C
+
+P
+P
+P
+P
+
+CS
+CS
+CS
+CS
+CS
+
+P CS
+P CS
+C P CS
+B C P CS
+
+Appendix 4
+List of apparatus and techniques
+The following list includes opportunities for choice and use of appropriate laboratory
+apparatus for a variety of experimental problem-solving and/or enquiry based activities.
+Safety is an overriding requirement for all practical work. Centres are responsible for
+ensuring appropriate safety procedures are followed whenever their students complete
+practical work.
+Use and production of appropriate scientific diagrams to set up and record apparatus and
+procedures used in practical work is common to all science subjects and should be
+included wherever appropriate.
+
+BIOLOGY
+
+CHEMISTRY
+
+1
+
+Use of appropriate apparatus to make
+and record a range of measurements
+accurately, including length, area,
+mass, time, temperature, volume of
+liquids and gases, and pH
+
+Use of appropriate apparatus to make
+and record a range of measurements
+accurately, including mass, time,
+temperature, and volume of liquids
+and gases
+
+2
+
+Safe use of appropriate heating
+devices and techniques including use
+of a Bunsen burner and a water bath
+or electric heater
+
+Safe use of appropriate heating
+devices and techniques including use
+of a Bunsen burner and a water bath
+or electric heater
+
+3
+
+Use of appropriate apparatus and
+techniques for the observation and
+measurement of biological changes
+and/or processes
+
+Use of appropriate apparatus and
+techniques for conducting and
+monitoring chemical reactions,
+including appropriate reagents and/or
+techniques for the measurement of pH
+in different situations
+
+4
+
+Safe and ethical use of living
+organisms (plants or animals) to
+measure physiological functions and
+responses to the environment
+
+Safe use of a range of equipment to
+purify and/or separate chemical
+mixtures including evaporation,
+filtration, crystallisation,
+chromatography and distillation
+
+5
+
+Measurement of rates of reaction by a
+variety of methods including
+production of gas, uptake of water and
+colour change of indicator
+
+Making and recording of appropriate
+observations during chemical
+reactions including changes in
+temperature and the measurement of
+rates of reaction by a variety of
+methods such as production of gas
+and colour change
+
+Safe use of appropriate apparatus in a
+range of contexts to measure energy
+changes/transfers and associated
+values such as work done
+
+6
+
+Application of appropriate sampling
+techniques to investigate the
+distribution and abundance of
+organisms in an ecosystem via direct
+use in the field
+
+Safe use and careful handling of
+gases, liquids and solids, including
+careful mixing of reagents under
+controlled conditions, using
+appropriate apparatus to explore
+chemical changes and/or products
+
+Use of appropriate apparatus to
+measure current, potential difference
+(voltage) and resistance, and to
+explore the characteristics of a variety
+of circuit elements
+
+7
+
+Use of appropriate apparatus,
+techniques and magnification,
+including microscopes, to make
+observations of biological specimens
+and produce labelled scientific
+drawings
+
+Use of appropriate apparatus and
+techniques to draw, set up and use
+electrochemical cells for separation
+and production of elements and
+compounds
+
+50
+
+PHYSICS
+
+Use of appropriate apparatus to make
+and record a range of measurements
+accurately, including length, area,
+mass, time, volume and temperature.
+Use of such measurements to
+determine densities of solid and liquid
+objects.
+Use of appropriate apparatus to
+measure and observe the effects of
+forces including the extension of
+springs
+Use of appropriate apparatus and
+techniques for measuring motion,
+including determination of speed and
+rate of change of speed
+(acceleration/deceleration)
+Making observations of waves in fluids
+and solids to identify the suitability of
+apparatus to measure
+speed/frequency/wavelength. Making
+observations of the effects of the
+interaction of electromagnetic waves
+with matter.
+
+Use of circuit diagrams to construct
+and check series and parallel circuits
+including a variety of common circuit
+elements
+
+SINGLE SCIENCES ONLY
+
+8
+
+Use of appropriate techniques and
+qualitative reagents to identify
+biological molecules and processes in
+more complex and problem-solving
+contexts including continuous
+sampling in an investigation.
+
+Use of appropriate qualitative
+reagents and techniques to analyse
+and identify unknown samples or
+products including gas tests, flame
+tests, precipitation reactions, and the
+determination of concentrations of
+strong acids and strong alkalis
+
+51
+
+Making observations of waves in fluids
+and solids to identify the suitability of
+apparatus to measure the effects of
+the interaction of waves with matter.
+
+© Crown copyright 2015
+You may re-use this document/publication (not including logos) free of charge in any
+format or medium, under the terms of the Open Government Licence v3.0. To view this
+licence, visit www.nationalarchives.gov.uk/doc/open-government-licence/version/3 or
+email: psi@nationalarchives.gsi.gov.uk.
+Where we have identified any third party copyright information you will need to obtain
+permission from the copyright holders concerned.
+Any enquiries regarding this publication should be sent to us at
+www.education.gov.uk/contactus.
+This document is available to download at www.gov.uk/government/publications.
+Follow us on Twitter: @educationgovuk
+Like us on Facebook: www.facebook.com/educationgovuk
+
+
+

@@ -101,7 +101,7 @@ export const CURRICULUM: Record<ConceptId, CurriculumPlace> = {
     stage: "Key stage 3",
     statements: [
       { source: 'ncMaths', where: "Key stage 3", text: "use integer powers and associated real roots (square, cube and higher), recognise powers of 2, 3, 4, 5 and distinguish between exact representations of roots and their decimal approximations" },
-      { source: 'ncMaths', where: "Key stage 3", text: "interpret and compare numbers in standard form A x 10ⁿ, 1≤A<10, where n is a positive or negative integer or 0" },
+      { source: 'ncMaths', where: "Key stage 3", text: "interpret and compare numbers in standard form A x 10ⁿ 1≤A<10, where n is a positive or negative integer or 0" },
     ],
   },
   binary: {
@@ -155,7 +155,8 @@ export const CURRICULUM: Record<ConceptId, CurriculumPlace> = {
     stage: "GCSE physics (key stage 4)",
     statements: [
       { source: 'gcsePhysics', where: "GCSE physics: Forces and motion", text: "define momentum and describe examples of momentum in collisions" },
-      { source: 'alScience', where: "A-level physics: Mechanics", text: "principle of conservation of momentum; calculations for one-dimensional problems" },
+      { source: 'alScience', where: "A-level physics: Mechanics (momentum)", text: "principle of conservation of momentum" },
+      { source: 'alScience', where: "A-level physics: Mechanics (momentum)", text: "calculations for one-dimensional problems" },
     ],
     note: "Conservation of momentum is listed in the A-level content. Check your own GCSE specification for how far it goes.",
   },
@@ -186,7 +187,8 @@ export const CURRICULUM: Record<ConceptId, CurriculumPlace> = {
     stage: "A-level mathematics",
     statements: [
       { source: 'ncMaths', where: "Key stage 3", text: "describe, interpret and compare observed distributions of a single variable through: appropriate graphical representation involving discrete, continuous and grouped data; and appropriate measures of central tendency (mean, mode, median) and spread (range, consideration of outliers)" },
-      { source: 'alMaths', where: "A-level mathematics: Data presentation and interpretation", text: "Interpret measures of central tendency and variation, extending to standard deviation. Be able to calculate standard deviation, including from summary statistics" },
+      { source: 'alMaths', where: "A-level mathematics: Data presentation and interpretation", text: "Interpret measures of central tendency and variation, extending to standard deviation" },
+      { source: 'alMaths', where: "A-level mathematics: Data presentation and interpretation", text: "Be able to calculate standard deviation, including from summary statistics" },
     ],
     note: "Mean, median, mode and range are key stage 3 work. Variance and standard deviation come in at A-level.",
   },
@@ -216,7 +218,7 @@ export const CURRICULUM: Record<ConceptId, CurriculumPlace> = {
   calculus: {
     stage: "A-level mathematics",
     statements: [
-      { source: 'alMaths', where: "A-level mathematics: Differentiation", text: "Understand and use the derivative of f(x) as the gradient of the tangent to the graph of y = f(x) at a general point (x, y); the gradient of the tangent as a limit; interpretation as a rate of change" },
+      { source: 'alMaths', where: "A-level mathematics: Differentiation", text: "Understand and use the derivative of f(x) as the gradient of the tangent to the graph of y = f(x) at a general point (x, y);the gradient of the tangent as a limit; interpretation as a rate of change" },
       { source: 'alMaths', where: "A-level mathematics: Kinematics", text: "Use calculus in kinematics for motion in a straight line" },
     ],
   },
@@ -224,7 +226,9 @@ export const CURRICULUM: Record<ConceptId, CurriculumPlace> = {
     stage: "A-level physics",
     statements: [
       { source: 'gcsePhysics', where: "GCSE physics: equations", text: "for gases: pressure x volume = constant (for a given mass of gas and at a constant temperature)" },
-      { source: 'alScience', where: "A-level physics: Matter", text: "ideal gases; pV = NkT; absolute zero; relationship between temperature and average molecular kinetic energy" },
+      { source: 'alScience', where: "A-level physics: Matter", text: "ideal gases; pV = NkT" },
+      { source: 'alScience', where: "A-level physics: Matter", text: "absolute zero" },
+      { source: 'alScience', where: "A-level physics: Matter", text: "relationship between temperature and average molecular kinetic energy" },
     ],
     note: "The official content writes the ideal gas equation as pV = NkT. This lesson uses the equivalent form pV = nRT. Entropy is not in the required content.",
   },
@@ -232,13 +236,16 @@ export const CURRICULUM: Record<ConceptId, CurriculumPlace> = {
     stage: "A-level physics",
     statements: [
       { source: 'gcsePhysics', where: "GCSE physics: Magnetism and electromagnetism", text: "recall that a change in the magnetic field around a conductor can give rise to an induced potential difference across its ends" },
-      { source: 'alScience', where: "A-level physics: Fields", text: "Faraday’s and Lenz’s laws; emf equals rate of change of magnetic flux linkage" },
+      { source: 'alScience', where: "A-level physics: Fields", text: "Faraday’s and Lenz’s laws" },
+      { source: 'alScience', where: "A-level physics: Fields", text: "emf equals rate of change of magnetic flux linkage" },
     ],
   },
   quantum: {
     stage: "A-level physics",
     statements: [
-      { source: 'alScience', where: "A-level physics: Quantum and nuclear physics", text: "photon model to explain observable phenomena; evidence supporting the photon model; wave-particle duality, particle diffraction" },
+      { source: 'alScience', where: "A-level physics: Quantum and nuclear physics", text: "photon model to explain observable phenomena" },
+      { source: 'alScience', where: "A-level physics: Quantum and nuclear physics", text: "evidence supporting the photon model" },
+      { source: 'alScience', where: "A-level physics: Quantum and nuclear physics", text: "wave-particle duality, particle diffraction" },
     ],
   },
   matrices: {

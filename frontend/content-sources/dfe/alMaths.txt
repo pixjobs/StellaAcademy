@@ -1,0 +1,2287 @@
+===== SOURCE FILE: GCE_AS_and_A_level_subject_content_for_mathematics_with_appendices.pdf =====
+Mathematics
+AS and A level content
+
+April 2016
+
+Content for mathematics AS and A level for teaching
+from 2017
+Introduction
+1.
+AS and A level subject content sets out the knowledge, understanding and
+skills common to all AS and A level specifications in mathematics.
+
+Purpose
+2.
+A level mathematics provides a framework within which a large number of
+young people continue the subject beyond GCSE level. It supports their mathematical
+needs across a broad range of other subjects at this level and provides a basis for
+subsequent quantitative work in a very wide range of higher education courses and in
+employment. It also supports the study of AS and A level further mathematics.
+3.
+A level mathematics builds from GCSE level mathematics and introduces
+calculus and its applications. It emphasises how mathematical ideas are
+interconnected and how mathematics can be applied to model situations
+mathematically using algebra and other representations, to help make sense of data,
+to understand the physical world and to solve problems in a variety of contexts,
+including social sciences and business. It prepares students for further study and
+employment in a wide range of disciplines involving the use of mathematics.
+4.
+AS mathematics, which can be co-taught with the A level as a separate
+qualification, is a very useful qualification in its own right. It consolidates and
+develops GCSE level mathematics and supports transition to higher education or
+employment in any of the many disciplines that make use of quantitative analysis,
+including those involving calculus.
+
+Aims and objectives
+5.
+
+AS and A level specifications in mathematics must encourage students to:
+•
+
+•
+•
+•
+
+understand mathematics and mathematical processes in a way that promotes
+confidence, fosters enjoyment and provides a strong foundation for progress to
+further study
+extend their range of mathematical skills and techniques
+understand coherence and progression in mathematics and how different
+areas of mathematics are connected
+apply mathematics in other fields of study and be aware of the relevance of
+mathematics to the world of work and to situations in society in general
+
+•
+
+•
+•
+•
+•
+•
+•
+
+•
+•
+•
+•
+•
+•
+•
+
+use their mathematical knowledge to make logical and reasoned decisions in
+solving problems both within pure mathematics and in a variety of contexts,
+and communicate the mathematical rationale for these decisions clearly
+reason logically and recognise incorrect reasoning
+generalise mathematically
+construct mathematical proofs
+use their mathematical skills and techniques to solve challenging problems
+which require them to decide on the solution strategy
+recognise when mathematics can be used to analyse and solve a problem in
+context
+represent situations mathematically and understand the relationship between
+problems in context and mathematical models that may be applied to solve
+them
+draw diagrams and sketch graphs to help explore mathematical situations and
+interpret solutions
+make deductions and inferences and draw conclusions by using mathematical
+reasoning
+interpret solutions and communicate their interpretation effectively in the
+context of the problem
+read and comprehend mathematical arguments, including justifications of
+methods and formulae, and communicate their understanding
+read and comprehend articles concerning applications of mathematics and
+communicate their understanding
+use technology such as calculators and computers effectively and recognise
+when such use may be inappropriate
+take increasing responsibility for their own learning and the evaluation of their
+own mathematical development
+
+Subject content
+Background knowledge
+6.
+AS and A level mathematics specifications must build on the skills, knowledge
+and understanding set out in the whole GCSE subject content for mathematics for
+first teaching from 2015. The knowledge and skills required for AS mathematics are
+shown in the following tables in bold text within square brackets.
+
+Overarching themes
+7.
+A level specifications in mathematics must require students to demonstrate the
+following overarching knowledge and skills. These must be applied, along with
+associated mathematical thinking and understanding, across the whole of the detailed
+content set out below.
+
+OT1
+
+Mathematical argument, language and proof
+
+AS and A level mathematics specifications must use the mathematical notation set
+out in appendix A and must require students to recall the mathematical formulae and
+identities set out in appendix B.
+Knowledge/Skill
+OT1.1
+
+[Construct and present mathematical arguments through appropriate
+use of diagrams; sketching graphs; logical deduction; precise
+statements involving correct use of symbols and connecting
+language, including: constant, coefficient, expression, equation,
+function, identity, index, term, variable]
+
+OT1.2
+
+[Understand and use mathematical language and syntax as set out in
+the content]
+
+OT1.3
+
+[Understand and use language and symbols associated with set
+theory, as set out in the content]
+[Apply to solutions of inequalities] and probability
+
+OT1.4
+
+Understand and use the definition of a function; domain and range of
+functions
+
+OT1.5
+
+[Comprehend and critique mathematical arguments, proofs and
+justifications of methods and formulae, including those relating to
+applications of mathematics]
+
+OT2
+
+Mathematical problem solving
+Knowledge/Skill
+
+OT2.1
+
+[Recognise the underlying mathematical structure in a situation
+and simplify and abstract appropriately to enable problems to be
+solved]
+
+OT2.2
+
+[Construct extended arguments to solve problems presented in an
+unstructured form, including problems in context]
+
+OT2.3
+
+[Interpret and communicate solutions in the context of the original
+problem]
+
+OT2.4
+
+Understand that many mathematical problems cannot be solved
+analytically, but numerical methods permit solution to a required level of
+accuracy
+
+OT2.5
+
+[Evaluate, including by making reasoned estimates, the accuracy
+or limitations of solutions], including those obtained using numerical
+methods
+
+OT2.6
+
+[Understand the concept of a mathematical problem solving cycle,
+including specifying the problem, collecting information,
+processing and representing information and interpreting results,
+which may identify the need to repeat the cycle]
+
+OT2.7
+
+[Understand, interpret and extract information from diagrams and
+construct mathematical diagrams to solve problems, including in
+mechanics]
+
+OT3
+
+Mathematical modelling
+Knowledge/Skill
+
+OT3.1
+
+[Translate a situation in context into a mathematical model, making
+simplifying assumptions]
+
+OT3.2
+
+[Use a mathematical model with suitable inputs to engage with and
+explore situations (for a given model or a model constructed or
+selected by the student)]
+
+OT3.3
+
+[Interpret the outputs of a mathematical model in the context of the
+original situation (for a given model or a model constructed or
+selected by the student)]
+
+OT3.4
+
+[Understand that a mathematical model can be refined by
+considering its outputs and simplifying assumptions; evaluate
+whether the model is appropriate]
+
+OT3.5
+
+[Understand and use modelling assumptions]
+
+Use of technology
+8.
+The use of technology, in particular mathematical and statistical graphing tools
+and spreadsheets, must permeate the study of AS and A level mathematics.
+Calculators used must include the following features:
+•
+•
+
+an iterative function
+the ability to compute summary statistics and access probabilities from
+standard statistical distributions
+
+Use of data in statistics
+9.
+
+AS and A level mathematics specifications must require students to:
+•
+
+•
+•
+•
+
+become familiar with one or more specific large data set(s) in advance of the
+final assessment (these data must be real and sufficiently rich to enable the
+concepts and skills of data presentation and interpretation in the specification
+to be explored)
+use technology such as spreadsheets or specialist statistical packages to
+explore the data set(s)
+interpret real data presented in summary or graphical form
+use data to investigate questions arising in real contexts
+
+10.
+Specifications should require students to explore the data set(s), and
+associated contexts, during their course of study to enable them to perform tasks that
+assume familiarity with the contexts, the main features of the data and the ways in
+which technology can help explore the data. Specifications should also require
+students to demonstrate the ability to analyse a subset or features of the data using a
+calculator with standard statistical functions, as detailed in paragraph 8.
+
+Detailed content statements
+11.
+A level specifications in mathematics must include the following content. This,
+assessed in the context of the overarching themes, represents 100% of the content.
+12.
+Content required for AS mathematics is shown in bold text within square
+brackets. This, assessed in the context of the AS overarching themes, represents
+100% of the AS content.
+A
+
+Proof
+Content
+
+A1
+
+[Understand and use the structure of mathematical proof, proceeding
+from given assumptions through a series of logical steps to a
+conclusion; use methods of proof, including proof by deduction, proof
+by exhaustion]
+[Disproof by counter example]
+Proof by contradiction (including proof of the irrationality of √2 and the
+infinity of primes, and application to unfamiliar proofs)
+
+B
+
+Algebra and functions
+Content
+
+B1
+
+[Understand and use the laws of indices for all rational exponents]
+
+B2
+
+[Use and manipulate surds, including rationalising the denominator]
+
+B3
+
+[Work with quadratic functions and their graphs; the discriminant of a
+quadratic function, including the conditions for real and repeated roots;
+completing the square; solution of quadratic equations including
+solving quadratic equations in a function of the unknown]
+
+B4
+
+[Solve simultaneous equations in two variables by elimination and by
+substitution, including one linear and one quadratic equation]
+
+B5
+
+[Solve linear and quadratic inequalities in a single variable and interpret
+such inequalities graphically, including inequalities with brackets and
+fractions]
+[Express solutions through correct use of ‘and’ and ‘or’, or through set
+notation]
+[Represent linear and quadratic inequalities such as y > x + 1 and
+
+y > ax 2 + bx + c graphically]
+B6
+
+[Manipulate polynomials algebraically, including expanding brackets
+and collecting like terms, factorisation and simple algebraic division;
+use of the factor theorem]
+
+Simplify rational expressions including by factorising and cancelling, and
+algebraic division (by linear expressions only)
+B7
+
+[Understand and use graphs of functions; sketch curves defined by
+simple equations including polynomials], the modulus of a linear function,
+a
+a
+[ y = and y = 2 (including their vertical and horizontal asymptotes);
+x
+x
+interpret algebraic solution of equations graphically; use intersection
+points of graphs to solve equations]
+[Understand and use proportional relationships and their graphs]
+
+B8
+
+Understand and use composite functions; inverse functions and their graphs
+
+B9
+
+[Understand the effect of simple transformations on the graph of
+
+y = f ( x ) including sketching associated graphs:
+
+y = a f ( x ) , y = f ( x ) + a, y = f ( x + a ) , y = f ( ax ) ], and combinations of these
+transformations
+B10
+
+Decompose rational functions into partial fractions (denominators not more
+complicated than squared linear terms and with no more than 3 terms,
+numerators constant or linear)
+
+B11
+
+Use of functions in modelling, including consideration of limitations and
+refinements of the models
+
+C
+
+Coordinate geometry in the (x,y) plane
+Content
+
+[Understand and use the equation of a straight line, including the forms
+y – y1 m( x – x1 )=
+=
+and ax + by + c 0 ; gradient conditions for two straight
+lines to be parallel or perpendicular]
+C1
+
+[Be able to use straight line models in a variety of contexts]
+C2
+
+[Understand and use the coordinate geometry of the circle including
+using the equation of a circle in the form ( x − a ) 2 + ( y − b ) 2 =
+r 2 ; completing
+the square to find the centre and radius of a circle; use of the following
+properties:
+• the angle in a semicircle is a right angle
+• the perpendicular from the centre to a chord bisects the chord
+• the radius of a circle at a given point on its circumference is
+perpendicular to the tangent to the circle at that point
+
+C3
+
+Understand and use the parametric equations of curves and conversion
+between Cartesian and parametric forms
+
+C4
+
+Use parametric equations in modelling in a variety of contexts
+
+
+D
+
+Sequences and series
+Content
+
+D1
+
+[Understand and use the binomial expansion of ( a + bx ) n for positive
+integer n; the notations n! and nCr; link to binomial probabilities]
+Extend to any rational n, including its use for approximation; be aware that the
+bx
+expansion is valid for
+< 1 . (proof not required)
+a
+
+D2
+
+Work with sequences including those given by a formula for the nth term and
+those generated by a simple relation of the form x n+1 = f(x n ); increasing
+sequences; decreasing sequences; periodic sequences
+
+D3
+
+Understand and use sigma notation for sums of series
+
+D4
+
+Understand and work with arithmetic sequences and series, including the
+formulae for nth term and the sum to n terms
+
+D5
+
+Understand and work with geometric sequences and series including the
+formulae for the nth term and the sum of a finite geometric series; the sum to
+infinity of a convergent geometric series, including the use of |r | < 1; modulus
+notation
+
+D6
+
+Use sequences and series in modelling
+
+E
+
+Trigonometry
+Content
+
+E1
+
+[Understand and use the definitions of sine, cosine and tangent for all
+arguments; the sine and cosine rules; the area of a triangle in the form
+1
+2 ab sin C ]
+Work with radian measure, including use for arc length and area of sector
+
+E2
+
+Understand and use the standard small angle approximations of sine, cosine
+and tangent
+
+sin θ ≈ θ , cos θ ≈ 1 −
+E3
+
+θ2
+2
+
+, tan θ ≈ θ where θ is in radians
+
+[Understand and use the sine, cosine and tangent functions; their
+graphs, symmetries and periodicity]
+
+π π π π
+, , , , π and
+6 4 3 2
+π π π
+multiples thereof, and exact values of tan for 0, , , , π and multiples
+
+Know and use exact values of sin and cos for 0,
+
+6
+
+thereof
+E4
+
+4
+
+3
+
+Understand and use the definitions of secant, cosecant and cotangent and of
+arcsin, arccos and arctan; their relationships to sine, cosine and tangent;
+
+understanding of their graphs; their ranges and domains
+E5
+
+[Understand and use tanθ =
+
+sinθ
+]
+cosθ
+
+2
+2
+2
+2
+1 ]; sec θ= 1 + tan θ and cosec θ= 1 + cot θ
+[Understand and use sin 2θ + cos 2θ =
+
+E6
+
+Understand and use double angle formulae; use of formulae for
+sin( A ± B ), cos( A ± B ) and tan( A ± B ) ; understand geometrical proofs of these
+formulae
+Understand and use expressions for a cos θ +b sin θ in the equivalent forms of
+r cos(θ ±α ) or r sin(θ ±α )
+
+E7
+
+[Solve simple trigonometric equations in a given interval, including
+quadratic equations in sin, cos and tan and equations involving multiples
+of the unknown angle]
+
+E8
+
+Construct proofs involving trigonometric functions and identities
+
+E9
+
+Use trigonometric functions to solve problems in context, including problems
+involving vectors, kinematics and forces
+
+F
+
+Exponentials and logarithms
+Content
+F1
+
+[Know and use the function a x and its graph, where a is positive]
+[Know and use the function e x and its graph]
+
+F2
+
+[Know that the gradient of e kx is equal to ke kx and hence understand
+why the exponential model is suitable in many applications]
+
+F3
+
+[Know and use the definition of log a x as the inverse of a x , where a is
+positive and x ≥ 0 ]
+[Know and use the function ln x and its graph]
+[Know and use ln x as the inverse function of e x ]
+
+F4
+
+[Understand and use the laws of logarithms:
+log a x + log a y =
+log a ( xy ) ; log a x – log a y = log a  x  ; k log a x = log a x k
+ y
+
+1
+2
+
+(including, for example, k =
+−1 and k =
+− )]
+F5
+
+[Solve equations of the form a x = b ]
+
+F6
+
+[Use logarithmic graphs to estimate parameters in relationships of the
+form y = ax n and y = kb x , given data for x and y]
+
+F7
+
+[Understand and use exponential growth and decay; use in modelling
+(examples may include the use of e in continuous compound interest,
+radioactive decay, drug concentration decay, exponential growth as a
+model for population growth); consideration of limitations and
+refinements of exponential models]
+
+G
+
+Differentiation
+Content
+
+G1
+
+[Understand and use the derivative of f ( x ) as the gradient of the tangent
+to the graph of y = f ( x ) at a general point (x, y);the gradient of the tangent
+as a limit; interpretation as a rate of change; sketching the gradient
+function for a given curve; second derivatives; differentiation from first
+principles for small positive integer powers of x] and for sin x and cos x
+[Understand and use the second derivative as the rate of change of
+gradient]; connection to convex and concave sections of curves and points
+of inflection
+
+G2
+
+[Differentiate x n , for rational values of n, and related constant multiples,
+sums and differences]
+Differentiate e kx and a kx , sin kx , cos kx , tan kx and related sums, differences
+and constant multiples
+Understand and use the derivative of ln x
+
+G3
+
+[Apply differentiation to find gradients, tangents and normals, maxima
+and minima and stationary points], points of inflection
+[Identify where functions are increasing or decreasing]
+
+G4
+
+Differentiate using the product rule, the quotient rule and the chain rule,
+including problems involving connected rates of change and inverse functions
+
+G5
+
+Differentiate simple functions and relations defined implicitly or parametrically,
+for first derivative only
+
+G6
+
+Construct simple differential equations in pure mathematics and in context,
+(contexts may include kinematics, population growth and modelling the
+relationship between price and demand)
+
+H
+
+Integration
+Content
+
+H1
+
+[Know and use the Fundamental Theorem of Calculus]
+
+H2
+
+[Integrate x n (excluding n = -1), and related sums, differences and
+constant multiples ]
+Integrate e kx ,
+multiples
+
+H3
+
+1
+, sin kx , cos kx and related sums, differences and constant
+x
+
+[Evaluate definite integrals; use a definite integral to find the area under
+a curve] and the area between two curves
+
+H4
+
+Understand and use integration as the limit of a sum
+
+H5
+
+Carry out simple cases of integration by substitution and integration by parts;
+understand these methods as the inverse processes of the chain and product
+rules respectively
+(Integration by substitution includes finding a suitable substitution and is limited
+to cases where one substitution will lead to a function which can be integrated;
+integration by parts includes more than one application of the method but
+excludes reduction formulae)
+
+H6
+
+Integrate using partial fractions that are linear in the denominator
+
+H7
+
+Evaluate the analytical solution of simple first order differential equations with
+separable variables, including finding particular solutions
+(Separation of variables may require factorisation involving a common factor)
+
+H8
+
+I
+
+Interpret the solution of a differential equation in the context of solving a
+problem, including identifying limitations of the solution; includes links to
+kinematics
+Numerical methods
+Content
+
+I1
+
+Locate roots of f ( x ) = 0 by considering changes of sign of f ( x ) in an interval of
+x on which f ( x ) is sufficiently well-behaved
+Understand how change of sign methods can fail
+
+I2
+
+Solve equations approximately using simple iterative methods; be able to draw
+associated cobweb and staircase diagrams
+Solve equations using the Newton-Raphson method and other recurrence
+relations of the form xn +1 = g ( xn )
+Understand how such methods can fail
+
+I3
+
+Understand and use numerical integration of functions, including the use of the
+trapezium rule and estimating the approximate area under a curve and limits
+that it must lie between
+
+I4
+
+Use numerical methods to solve problems in context
+
+J
+
+Vectors
+Content
+J1
+
+[Use vectors in two dimensions] and in three dimensions
+
+J2
+
+[Calculate the magnitude and direction of a vector and convert between
+
+component form and magnitude/direction form]
+J3
+
+[Add vectors diagrammatically and perform the algebraic operations of
+vector addition and multiplication by scalars, and understand their
+geometrical interpretations]
+
+J4
+
+[Understand and use position vectors; calculate the distance between
+two points represented by position vectors]
+
+J5
+
+[Use vectors to solve problems in pure mathematics and in context,
+including forces] and kinematics
+
+13. For sections K to O students must demonstrate the ability to use calculator technology
+to compute summary statistics and access probabilities from standard statistical
+distributions.
+
+K
+
+Statistical sampling
+Content
+
+K1
+
+[Understand and use the terms ‘population’ and ‘sample’]
+[Use samples to make informal inferences about the population]
+[Understand and use sampling techniques, including simple random
+sampling and opportunity sampling]
+[Select or critique sampling techniques in the context of solving a
+statistical problem, including understanding that different samples can
+lead to different conclusions about the population]
+
+L
+
+Data presentation and interpretation
+Content
+L1
+
+[Interpret diagrams for single-variable data, including understanding that
+area in a histogram represents frequency]
+[Connect to probability distributions]
+
+L2
+
+[Interpret scatter diagrams and regression lines for bivariate data,
+including recognition of scatter diagrams which include distinct sections
+of the population (calculations involving regression lines are excluded)]
+[Understand informal interpretation of correlation]
+[Understand that correlation does not imply causation]
+
+L3
+
+[Interpret measures of central tendency and variation, extending to
+standard deviation]
+[Be able to calculate standard deviation, including from summary
+
+statistics]
+L4
+
+[Recognise and interpret possible outliers in data sets and statistical
+diagrams]
+[Select or critique data presentation techniques in the context of a
+statistical problem]
+[Be able to clean data, including dealing with missing data, errors and
+outliers]
+
+M
+
+Probability
+Content
+
+M1
+
+[Understand and use mutually exclusive and independent events when
+calculating probabilities]
+[Link to discrete and continuous distributions]
+
+M2
+
+Understand and use conditional probability, including the use of tree diagrams,
+Venn diagrams, two-way tables
+Understand and use the conditional probability formula
+P( A | B ) =
+
+M3
+N
+
+P ( A ∩ B)
+P( B )
+
+Modelling with probability, including critiquing assumptions made and the likely
+effect of more realistic assumptions
+Statistical distributions
+Content
+
+N1
+
+[Understand and use simple, discrete probability distributions
+(calculation of mean and variance of discrete random variables is
+excluded), including the binomial distribution, as a model; calculate
+probabilities using the binomial distribution]
+
+N2
+
+Understand and use the Normal distribution as a model; find probabilities using
+the Normal distribution
+Link to histograms, mean, standard deviation, points of inflection and the
+binomial distribution
+
+N3
+
+Select an appropriate probability distribution for a context, with appropriate
+reasoning, including recognising when the binomial or Normal model may not
+be appropriate
+
+
+O
+
+Statistical hypothesis testing
+Content
+
+O1
+
+[Understand and apply the language of statistical hypothesis testing,
+developed through a binomial model: null hypothesis, alternative
+hypothesis, significance level, test statistic, 1-tail test, 2-tail test, critical
+value, critical region, acceptance region, p-value]; extend to correlation
+coefficients as measures of how close data points lie to a straight line and be
+able to interpret a given correlation coefficient using a given p-value or critical
+value (calculation of correlation coefficients is excluded)
+
+O2
+
+[Conduct a statistical hypothesis test for the proportion in the binomial
+distribution and interpret the results in context]
+[Understand that a sample is being used to make an inference about the
+population and appreciate that the significance level is the probability of
+incorrectly rejecting the null hypothesis]
+
+O3
+P
+
+Conduct a statistical hypothesis test for the mean of a Normal distribution with
+known, given or assumed variance and interpret the results in context
+Quantities and units in mechanics
+Content
+
+P1
+
+[Understand and use fundamental quantities and units in the S.I. system:
+length, time, mass]
+[Understand and use derived quantities and units: velocity, acceleration,
+force, weight], moment
+
+Q
+
+Kinematics
+Content
+
+Q1
+
+[Understand and use the language of kinematics: position; displacement;
+distance travelled; velocity; speed; acceleration]
+
+Q2
+
+[Understand, use and interpret graphs in kinematics for motion in a
+straight line: displacement against time and interpretation of gradient;
+velocity against time and interpretation of gradient and area under the
+graph]
+
+Q3
+
+[Understand, use and derive the formulae for constant acceleration for
+motion in a straight line]; extend to 2 dimensions using vectors
+
+Q4
+
+[Use calculus in kinematics for motion in a straight line:
+=
+v
+
+Q5
+
+dr
+dv d 2 r
+,=
+,=
+a =
+r
+dt
+dt dt 2
+
+∫ v dt ,=v ∫ a dt ]; extend to 2 dimensions using vectors
+
+Model motion under gravity in a vertical plane using vectors; projectiles
+
+R
+
+Forces and Newton’s laws
+Content
+
+R1
+
+[Understand the concept of a force; understand and use Newton’s first
+law]
+
+R2
+
+[Understand and use Newton’s second law for motion in a straight line
+(restricted to forces in two perpendicular directions or simple cases of
+forces given as 2-D vectors)]; extend to situations where forces need to be
+resolved (restricted to 2 dimensions)
+
+R3
+
+[Understand and use weight and motion in a straight line under gravity;
+gravitational acceleration, g, and its value in S.I. units to varying degrees
+of accuracy]
+[(The inverse square law for gravitation is not required and g may be
+assumed to be constant, but students should be aware that g is not a
+universal constant but depends on location)]
+
+R4
+
+[Understand and use Newton’s third law; equilibrium of forces on a
+particle and motion in a straight line (restricted to forces in two
+perpendicular directions or simple cases of forces given as 2-D vectors);
+application to problems involving smooth pulleys and connected
+particles]; resolving forces in 2 dimensions; equilibrium of a particle under
+coplanar forces
+
+R5
+
+Understand and use addition of forces; resultant forces; dynamics for motion in
+a plane
+
+R6
+
+Understand and use the F ≤ µ R model for friction; coefficient of friction; motion
+of a body on a rough surface; limiting friction and statics
+
+S
+
+Moments
+Content
+
+S1
+
+Understand and use moments in simple static contexts
+
+
+Appendix A: mathematical notation for AS and A level qualifications
+in mathematics and further mathematics
+The tables below set out the notation that must be used by AS and A level
+mathematics and further mathematics specifications. Students will be expected to
+understand this notation without need for further explanation.
+Mathematics students will not be expected to understand notation that relates only to
+further mathematics content. Further mathematics students will be expected to
+understand all notation in the list.
+For further mathematics, the notation for the core content is listed under sub
+headings indicating ‘further mathematics only’. In this subject, awarding organisations
+are required to include, in their specifications, content that is additional to the core
+content. They will therefore need to add to the notation list accordingly.
+AS students will be expected to understand notation that relates to AS content, and
+will not be expected to understand notation that relates only to A level content.
+Set Notation
+
+1
+1.1
+
+∈
+
+is an element of
+
+1.2
+
+∉
+
+is not an element of
+
+1.3
+
+⊆
+
+is a subset of
+
+1.4
+
+⊂
+
+is a proper subset of
+
+1.5
+
+{ x1, x2 , }
+
+the set with elements x1 , x2 , 
+
+1.6
+
+{x : }
+
+the set of all x such that 
+
+1.7
+
+n( A)
+
+the number of elements in set A
+
+1.8
+
+∅
+
+the empty set
+
+1.9
+
+ε
+
+the universal set
+
+1.10
+
+A′
+
+the complement of the set A
+
+1.11
+
+ℕ
+
+the set of natural numbers, {1, 2, 3, }
+
+ℤ+
+
+the set of positive integers, {1, 2, 3, }
+
+ℝ
+
+the set of real numbers
+
+1.12
+1.13
+1.14
+1.15
+
+the set of integers, {0, ± 1, ± 2, ± 3, }
+
+ℤ
+
++
+
+ℤ0
+
+the set of non-negative integers, {0, 1, 2, 3, …}
+
+
+1.16
+1.17
+
+ℚ
+
+p
+
+the set of rational numbers,  : p ∈ , q ∈  + 
+q
+
+
+∪
+
+union
+
+1.18
+
+∩
+
+intersection
+
+1.19
+
+( x, y )
+
+the ordered pair x , y
+
+1.20
+
+[ a, b]
+
+the closed interval { x ∈  : a ≤ x ≤ b}
+
+1.21
+
+[ a, b)
+
+the interval { x ∈ < : a ≤ x < b}
+
+1.22
+
+( a, b]
+
+the interval { x ∈ < : a < x ≤ b}
+
+1.23
+
+( a, b)
+
+the open interval { x ∈ < : a < x < b}
+
+Set Notation (Further Mathematics only)
+
+1
+1.24
+
+the set of complex numbers
+
+2
+
+ℂ
+
+Miscellaneous Symbols
+
+2.1
+
+=
+
+is equal to
+
+2.2
+
+≠
+
+is not equal to
+
+2.3
+
+≡
+
+is identical to or is congruent to
+
+2.4
+
+≈
+
+is approximately equal to
+
+2.5
+
+∞
+
+infinity
+
+2.6
+
+∝
+
+is proportional to
+
+∵
+
+because
+
+⩽,≤
+
+is less than or equal to, is not greater than
+
+is greater than or equal to, is not less than
+
+2.7
+
+∴
+
+therefore
+
+<
+
+is less than
+
+is greater than
+
+2.12
+
+>
+
+2.13
+
+⩾,≥
+
+p⇒q
+
+p implies q (if p then q )
+
+2.14
+
+p⇐q
+
+p is implied by q (if q then p )
+
+2.15
+
+p⇔q
+
+p implies and is implied by q ( p is equivalent to q )
+
+2.16
+
+a
+
+first term for an arithmetic or geometric sequence
+
+2.17
+
+l
+
+last term for an arithmetic sequence
+
+2.18
+
+d
+
+common difference for an arithmetic sequence
+
+2.19
+
+r
+
+common ratio for a geometric sequence
+
+2.20
+
+Sn
+
+sum to n terms of a sequence
+
+2.8
+2.9
+2.10
+2.11
+
+
+2.21
+
+S∞
+
+sum to infinity of a sequence
+
+Operations
+
+3
+3.1
+
+a+b
+
+a plus b
+
+3.2
+
+a −b
+
+a minus b
+
+3.3
+
+a × b, ab, a.b
+
+a multiplied by b
+
+3.4
+
+a ÷ b,
+
+a
+b
+
+a divided by b
+
+3.5
+
+∑ ai
+
+n
+
+i =1
+n
+
+a1 + a2 +  + an
+
+3.6
+
+∏ ai
+
+3.7
+
+a
+
+the non-negative square root of a
+
+3.8
+
+a
+
+the modulus of a
+
+3.9
+
+n!
+
+n factorial: n ! = n × (n − 1) × ... × 2 × 1, n ∈ ; 0!=1
+
+3.10
+
+ n n
+  , Cr , n Cr
+r
+
+i =1
+
+a1 × a2 ×  × an
+
+the binomial coefficient
+or
+
+n!
++
+for n, r ∊ ℤ 0 , r ⩽ n
+r !(n − r )!
+
+n(n − 1) (n − r + 1)
++
+for n ∈ ℚ, r ∊ ℤ 0
+r!
+
+Functions
+
+4
+4.1
+
+f( x)
+
+the value of the function f at x
+
+4.2
+
+f :x y
+
+the function f maps the element x to the element y
+
+4.3
+
+f −1
+
+the inverse function of the function f
+
+4.4
+
+gf
+
+the composite function of f and g which is defined by
+gf ( x) = g(f( x))
+
+4.5
+
+x →a
+
+lim f( x)
+
+the limit of f( x) as x tends to a
+
+4.6
+
+∆x, δx
+
+an increment of x
+
+4.7
+
+dy
+dx
+
+the derivative of y with respect to x
+
+4.8
+
+dn y
+dx n
+
+the n th derivative of y with respect to x
+
+4.9
+
+f ′( x), f ′′( x),  , f ( n ) ( x)
+
+the first, second, ..., nth derivatives of f( x) with respect
+to x
+
+4.10
+
+x , 
+x, 
+
+the first, second, ... derivatives of x with respect to t
+
+4.11
+
+∫ y dx
+
+4.12
+
+∫a y dx
+
+the indefinite integral of y with respect to x
+the definite integral of y with respect to x between the
+limits x = a and x = b
+
+b
+
+Exponential and Logarithmic Functions
+
+5
+5.1
+
+e
+
+base of natural logarithms
+
+5.2
+
+e x , exp x
+
+exponential function of x
+
+5.3
+
+log a x
+
+logarithm to the base a of x
+
+5.4
+
+ln x, log e x
+
+natural logarithm of x
+
+Trigonometric Functions
+
+6
+6.1
+
+sin, cos, tan, 
+
+cosec, sec, cot 
+
+the trigonometric functions
+
+6.2
+
+sin −1 , cos −1 , tan −1 , 
+
+
+arcsin, arccos, arctan 
+
+
+the inverse trigonometric functions
+
+6.3
+
+°
+
+degrees
+
+6.4
+
+rad
+
+radians
+
+Trigonometric and Hyperbolic Functions (Further Mathematics
+only)
+
+6
+6.5
+
+cosec −1 , sec −1 , cot −1 , 
+
+
+arccosec, arcsec, arccot 
+
+
+the inverse trigonometric functions
+
+6.6
+
+sinh, cosh, tanh, 
+
+cosech, sech, coth 
+
+the hyperbolic functions
+
+6.7
+
+sinh −1 , cosh −1 , tanh −1 , 
+
+
+−1
+−1
+−1
+cosech , sech , coth 
+
+
+arsinh, arcosh, artanh, 
+
+arcosech, arsech, arcoth 
+
+the inverse hyperbolic functions
+
+Complex Numbers (Further Mathematics only)
+
+7
+7.1
+
+i, j
+
+square root of −1
+
+7.2
+
+x + iy
+
+complex number with real part x and imaginary part y
+
+7.3
+
+r (cos θ + i sin θ )
+
+7.4
+
+z
+
+modulus argument form of a complex number with
+modulus 𝑟𝑟 and argument 𝜃𝜃
+
+a complex number, z = x + iy =r (cos θ + isin θ )
+
+7.5
+
+Re ( z )
+
+the real part of z , Re ( z ) = x
+
+7.6
+
+Im ( z )
+
+the imaginary part of z , Im ( z ) = y
+
+7.7
+
+z
+
+the modulus of z , =
+z
+
+7.8
+
+arg(𝑧𝑧)
+
+the argument of z , arg(𝑧𝑧) = 𝜃𝜃, −𝜋𝜋 < 𝜃𝜃 ≤ 𝜋𝜋
+
+7.9
+
+z*
+
+x2 + y 2
+
+the complex conjugate of z , x − iy
+
+Matrices (Further Mathematics only)
+
+8
+8.1
+
+M
+
+a matrix M
+
+8.2
+
+0
+
+zero matrix
+
+8.3
+
+I
+
+identity matrix
+
+8.4
+
+M −1
+
+the inverse of the matrix M
+
+8.5
+
+MT
+
+the transpose of the matrix M
+
+8.6
+
+Δ, det M or⎹ M ⎸
+
+the determinant of the square matrix M
+
+8.7
+
+Mr
+
+Image of column vector r under the transformation
+associated with the matrix M
+
+Vectors
+
+9
+9.1
+
+a, a, a
+
+
+the vector a, a, a ; these alternatives apply throughout
+
+section 9
+
+9.2
+
+
+AB
+
+the vector represented in magnitude and direction by the
+directed line segment AB
+
+9.3
+
+â
+
+a unit vector in the direction of a
+
+9.4
+
+i, j, k
+
+unit vectors in the directions of the cartesian coordinate
+axes
+
+9.5
+
+a , a
+
+the magnitude of a
+
+9.6
+
+
+AB , AB
+
+
+the magnitude of AB
+
+9.7
+
+a
+  , ai + bj
+b
+
+column vector and corresponding unit vector notation
+
+9.8
+
+r
+
+position vector
+
+9.9
+
+s
+
+displacement vector
+
+9.10
+
+v
+
+velocity vector
+
+9.11
+
+a
+
+acceleration vector
+
+
+Vectors (Further Mathematics only)
+
+9
+9.12
+
+Differential Equations (Further Mathematics only)
+
+10
+10.1
+
+the scalar product of a and b
+
+a.b
+
+ω
+
+angular speed
+
+Probability and Statistics
+
+11
+11.1
+
+A, B, C , etc.
+
+events
+
+11.2
+
+A∪ B
+
+union of the events A and B
+
+11.3
+
+A∩ B
+
+intersection of the events A and B
+
+11.4
+
+P( A)
+
+probability of the event A
+
+11.5
+
+A′
+
+complement of the event A
+
+11.6
+
+P( A | B )
+
+probability of the event A conditional on the event B
+
+11.7
+
+X , Y , R, etc.
+
+random variables
+
+11.8
+
+x, y, r , etc.
+
+values of the random variables X , Y , R etc.
+
+11.9
+
+x1 , x2 , 
+
+values of observations
+
+11.10
+
+f1 , f 2 , 
+
+frequencies with which the observations x1 , x2 , 
+occur
+
+11.11
+
+p(x), P(X = x)
+
+probability function of the discrete random variable X
+
+11.12
+
+p1 , p2 , 
+
+probabilities of the values x1 , x2 ,  of the discrete
+random variable X
+
+11.13
+
+E( X )
+
+expectation of the random variable X
+
+11.14
+
+Var( X )
+
+variance of the random variable X
+
+11.15
+
+~
+
+has the distribution
+
+11.16
+
+B(n, p)
+
+binomial distribution with parameters n and p, where n
+is the number of trials and p is the probability of success
+in a trial
+
+11.17
+
+q
+
+q = 1 − p for binomial distribution
+
+11.18
+
+N( µ , σ 2 )
+
+Normal distribution with mean µ and variance σ 2
+
+11.19
+
+Z ~ N ( 0,1)
+
+standard Normal distribution
+
+11.20
+
+φ
+
+probability density function of the standardised Normal
+variable with distribution N(0, 1)
+
+11.21
+
+Φ
+
+corresponding cumulative distribution function
+
+11.22
+
+µ
+
+population mean
+
+11.23
+
+σ2
+
+population variance
+
+11.24
+
+σ
+
+population standard deviation
+
+11.25
+
+𝑥𝑥̅
+
+sample mean
+
+𝑠𝑠
+
+sample standard deviation
+
+sample variance
+
+11.27
+
+𝑠𝑠 2
+
+11.28
+
+H0
+
+Null hypothesis
+
+11.29
+
+H1
+
+Alternative hypothesis
+
+11.30
+
+r
+
+product moment correlation coefficient for a sample
+
+11.31
+
+product moment correlation coefficient for a population
+
+12
+
+𝜌𝜌
+
+12.1
+
+kg
+
+kilograms
+
+12.2
+
+m
+
+metres
+
+12.3
+
+km
+
+kilometres
+
+12.4
+
+m/s, m s-1
+
+metres per second (velocity)
+
+12.5
+
+m/s2, m s-2
+
+metres per second per second (acceleration)
+
+12.6
+
+Force or resultant force
+
+12.7
+
+𝐹𝐹
+
+N
+
+Newton
+
+12.8
+
+Nm
+
+Newton metre (moment of a force)
+
+12.9
+
+𝑡𝑡
+
+time
+
+𝑢𝑢
+
+initial velocity
+
+𝑎𝑎
+
+acceleration
+
+𝜇𝜇
+
+coefficient of friction
+
+11.26
+
+12.10
+12.11
+12.12
+12.13
+12.14
+12.15
+
+Mechanics
+
+𝑠𝑠
+
+displacement
+
+𝑣𝑣
+
+velocity or final velocity
+
+𝑔𝑔
+
+acceleration due to gravity
+
+
+Appendix B: mathematical formulae and identities
+Students must be able to use the following formulae and identities for AS and A level
+mathematics, without these formulae and identities being provided, either in these
+forms or in equivalent forms. These formulae and identities may only be provided
+where they are the starting point for a proof or as a result to be proved.
+Pure Mathematics
+Quadratic Equations
+
+ax 2 + bx + c =
+0 has roots
+
+−b ± b 2 − 4ac
+2a
+
+Laws of Indices
+
+a xa y ≡ a x+ y
+a x ÷ a y ≡ a x− y
+( a x ) y ≡ a xy
+Laws of Logarithms
+
+x = a n ⇔ n = log a x for a > 0 and x > 0
+loga x + loga y ≡ loga ( xy)
+ x
+loga x − loga y ≡ loga  
+ y
+k
+k loga x ≡ loga ( x )
+Coordinate Geometry
+A straight line graph, gradient m passing through ( x1 , y1 ) has equation
+
+y − y1= m ( x − x1 )
+
+Straight lines with gradients m1 and m2 are perpendicular when m1m2 = −1
+
+
+Sequences
+General term of an arithmetic progression:
+𝑢𝑢𝑛𝑛 = 𝑎𝑎 + (𝑛𝑛 − 1)𝑑𝑑
+
+General term of a geometric progression:
+
+un = ar n −1
+Trigonometry
+In the triangle ABC
+
+a
+b
+c
+= =
+sin A sin B sin C
+
+Sine rule:
+Cosine rule:
+
+a 2 = b 2 + c 2 − 2bc cos A
+
+1
+Area = ab sin C
+2
+
+cos 2 A + sin 2 A ≡ 1
+sec 2 A ≡ 1 + tan 2 A
+2
+2
+cosec A ≡ 1 + cot A
+sin 2 A ≡ 2 sin A cos A
+cos 2 A ≡ cos2 A − sin2 A
+
+tan 2 A ≡
+
+2 tan A
+1 − tan 2 A
+
+Mensuration
+Circumference and Area of circle, radius r and diameter d:
+
+=
+C 2=
+πr πd =
+A π r2
+Pythagoras’ Theorem: In any right-angled triangle where a, b and c are the lengths of the sides
+and c is the hypotenuse:
+2
+c=
+a 2 + b2
+
+1
+(a + b)h , where a and b are the lengths of the parallel sides and h is
+2
+their perpendicular separation.
+
+Area of a trapezium =
+
+Volume of a prism = area of cross section × length
+
+
+For a circle of radius r, where an angle at the centre of θ radians subtends an arc of length s
+and encloses an associated sector of area A:
+
+=
+s r=
+θ A
+
+1 2
+rθ
+2
+
+Calculus and Differential Equations
+Differentiation
+Function
+
+Derivative
+
+xn
+sin kx
+cos kx
+e kx
+
+nxn − 1
+k cos kx
+− k sin kx
+ke kx
+1
+x
+f ′( x) + g′( x)
+f ′( x)g( x) + f ( x)g′( x)
+f ′(g( x))g′( x)
+
+ln x
+
+f ( x) + g( x)
+f ( x)g( x)
+f (g( x))
+Integration
+Function
+
+Integral
+
+1 n +1
+x + c, n ≠ −1
+n +1
+1
+sin kx + c
+k
+1
+− cos kx + c
+k
+1 kx
+e +c
+k
+
+xn
+cos kx
+sin kx
+
+e kx
+
+1
+x
+f ′( x) + g′( x)
+f ′(g( x))g′( x)
+
+ln x + c, x ≠ 0
+f ( x) + g( x) + c
+f (g( x)) + c
+b
+
+Area under a curve = ∫ y dx ( y ≥ 0)
+a
+
+
+Vectors
+|𝑥𝑥𝐢𝐢 + 𝑦𝑦𝐣𝐣 + 𝑧𝑧𝐤𝐤| = �(𝑥𝑥 2 + 𝑦𝑦 2 + 𝑧𝑧 2 )
+Mechanics
+Forces and Equilibrium
+Weight = mass × g
+Friction: F ≤ µR
+Newton’s second law in the form: F = ma
+Kinematics
+For motion in a straight line with variable acceleration:
+
+=
+v
+
+=
+r
+
+dr
+dt
+
+=
+a
+
+dv d 2 r
+=
+dt dt 2
+
+v dt
+v ∫a dt
+∫=
+
+Statistics
+The mean of a set of data:=
+x
+
+x ∑ fx
+∑
+=
+n
+∑f
+
+The standard Normal variable: Z =
+
+X −µ
+
+σ
+
+26
+
+where
+
+(
+
+X ~ N µ ,σ 2
+
+)
+
+© Crown copyright 2014
+You may re-use this document/publication (not including logos) free of charge in any
+format or medium, under the terms of the Open Government Licence v3.0. Where we
+have identified any third party copyright information you will need to obtain permission
+from the copyright holders concerned.
+To view this licence:
+visit
+www.nationalarchives.gov.uk/doc/open-government-licence/version/3
+email
+psi@nationalarchives.gsi.gov.uk
+About this publication:
+enquiries www.education.gov.uk/contactus
+download www.gov.uk/government/publications
+Reference:
+DFE-00706-2014 Mathematics AS and A level content
+Follow us on
+Twitter: @educationgovuk
+
+Like us on Facebook:
+facebook.com/educationgovuk
+
+
+

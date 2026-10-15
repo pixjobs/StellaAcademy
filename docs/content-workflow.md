@@ -62,7 +62,10 @@ Short, and agreed before any writing:
 
 ## The automatic content checks
 
-To be built once, before the first lesson rewrite (`npm run check:content`):
+Run `npm run check:content` in `frontend/` (default: Mission 2; `--lessons=a,b` or `--all`). The code is in
+`frontend/scripts/content-checks/`, and the Department for Education source texts it checks quotes against are in
+`frontend/content-sources/dfe/` (download details in `SOURCES.md` there). A lesson ships only when the command
+reports no failures for it (`--lessons=<id>`). The checks are:
 
 - **Answers:** every worked example and practice answer is recomputed from its inputs and compared.
 - **Style:** headings in sentence case; banned characters and words (em dashes, "Kelvin" capitalised,
