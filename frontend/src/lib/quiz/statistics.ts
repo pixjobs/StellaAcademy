@@ -2,7 +2,7 @@
  * Quiz for "Mean, Variance and Standard Deviation" (KAN-84): averages and range, a missing value, standard
  * deviation from data and from summary statistics. Key stage 3 to A-level; calculator answers to 3 s.f.
  */
-import { D, approx, sf3, fmt, int, pick, sameNumber, shuffle, toNumber, whyAll, type LessonQuiz, type Question as Q, type Step } from '@/lib/quiz/core';
+import { D, approx, sf3, fmt, int, pick, sameNumber, shuffle, toNumber, whyAll, type LessonQuiz, type Question as Q } from '@/lib/quiz/core';
 
 export type Round = 'averages' | 'missing' | 'spread';
 
@@ -20,11 +20,13 @@ export type StatisticsCheck =
 type Question = Q<StatisticsCheck>;
 
 /** Data shown on the lesson page. The quiz never asks these. */
-const SHOWN = new Set(['2,4,4,4,5,5,7,9', '99,100,100,101', '50,80,120,150', '3,7,7,9,12,15', '2,4,6,8', '-22,-21,-20,-19,-18', 'summary 10 50 290', 'summary 8 40 232']);
+const SHOWN = new Set(['2,4,4,4,5,5,7,9', '99,100,100,101', '50,80,120,150', '3,7,7,9,12,15', '2,4,6,8', '-22,-21,-20,-19,-18', 'summary 10 50 290', 'summary 8 40 232', 'missing 80 70,75,85,90']);
 
 const key = (xs: number[]) => [...xs].sort((a, b) => a - b).join(',');
 const sum = (xs: number[]) => xs.reduce((a, b) => a + b, 0);
-const exactOr3sf = (x: number) => (Number.isInteger(x * 100) ? { answer: D(Number(x.toFixed(2))) } : approx(x));
+/** An exact value to 2 decimal places where there is one (15.25), else 3 s.f.; either way 3 s.f. typed is right. */
+const exactOr3sf = (x: number) => (Number.isInteger(Math.round(x * 1e6) / 1e4) ? { ...approx(x), answer: D(Number(x.toFixed(2))), shown: fmt(D(Number(x.toFixed(2)))) } : approx(x));
+const CONTEXTS = ['Find the', 'A sensor records these readings. Find the', 'These are the times, in seconds, for a ball to roll down a ramp. Find the', 'These are the numbers of goals scored in some matches. Find the'];
 const show = (x: number) => (Number.isInteger(x * 100) ? fmt(D(Number(x.toFixed(2)))) : sf3(x));
 
 // ---------------------------------------------------------------------------------------------
@@ -44,7 +46,7 @@ function averages(r: () => number): Question {
       const mean = total / n;
       return {
         round: 'averages',
-        prompt: `Find the mean of ${list}.`,
+        prompt: `${pick(r, CONTEXTS)} mean of ${list}.`,
         steps: [
           { type: 'number', prompt: 'Add up all the values.', answer: D(total), feedback: () => 'Add every value in the list.' },
           { type: 'number', prompt: 'How many values are there?', answer: D(n), feedback: () => 'Count the values.' },
@@ -62,7 +64,7 @@ function averages(r: () => number): Question {
       const correct = options.indexOf('Put them in order');
       return {
         round: 'averages',
-        prompt: `Find the median of ${list}.`,
+        prompt: `${pick(r, CONTEXTS)} median of ${list}.`,
         steps: [
           { type: 'choice', prompt: 'What do you do first?', options, correct, why: whyAll(options, correct, () => 'The median is the middle value of the data in order, smallest to largest.') },
           { type: 'number', prompt: `There are ${n} values. Which position is the middle? (For an even number, it is halfway between two positions, such as 3.5.)`, answer: D((n + 1) / 2), feedback: () => `(${n} + 1) ÷ 2.` },
@@ -80,7 +82,7 @@ function averages(r: () => number): Question {
     const range = sorted[n - 1] - sorted[0];
     return {
       round: 'averages',
-      prompt: `Find the range of ${list}.`,
+      prompt: `${pick(r, CONTEXTS)} range of ${list}.`,
       steps: [
         { type: 'number', prompt: 'What is the largest value?', answer: D(sorted[n - 1]), feedback: () => 'Look for the biggest number.' },
         { type: 'number', prompt: 'What is the smallest value?', answer: D(sorted[0]), feedback: () => 'Look for the smallest number.' },
@@ -99,20 +101,26 @@ function averages(r: () => number): Question {
 function missing(r: () => number): Question {
   for (;;) {
     const n = int(r, 4, 7);
-    const mean = int(r, 5, 90);
-    const known = Array.from({ length: n - 1 }, () => int(r, Math.max(1, mean - 20), mean + 20));
-    const answer = mean * n - sum(known);
-    if (answer < 1 || SHOWN.has(`missing ${mean} ${key(known)}`)) continue;
-    const ctx = pick(r, [`The mean of ${n} test scores is ${mean}. ${n - 1} of them are ${known.join(', ')}.`, `A sensor takes ${n} readings with a mean of ${mean}. ${n - 1} of them are ${known.join(', ')}.`]);
+    const tests = r() < 0.5;
+    // Every value, the missing one too, is drawn from the same spread; the mean must then be a whole number.
+    const centre = tests ? int(r, 40, 85) : int(r, 10, 90);
+    const all = Array.from({ length: n }, () => Math.min(tests ? 100 : 999, int(r, centre - 15, centre + 15)));
+    const total = sum(all);
+    if (total % n !== 0 || all.some((x) => x < 1)) continue;
+    const mean = total / n;
+    const answer = all[n - 1];
+    const known = all.slice(0, -1);
+    if (SHOWN.has(`missing ${mean} ${key(known)}`)) continue;
+    const ctx = tests ? `The mean of ${n} test scores (out of 100) is ${mean}. ${n - 1} of them are ${known.join(', ')}.` : `A sensor takes ${n} readings with a mean of ${mean}. ${n - 1} of them are ${known.join(', ')}.`;
     return {
       round: 'missing',
       prompt: `${ctx} What is the other one?`,
       steps: [
-        { type: 'number', prompt: `What must all ${n} values add up to?`, answer: D(mean * n), feedback: () => `Mean × number of values: ${mean} × ${n}.` },
+        { type: 'number', prompt: `What must all ${n} values add up to?`, answer: D(total), feedback: () => 'Multiply the mean by the number of values.' },
         { type: 'number', prompt: `What do the ${n - 1} values you know add up to?`, answer: D(sum(known)), feedback: () => 'Add them.' },
         { type: 'number', prompt: 'So what is the missing value?', answer: D(answer), feedback: () => 'Take the known total from the total of all of them.' },
       ],
-      workings: [`All ${n} add up to ${mean} × ${n} = ${mean * n}.`, `The others add up to ${sum(known)}.`, `So the missing value is ${mean * n} − ${sum(known)} = ${answer}.`],
+      workings: [`All ${n} add up to ${mean} × ${n} = ${total}.`, `The others add up to ${sum(known)}.`, `So the missing value is ${total} − ${sum(known)} = ${answer}.`],
       check: { kind: 'missing', mean, known, answer },
     };
   }
@@ -127,7 +135,7 @@ function spread(r: () => number): Question {
     if (r() < 0.5) {
       // From data, with a whole-number mean so the distances are easy.
       const n = int(r, 4, 6);
-      const mean = int(r, 3, 20);
+      const mean = int(r, 8, 20); // so no value goes below zero
       const data = Array.from({ length: n - 1 }, () => mean + int(r, -6, 6));
       data.push(mean * n - sum(data));
       if (data[n - 1] < 0 || Math.abs(data[n - 1] - mean) > 10 || SHOWN.has(key(data))) continue;
@@ -138,11 +146,16 @@ function spread(r: () => number): Question {
       const sdSample = Math.sqrt(ss / (n - 1));
       return {
         round: 'spread',
-        prompt: `Find the standard deviation of ${data.join(', ')}.`,
+        prompt: `${pick(r, ['A sensor records these readings.', 'These are the lengths, in cm, of some leaves.', 'These are the marks of a small group in a short test.'])} Find their standard deviation: ${data.join(', ')}.`,
         steps: [
           { type: 'number', prompt: 'What is the mean?', answer: D(mean), feedback: () => `Add them and divide by ${n}.` },
           { type: 'number', prompt: `Square each distance from the mean, and add them up. Σ(x − x̄)^{2} = ?`, answer: D(ss), feedback: () => `For each value, take away ${mean}, square it, then add the squares.` },
-          { type: 'number', prompt: `Divide by ${n}. What is the variance? (Exact, or 3 significant figures.)`, ...exactOr3sf(variance), feedback: () => `${ss} ÷ ${n}.` },
+          {
+            type: 'number',
+            prompt: 'Divide by n, the number of values. What is the variance? (Exact, or 3 significant figures.)',
+            ...exactOr3sf(variance),
+            feedback: (g) => (Math.abs(toNumber(g) - ss / (n - 1)) <= (ss / (n - 1)) * 0.003 ? `That divides by ${n - 1}. This lesson divides by n, the number of values.` : `Divide ${ss} by the number of values.`),
+          },
           {
             type: 'number',
             prompt: 'Take the square root. What is the standard deviation, σ? (3 significant figures, or exact.)',

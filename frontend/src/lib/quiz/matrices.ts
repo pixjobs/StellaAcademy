@@ -15,19 +15,26 @@ export const ROUNDS: Record<Round, { label: string; blurb: string }> = {
 type M = [number, number, number, number]; // a, b, c, d: [[a, b], [c, d]]
 export type MatricesCheck =
   | { kind: 'add' | 'sub' | 'scale'; a: M; b: M | null; k: number; answer: M }
-  | { kind: 'mul'; a: M; b: M; answer: M }
+  | { kind: 'mul'; a: M; b: M; answer: M; ba: M }
   | { kind: 'apply'; m: M; p: [number, number]; answer: [number, number] }
   | { kind: 'name'; m: M; answer: string };
 type Question = Q<MatricesCheck>;
 
 /** Matrices shown on the lesson page and in its earlier practice questions. The quiz never asks these. */
-const SHOWN = new Set(['2,1,0,3', '1,-1,4,2', '1,0,2,-1', '1,2,3,4', '0,1,1,0', '1,0,0,-1', '0,-1,1,0']);
+const SHOWN = new Set(['2,1,0,3', '1,-1,4,2', '1,0,2,-1', '1,2,3,4', '0,1,1,0', '1,0,0,-1', '0,-1,1,0', '0,1,-1,0', '0,-1,-1,0']);
 
 const sn = (x: number) => (x < 0 ? `−${-x}` : String(x));
 const mat = (m: M) => `[[${sn(m[0])},${sn(m[1])};${sn(m[2])},${sn(m[3])}]]`;
 const vec = (v: [number, number]) => `[[${sn(v[0])};${sn(v[1])}]]`;
 const rand = (r: () => number): M => [int(r, -4, 6), int(r, -4, 6), int(r, -4, 6), int(r, -4, 6)];
 const POS = ['top left', 'top right', 'bottom left', 'bottom right'] as const;
+
+/** Two positions to ask about, preferring ones where a negative number is involved. */
+function pickTwo(a: M, b: M | null, r: () => number): number[] {
+  const tricky = [0, 1, 2, 3].filter((i) => a[i] < 0 || (b && b[i] < 0));
+  const rest = [0, 1, 2, 3].filter((i) => !tricky.includes(i));
+  return [...shuffle(r, tricky), ...shuffle(r, rest)].slice(0, 2).sort();
+}
 
 /** Four number steps, one per entry. */
 function entrySteps(answer: M, how: (i: number) => string, slip?: (i: number) => number | null, slipText?: string): Step[] {
@@ -54,12 +61,14 @@ function addScale(r: () => number): Question {
     const right = kind === 'scale' ? `Multiply every entry by ${sn(k)}` : `${kind === 'add' ? 'Add' : 'Take away'} the entries in matching positions`;
     const options = shuffle(r, [right, kind === 'scale' ? `Multiply only the top row by ${sn(k)}` : 'Multiply rows by columns', kind === 'scale' ? `Add ${sn(k)} to every entry` : 'Add all the entries together']);
     const correct = options.indexOf(right);
+    const asked = pickTwo(a, b, r);
     return {
       round: 'add',
       prompt: kind === 'scale' ? `A = ${mat(a)}. Work out ${expr}.` : `A = ${mat(a)} and B = ${mat(b!)}. Work out ${expr}.`,
       steps: [
         { type: 'choice', prompt: `How do you work out ${expr}?`, options, correct, why: whyAll(options, correct, () => (kind === 'scale' ? 'Multiplying a matrix by a number multiplies every entry.' : 'Matrices of the same size are added or taken away position by position.')) },
-        ...entrySteps(answer, (i) => (kind === 'scale' ? `${sn(k)} × ${sn(a[i])}.` : `${sn(a[i])} ${kind === 'add' ? '+' : '−'} ${b![i] < 0 ? `(${sn(b![i])})` : sn(b![i])}.`)),
+        // Two entries, one of them with a negative number where there is one; the other two are in the working.
+        ...entrySteps(answer, (i) => (kind === 'scale' ? `${sn(k)} × ${sn(a[i])}.` : `${sn(a[i])} ${kind === 'add' ? '+' : '−'} ${b![i] < 0 ? `(${sn(b![i])})` : sn(b![i])}.`)).filter((_, i) => asked.includes(i)),
       ],
       workings: [right + '.', `So ${expr} = ${mat(answer)}.`],
       check: { kind, a, b, k, answer },
@@ -73,6 +82,8 @@ function multiply(r: () => number): Question {
     const b: M = [int(r, -3, 5), int(r, -3, 5), int(r, -3, 5), int(r, -3, 5)];
     if (SHOWN.has(a.join(',')) || SHOWN.has(b.join(','))) continue;
     const answer: M = [a[0] * b[0] + a[1] * b[2], a[0] * b[1] + a[1] * b[3], a[2] * b[0] + a[3] * b[2], a[2] * b[1] + a[3] * b[3]];
+    const ba: M = [b[0] * a[0] + b[1] * a[2], b[0] * a[1] + b[1] * a[3], b[2] * a[0] + b[3] * a[2], b[2] * a[1] + b[3] * a[3]];
+    if (ba[0] === answer[0]) continue; // the BA step needs a top left entry that shows order matters
     const pairwise = (i: number) => a[i] * b[i]; // the slip: multiplying matching positions
     const right = 'A row of A times a column of B, multiplied in pairs and added';
     const options = shuffle(r, [right, 'Multiply the numbers in matching positions', 'A column of A times a row of B']);
@@ -90,9 +101,15 @@ function multiply(r: () => number): Question {
       steps: [
         { type: 'choice', prompt: 'How is each entry of AB made?', options, correct, why: whyAll(options, correct, () => 'Each entry of AB is a row of A times a column of B: multiply in pairs, then add.') },
         ...entrySteps(answer, how, pairwise, 'That multiplies the numbers in matching positions. Take a row of A and a column of B, multiply in pairs and add.'),
+        {
+          type: 'number',
+          prompt: 'Now the other order. What is the top left entry of BA?',
+          answer: D(ba[0]),
+          feedback: (g) => (sameNumber(g, answer[0]) ? 'Order matters: BA is not the same as AB. Take row 1 of B times column 1 of A.' : 'Take row 1 of B times column 1 of A: multiply in pairs and add.'),
+        },
       ],
-      workings: [`Top left: row 1 of A times column 1 of B = ${sn(answer[0])}. Top right: row 1 times column 2 = ${sn(answer[1])}.`, `Bottom left: row 2 times column 1 = ${sn(answer[2])}. Bottom right: row 2 times column 2 = ${sn(answer[3])}.`, `So AB = ${mat(answer)}.`],
-      check: { kind: 'mul', a, b, answer },
+      workings: [`Top left: row 1 of A times column 1 of B = ${sn(answer[0])}. Top right: row 1 times column 2 = ${sn(answer[1])}.`, `Bottom left: row 2 times column 1 = ${sn(answer[2])}. Bottom right: row 2 times column 2 = ${sn(answer[3])}.`, `So AB = ${mat(answer)}.`, `BA is ${mat(ba)}: its top left entry is row 1 of B times column 1 of A = ${sn(ba[0])}, not ${sn(answer[0])}. Order matters.`],
+      check: { kind: 'mul', a, b, answer, ba },
     };
   }
 }
@@ -106,14 +123,29 @@ const NAMED: { m: M; name: string }[] = [
   { m: [0, 1, 1, 0], name: 'Reflection in the line y = x' },
   { m: [2, 0, 0, 2], name: 'Enlargement, scale factor 2, centre the origin' },
   { m: [3, 0, 0, 3], name: 'Enlargement, scale factor 3, centre the origin' },
+  { m: [-2, 0, 0, -2], name: 'Enlargement, scale factor −2, centre the origin' },
+  { m: [2, 0, 0, 1], name: 'Stretch, scale factor 2, parallel to the x-axis' },
+  { m: [1, 0, 0, 3], name: 'Stretch, scale factor 3, parallel to the y-axis' },
+  { m: [0, -1, -1, 0], name: 'Reflection in the line y = −x' },
 ];
+
+/** Where (1, 0) or (0, 1) goes: the first or second column, chosen from the columns and their mix-ups. */
+function whereStep(r: () => number, m: M, col: 0 | 1): Step {
+  const pt = (x: number, y: number) => `(${sn(x)}, ${sn(y)})`;
+  const right = col === 0 ? pt(m[0], m[2]) : pt(m[1], m[3]);
+  const wrong = col === 0 ? [pt(m[0], m[1]), pt(m[1], m[3]), pt(-m[0], -m[2])] : [pt(m[2], m[3]), pt(m[0], m[2]), pt(-m[1], -m[3])];
+  const options = shuffle(r, [...new Set([right, ...wrong])]).slice(0, 4);
+  if (!options.includes(right)) options[0] = right;
+  const correct = options.indexOf(right);
+  return { type: 'choice', prompt: `Where does ${col === 0 ? '(1, 0)' : '(0, 1)'} go?`, options, correct, why: whyAll(options, correct, () => `It goes to the ${col === 0 ? 'first' : 'second'} column of the matrix, read downwards.`) };
+}
 
 function transform(r: () => number): Question {
   for (;;) {
     if (r() < 0.5) {
       const m: M = r() < 0.5 ? pick(r, NAMED).m : rand(r);
       const p: [number, number] = [int(r, -5, 6), int(r, -5, 6)];
-      if (p[0] === 0 && p[1] === 0) continue;
+      if ((p[0] === 0 && p[1] === 0) || SHOWN.has(m.join(','))) continue;
       const answer: [number, number] = [m[0] * p[0] + m[1] * p[1], m[2] * p[0] + m[3] * p[1]];
       return {
         round: 'transform',
@@ -134,11 +166,9 @@ function transform(r: () => number): Question {
       round: 'transform',
       prompt: `What transformation does the matrix ${mat(target.m)} do?`,
       steps: [
-        { type: 'number', prompt: 'The first column is where (1, 0) goes. What is its x?', answer: D(target.m[0]), feedback: () => 'Read the top of the first column.' },
-        { type: 'number', prompt: 'And its y?', answer: D(target.m[2]), feedback: () => 'Read the bottom of the first column.' },
-        { type: 'number', prompt: 'The second column is where (0, 1) goes. What is its x?', answer: D(target.m[1]), feedback: () => 'Read the top of the second column.' },
-        { type: 'number', prompt: 'And its y?', answer: D(target.m[3]), feedback: () => 'Read the bottom of the second column.' },
-        { type: 'choice', prompt: `So (1, 0) goes to (${sn(target.m[0])}, ${sn(target.m[2])}) and (0, 1) goes to (${sn(target.m[1])}, ${sn(target.m[3])}). Which transformation is it?`, options, correct, why: whyAll(options, correct, () => 'Sketch where the two points go, and match the movement.') },
+        whereStep(r, target.m, 0),
+        whereStep(r, target.m, 1),
+        { type: 'choice', prompt: 'So which transformation is it?', options, correct, why: whyAll(options, correct, () => 'Sketch where (1, 0) and (0, 1) go, and match the movement.') },
       ],
       workings: [`(1, 0) goes to (${sn(target.m[0])}, ${sn(target.m[2])}) and (0, 1) goes to (${sn(target.m[1])}, ${sn(target.m[3])}).`, `So it is: ${target.name}.`],
       check: { kind: 'name', m: target.m, answer: target.name },

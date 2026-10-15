@@ -178,7 +178,8 @@ export const fracText = (f: Fraction) => (f.d === 1n ? String(f.n) : `${f.n}/${f
 
 /** Reads "7/20", "2 3/4" (a mixed number) or a whole number. */
 export function readFraction(text: string): Fraction | null {
-  const t = text.trim().replace(/\s+/g, ' ');
+  // A pupil may type the π of an angle (2π/3, π/12, 5/3 π): read the number in front of it.
+  const t = text.trim().replace(/\s+/g, ' ').replace(/^(π|pi)\s*\//i, '1/').replace(/\s*(π|pi)\s*/gi, '').trim();
   let m = t.match(/^(\d+) (\d+)\s*\/\s*(\d+)$/);
   if (m) {
     const d = BigInt(m[3]);

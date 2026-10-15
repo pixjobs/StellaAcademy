@@ -38,7 +38,11 @@ export const statisticsVerifier: Verifier = {
     }
     if (c.kind === 'sd') {
       const variance = c.answer ** 2;
-      return Math.abs(variance - c.answer) / c.answer > 0.01 ? [{ step: last, typed: String(Number(variance.toPrecision(4))), expect: 'That is the variance' }] : [];
+      const n = c.data.length;
+      const sample = (variance * n) / (n - 1);
+      const out = [{ step: 2, typed: String(Number(sample.toPrecision(4))), expect: `divides by ${n - 1}` }];
+      if (Math.abs(variance - c.answer) / c.answer > 0.01) out.push({ step: last, typed: String(Number(variance.toPrecision(4))), expect: 'That is the variance' });
+      return out;
     }
     if (c.kind === 'summary') {
       const notSquared = c.sxx / c.n - c.sx / c.n;

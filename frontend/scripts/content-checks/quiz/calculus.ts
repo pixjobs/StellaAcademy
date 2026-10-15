@@ -26,9 +26,15 @@ export const calculusVerifier: Verifier = {
     const q = question as Question<CalculusCheck>;
     const c = q.check;
     if (c.kind === 'limit') return [{ step: q.steps.length - 1, typed: '0', expect: 'Only the h part' }];
-    // The coefficient left unmultiplied, on the first term's coefficient step.
+    const out: { step: number; typed: string; expect: string }[] = [];
+    // The coefficient left unmultiplied, and multiplied by the new power, on the first term's coefficient step.
     const t = c.terms[0];
     const at = q.steps.findIndex((s) => s.type === 'number' && /multiply by the power/.test(s.prompt));
-    return t.n > 1 && at !== -1 ? [{ step: at, typed: String(t.c), expect: 'by the power' }] : [];
+    if (t.n > 1 && at !== -1) out.push({ step: at, typed: String(t.c), expect: 'by the power' });
+    if (t.n > 2 && at !== -1 && t.c * (t.n - 1) !== t.c * t.n && t.c * (t.n - 1) !== t.c) out.push({ step: at, typed: String(t.c * (t.n - 1)), expect: 'new power' });
+    // The constant kept in the value at the end.
+    const k = c.terms.find((x) => x.n === 0);
+    if (k && k.c !== 0) out.push({ step: q.steps.length - 1, typed: String(c.answer + k.c), expect: 'no derivative' });
+    return out;
   },
 };

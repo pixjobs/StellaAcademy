@@ -28,7 +28,11 @@ export const anglesVerifier: Verifier = {
       const wrong = c.kind === 'arc' ? c.r * c.theta : 0.5 * c.r * c.r * c.theta;
       return [{ step: last, typed: String(Number(wrong.toPrecision(4))), expect: 'in degrees in a radians formula' }];
     }
-    if (c.kind === 'sector' && c.radians) return [{ step: last, typed: String(Number((c.r * c.r * c.theta).toPrecision(4))), expect: 'half' }];
+    if (c.kind === 'sector' && c.radians)
+      return [
+        { step: last, typed: String(Number((c.r * c.r * c.theta).toPrecision(4))), expect: 'half' },
+        ...(c.r !== 2 ? [{ step: last, typed: String(Number((0.5 * c.r * c.theta).toPrecision(4))), expect: 'Square the radius' }] : []),
+      ];
     return [];
   },
 };

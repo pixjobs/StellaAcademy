@@ -32,6 +32,14 @@ export const diffeqVerifier: Verifier = {
     const c = q.check;
     const last = q.steps.length - 1;
     if (c.kind === 'scale' && c.power === 2 && c.m !== 1) return [{ step: last, typed: String(c.rate * c.m), expect: 'square of the speed' }];
+    if (c.kind === 'build') {
+      // An option with the wrong sign at the front is named as a sign slip.
+      const choice = q.steps[1];
+      if (choice.type !== 'choice') return [];
+      const front = (o: string) => o.split('= ')[1].startsWith('−');
+      const wrongSign = choice.options.find((o, i) => i !== choice.correct && front(o) !== front(c.answer));
+      return wrongSign ? [{ step: 1, typed: wrongSign, expect: 'Check the sign' }] : [];
+    }
     if (c.kind === 'drag') {
       const noOne = c.v0 / (c.k * c.v0 * c.t);
       return [{ step: last, typed: String(Number(noOne.toPrecision(4))), expect: 'Remember the 1' }];

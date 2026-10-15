@@ -2,7 +2,7 @@
  * Quiz for "Trigonometry in Right-Angled Triangles" (KAN-81): finding a side, finding an angle, Pythagoras.
  * GCSE: a calculator is allowed and answers are marked to 3 significant figures (core.ts `approx`).
  */
-import { D, approx, sf3, fmt, int, pick, shuffle, toNumber, whyAll, type LessonQuiz, type Question as Q, type Step } from '@/lib/quiz/core';
+import { D, approx, sf3, int, pick, shuffle, toNumber, whyAll, type LessonQuiz, type Question as Q, type Step } from '@/lib/quiz/core';
 
 export type Round = 'sides' | 'angles' | 'pythagoras';
 

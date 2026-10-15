@@ -19,7 +19,8 @@ export type AnglesCheck =
 type Question = Q<AnglesCheck>;
 
 /** Examples shown on the lesson page. The quiz never asks these. */
-const SHOWN = new Set(['to-rad 90', 'to-rad 180', 'to-rad 360', 'to-rad 60', 'arc 4 1/2', 'sector 4 1/2', 'arc 5 2', 'sector 6 1/3', 'arc 10 72']);
+// The page's arcs and sectors use π/2 and π/3; the quiz uses decimal radians, so they cannot repeat.
+const SHOWN = new Set(['to-rad 90', 'to-rad 180', 'to-rad 360', 'to-rad 60', 'arc 5 2', 'arc 10 72']);
 
 /** θ as kπ written for a pupil: π/3, 2π/3, 5π/4. */
 const piText = (num: number, den: number) => `${num === 1 ? '' : num}π${den === 1 ? '' : `/${den}`}`;
@@ -34,7 +35,7 @@ function convert(r: () => number): Question {
         round: 'convert',
         prompt: `Convert ${degrees}° to radians. Give your answer as a fraction of π.`,
         steps: [
-          { type: 'fraction', prompt: `180° is π radians. What fraction of 180° is ${degrees}°?`, answer: F(degrees, 180), simplest: false, feedback: () => `${degrees} over 180.` },
+          { type: 'fraction', prompt: `180° is π radians. What fraction of 180° is ${degrees}°?`, answer: F(degrees, 180), simplest: false, feedback: () => 'Put the angle over 180.' },
           {
             type: 'fraction',
             prompt: `Simplify it. ${degrees}° is how many π radians? (Type the number in front of π, such as 2/3 for 2π/3.)`,
@@ -75,7 +76,7 @@ function arcOrSector(r: () => number, kind: 'arc' | 'sector'): Question {
     const theta = radians ? int(r, 3, 30) / 10 : pick(r, [20, 30, 40, 45, 50, 60, 80, 100, 120, 135, 150, 210, 240, 270]);
     if (SHOWN.has(`${kind} ${radius} ${theta}`)) continue;
     const exact = kind === 'arc' ? (radians ? radius * theta : (theta / 360) * 2 * Math.PI * radius) : radians ? 0.5 * radius * radius * theta : (theta / 360) * Math.PI * radius * radius;
-    const thetaText = radians ? `${theta} radians` : `${theta}°`;
+    const thetaText = radians ? `${theta} radian${theta === 1 ? '' : 's'}` : `${theta}°`;
     const unit = kind === 'arc' ? 'cm' : 'cm²';
     const rightRule = kind === 'arc' ? (radians ? 's = rθ' : 's = θ/360 × 2πr') : radians ? 'A = ½r²θ' : 'A = θ/360 × πr²';
     const wrongRules = kind === 'arc' ? (radians ? ['s = θ/360 × 2πr', 's = 2πrθ'] : ['s = rθ, with θ in degrees', 's = θ/360 × πr²']) : radians ? ['A = r²θ', 'A = ½rθ'] : ['A = ½r²θ, with θ in degrees', 'A = θ/360 × 2πr'];
@@ -99,7 +100,6 @@ function arcOrSector(r: () => number, kind: 'arc' | 'sector'): Question {
             o.includes('with θ in degrees') ? `${o.split(',')[0]} only works with θ in radians.` : kind === 'arc' ? 'The arc is the radius times the angle in radians, or that fraction of the circumference in degrees.' : 'The sector is half the radius squared times the angle in radians, or that fraction of the circle’s area in degrees.',
           ),
         },
-        ...(kind === 'sector' ? [{ type: 'number' as const, prompt: `What is r^{2}?`, answer: D(radius * radius), feedback: () => `${radius} × ${radius}.` }] : []),
         {
           type: 'number',
           prompt: `So what is the ${kind === 'arc' ? 'arc length' : 'area'}? Give 3 significant figures.`,

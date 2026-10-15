@@ -50,9 +50,21 @@ function powerRuleSteps(r: () => number, ts: Term[], v: string): Step[] {
     const term = termText(t, v, true);
     steps.push({
       type: 'number',
-      prompt: `For ${term}: multiply by the power. What is the new number in front?`,
+      prompt:
+        t.n === 1
+          ? `For ${term} (that is ${term}^{1}): multiply by the power, then take one off it, leaving ${v}^{0}, which is 1. What is left?`
+          : `For ${term}: multiply by the power. What is the new number in front?`,
       answer: D(t.c * t.n),
-      feedback: (g) => (sameNumber(g, t.c) && t.n !== 1 ? `Multiply ${sn(t.c)} by the power, ${t.n}.` : sameNumber(g, t.c * (t.n - 1)) && t.n > 1 ? `Multiply by the power before you take one off it: ${sn(t.c)} × ${t.n}.` : `${sn(t.c)} × ${t.n}.`),
+      feedback: (g) =>
+        t.n === 1
+          ? sameNumber(g, 0)
+            ? `Only ${v} becomes ${v}^{0}, which is 1, not 0. The number in front stays.`
+            : `The power is 1, so multiplying by it leaves the number in front as it was.`
+          : sameNumber(g, t.c)
+            ? `Multiply the number in front by the power, ${t.n}.`
+            : sameNumber(g, t.c * (t.n - 1))
+              ? 'That multiplies by the new power. Multiply by the power before you take one off it.'
+              : `Multiply the number in front by the power, ${t.n}.`,
     });
     if (t.n > 1) steps.push({ type: 'number', prompt: `And the new power of ${v}?`, answer: D(t.n - 1), feedback: () => `Take one off the power: ${t.n} − 1.` });
   }
@@ -66,7 +78,7 @@ function powerRule(r: () => number): Question {
     const ts: Term[] = [{ c: pick(r, [1, 2, 3, 4, 5, -2, -3]), n: n1 }, { c: pick(r, [2, 3, 4, 5, 6, 7, -1, -4, -5]), n: n2 }];
     if (r() < 0.5) ts.push({ c: int(r, -9, 9) || 1, n: 0 });
     if (SHOWN.has(key(ts))) continue;
-    const x = pick(r, [-2, -1, 1, 2, 3]);
+    const x = pick(r, n1 >= 4 ? [-2, -1, 1, 2] : [-2, -1, 1, 2, 3]); // keeps the numbers to mental-sized
     const d = derive(ts);
     const answer = evaluate(d, x);
     const withConstant = ts.some((t) => t.n === 0) ? answer + ts.find((t) => t.n === 0)!.c : null;
@@ -99,6 +111,8 @@ function motion(r: () => number): Question {
     const d = derive(ts);
     const answer = evaluate(d, t);
     const unit = acc ? 'm/s²' : 'm/s';
+    const constant = ts.find((x) => x.n === 0);
+    const withConstant = constant ? answer + constant.c : null;
     const how = shuffle(r, ['Differentiate', 'Integrate', 'Divide by t']);
     const howRight = how.indexOf('Differentiate');
     return {
@@ -115,7 +129,13 @@ function motion(r: () => number): Question {
           why: whyAll(how, howRight, () => 'Velocity is the rate of change of displacement, and acceleration is the rate of change of velocity: differentiate.'),
         },
         ...powerRuleSteps(r, ts, 't'),
-        { type: 'number', prompt: `So ${acc ? 'a' : 'v'} = ${poly(d, 't')}. What is it at t = ${t}?`, answer: D(answer), unit, feedback: () => `Put t = ${t} into ${poly(d, 't')}.` },
+        {
+          type: 'number',
+          prompt: `So ${acc ? 'a' : 'v'} = ${poly(d, 't')}. What is it at t = ${t}?`,
+          answer: D(answer),
+          unit,
+          feedback: (g) => (withConstant !== null && sameNumber(g, withConstant) ? 'The constant has no derivative: leave it out.' : `Put t = ${t} into ${poly(d, 't')}.`),
+        },
       ],
       workings: [`${acc ? 'a = dv/dt' : 'v = ds/dt'} = ${poly(d, 't')}.`, `At t = ${t}: ${sn(answer)} ${unit}.`],
       check: { kind: acc ? 'acceleration' : 'velocity', terms: ts, t, answer },
