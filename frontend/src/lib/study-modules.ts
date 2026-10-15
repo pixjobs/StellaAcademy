@@ -143,8 +143,9 @@ export const studyModules: StudyModule[] = [
       problem: 'Find the gravitational force between Earth ($M = 5.97 \\times 10^{24}$ kg) and a $1000$ kg satellite in a low orbit, $r = 6.7 \\times 10^6$ m from Earth\'s centre.',
       steps: [
         'Write down the constant: $G = 6.67 \\times 10^{-11}$ N m² kg⁻².',
-        'Substitute into $F = \\dfrac{GMm}{r^2}$: $F = \\dfrac{6.67 \\times 10^{-11} \\times 5.97 \\times 10^{24} \\times 1000}{(6.7 \\times 10^6)^2}$.',
-        'Work out the top and the bottom: $F = \\dfrac{3.98 \\times 10^{17}}{4.49 \\times 10^{13}}$.'
+        'Multiply the top, $G \\times M \\times m$: this gives $3.98 \\times 10^{17}$.',
+        'Square the distance: $(6.7 \\times 10^6)^2 = 4.49 \\times 10^{13}$.',
+        'Divide: $F = \\dfrac{3.98 \\times 10^{17}}{4.49 \\times 10^{13}}$.'
       ],
       resultFormula: 'F \\approx 8870 \\text{ N}'
     },

@@ -197,9 +197,9 @@ export default async function LessonPage({ params }: Props) {
                     </dt>
                     <dd className="font-semibold text-[var(--ink)]">
                       {v.name}
-                      {v.unit && <span className="font-normal text-[var(--ink-soft)]">, {v.unit}</span>}
+                      {v.unit && <span className="font-normal text-[var(--ink-soft)]">, <Rich text={v.unit} /></span>}
                     </dd>
-                    <dd className="text-[15px] leading-relaxed text-[var(--ink-soft)]">{v.description}</dd>
+                    <dd className="text-[15px] leading-relaxed text-[var(--ink-soft)]"><Rich text={v.description} /></dd>
                   </div>
                 ))}
               </dl>

@@ -408,8 +408,8 @@ const MISSION_2_TABLE: Entry[] = [
     compute: () => (C.G_NOTES_GRAVITY * C.M_EARTH * 1000) / (6.7e6) ** 2, expected: 8870.5, tolerance: 5, unit: 'N',
   },
   {
-    lesson: 'gravity', where: 'solvedExample.steps[2]', expectQuestionIncludes: 'Earth ($M = 5.97 \\times 10^{24}$ kg) and a $1000$ kg satellite in a low orbit',
-    stated: '{3.98 \\times 10^{17}}', compute: () => C.G_NOTES_GRAVITY * C.M_EARTH * 1000, expected: 3.982e17, relTolerance: 0.002, unit: 'N m²',
+    lesson: 'gravity', where: 'solvedExample.steps[1]', expectQuestionIncludes: 'Earth ($M = 5.97 \\times 10^{24}$ kg) and a $1000$ kg satellite in a low orbit',
+    stated: '$3.98 \\times 10^{17}$', compute: () => C.G_NOTES_GRAVITY * C.M_EARTH * 1000, expected: 3.982e17, relTolerance: 0.002, unit: 'N m²',
   },
   {
     lesson: 'gravity', where: 'practiceProblems[0]', expectQuestionIncludes: 'The distance between two masses is tripled',
