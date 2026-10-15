@@ -50,6 +50,22 @@ const nextConfig: NextConfig = {
     remotePatterns: [{ protocol: "https", hostname: "**.nasa.gov", pathname: "/**" }],
   },
 
+  /**
+   * One address for the site. stella-academy.org is mapped to the same Cloud Run service as www, so without
+   * this it served a second copy of every page; Search Console listed those as "Alternative page with proper
+   * canonical tag". A permanent redirect sends visitors and search engines to the www address instead.
+   */
+  async redirects() {
+    return [
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "stella-academy.org" }],
+        destination: "https://www.stella-academy.org/:path*",
+        permanent: true,
+      },
+    ];
+  },
+
   async headers() {
     // Footage and pictures in /public change rarely, so browsers may keep them for 30 days
     // instead of asking the server about each one on every visit. (Not "immutable": a
