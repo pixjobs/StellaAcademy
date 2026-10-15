@@ -31,6 +31,11 @@ export type NumberStep = {
   alsoAccept?: Digits[];
   /** Show the answer without commas (a binary number such as 110011). */
   plain?: boolean;
+  /**
+   * A calculator answer (GCSE and A-level): `answer` is the exact value rounded to 3 significant figures, and
+   * any typed value within half a unit of the third significant figure of `exact` is right (36.87 or 36.9).
+   */
+  exact?: number;
 };
 
 export type FractionStep = {
@@ -192,7 +197,7 @@ export function readFraction(text: string): Fraction | null {
 
 /** Reads a typed number: digits with optional commas, then optionally a unit or %. */
 export function readAnswer(text: string): { value: Digits; unit: string } | null {
-  const m = text.trim().match(/^(?:about\s+)?([-−]?)\s*([\d.,]+)\s*([a-zA-Z %²^.°]*2?)$/i);
+  const m = text.trim().match(/^(?:about\s+)?([-−–]?)\s*([\d.,]+)\s*([a-zA-Z %²^.°]*2?)$/i);
   const value = m && parseDecimal(m[2]);
   if (!m || !value) return null;
   return { value: m[1] && value.digits !== '0' ? { ...value, neg: true } : value, unit: m[3].trim().toLowerCase() };
@@ -206,6 +211,8 @@ const UNIT_WORDS: Record<string, string[]> = {
   '%': ['%', 'percent', 'per cent'],
   '£': ['£'],
   days: ['day', 'days'],
+  '°': ['°', 'deg', 'degree', 'degrees'],
+  hours: ['h', 'hr', 'hrs', 'hour', 'hours'],
   watts: ['w', 'watt', 'watts'],
   '°c': ['°c', '° c', 'c', 'degrees', '°', 'degrees c'],
   // The last word is the one feedback uses.
@@ -214,7 +221,21 @@ const UNIT_WORDS: Record<string, string[]> = {
 };
 
 /** Is the typed number right? Empty feedback means yes. */
+let unitWords: Set<string> | null = null;
+/** Every unit word a pupil might type, so a unit on an answer that has none can be refused. */
+const allUnitWords = () => (unitWords ??= new Set(Object.values(UNIT_WORDS).flat()));
+
 export function markNumber(step: NumberStep, text: string): { ok: boolean; feedback: string } {
+  if (step.plain) {
+    // A binary number: only 0s and 1s.
+    if (/^\s*\d+\s*$/.test(text) && /[2-9]/.test(text)) {
+      // Digits other than 0 and 1: name the slip if this step knows it (adding as in denary), else say why.
+      return { ok: false, feedback: step.feedback(D(text.trim())) || 'Binary uses only 0s and 1s.' };
+    }
+    if (!/^\s*[01]+\s*$/.test(text)) return { ok: false, feedback: 'Type only 0s and 1s, such as 10110.' };
+    const given = D(text.trim().replace(/^0+(?=\d)/, ''));
+    return same(given, step.answer) ? { ok: true, feedback: '' } : { ok: false, feedback: step.feedback(given) || 'Not quite. Try again.' };
+  }
   const pounds = /^£/.test(text.trim());
   if (pounds && step.unit !== '£') return { ok: false, feedback: 'This answer is not money. Type just the number.' };
   const read = readAnswer(text.trim().replace(/^£\s*/, ''));
@@ -224,12 +245,31 @@ export function markNumber(step: NumberStep, text: string): { ok: boolean; feedb
     if (same(read.value, step.answer)) return { ok: true, feedback: '' };
     return { ok: false, feedback: step.feedback(read.value) || 'Not quite. Try again.' };
   }
+  if (read.unit && !step.unit && allUnitWords().has(read.unit)) return { ok: false, feedback: 'This answer has no unit. Type just the number.' };
   if (read.unit && step.unit && !(UNIT_WORDS[step.unit] ?? [step.unit]).includes(read.unit)) {
     const words = UNIT_WORDS[step.unit];
     return { ok: false, feedback: `Check the unit: this answer is in ${words ? words[words.length - 1] : step.unit}.` };
   }
   if (same(read.value, step.answer) || step.alsoAccept?.some((d) => same(read.value, d))) return { ok: true, feedback: '' };
+  if (step.exact !== undefined) {
+    const v = toNumber(read.value);
+    const tol = sigFigUnit(step.exact) / 2;
+    if (Math.abs(v - step.exact) <= tol * 1.0001) return { ok: true, feedback: '' };
+    // Right but rounded too far, such as 37 for 36.87.
+    if (Math.abs(v - step.exact) <= 10 * tol && countSigFigs(read.value) < 3) return { ok: false, feedback: 'Close, but give your answer to 3 significant figures.' };
+  }
   return { ok: false, feedback: step.feedback(read.value) || 'Not quite. Try again.' };
+}
+
+/** A decimal as an ordinary number. */
+export const toNumber = (d: Digits) => (d.neg ? -1 : 1) * Number(d.digits) * 10 ** (d.top - d.digits.length + 1);
+/** The place value of the third significant figure of x. */
+const sigFigUnit = (x: number) => 10 ** (Math.floor(Math.log10(Math.abs(x))) - 2);
+const countSigFigs = (d: Digits) => d.digits.replace(/^0+/, '').length;
+
+/** A calculator answer: rounded to 3 significant figures for display, with the exact value for marking. */
+export function approx(x: number): { answer: Digits; exact: number } {
+  return { answer: D(Number(x.toPrecision(3))), exact: x };
 }
 
 /** Is the typed fraction right? */
@@ -261,7 +301,7 @@ export function answerText(step: Step): string {
   if (step.type === 'number') {
     if (step.plain) return fmt(step.answer).replace(/,/g, '');
     if (step.unit === '£') return `£${fmt(step.answer)}`;
-    return `${fmt(step.answer)}${step.unit ? (step.unit === '%' ? '%' : ` ${unitLabel(step.unit)}`) : ''}`;
+    return `${fmt(step.answer)}${step.unit ? (step.unit === '%' || step.unit === '°' ? step.unit : ` ${unitLabel(step.unit)}`) : ''}`;
   }
   if (step.type === 'fraction') {
     const { n, d } = step.answer;

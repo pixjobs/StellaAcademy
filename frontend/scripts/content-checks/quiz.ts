@@ -29,6 +29,7 @@ import { measuresVerifier } from './quiz/measures';
 import { multiplicationVerifier } from './quiz/multiplication';
 import { negativeNumbersVerifier } from './quiz/negative-numbers';
 import { proportionsVerifier } from './quiz/proportions';
+import { trigonometryVerifier } from './quiz/trigonometry';
 import type { Verifier } from './quiz/types';
 
 type Finding = { check: string; lesson: string; where: string; excerpt: string; message: string; level: 'fail' | 'warn' | 'info' };
@@ -46,6 +47,7 @@ const VERIFIERS: Record<string, Verifier> = {
   proportions: proportionsVerifier,
   'exponents-roots': exponentsRootsVerifier,
   binary: binaryVerifier,
+  trigonometry: trigonometryVerifier,
 };
 
 export function runQuizChecks(lessons?: string[]): Finding[] {
@@ -95,7 +97,9 @@ export function runQuizChecks(lessons?: string[]): Finding[] {
             });
           } else if (s.type === 'number') {
             const a = formatDecimal(s.answer);
-            const forms = [a, a.replace(/,/g, ''), `about ${a}`];
+            // A binary answer is typed as plain 0s and 1s, with or without leading zeros; commas are refused.
+            const forms = s.plain ? [a.replace(/,/g, ''), `0${a.replace(/,/g, '')}`] : [a, a.replace(/,/g, ''), `about ${a}`];
+            if (s.plain && markTyped(s, a.includes(',') ? a : `${a}2`).ok) fail(where, s.prompt, 'binary step accepts a non-binary answer');
             if (s.unit) forms.push(s.unit === '%' ? `${a}%` : s.unit === '£' ? `£${a}` : `${a} ${s.unit}`);
             if (s.unit === '£') forms.push(`£ ${a}`);
             for (const typed of forms) if (!markTyped(s, typed).ok) fail(where, s.prompt, `marker rejects "${typed}"`);

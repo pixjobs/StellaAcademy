@@ -21,7 +21,7 @@ export const binaryVerifier: Verifier = {
     const q = question as Question<BinaryCheck>;
     const c = q.check;
     const last = q.steps.length - 1;
-    if (c.kind === 'to-denary') return [{ step: last, typed: String([...c.bits].filter((b) => b === '1').length), expect: 'counts the 1s' }];
+    if (c.kind === 'to-denary') return [{ step: last, typed: String([...c.bits].filter((b) => b === '1').length), expect: 'counts the 1s' }, { step: last, typed: c.bits, expect: 'as a denary number' }];
     if (c.kind === 'to-binary') {
       const rev = [...c.answer].reverse().join('');
       return rev === c.answer ? [] : [{ step: last, typed: rev.replace(/^0+/, ''), expect: 'backwards' }];

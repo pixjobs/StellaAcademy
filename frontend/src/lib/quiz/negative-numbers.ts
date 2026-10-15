@@ -19,7 +19,12 @@ export type NegativeCheck =
 type Question = Q<NegativeCheck>;
 
 /** Examples shown on the lesson page. The quiz never asks these. */
-const SHOWN = new Set(['add -4 + 6', 'add 4 − 9', 'add 6 + -2', 'add -2 − -5', 'zero -8 5', 'mul 2 × 6', 'mul -2 × -6', 'mul 2 × -6', 'mul -12 ÷ -4', 'mul 12 ÷ -4', 'mul -1.5 × 4', 'mul -3 × -4']);
+const SHOWN = new Set([
+  'add -4 + 6', 'add 4 − 9', 'add 6 + -2', 'add -2 − -5', 'add -5 + 8', 'add -3 − -7', 'add 12 + -2',
+  'zero -8 5', 'zero -130 120',
+  'mul 2 × 6', 'mul -2 × -6', 'mul 2 × -6', 'mul -12 ÷ -4', 'mul 12 ÷ -4', 'mul -1.5 × 4', 'mul -3 × -4', 'mul -3 × -7', 'mul 36 ÷ -4', 'mul -2.5 × 4',
+]);
+const places = (n: number) => `${n} place${n === 1 ? '' : 's'}`;
 
 /** −5 with a proper minus sign. */
 const sn = (x: number) => (x < 0 ? `−${fmt(D(-x))}` : fmt(D(x)));
@@ -52,8 +57,8 @@ function addSub(r: () => number): Question {
     if (b < 0) {
       // Two signs together: rewrite first.
       const right = op === '+' ? `${sn(a)} − ${-b}` : `${sn(a)} + ${-b}`;
-      const wrongs = op === '+' ? [`${sn(a)} + ${-b}`, `${sn(-a)} − ${-b}`] : [`${sn(a)} − ${-b}`, `${sn(-a)} + ${-b}`];
-      const options = shuffle(r, [...new Set([right, ...wrongs])]);
+      const wrong = op === '+' ? `${sn(a)} + ${-b}` : `${sn(a)} − ${-b}`;
+      const options = shuffle(r, [right, wrong]);
       const correct = options.indexOf(right);
       steps.push({
         type: 'choice',
@@ -65,14 +70,24 @@ function addSub(r: () => number): Question {
       workings.push(`${expr} is the same as ${right}.`);
     }
     const direction = move > 0 ? 'Right' : 'Left';
-    const dirOptions = shuffle(r, [`Right, ${Math.abs(move)} places`, `Left, ${Math.abs(move)} places`]);
-    const dirCorrect = dirOptions.indexOf(`${direction}, ${Math.abs(move)} places`);
+    // Four options, so the distance is tested as well as the direction.
+    const other = Math.abs(a) !== Math.abs(move) ? Math.abs(a) : Math.abs(move) + 1;
+    const dirOptions = shuffle(r, [`Right, ${places(Math.abs(move))}`, `Left, ${places(Math.abs(move))}`, `Right, ${places(other)}`, `Left, ${places(other)}`]);
+    const dirCorrect = dirOptions.indexOf(`${direction}, ${places(Math.abs(move))}`);
     steps.push({
       type: 'choice',
       prompt: `Start at ${sn(a)} on the number line. Which way do you move, and how far?`,
       options: dirOptions,
       correct: dirCorrect,
-      why: whyAll(dirOptions, dirCorrect, () => (op === '−' && b < 0 ? 'Taking away a negative makes the answer bigger: move right.' : move > 0 ? 'Adding a positive amount moves you right.' : 'Taking away, or adding a negative, moves you left.')),
+      why: whyAll(dirOptions, dirCorrect, (o) =>
+        o.startsWith(direction)
+          ? `The direction is right, but the distance is the size of the number being ${op === '+' ? 'added' : 'taken away'}: ${Math.abs(b)}.`
+          : op === '−' && b < 0
+            ? 'Taking away a negative makes the answer bigger: move right.'
+            : move > 0
+              ? 'Adding a positive amount moves you right.'
+              : 'Taking away, or adding a negative, moves you left.',
+      ),
     });
     const wrongWay = a - move; // moving the wrong way
     steps.push({
@@ -86,7 +101,7 @@ function addSub(r: () => number): Question {
             : 'That is moving the wrong way along the number line.'
           : `Start at ${sn(a)} and move ${Math.abs(move)} to the ${direction.toLowerCase()}.`,
     });
-    workings.push(`Start at ${sn(a)} and move ${Math.abs(move)} to the ${direction.toLowerCase()}.`, `So ${expr} = ${sn(answer)}.`);
+    workings.push(`Start at ${sn(a)} and move ${places(Math.abs(move))} to the ${direction.toLowerCase()}.`, `So ${expr} = ${sn(answer)}.`);
     return { round: 'add', prompt: `Work out ${expr}.`, steps, workings, check: { kind: 'add', a, op, b, answer } };
   }
 }
@@ -97,22 +112,22 @@ function addSub(r: () => number): Question {
 
 const ZERO_CONTEXTS = [
   { ask: (lo: number, hi: number) => `At night it is ${sn(lo)} °C. By midday it is ${sn(hi)} °C. How many degrees warmer is it at midday?`, unit: '°C' },
-  { ask: (lo: number, hi: number) => `On the Moon the ground can be ${sn(lo * 10)} °C at night and ${sn(hi * 10)} °C in the day. What is the difference?`, unit: '°C', scale: 10 },
-  { ask: (lo: number, hi: number) => `A diver is ${-lo} m below the sea's surface, at ${sn(lo)} m. A seabird is ${hi} m above it. How far apart are they?`, unit: 'm' },
+  { ask: (lo: number, hi: number) => `On the Moon the ground can be ${sn(lo)} °C at night and ${sn(hi)} °C in the day. What is the difference?`, unit: '°C', moon: true },
+  { ask: (lo: number, hi: number) => `A diver is at ${sn(lo)} m, below the sea's surface. A seabird flies ${hi} m above the surface. How far apart are they?`, unit: 'm' },
 ];
 
 function acrossZero(r: () => number): Question {
   for (;;) {
     const ctx = pick(r, ZERO_CONTEXTS);
-    const k = ctx.scale ?? 1;
-    const lo = -int(r, 2, 15) * k;
-    const hi = int(r, 2, 15) * k;
+    // The Moon's surface: about −170 °C to −130 °C at night and 100 °C to 120 °C in the day.
+    const lo = ctx.moon ? -10 * int(r, 13, 17) : -int(r, 2, 15);
+    const hi = ctx.moon ? 10 * int(r, 10, 12) : int(r, 2, 15);
     if (SHOWN.has(`zero ${lo} ${hi}`) || -lo === hi) continue;
     const answer = hi - lo;
     const unit = ctx.unit === '°C' ? '°c' : ctx.unit;
     return {
       round: 'zero',
-      prompt: ctx.ask(lo / k, hi / k),
+      prompt: ctx.ask(lo, hi),
       steps: [
         { type: 'number', prompt: `How far is it from ${sn(lo)} up to 0?`, answer: D(-lo), unit, feedback: (g) => (g.neg ? 'A distance is never negative: count the steps up to 0.' : `Count up from ${sn(lo)} to 0.`) },
         { type: 'number', prompt: `And from 0 up to ${sn(hi)}?`, answer: D(hi), unit, feedback: () => `Count from 0 to ${hi}.` },
@@ -145,20 +160,22 @@ function mulDiv(r: () => number): Question {
     if (Math.abs(b) === 1 || SHOWN.has(`mul ${a} ${op} ${b}`)) continue;
     const answer = op === '×' ? a * b : a / b;
     const sameSign = a < 0 === b < 0;
-    const expr = `${br(a)} ${op} ${br(b)}`;
-    const signOptions = ['The same', 'Different'];
-    const posNeg = ['Positive', 'Negative'];
+    const expr = `${sn(a)} ${op} ${br(b)}`;
+    const signOptions = shuffle(r, ['The same', 'Different']);
+    const posNeg = shuffle(r, ['Positive', 'Negative']);
+    const sameAt = signOptions.indexOf(sameSign ? 'The same' : 'Different');
+    const posAt = posNeg.indexOf(sameSign ? 'Positive' : 'Negative');
     return {
       round: 'multiply',
       prompt: `Work out ${expr}.`,
       steps: [
-        { type: 'choice', prompt: `Are the signs of ${sn(a)} and ${sn(b)} the same or different?`, options: signOptions, correct: sameSign ? 0 : 1, why: { [sameSign ? 1 : 0]: `${sn(a)} is ${a < 0 ? 'negative' : 'positive'} and ${sn(b)} is ${b < 0 ? 'negative' : 'positive'}.` } },
+        { type: 'choice', prompt: `Are the signs of ${sn(a)} and ${sn(b)} the same or different?`, options: signOptions, correct: sameAt, why: { [1 - sameAt]: `${sn(a)} is ${a < 0 ? 'negative' : 'positive'} and ${sn(b)} is ${b < 0 ? 'negative' : 'positive'}.` } },
         {
           type: 'choice',
           prompt: 'So is the answer positive or negative?',
           options: posNeg,
-          correct: sameSign ? 0 : 1,
-          why: { [sameSign ? 1 : 0]: sameSign ? `Same signs give a positive answer: a negative ${op === '×' ? 'times' : 'divided by'} a negative is positive.` : 'Different signs give a negative answer.' },
+          correct: posAt,
+          why: { [1 - posAt]: sameSign ? `Same signs give a positive answer: a negative ${op === '×' ? 'times' : 'divided by'} a negative is positive.` : 'Different signs give a negative answer.' },
         },
         {
           type: 'number',

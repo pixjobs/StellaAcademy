@@ -43,7 +43,10 @@ function Readout({ label, value, note }: { label: string; value: string; note?: 
  * Nothing here moves on its own, so there is no animation loop: React's render
  * is always the complete picture.
  */
-export default function TrigTriangle({ placement = 'lesson' }: { placement?: string }) {
+/** `bare`: inside a Try it panel that already has its frame (the Explore tab on a quiz lesson). */
+export default function TrigTriangle({ placement = 'lesson', bare = false }: { placement?: string; bare?: boolean }) {
+  const Frame = bare ? 'div' : 'figure';
+  const Caption = bare ? 'p' : 'figcaption';
   const labelsRef = useReadableLabels();
   const [angle, setAngle] = useState(35); // degrees
   const [hyp, setHyp] = useState(8); // metres
@@ -88,10 +91,10 @@ export default function TrigTriangle({ placement = 'lesson' }: { placement?: str
   const sentence = `${ratio} ${angle}° = ${top} ÷ ${bottom} = ${lengths[top].toFixed(2)} ÷ ${lengths[bottom].toFixed(2)} = ${ratioValue.toFixed(3)}`;
 
   return (
-    <figure className="night-window overflow-hidden rounded-3xl p-4 shadow-[0_30px_60px_-20px_rgba(11,16,38,0.55)] sm:p-6">
-      <figcaption className="flex items-baseline justify-between gap-3">
+    <Frame className={bare ? '' : 'night-window overflow-hidden rounded-3xl p-4 shadow-[0_30px_60px_-20px_rgba(11,16,38,0.55)] sm:p-6'}>
+      <Caption className="flex items-baseline justify-between gap-3">
         <span className="font-fraunces text-xl font-semibold text-white">Trigonometry: sides and angles</span>
-      </figcaption>
+      </Caption>
 
       <svg
         ref={labelsRef}
@@ -222,6 +225,6 @@ export default function TrigTriangle({ placement = 'lesson' }: { placement?: str
         Lengths are rounded to 2 decimal places and ratios to 3, so working from the rounded numbers on a calculator can
         differ in the last digit.
       </p>
-    </figure>
+    </Frame>
   );
 }

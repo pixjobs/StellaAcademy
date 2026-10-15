@@ -11,6 +11,7 @@ import { measuresQuiz } from '@/lib/quiz/measures';
 import { multiplicationQuiz } from '@/lib/quiz/multiplication';
 import { negativeNumbersQuiz } from '@/lib/quiz/negative-numbers';
 import { proportionsQuiz } from '@/lib/quiz/proportions';
+import { trigonometryQuiz } from '@/lib/quiz/trigonometry';
 
 /** Lessons with a step-by-step quiz (KAN-70). On these, the quiz takes the place of the printed practice questions. */
 export const QUIZZES: Partial<Record<ConceptId, LessonQuiz>> = {
@@ -25,6 +26,7 @@ export const QUIZZES: Partial<Record<ConceptId, LessonQuiz>> = {
   proportions: proportionsQuiz as LessonQuiz,
   'exponents-roots': exponentsRootsQuiz as LessonQuiz,
   binary: binaryQuiz as LessonQuiz,
+  trigonometry: trigonometryQuiz as LessonQuiz,
 };
 
 export const hasQuiz = (id: ConceptId) => id in QUIZZES;

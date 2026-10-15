@@ -2,7 +2,7 @@
  * Quiz for "Ratio and Proportion" (KAN-78): simplifying ratios, sharing in a ratio, direct and inverse
  * proportion. Key stage 3. Built on lib/quiz/core.ts; every answer is a whole number.
  */
-import { D, F, fracText, gcd, int, pick, sameNumber, shuffle, simplify, whyAll, type LessonQuiz, type Question as Q, type Step } from '@/lib/quiz/core';
+import { D, F, fmt, fracText, gcd, int, pick, sameNumber, shuffle, simplify, whyAll, type LessonQuiz, type Question as Q, type Step } from '@/lib/quiz/core';
 import type { Digits } from '@/lib/measures';
 
 export type Round = 'simplify' | 'share' | 'proportion';
@@ -51,8 +51,8 @@ function simplifyRatio(r: () => number): Question {
     if (SHOWN.has(`simplify ${a} ${b}`) || SHOWN.has(`simplify ${p} ${q}`)) continue;
     const ctx = pick(r, [
       `Write the ratio ${a} : ${b} in its simplest form.`,
-      `A rocket fuel has ${a} kg of fuel to ${b} kg of oxidiser. Write the ratio of fuel to oxidiser in its simplest form.`,
-      `A class has ${a} girls and ${b} boys. Write the ratio of girls to boys in its simplest form.`,
+      `A rocket mixture has ${a} kg of fuel to ${b} kg of oxidiser. Write the ratio of fuel to oxidiser in its simplest form.`,
+      ...(a + b <= 34 ? [`A class has ${a} girls and ${b} boys. Write the ratio of girls to boys in its simplest form.`] : []),
     ]);
     return {
       round: 'simplify',
@@ -84,7 +84,8 @@ function share(r: () => number): Question {
     const prompt = money
       ? `${show(total)} is shared between Amir and Beth in the ratio ${p} : ${q}. How much does each get?`
       : `${show(total)} of rock samples is shared between two labs in the ratio ${p} : ${q}. How much does each lab get?`;
-    const byPart = total / p; // the slip: dividing by one part of the ratio
+    // The slip: dividing by one part of the ratio instead of all the parts.
+    const byPart = [total / p, total / q].filter((x) => Number.isInteger(x) && x !== one);
     const steps: Step[] = [
       { type: 'number', prompt: `How many parts are there altogether?`, answer: D(parts), feedback: () => `Add the parts of the ratio: ${p} + ${q}.` },
       {
@@ -92,7 +93,7 @@ function share(r: () => number): Question {
         prompt: `So how much is one part?`,
         answer: D(one),
         unit,
-        feedback: (g) => (sameNumber(g, byPart) && byPart !== one ? `It looks like you divided by ${p}, one part of the ratio. Divide by all the parts: ${p} + ${q} = ${parts}.` : `Share ${show(total)} into ${parts} equal parts.`),
+        feedback: (g) => (byPart.some((x) => sameNumber(g, x)) ? `It looks like you divided by one part of the ratio. Divide by all the parts: ${p} + ${q} = ${parts}.` : `Share ${show(total)} into ${parts} equal parts.`),
       },
       { type: 'number', prompt: `So how much is the first share, ${p} part${p === 1 ? '' : 's'}?`, answer: D(p * one), unit, feedback: () => `${p} lots of one part.` },
       { type: 'number', prompt: `And the second share, ${q} part${q === 1 ? '' : 's'}?`, answer: D(q * one), unit, feedback: () => `${q} lots of one part. Check: the two shares add up to ${show(total)}.` },
@@ -107,68 +108,104 @@ function share(r: () => number): Question {
   }
 }
 
-type Situation = { kind: 'direct' | 'inverse'; ask: (n1: number, v1: number, n2: number) => string; unit: string; more: string; one: string };
+type Situation = {
+  kind: 'direct' | 'inverse';
+  ask: (n1: number, v1: number, n2: number) => string;
+  /** The thing that changes from n1 to n2, and the unit of the answer. */
+  thing: string;
+  unit: string;
+  /** Why the answer goes the way it does, for more and for fewer. */
+  more: string;
+  fewer: string;
+  /** Direct: the amount for one; inverse: the name of the total. */
+  one: string;
+};
 const SITUATIONS: Situation[] = [
-  { kind: 'direct', ask: (n1, v1, n2) => `${n1} bags of rice cost £${v1}. How much do ${n2} bags cost?`, unit: '£', more: 'More bags cost more.', one: 'one bag' },
-  { kind: 'direct', ask: (n1, v1, n2) => `A rover drives ${v1} km in ${n1} hours. How far does it drive in ${n2} hours at the same speed?`, unit: 'km', more: 'More time means further.', one: 'one hour' },
-  { kind: 'direct', ask: (n1, v1, n2) => `${n1} solar panels make ${v1} watts. How many watts do ${n2} of the same panels make?`, unit: 'watts', more: 'More panels make more.', one: 'one panel' },
-  { kind: 'inverse', ask: (n1, v1, n2) => `Food for ${n1} astronauts lasts ${v1} days. How long would the same food last ${n2} astronauts?`, unit: 'days', more: 'More astronauts eat it faster, so it lasts less time.', one: 'astronaut-days' },
-  { kind: 'inverse', ask: (n1, v1, n2) => `${n1} workers take ${v1} days to build a launch pad. How long would ${n2} workers take, working at the same rate?`, unit: 'days', more: 'More workers finish sooner.', one: 'worker-days' },
+  { kind: 'direct', ask: (n1, v1, n2) => `${n1} bags of rice cost £${v1}. How much do ${n2} bags cost?`, thing: 'bags', unit: '£', more: 'More bags cost more.', fewer: 'Fewer bags cost less.', one: 'one bag' },
+  { kind: 'direct', ask: (n1, v1, n2) => `Hiring a car costs £${v1} for ${n1} days. How much does it cost for ${n2} days?`, thing: 'days', unit: '£', more: 'More days cost more.', fewer: 'Fewer days cost less.', one: 'one day' },
+  { kind: 'direct', ask: (n1, v1, n2) => `A rover drives ${v1} km in ${n1} hours. How far does it drive in ${n2} hours at the same speed?`, thing: 'hours', unit: 'km', more: 'More time means further.', fewer: 'Less time means less far.', one: 'one hour' },
+  { kind: 'direct', ask: (n1, v1, n2) => `${n1} solar panels make ${v1} watts. How many watts do ${n2} of the same panels make?`, thing: 'panels', unit: 'watts', more: 'More panels make more.', fewer: 'Fewer panels make less.', one: 'one panel' },
+  { kind: 'inverse', ask: (n1, v1, n2) => `Food for ${n1} astronauts lasts ${v1} days. How long would the same food last ${n2} astronauts?`, thing: 'astronauts', unit: 'days', more: 'More astronauts eat it faster, so it lasts less time.', fewer: 'Fewer astronauts eat it more slowly, so it lasts longer.', one: 'astronaut-days' },
+  { kind: 'inverse', ask: (n1, v1, n2) => `${n1} workers take ${v1} days to build a launch pad. How long would ${n2} workers take, working at the same rate?`, thing: 'workers', unit: 'days', more: 'More workers finish sooner.', fewer: 'Fewer workers take longer.', one: 'worker-days' },
+  { kind: 'inverse', ask: (n1, v1, n2) => `${n1} pumps fill a fuel tank in ${v1} hours. How long would ${n2} of the same pumps take?`, thing: 'pumps', unit: 'hours', more: 'More pumps fill it sooner.', fewer: 'Fewer pumps take longer.', one: 'pump-hours' },
 ];
+
+/** The amount for one: realistic sizes for each situation. */
+function each(r: () => number, sit: Situation): number {
+  if (sit.unit === 'watts') return 50 * int(r, 4, 9); // a panel makes a few hundred watts
+  if (sit.thing === 'days') return 5 * int(r, 6, 16); // a car costs £30 to £80 a day
+  if (sit.thing === 'hours') return int(r, 2, 15); // km in an hour
+  return int(r, 2, 9); // a bag of rice
+}
 
 function proportion(r: () => number): Question {
   for (;;) {
     const sit = pick(r, SITUATIONS);
     const n1 = int(r, 2, 8);
-    let n2 = int(r, 2, 12);
-    if (n2 === n1) continue;
+    let n2: number;
+    let v1: number;
+    let answer: number;
+    let product = 0;
     if (sit.kind === 'direct') {
-      const each = int(r, 2, 30);
-      const v1 = n1 * each;
-      if (SHOWN.has(`direct ${n1} ${v1} ${n2}`)) continue;
-      const answer = each * n2;
-      const options = shuffle(r, ['It goes up', 'It goes down']);
-      const right = n2 > n1 ? 'It goes up' : 'It goes down';
-      const money = sit.unit === '£';
-      const show = (v: number) => (money ? `£${v}` : `${v} ${sit.unit}`);
+      n2 = int(r, 2, 12);
+      const unitAmount = each(r, sit);
+      v1 = n1 * unitAmount;
+      answer = unitAmount * n2;
+    } else {
+      // Inverse: the product stays the same, so pick numbers that divide exactly.
+      product = n1 * int(r, 3, 30);
+      v1 = product / n1;
+      const divisors = [...Array(11).keys()].map((k) => k + 2).filter((d) => product % d === 0 && d !== n1 && product / d > 1);
+      if (!divisors.length) continue;
+      n2 = pick(r, divisors);
+      answer = product / n2;
+    }
+    if (n2 === n1 || SHOWN.has(`${sit.kind} ${n1} ${v1} ${n2}`)) continue;
+    const goesUp = sit.kind === 'direct' ? n2 > n1 : n2 < n1;
+    const options = shuffle(r, ['It goes up', 'It goes down']);
+    const correct = options.indexOf(goesUp ? 'It goes up' : 'It goes down');
+    const why = n2 > n1 ? sit.more : sit.fewer;
+    const c = (v: number) => fmt(D(v)); // with commas from 1,000
+    const show = (v: number) => (sit.unit === '£' ? `£${c(v)}` : `${c(v)} ${sit.unit}`);
+    // The same first question for both kinds, so the wording does not give the kind away.
+    const upDown: Step = {
+      type: 'choice',
+      prompt: `Going from ${n1} to ${n2} ${sit.thing}, does the answer go up or down?`,
+      options,
+      correct,
+      why: whyAll(options, correct, () => `${why} This is ${sit.kind} proportion.`),
+    };
+    if (sit.kind === 'direct') {
+      const unitAmount = v1 / n1;
+      const how = sit.unit === 'km' ? 'far' : 'much';
       return {
         round: 'proportion',
         prompt: sit.ask(n1, v1, n2),
         steps: [
-          { type: 'choice', prompt: `Going from ${n1} to ${n2}, does the answer go up or down?`, options, correct: options.indexOf(right), why: whyAll(options, options.indexOf(right), () => `${sit.more} This is direct proportion.`) },
-          { type: 'number', prompt: `How much for ${sit.one}?`, answer: D(each), unit: sit.unit, feedback: () => `Divide by ${n1}: ${show(v1)} ÷ ${n1}.` },
-          { type: 'number', prompt: `So how much for ${n2}?`, answer: D(answer), unit: sit.unit, feedback: () => `${n2} lots of ${show(each)}.` },
+          upDown,
+          { type: 'number', prompt: `How ${how} for ${sit.one}?`, answer: D(unitAmount), unit: sit.unit, feedback: () => `Divide by ${n1}: ${show(v1)} ÷ ${n1}.` },
+          { type: 'number', prompt: `So how ${how} for ${n2} ${sit.thing}?`, answer: D(answer), unit: sit.unit, feedback: () => `${n2} lots of ${show(unitAmount)}.` },
         ],
-        workings: [`Direct proportion: ${sit.more.toLowerCase()}`, `For ${sit.one}: ${show(v1)} ÷ ${n1} = ${show(each)}.`, `For ${n2}: ${n2} × ${show(each)} = ${show(answer)}.`],
+        workings: [`Direct proportion: ${why.toLowerCase()}`, `For ${sit.one}: ${show(v1)} ÷ ${n1} = ${show(unitAmount)}.`, `For ${n2} ${sit.thing}: ${n2} × ${show(unitAmount)} = ${show(answer)}.`],
         check: { kind: 'direct', n1, v1, n2, answer },
       };
     }
-    // Inverse: the product stays the same, so pick numbers that divide exactly.
-    const product = n1 * int(r, 3, 30);
-    const v1 = product / n1;
-    const divisors = [...Array(20).keys()].map((k) => k + 2).filter((d) => product % d === 0 && d !== n1);
-    if (!divisors.length) continue;
-    n2 = pick(r, divisors);
-    if (SHOWN.has(`inverse ${n1} ${v1} ${n2}`)) continue;
-    const answer = product / n2;
     const asDirect = (v1 * n2) / n1; // the slip: treating it as direct proportion
-    const options = shuffle(r, ['It goes up', 'It goes down']);
-    const right = n2 > n1 ? 'It goes down' : 'It goes up';
     return {
       round: 'proportion',
       prompt: sit.ask(n1, v1, n2),
       steps: [
-        { type: 'choice', prompt: `Going from ${n1} to ${n2}, does the number of days go up or down?`, options, correct: options.indexOf(right), why: whyAll(options, options.indexOf(right), () => `${sit.more} This is inverse proportion.`) },
+        upDown,
         { type: 'number', prompt: `Multiply them: how many ${sit.one} is that in total? ${n1} × ${v1} = ?`, answer: D(product), feedback: () => `Work out ${n1} × ${v1}.` },
         {
           type: 'number',
-          prompt: `Share the ${product} ${sit.one} between ${n2}. How many days?`,
+          prompt: `Share the ${product} ${sit.one} between ${n2} ${sit.thing}. How many ${sit.unit}?`,
           answer: D(answer),
-          unit: 'days',
-          feedback: (g) => (Number.isInteger(asDirect) && sameNumber(g, asDirect) && asDirect !== answer ? `That treats it as direct proportion. ${sit.more} Divide the total by ${n2}.` : `Work out ${product} ÷ ${n2}.`),
+          unit: sit.unit,
+          feedback: (g) => (Number.isInteger(asDirect) && sameNumber(g, asDirect) && asDirect !== answer ? `That treats it as direct proportion. ${why} Divide the total by ${n2}.` : `Work out ${product} ÷ ${n2}.`),
         },
       ],
-      workings: [`Inverse proportion: ${sit.more.toLowerCase()}`, `The total stays the same: ${n1} × ${v1} = ${product} ${sit.one}.`, `${product} ÷ ${n2} = ${answer} days.`],
+      workings: [`Inverse proportion: ${why.toLowerCase()}`, `The total stays the same: ${n1} × ${v1} = ${product} ${sit.one}.`, `${c(product)} ÷ ${n2} = ${c(answer)} ${sit.unit}.`],
       check: { kind: 'inverse', n1, v1, n2, answer },
     };
   }

@@ -28,6 +28,7 @@ export const exponentsRootsVerifier: Verifier = {
         const vx = math.multiply(big(c.x[0]), math.pow(big(10), big(c.x[1])));
         const vy = math.multiply(big(c.y[0]), math.pow(big(10), big(c.y[1])));
         const larger = math.larger(vx, vy) ? c.x : c.y;
+        if (math.equal(vx, vy)) return 'compare: equal values';
         return c.larger.startsWith(`${larger[0]} ×`) ? null : `compare: said ${c.larger}`;
       }
     }

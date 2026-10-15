@@ -28,12 +28,20 @@ export const proportionsVerifier: Verifier = {
   mistakes: (question) => {
     const q = question as Question<ProportionCheck>;
     const c = q.check;
-    if (c.kind === 'share' && c.total / c.p !== c.total / (c.p + c.q) && Number.isInteger(c.total / c.p)) return [{ step: 1, typed: String(c.total / c.p), expect: 'one part of the ratio' }];
+    if (c.kind === 'share') {
+      const one = c.total / (c.p + c.q);
+      return [c.total / c.p, c.total / c.q].filter((x) => Number.isInteger(x) && x !== one).map((x) => ({ step: 1, typed: String(x), expect: 'one part of the ratio' }));
+    }
     if (c.kind === 'inverse') {
       const asDirect = (c.v1 * c.n2) / c.n1;
       return Number.isInteger(asDirect) && asDirect !== c.answer ? [{ step: 2, typed: String(asDirect), expect: 'direct proportion' }] : [];
     }
-    if (c.kind === 'simplify') return [{ step: 0, typed: '1', expect: 'every number' }];
+    if (c.kind === 'simplify') {
+      // A common factor that is not the biggest is named as such.
+      const g = Number(math.gcd(c.a, c.b));
+      const smaller = [2, 3, 5, 7].find((p) => g % p === 0 && p !== g);
+      return [{ step: 0, typed: '1', expect: 'every number' }, ...(smaller ? [{ step: 0, typed: String(smaller), expect: 'bigger number' }] : [])];
+    }
     return [];
   },
 };

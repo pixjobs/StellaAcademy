@@ -118,8 +118,8 @@ function QuizModel({ id }: { id: ConceptId }) {
 export default function LessonModel({ id }: { id: ConceptId }) {
   if (id === 'measures') return <MeasuresModel />; // pauses its own tools during a quiz question
   if (hasQuiz(id) && FLASHCARDS.includes(id)) return <QuizModel id={id} />;
-  // A lesson with its own animation and a quiz: Explore and Quiz tabs, as on Measures.
-  if (hasQuiz(id) && !CUSTOM_MODELS.includes(id)) return <TryItWithQuiz lesson={id} explore={<AnimatedModel id={id} bare />} />;
+  // A lesson with its own model or animation and a quiz: Explore and Quiz tabs, as on Measures.
+  if (hasQuiz(id)) return <TryItWithQuiz lesson={id} explore={CUSTOM_MODELS.includes(id) ? <ModelFor id={id} bare /> : <AnimatedModel id={id} bare />} />;
   return (
     <PausedDuringQuiz id={id}>
       <ModelFor id={id} />
@@ -130,11 +130,12 @@ export default function LessonModel({ id }: { id: ConceptId }) {
 /** Lessons with their own model component rather than the shared animation. */
 const CUSTOM_MODELS: ConceptId[] = ['gravity', 'waves', 'circuit', 'trigonometry', 'gears', 'momentum', 'thermodynamics', 'trajectory', 'units'];
 
-function ModelFor({ id }: { id: ConceptId }) {
+/** `bare` drops a model's own frame, for the Explore tab; models without that option keep theirs. */
+function ModelFor({ id, bare = false }: { id: ConceptId; bare?: boolean }) {
   if (id === 'gravity') return <OrbitLauncher placement="lesson" />;
   if (id === 'waves') return <WaveInstrument placement="lesson" />;
   if (id === 'circuit') return <CircuitBoard />;
-  if (id === 'trigonometry') return <TrigTriangle />;
+  if (id === 'trigonometry') return <TrigTriangle bare={bare} />;
   if (id === 'gears') return <GearTrain />;
   if (id === 'momentum') return <MomentumTrack />;
   if (id === 'thermodynamics') return <GasPiston />;

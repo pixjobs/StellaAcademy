@@ -21,9 +21,8 @@ export type ExponentsCheck =
   | { kind: 'compare'; x: [string, number]; y: [string, number]; larger: string };
 type Question = Q<ExponentsCheck>;
 
-const SUP: Record<string, string> = { '-': '⁻', '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹' };
-/** 2⁵, 10⁻³: an index written as a superscript. */
-const pow = (b: number | string, i: number) => `${b}${String(i).split('').map((c) => SUP[c]).join('')}`;
+/** 2^{5}, 10^{−3}: a power, drawn with a raised index by the quiz panel. */
+const pow = (b: number | string, i: number) => `${b}^{${i < 0 ? `−${-i}` : i}}`;
 
 /** Powers and roots shown in the lesson's table and examples. The quiz never asks these. */
 const SHOWN_POWERS = new Set(['2 1', '2 2', '2 3', '2 4', '2 5', '2 6', '3 1', '3 2', '3 3', '3 4', '4 1', '4 2', '4 3', '5 1', '5 2', '5 3', '7 0', '10 -3', '2 7']);
@@ -69,19 +68,26 @@ function powerOrRoot(r: () => number): Question {
     if (SHOWN_ROOTS.has(`${which} ${n}`)) continue;
     const name = which === 2 ? 'square root' : 'cube root';
     const sym = which === 2 ? `√${fmt(D(n))}` : `∛${fmt(D(n))}`;
-    const right = which === 2 ? `The number that multiplied by itself makes ${fmt(D(n))}` : `The number that multiplied by itself three times makes ${fmt(D(n))}`;
-    const options = shuffle(r, [right, `${fmt(D(n))} divided by ${which}`, `${fmt(D(n))} multiplied by ${which}`]);
+    const right = which === 2 ? `The number that multiplied by itself makes ${fmt(D(n))}` : `The number that, used three times in a multiplication, makes ${fmt(D(n))}`;
+    const divided = `${fmt(D(n))} divided by ${which}`;
+    const options = shuffle(r, [right, divided, `${fmt(D(n))} multiplied by ${which}`]);
     const correct = options.indexOf(right);
     return {
       round: 'powers',
       prompt: `What is the ${name} of ${fmt(D(n))}, written ${sym}?`,
       steps: [
-        { type: 'choice', prompt: `What does the ${name} of ${fmt(D(n))} mean?`, options, correct, why: whyAll(options, correct, () => `A root undoes a power: it is not ${which === 2 ? 'halving' : 'dividing by 3'}.`) },
+        {
+          type: 'choice',
+          prompt: `What does the ${name} of ${fmt(D(n))} mean?`,
+          options,
+          correct,
+          why: whyAll(options, correct, (o) => (o === divided ? `A root undoes a power: it is not ${which === 2 ? 'halving' : 'dividing by 3'}.` : `A root makes the number smaller: it undoes a power, so it is not multiplying.`)),
+        },
         {
           type: 'number',
           prompt: `So what is ${sym}?`,
           answer: D(answer),
-          feedback: (g) => (sameNumber(g, n / which) ? `That is ${fmt(D(n))} ÷ ${which}. The ${name} is the number that ${which === 2 ? 'times itself' : 'times itself and itself again'} makes ${fmt(D(n))}.` : `Try numbers: which one, ${which === 2 ? 'squared' : 'cubed'}, makes ${fmt(D(n))}?`),
+          feedback: (g) => (sameNumber(g, n / which) ? `That is ${fmt(D(n))} ÷ ${which}. The ${name} is the number that, ${which === 2 ? 'times itself' : 'used three times in a multiplication'}, makes ${fmt(D(n))}.` : `Try numbers: which one, ${which === 2 ? 'squared' : 'cubed'}, makes ${fmt(D(n))}?`),
         },
       ],
       workings: [`${which === 2 ? `${answer} × ${answer}` : `${answer} × ${answer} × ${answer}`} = ${fmt(D(n))}.`, `So ${sym} = ${answer}.`],
@@ -103,7 +109,7 @@ function law(r: () => number): Question {
     if (op === 'div' && n >= m) continue;
     if (SHOWN_LAWS.has(`${op} ${base} ${m} ${n}`)) continue;
     const index = op === 'mul' ? m + n : op === 'div' ? m - n : m * n;
-    const expr = op === 'mul' ? `${pow(base, m)} × ${pow(base, n)}` : op === 'div' ? `${pow(base, m)} ÷ ${pow(base, n)}` : `(${pow(base, m)})${pow('', n)}`;
+    const expr = op === 'mul' ? `${pow(base, m)} × ${pow(base, n)}` : op === 'div' ? `${pow(base, m)} ÷ ${pow(base, n)}` : `(${pow(base, m)})^{${n}}`;
     const rule = op === 'mul' ? 'Add them' : op === 'div' ? 'Take them away' : 'Multiply them';
     const verb = op === 'mul' ? 'Add' : op === 'div' ? 'Take away' : 'Multiply';
     const options = shuffle(r, ['Add them', 'Take them away', 'Multiply them']);
@@ -117,7 +123,7 @@ function law(r: () => number): Question {
         options,
         correct,
         why: whyAll(options, correct, () =>
-          op === 'mul' ? `Multiplying powers of the same number: write out the ${base}s and count them. That adds the indices.` : op === 'div' ? 'Dividing cancels some of the multiplications: take the indices away.' : `A power of a power: ${n} lots of ${m} ${base}s. Multiply the indices.`,
+          op === 'mul' ? `Multiplying powers of the same number: write out the ${base}s and count them. That adds the indices.` : op === 'div' ? 'Dividing cancels some of the multiplications: take the indices away.' : `${expr} means ${pow(base, m)} multiplied by itself ${n} times, so there are ${n} × ${m} ${base}s. Multiply the indices.`,
         ),
       },
       {
@@ -145,7 +151,8 @@ function law(r: () => number): Question {
 function standard(r: () => number): Question {
   for (;;) {
     if (r() < 0.25) return compare(r);
-    const digits = String(pick(r, [int(r, 1, 9), int(r, 11, 99), int(r, 101, 999)])).replace(/0+$/, '');
+    // Mostly two or three digits; a single digit only now and then.
+    const digits = String(pick(r, [int(r, 1, 9), int(r, 11, 99), int(r, 11, 99), int(r, 101, 999), int(r, 101, 999)])).replace(/0+$/, '');
     if (!digits) continue;
     const big = r() < 0.55;
     const n = big ? int(r, 3, 9) : -int(r, 1, 6);
@@ -161,7 +168,7 @@ function standard(r: () => number): Question {
       steps: [
         {
           type: 'number',
-          prompt: `Standard form starts with a number from 1 up to (but not including) 10, using the digits ${digits.split('').join(', ')}. What is that number?`,
+          prompt: `Standard form starts with a number from 1 up to (but not including) 10, using the ${digits.length === 1 ? 'digit' : 'digits'} ${digits.split('').join(', ')}. What is that number?`,
           answer: A,
           feedback: (g) => (g.digits === digits ? `It must be at least 1 and less than 10: put the decimal point straight after the first digit.` : `Use the digits of ${valueText}, with the point after the first one.`),
         },
@@ -174,12 +181,12 @@ function standard(r: () => number): Question {
         },
         {
           type: 'number',
-          prompt: `How many places is ${a} from ${valueText}? So what is the power of ten? (Type a negative number with a minus sign.)`,
+          prompt: `How many places does the decimal point move to turn ${a} into ${valueText}? So what is the power of ten? (Type a negative power with a minus sign.)`,
           answer: D(n),
           feedback: (g) => (sameNumber(g, -n) ? (big ? 'A big number has a positive power.' : 'A number smaller than 1 has a negative power: put a minus sign in front.') : `Count how many places the digits move between ${a} and ${valueText}.`),
         },
       ],
-      workings: [`The first number is ${a}.`, `The digits move ${Math.abs(n)} places, and ${valueText} is ${big ? 'bigger' : 'smaller'} than 1, so the power is ${fmt(D(n))}.`, `So ${valueText} = ${a} × ${pow(10, n)}.`],
+      workings: [`The first number is ${a}.`, `The digits move ${Math.abs(n)} place${Math.abs(n) === 1 ? '' : 's'}, and ${valueText} is ${big ? 'bigger' : 'smaller'} than 1, so the power is ${fmt(D(n))}.`, `So ${valueText} = ${a} × ${pow(10, n)}.`],
       check: { kind: 'standard', value: valueText, a, n },
     };
   }
@@ -189,28 +196,41 @@ function compare(r: () => number): Question {
   for (;;) {
     const ax = fmt({ digits: String(int(r, 11, 99)).replace(/0+$/, ''), top: 0 });
     const ay = fmt({ digits: String(int(r, 11, 99)).replace(/0+$/, ''), top: 0 });
+    if (ax === ay) continue;
     const nx = int(r, 3, 9);
-    const ny = nx + pick(r, [-1, 1]);
-    // The trap: the bigger front number has the smaller power.
+    // Three kinds, so no pattern gives the answer: the bigger power with the smaller front number (the trap),
+    // the bigger power with the bigger front number, and equal powers, where the front numbers decide.
+    const kind = pick(r, ['trap', 'both', 'equal'] as const);
     const [hiA, loA] = Number(ax) > Number(ay) ? [ax, ay] : [ay, ax];
-    const x: [string, number] = [hiA, Math.min(nx, ny)];
-    const y: [string, number] = [loA, Math.max(nx, ny)];
-    if (hiA === loA) continue;
-    if ((x[0] === '9' && x[1] === 7) || (y[0] === '2' && y[1] === 8)) continue; // shown on the page
-    const fx = `${x[0]} × ${pow(10, x[1])}`;
-    const fy = `${y[0]} × ${pow(10, y[1])}`;
-    const options = shuffle(r, [fx, fy]);
-    const correct = options.indexOf(fy);
+    const ny = kind === 'equal' ? nx : nx + pick(r, [1, 2]);
+    const x: [string, number] = kind === 'both' ? [loA, nx] : [hiA, nx];
+    const y: [string, number] = kind === 'both' ? [hiA, ny] : kind === 'equal' ? [loA, ny] : [loA, ny];
+    const vx = Number(x[0]) * 10 ** x[1];
+    const vy = Number(y[0]) * 10 ** y[1];
+    const [win, lose] = vx > vy ? [x, y] : [y, x];
+    const fw = `${win[0]} × ${pow(10, win[1])}`;
+    const fl = `${lose[0]} × ${pow(10, lose[1])}`;
+    if (['9 7', '2 8', '9.8 4', '4.2 5'].includes(`${x[0]} ${x[1]}`) || ['9 7', '2 8', '9.8 4', '4.2 5'].includes(`${y[0]} ${y[1]}`)) continue; // shown on the page
+    const options = shuffle(r, [fw, fl]);
+    const correct = options.indexOf(fw);
+    // Which power of ten is bigger: one of the two, or neither.
+    const po = shuffle(r, [...new Set([pow(10, x[1]), pow(10, y[1]), 'They are the same'])]);
+    const powRight = x[1] === y[1] ? 'They are the same' : pow(10, Math.max(x[1], y[1]));
     return {
       round: 'standard',
       prompt: `Which is larger: ${options[0]} or ${options[1]}?`,
       steps: [
-        { type: 'number', prompt: `What is the power of ten in ${fx}?`, answer: D(x[1]), feedback: () => 'The small raised number on the 10.' },
-        { type: 'number', prompt: `And in ${fy}?`, answer: D(y[1]), feedback: () => 'The small raised number on the 10.' },
-        { type: 'choice', prompt: 'So which is larger?', options, correct, why: whyAll(options, correct, () => `Look at the powers of ten first. ${pow(10, y[1])} is ten times ${pow(10, x[1])}, so it wins even though ${x[0]} is bigger than ${y[0]}.`) },
+        { type: 'choice', prompt: 'Look at the powers of ten first. Which is bigger?', options: po, correct: po.indexOf(powRight), why: whyAll(po, po.indexOf(powRight), () => `Compare the small raised numbers on the 10s: ${x[1]} and ${y[1]}.`) },
+        {
+          type: 'choice',
+          prompt: 'So which number is larger?',
+          options,
+          correct,
+          why: whyAll(options, correct, () => (x[1] === y[1] ? 'The powers are the same, so the front numbers decide.' : `The bigger power of ten wins, whatever the front numbers: each step in the power is ten times bigger.`)),
+        },
       ],
-      workings: [`The powers of ten are ${x[1]} and ${y[1]}.`, `The bigger power wins, whatever the front numbers are.`, `So ${fy} is larger.`],
-      check: { kind: 'compare', x, y, larger: fy },
+      workings: [`The powers of ten are ${x[1]} and ${y[1]}.`, x[1] === y[1] ? 'They are the same, so compare the front numbers.' : 'The bigger power wins, whatever the front numbers are.', `So ${fw} is larger.`],
+      check: { kind: 'compare', x, y, larger: fw },
     };
   }
 }
