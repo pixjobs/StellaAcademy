@@ -17,7 +17,7 @@ export const MISSIONS: Mission[] = [
     id: 'toolkit',
     title: 'Build your toolkit',
     goal: 'The number skills every other mission relies on.',
-    lessons: ['arithmetic', 'negative-numbers', 'multiplication', 'fractions', 'fraction-ops', 'decimals-percentages', 'proportions', 'basic-geometry', 'exponents-roots'],
+    lessons: ['arithmetic', 'negative-numbers', 'multiplication', 'fractions', 'fraction-ops', 'decimals-percentages', 'proportions', 'basic-geometry', 'exponents-roots', 'measures'],
   },
   {
     id: 'orbit',

@@ -9,6 +9,7 @@ import { MISSIONS } from '../../src/lib/missions';
 import { studyModules } from '../../src/lib/study-modules';
 import { runAnswerChecks } from './answers';
 import { runCurriculumChecks } from './curriculum';
+import { runQuizChecks } from './quiz';
 import { runStyleChecks } from './style';
 
 type Finding = { check: string; lesson: string; where: string; excerpt: string; message: string; level: 'fail' | 'warn' | 'info' };
@@ -28,6 +29,8 @@ const groups: Array<[string, Finding[]]> = [
   ['answers', runAnswerChecks(lessons)],
   ['style', runStyleChecks(lessons)],
   ['curriculum', runCurriculumChecks(lessons)],
+  // The Measures quiz is generated, so its questions are checked by generating thousands of them.
+  ...(lessons.includes('measures') ? ([['quiz', runQuizChecks()]] as Array<[string, Finding[]]>) : []),
 ];
 
 let fails = 0;

@@ -385,3 +385,21 @@ body[data-font-family="mono"] *:not(.katex, .katex *) {
 .reduce-motion .shooting-star {
   animation: none !important;
 }
+
+/* Measures lesson: place-holding zeros and ruler labels fade in after the digits move. */
+@keyframes measures-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.measures-fade {
+  animation: measures-fade 500ms ease-out 350ms both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .measures-fade { animation: none; }
+}
+.reduce-motion .measures-fade {
+  animation: none !important;
+}
+.reduce-motion .measures-slide {
+  transition: none !important;
+}

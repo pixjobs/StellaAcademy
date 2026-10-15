@@ -27,6 +27,7 @@ const LEVEL_BY_ID: Record<ConceptId, LevelId> = {
   'fraction-ops': 'ks2',
   'decimals-percentages': 'ks2',
   'basic-geometry': 'ks2',
+  measures: 'ks2',
 
   'negative-numbers': 'ks3',
   proportions: 'ks3',

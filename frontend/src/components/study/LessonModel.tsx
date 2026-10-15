@@ -5,6 +5,7 @@ import GSAPSimulation from '@/components/GSAPSimulation';
 import CircuitBoard from '@/components/lesson-models/CircuitBoard';
 import GasPiston from '@/components/lesson-models/GasPiston';
 import GearTrain from '@/components/lesson-models/GearTrain';
+import MeasuresModel from '@/components/lesson-models/MeasuresModel';
 import MomentumTrack from '@/components/lesson-models/MomentumTrack';
 import TransferOrbit from '@/components/lesson-models/TransferOrbit';
 import TrigTriangle from '@/components/lesson-models/TrigTriangle';
@@ -75,6 +76,7 @@ export default function LessonModel({ id }: { id: ConceptId }) {
   if (id === 'momentum') return <MomentumTrack />;
   if (id === 'thermodynamics') return <GasPiston />;
   if (id === 'trajectory') return <TransferOrbit />;
+  if (id === 'measures') return <MeasuresModel />;
   if (id === 'units')
     return (
       <Panel>
