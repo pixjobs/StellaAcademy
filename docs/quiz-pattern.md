@@ -35,8 +35,10 @@ owner, the build, the automatic checks, a fresh review by someone who did not bu
    an equal fraction that is not in its simplest form when the simplest form is asked for.
 8. **Hard to game.** A slip or "Show me how" is saved straight away. Unfinished rounds stay in the history.
    While a question is in progress the lesson's explore tools pause. The right option's position is shuffled.
-9. **Calculators:** key stages 2 and 3 are worked without one. GCSE and A-level allow one, and answers are
-   accepted to 3 significant figures, with a note saying so.
+9. **Calculators:** key stages 2 and 3 are worked without one. GCSE and A-level allow one. A calculator answer is
+   shown to 3 significant figures (keeping trailing zeros, such as 13.0), and anything within half a unit of the
+   third significant figure, or within 0.2% of the exact value, is right, so rounding along the way is not
+   penalised. An answer rounded too far (37 for 36.87) gets "give your answer to 3 significant figures".
 10. **House style** as for all lesson text: UK English, plain words, no em dashes, sentence case.
 
 ## How it is built
@@ -51,9 +53,17 @@ owner, the build, the automatic checks, a fresh review by someone who did not bu
 | The quiz on screen | `frontend/src/components/quiz/QuizPanel.tsx`, placed by `components/study/LessonModel.tsx` |
 | Automatic check | `frontend/scripts/content-checks/quiz.ts` plus `quiz/<lesson>.ts` (an independent verifier) |
 
-Step types: `choice` (options, the right one, feedback for each wrong one), `number` (an exact decimal, an optional
-unit such as `%`, `£` or `km`, and feedback for a wrong answer) and `fraction` (an exact fraction, simplest form or
-a fixed bottom number). New types are added to the engine only when a lesson needs one.
+Step types: `choice` (options, the right one, feedback for each wrong one), `number` (an exact decimal, negative
+allowed, an optional unit such as `%`, `£`, `km`, `cm²`, `°` or `m/s`, `exact` for a calculator answer from
+`approx()`, and `plain` for a binary number) and `fraction` (an exact fraction, simplest form, a fixed bottom
+number, or a mixed number). New types are added to the engine only when a lesson needs one.
+
+Maths in quiz text is written as markup that `QuizPanel` draws: `10^{-3}` for a power (the site's font has no
+superscript digits beyond ¹²³), `[[3;−2]]` for a column vector and `[[1,2;3,4]]` for a 2 × 2 matrix. Screen
+readers hear "to the power", "column vector" and "matrix".
+
+Answers that are expressions (calculus) are split into steps that each ask for one number: the new coefficient,
+the new power, then a value. No algebra has to be typed.
 
 ### Adding a quiz to a lesson
 
@@ -67,7 +77,7 @@ a fixed bottom number). New types are added to the engine only when a lesson nee
 5. Run `npm run check:content -- --lessons=<lesson>`. It generates 3,000 questions per round and checks the
    answers, every step, the typed forms, the units, the named mistakes and the seeds. Then plant a mistake in the
    generator and check that the check fails.
-6. Play every round in a browser on desktop and phone (`~/stella-work` has a script that pins the random numbers so
-   a perfect run can be played), and run all browser suites with `~/stella-work/browser-checks/run-all.sh`, which
-   fails on any FAIL line.
+6. Play every round in a browser on desktop and phone. Setting `window.__stellaQuizSeed` (a test hook in
+   `QuizPanel`) makes the quiz use known seeds, so a script can work out the same questions and play a perfect
+   run. Run all browser suites with `~/stella-work/browser-checks/run-all.sh`, which fails on any FAIL line.
 7. A fresh agent reviews the quiz against the brief and this page. Fix every finding, then ask the owner to review.
