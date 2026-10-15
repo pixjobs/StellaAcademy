@@ -1,6 +1,6 @@
 import { type FormulaElement } from '@/components/study/VariableHighlighter';
 
-export type ConceptId = 'gravity' | 'prism' | 'gears' | 'trajectory' | 'circuit' | 'waves' | 'fractions' | 'trigonometry' | 'calculus' | 'vectors' | 'matrices' | 'probability' | 'diffeq' | 'arithmetic' | 'basic-geometry' | 'proportions' | 'decimals-percentages' | 'angles' | 'binary' | 'multiplication' | 'fraction-ops' | 'negative-numbers' | 'exponents-roots' | 'thermodynamics' | 'momentum' | 'statistics' | 'electromagnetism' | 'quantum' | 'units';
+export type ConceptId = 'gravity' | 'prism' | 'gears' | 'trajectory' | 'circuit' | 'waves' | 'fractions' | 'trigonometry' | 'calculus' | 'vectors' | 'matrices' | 'probability' | 'diffeq' | 'arithmetic' | 'basic-geometry' | 'proportions' | 'decimals-percentages' | 'angles' | 'binary' | 'multiplication' | 'fraction-ops' | 'negative-numbers' | 'exponents-roots' | 'thermodynamics' | 'momentum' | 'statistics' | 'electromagnetism' | 'quantum' | 'units' | 'measures';
 export type CategoryId = 'physics' | 'mechanics' | 'electronics' | 'mathematics' | 'elementary-math';
 
 export interface StudyModule {
@@ -3955,7 +3955,7 @@ Scientists use standard form for numbers like these. Light travels about $3 \\ti
 
 ### Next on the journey
 
-That completes your toolkit. Scientists often swap powers of ten for short words: 1000 metres is 1 kilometre, and $10^{-3}$ metres is 1 millimetre. Mission 2, "Get to orbit", starts with converting units like these.
+Multiplying and dividing by 10, 100 and 1000 is also how you change from one unit of measure to another: 1 kilometre is 1000 metres, and 1 metre is 1000 millimetres. The last lesson of your toolkit shows how.
 
 ### Sources
 
@@ -3966,6 +3966,233 @@ The topics in these notes follow the Department for Education document below.
   },
 
   // ─── THERMODYNAMICS ───────────────────────────────────────────────────────────
+  {
+    id: 'measures',
+    category: 'elementary-math',
+    title: "Measures and Converting Units",
+    subtitle: "Change between kilometres, metres, centimetres and millimetres, and between metric and imperial units.",
+    icon: 'Ruler',
+    accentColor: 'emerald',
+    difficulty: 1,
+    estimatedMinutes: 15,
+    formula: '\\text{km} {\\,\\to\\,} \\text{m} {\\,\\to\\,} \\text{cm} {\\,\\to\\,} \\text{mm}',
+    formulaLayout: [
+      { type: 'variable', symbol: '\\text{km}' },
+      { type: 'static', latex: '\\to' },
+      { type: 'variable', symbol: '\\text{m}' },
+      { type: 'static', latex: '\\to' },
+      { type: 'variable', symbol: '\\text{cm}' },
+      { type: 'static', latex: '\\to' },
+      { type: 'variable', symbol: '\\text{mm}' }
+    ],
+    variables: [
+      {
+        symbol: '\\text{km}',
+        name: 'Kilometre',
+        unit: '1 km = 1000 m',
+        description: 'For long distances, such as from one town to the next.',
+        color: 'text-emerald-400'
+      },
+      {
+        symbol: '\\text{m}',
+        name: 'Metre',
+        unit: '1 m = 100 cm',
+        description: 'About the length of a big step.',
+        color: 'text-cyan-400'
+      },
+      {
+        symbol: '\\text{cm}',
+        name: 'Centimetre',
+        unit: '1 cm = 10 mm',
+        description: 'About the width of your little finger.',
+        color: 'text-amber-400'
+      },
+      {
+        symbol: '\\text{mm}',
+        name: 'Millimetre',
+        unit: 'the gap between the smallest marks on a ruler',
+        description: 'About the thickness of a bank card.',
+        color: 'text-rose-400'
+      }
+    ],
+    conceptSteps: [
+      {
+        stepNumber: 1,
+        title: 'Same length, different number',
+        content: 'A door 2 m tall is also 200 cm tall. The door has not changed; only the unit has. A centimetre is much smaller than a metre, so it takes more of them to measure the same door.',
+        keyInsight: 'Changing to a smaller unit makes the number bigger. Changing to a bigger unit makes the number smaller.',
+        relatedVariables: ['\\text{m}', '\\text{cm}']
+      },
+      {
+        stepNumber: 2,
+        title: 'The metric ladder',
+        content: 'Each step down the ladder, from km to m, from m to cm and from cm to mm, goes to a smaller unit, so you multiply: by 1000, by 100 and by 10. Each step back up goes to a bigger unit, so you divide by the same number.',
+        keyInsight: 'Before you calculate, ask: is the new unit smaller or bigger? Smaller means multiply; bigger means divide.',
+        relatedVariables: ['\\text{km}', '\\text{m}', '\\text{cm}', '\\text{mm}']
+      },
+      {
+        stepNumber: 3,
+        title: 'Mass and capacity work the same way',
+        content: 'Mass is how heavy something is, and capacity is how much a container holds. Kilo always means 1000, centi means one hundredth and milli means one thousandth. So 1 kilogram is 1000 grams, just as 1 kilometre is 1000 metres, and 1 litre is 1000 millilitres, just as 1 metre is 1000 millimetres.',
+        keyInsight: 'Learn what kilo, centi and milli mean, and you know the factors for length, mass and capacity.',
+        relatedVariables: ['\\text{km}', '\\text{mm}']
+      },
+      {
+        stepNumber: 4,
+        title: 'Imperial units',
+        content: 'Before metric units, Britain used imperial units: inches and miles for length, pounds for mass and pints for capacity. Some are still used every day, such as miles on road signs and pints of milk.',
+        keyInsight: 'For working in your head, use rough equivalents: 1 inch is about 2.5 cm, 1 kg is about 2.2 pounds, 1 pint is a little more than half a litre, and 5 miles is about 8 km.',
+        relatedVariables: []
+      },
+      {
+        stepNumber: 5,
+        title: 'Check that the answer makes sense',
+        content: 'A mile is longer than a kilometre, so a distance in kilometres is always a bigger number than the same distance in miles. After any conversion, check that the number has moved the right way.',
+        keyInsight: 'If the new unit is smaller, the number should have gone up. If it has gone down, you have divided when you should have multiplied.',
+        relatedVariables: []
+      }
+    ],
+    solvedExample: {
+      problem: 'The International Space Station flies about 400 km above the Earth. How high is that in metres, and roughly how high in miles?',
+      steps: [
+        'Metres are smaller than kilometres, so the number gets bigger: multiply by 1000. $400 \\times 1000 = 400{,}000$, so that is 400,000 m.',
+        'For miles, use 5 miles is about 8 km. Find how many lots of 8 km there are in 400 km: $400 \\div 8 = 50$.',
+        'Each lot of 8 km is about 5 miles: $50 \\times 5 = 250$.',
+        'Check: a mile is longer than a kilometre, so the number of miles should be smaller than 400. It is.'
+      ],
+      resultFormula: '400\\text{ km} = 400{,}000\\text{ m} \\approx 250\\text{ miles}'
+    },
+    practiceProblems: [
+      {
+        question: "Convert 3.5 km to metres.",
+        hint: "Metres are smaller than kilometres. How many metres are in 1 km?",
+        answer: "3500 m"
+      },
+      {
+        question: "A pencil is 17 cm long. How long is it in millimetres?",
+        hint: "There are 10 mm in every centimetre.",
+        answer: "170 mm"
+      },
+      {
+        question: "Convert 45 mm to centimetres.",
+        hint: "Centimetres are bigger than millimetres, so the number gets smaller.",
+        answer: "4.5 cm"
+      },
+      {
+        question: "Which is longer: 1.2 km or 1150 m?",
+        hint: "Change 1.2 km into metres first.",
+        answer: "1.2 km, which is 1200 m"
+      },
+      {
+        question: "A bag of potatoes has a mass of 2750 g. What is that in kilograms?",
+        hint: "Kilograms are bigger than grams. Divide by the number of grams in 1 kg.",
+        answer: "2.75 kg"
+      },
+      {
+        question: "A water bottle holds 1.5 litres. How many millilitres is that?",
+        hint: "Milli means one thousandth, so there are 1000 ml in a litre.",
+        answer: "1500 ml"
+      },
+      {
+        question: "Mount Everest is 8849 m high. Write its height in kilometres.",
+        hint: "Divide by 1000. Each digit moves three places to the right.",
+        answer: "8.849 km"
+      },
+      {
+        question: "A road sign says it is 15 miles to the next town. Roughly how far is that in kilometres?",
+        hint: "5 miles is about 8 km. How many lots of 5 miles are in 15 miles?",
+        answer: "About 24 km"
+      },
+      {
+        question: "A ruler is 30 cm long. Roughly how long is it in inches?",
+        hint: "1 inch is about 2.5 cm.",
+        answer: "About 12 inches"
+      },
+      {
+        question: "An airline lets you take a 20 kg suitcase. Roughly how many pounds is that?",
+        hint: "1 kg is about 2.2 pounds.",
+        answer: "About 44 pounds"
+      },
+    ],
+    realWorldConnection: 'UK road signs give distances in miles and speed limits in miles per hour. In France, and most other countries, they are in kilometres, so drivers who take a car across the Channel have to convert.',
+    textbookContent: `
+## Measures and converting units
+
+In the last lesson you multiplied and divided by 10, 100 and 1000. That is all the maths you need here. A measurement is a number and a unit together. The same length can be written with different units: 1 metre is also 100 centimetres. Converting changes the number and the unit, never the length itself.
+
+### Units of length
+
+| Unit | Symbol | How big |
+| --- | --- | --- |
+| kilometre | km | 1 km = 1000 m |
+| metre | m | 1 m = 100 cm |
+| centimetre | cm | 1 cm = 10 mm |
+| millimetre | mm | the gap between the smallest marks on a ruler |
+
+### Moving up and down the ladder
+
+Going to a **smaller** unit, multiply. Going to a **bigger** unit, divide.
+
+*   6 km to metres: metres are smaller, so multiply by 1000. $6 \\times 1000 = 6000$, so 6 km = 6000 m.
+*   250 cm to metres: metres are bigger, so divide by 100. $250 \\div 100 = 2.5$, so 250 cm = 2.5 m.
+*   4.2 cm to millimetres: millimetres are smaller, so multiply by 10. $4.2 \\times 10 = 42$, so 4.2 cm = 42 mm.
+
+Multiplying by 10 moves every digit one place to the left; dividing by 10 moves every digit one place to the right. For 100 the digits move two places, and for 1000 they move three.
+
+### Jumping more than one step
+
+From metres to millimetres is two steps down: $\\times 100$ and then $\\times 10$, which is $\\times 1000$ altogether. So 3 m = 3000 mm. A common mistake is to use 100 here, because 100 cm make a metre. Count the steps on the ladder before you choose the number.
+
+### Mass and capacity
+
+Mass is how heavy something is. Capacity is how much a container holds.
+
+| Measure | Units | How big |
+| --- | --- | --- |
+| Mass | kilogram (kg) and gram (g) | 1 kg = 1000 g |
+| Capacity | litre (l) and millilitre (ml) | 1 l = 1000 ml |
+
+They work like length. 3.4 kg = 3400 g, and 750 ml = 0.75 l.
+
+### Up to three decimal places
+
+Dividing by 1000 can give three decimal places. A path 1234 m long is 1.234 km. A 5 m rope is 0.005 km: the 5 moves three places to the right, so put in zeros to hold the places.
+
+### Imperial units
+
+Imperial units are older British units. Some are still in everyday use in the UK.
+
+| Imperial unit | Roughly in metric |
+| --- | --- |
+| 1 inch | 2.5 cm |
+| 1 mile | 1.6 km |
+| 1 pound (lb) | 0.45 kg, so 1 kg is about 2.2 pounds |
+| 1 pint | 0.57 litres, a little more than half a litre |
+
+These are rounded, which is fine for estimating. Some imperial units are now defined exactly by metric ones: 1 inch is exactly 2.54 cm, 1 mile is exactly 1.609344 km, and 1 pound is exactly 0.45359237 kg.
+
+### Miles and kilometres
+
+5 miles is about 8 km. To convert, find how many lots of 5 or 8 there are.
+
+*   20 miles to kilometres: $20 \\div 5 = 4$ lots, and $4 \\times 8 = 32$, so about 32 km.
+*   40 km to miles: $40 \\div 8 = 5$ lots, and $5 \\times 5 = 25$, so about 25 miles.
+
+### Does the answer make sense?
+
+After every conversion, check the direction. A kilometre is shorter than a mile, so the kilometre number should always be the bigger one. A kilogram is heavier than a pound, so the pound number should be the bigger one.
+
+### Next on the journey
+
+That completes your toolkit. Scientists use many more units than these, with prefixes such as mega and nano, and units made from two units, such as kilometres per hour. Mission 2, "Get to orbit", starts with converting units like these.
+
+### Sources
+
+The topics in these notes follow the Department for Education document below.
+
+*   [National curriculum in England: mathematics programmes of study](https://www.gov.uk/government/publications/national-curriculum-in-england-mathematics-programmes-of-study) (Department for Education)
+`
+  },
   {
     id: 'thermodynamics',
     category: 'physics',

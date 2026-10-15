@@ -104,6 +104,15 @@ export const CURRICULUM: Record<ConceptId, CurriculumPlace> = {
       { source: 'ncMaths', where: "Key stage 3", text: "interpret and compare numbers in standard form A x 10ⁿ 1≤A<10, where n is a positive or negative integer or 0" },
     ],
   },
+  measures: {
+    stage: "Key stage 2 (Years 5 and 6)",
+    statements: [
+      { source: 'ncMaths', where: "Year 5", text: "convert between different units of metric measure [for example, kilometre and metre; centimetre and metre; centimetre and millimetre; gram and kilogram; litre and millilitre]" },
+      { source: 'ncMaths', where: "Year 5", text: "understand and use approximate equivalences between metric units and common imperial units such as inches, pounds and pints" },
+      { source: 'ncMaths', where: "Year 6", text: "convert between miles and kilometres" },
+      { source: 'ncMaths', where: "Year 6", text: "use, read, write and convert between standard units, converting measurements of length, mass, volume and time from a smaller unit of measure to a larger unit, and vice versa, using decimal notation to up to 3 decimal places" },
+    ],
+  },
   binary: {
     stage: "Key stage 3 computing",
     statements: [

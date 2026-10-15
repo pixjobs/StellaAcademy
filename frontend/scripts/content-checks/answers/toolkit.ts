@@ -798,7 +798,86 @@ const EXPONENTS_ROOTS: Entry[] = [
   { ...nv(ER, 'textbookContent: speed of light', 'Scientists use standard form for numbers like these.', 'Light travels about $3 \\times 10^8$ metres every second.', 0, SPEED_OF_LIGHT, 'm/s'), relTolerance: 0.01 },
 ];
 
+/** A claim in any lesson. */
+const claim2 = (lesson: string, where: string, fragment: string, claimIncludes: string, holds: boolean, detail: string): Entry => ({
+  lesson, where, kind: 'claim',
+  ...(where.startsWith('textbookContent') || where.startsWith('conceptSteps') ? { expectNotesIncludes: fragment, expectQuestionIncludes: fragment } : { expectQuestionIncludes: fragment }),
+  claimIncludes, verify: () => ({ holds, detail }),
+});
+
+const ME = 'measures';
+const ME_SOLVED = 'The International Space Station flies about 400 km above the Earth.';
+// Exact definitions (Weights and Measures Act 1985, Schedule 1): yard = 0.9144 m, pound = 0.45359237 kg,
+// gallon = 4.54609 litres, pint = gallon / 8.
+const INCH_CM = 2.54;
+const MILE_KM = (1760 * 0.9144) / 1000;
+const POUND_KG = 0.45359237;
+const PINT_L = 4.54609 / 8;
+const MEASURES: Entry[] = [
+  // Concept steps
+  nv(ME, 'conceptSteps[0] (door)', 'A door 2 m tall is also 200 cm tall.', 'A door 2 m tall is also 200 cm tall.', 1, 2 * 100),
+  { ...nv(ME, 'conceptSteps[3] (inch)', 'Before metric units, Britain used imperial units', '1 inch is about 2.5 cm', 1, INCH_CM), tolerance: 0.05 },
+  { ...nv(ME, 'conceptSteps[3] (kg in pounds)', 'Before metric units, Britain used imperial units', '1 kg is about 2.2 pounds', 1, 1 / POUND_KG), tolerance: 0.01 },
+  { ...nv(ME, 'conceptSteps[3] (5 miles)', 'Before metric units, Britain used imperial units', '5 miles is about 8 km', 1, 5 * MILE_KM), tolerance: 0.1 },
+  claim2(ME, 'conceptSteps[3] (pint)', 'Before metric units, Britain used imperial units', '1 pint is a little more than half a litre', PINT_L > 0.5 && PINT_L < 0.6, `1 pint = ${PINT_L} litres`),
+  claim2(ME, 'conceptSteps[4] (mile longer than km)', 'A mile is longer than a kilometre', 'A mile is longer than a kilometre', MILE_KM > 1, `1 mile = ${MILE_KM} km`),
+  // Worked example
+  nv(ME, 'solvedExample.steps[0] (400 × 1000)', ME_SOLVED, '$400 \\times 1000 = 400{,}000$', 2, 400 * 1000),
+  nv(ME, 'solvedExample.steps[0] (400,000 m)', ME_SOLVED, 'so that is 400,000 m', 0, 400 * 1000, 'm'),
+  nv(ME, 'solvedExample.steps[1]', ME_SOLVED, '$400 \\div 8 = 50$', 2, 400 / 8),
+  nv(ME, 'solvedExample.steps[2]', ME_SOLVED, '$50 \\times 5 = 250$', 2, (400 / 8) * 5),
+  nv(ME, 'solvedExample.resultFormula (m)', ME_SOLVED, '= 400{,}000\\text{ m}', 0, 400 * 1000, 'm'),
+  { ...nv(ME, 'solvedExample.resultFormula (miles, against the exact mile)', ME_SOLVED, '\\approx 250\\text{ miles}', 0, 400 / MILE_KM, 'miles'), tolerance: 2 },
+  // Practice
+  nv(ME, 'practiceProblems[0]', 'Convert 3.5 km to metres.', '3500 m', 0, 3.5 * 1000, 'm'),
+  nv(ME, 'practiceProblems[1]', 'A pencil is 17 cm long.', '170 mm', 0, 17 * 10, 'mm'),
+  nv(ME, 'practiceProblems[2]', 'Convert 45 mm to centimetres.', '4.5 cm', 0, 45 / 10, 'cm'),
+  {
+    lesson: ME, where: 'practiceProblems[3]', kind: 'qualitative', expectQuestionIncludes: 'Which is longer: 1.2 km or 1150 m?',
+    expectAnswerIncludes: '1.2 km, which is 1200 m',
+    verify: () => ({ holds: 1.2 * 1000 > 1150, detail: '1200 m > 1150 m' }),
+  },
+  nv(ME, 'practiceProblems[3] (1200 m)', 'Which is longer: 1.2 km or 1150 m?', '1.2 km, which is 1200 m', 1, 1.2 * 1000, 'm'),
+  nv(ME, 'practiceProblems[4]', 'A bag of potatoes has a mass of 2750 g.', '2.75 kg', 0, 2750 / 1000, 'kg'),
+  nv(ME, 'practiceProblems[5]', 'A water bottle holds 1.5 litres.', '1500 ml', 0, 1.5 * 1000, 'ml'),
+  nv(ME, 'practiceProblems[6]', 'Mount Everest is 8849 m high.', '8.849 km', 0, 8849 / 1000, 'km'),
+  nv(ME, 'practiceProblems[7]', 'A road sign says it is 15 miles to the next town.', 'About 24 km', 0, (15 / 5) * 8, 'km'),
+  { ...nv(ME, 'practiceProblems[7] (against the exact mile)', 'A road sign says it is 15 miles to the next town.', 'About 24 km', 0, 15 * MILE_KM, 'km'), tolerance: 0.5 },
+  nv(ME, 'practiceProblems[8]', 'A ruler is 30 cm long.', 'About 12 inches', 0, 30 / 2.5, 'inches'),
+  { ...nv(ME, 'practiceProblems[8] (against the exact inch)', 'A ruler is 30 cm long.', 'About 12 inches', 0, 30 / INCH_CM, 'inches'), tolerance: 0.5 },
+  nv(ME, 'practiceProblems[9]', 'An airline lets you take a 20 kg suitcase.', 'About 44 pounds', 0, 20 * 2.2, 'pounds'),
+  { ...nv(ME, 'practiceProblems[9] (against the exact pound)', 'An airline lets you take a 20 kg suitcase.', 'About 44 pounds', 0, 20 / POUND_KG, 'pounds'), tolerance: 0.5 },
+  // Notes
+  nv(ME, 'textbookContent: 6 km', '6 km to metres', '$6 \\times 1000 = 6000$', 2, 6 * 1000),
+  nv(ME, 'textbookContent: 6 km (result)', '6 km to metres', 'so 6 km = 6000 m', 1, 6 * 1000, 'm'),
+  nv(ME, 'textbookContent: 250 cm', '250 cm to metres', '$250 \\div 100 = 2.5$', 2, 250 / 100),
+  nv(ME, 'textbookContent: 250 cm (result)', '250 cm to metres', 'so 250 cm = 2.5 m', 1, 250 / 100, 'm'),
+  nv(ME, 'textbookContent: 4.2 cm', '4.2 cm to millimetres', '$4.2 \\times 10 = 42$', 2, 4.2 * 10),
+  nv(ME, 'textbookContent: 4.2 cm (result)', '4.2 cm to millimetres', 'so 4.2 cm = 42 mm', 1, 4.2 * 10, 'mm'),
+  nv(ME, 'textbookContent: m to mm factor', 'From metres to millimetres is two steps down', 'which is $\\times 1000$ altogether', 0, 100 * 10),
+  nv(ME, 'textbookContent: 3 m', 'From metres to millimetres is two steps down', 'So 3 m = 3000 mm.', 1, 3 * 1000, 'mm'),
+  nv(ME, 'textbookContent: 3.4 kg', 'They work like length.', '3.4 kg = 3400 g', 1, 3.4 * 1000, 'g'),
+  nv(ME, 'textbookContent: 750 ml', 'They work like length.', '750 ml = 0.75 l', 1, 750 / 1000, 'l'),
+  nv(ME, 'textbookContent: 1234 m', 'Dividing by 1000 can give three decimal places.', 'A path 1234 m long is 1.234 km.', 1, 1234 / 1000, 'km'),
+  nv(ME, 'textbookContent: 5 m', 'Dividing by 1000 can give three decimal places.', 'A 5 m rope is 0.005 km', 1, 5 / 1000, 'km'),
+  { ...nv(ME, 'textbookContent: inch', '| Imperial unit | Roughly in metric |', '| 1 inch | 2.5 cm |', 1, INCH_CM, 'cm'), tolerance: 0.05 },
+  { ...nv(ME, 'textbookContent: mile', '| Imperial unit | Roughly in metric |', '| 1 mile | 1.6 km |', 1, MILE_KM, 'km'), tolerance: 0.01 },
+  { ...nv(ME, 'textbookContent: pound', '| Imperial unit | Roughly in metric |', '| 1 pound (lb) | 0.45 kg', 1, POUND_KG, 'kg'), tolerance: 0.005 },
+  { ...nv(ME, 'textbookContent: kg in pounds', '| Imperial unit | Roughly in metric |', 'so 1 kg is about 2.2 pounds', 1, 1 / POUND_KG, 'pounds'), tolerance: 0.01 },
+  { ...nv(ME, 'textbookContent: pint', '| Imperial unit | Roughly in metric |', '| 1 pint | 0.57 litres', 1, PINT_L, 'litres'), tolerance: 0.005 },
+  claim2(ME, 'textbookContent: exact inch', 'Some imperial units are now defined exactly', '1 inch is exactly 2.54 cm', Math.abs(0.9144 / 36 - 0.0254) < 1e-12, 'yard 0.9144 m ÷ 36 = 0.0254 m'),
+  { ...nv(ME, 'textbookContent: exact mile', 'Some imperial units are now defined exactly', '1 mile is exactly 1.609344 km', 1, MILE_KM, 'km'), tolerance: 1e-9 },
+  { ...nv(ME, 'textbookContent: exact pound', 'Some imperial units are now defined exactly', '1 pound is exactly 0.45359237 kg', 1, POUND_KG, 'kg'), tolerance: 1e-12 },
+  nv(ME, 'textbookContent: 20 miles (lots)', '20 miles to kilometres', '$20 \\div 5 = 4$', 2, 20 / 5),
+  nv(ME, 'textbookContent: 20 miles (km)', '20 miles to kilometres', '$4 \\times 8 = 32$', 2, (20 / 5) * 8),
+  { ...nv(ME, 'textbookContent: 20 miles (against the exact mile)', '20 miles to kilometres', 'so about 32 km', 0, 20 * MILE_KM, 'km'), tolerance: 0.5 },
+  nv(ME, 'textbookContent: 40 km (lots)', '40 km to miles', '$40 \\div 8 = 5$', 2, 40 / 8),
+  nv(ME, 'textbookContent: 40 km (miles)', '40 km to miles', '$5 \\times 5 = 25$', 2, (40 / 8) * 5),
+  { ...nv(ME, 'textbookContent: 40 km (against the exact mile)', '40 km to miles', 'so about 25 miles', 0, 40 / MILE_KM, 'miles'), tolerance: 0.5 },
+  claim2(ME, 'textbookContent: kg heavier than pound', 'A kilogram is heavier than a pound', 'A kilogram is heavier than a pound', 1 > POUND_KG, `1 pound = ${POUND_KG} kg`),
+];
+
 export const ENTRIES: Entry[] = [
   ...ARITHMETIC, ...NEGATIVE_NUMBERS, ...MULTIPLICATION, ...FRACTIONS, ...FRACTION_OPS, ...DECIMALS_PERCENTAGES,
-  ...PROPORTIONS, ...BASIC_GEOMETRY, ...EXPONENTS_ROOTS,
+  ...PROPORTIONS, ...BASIC_GEOMETRY, ...EXPONENTS_ROOTS, ...MEASURES,
 ];

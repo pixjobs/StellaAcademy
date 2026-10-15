@@ -197,6 +197,13 @@ const DIAGRAMS: Record<ConceptId, React.ReactNode> = {
       <rect x="40" y="26" width="13" height="13" rx="1.5" stroke="var(--diagram-accent, var(--brand-gold))"/>
     </>
   ),
+  measures: (
+    <>
+      <rect x="6" y="24" width="52" height="16" rx="2"/>
+      <path d="M14 24 V31 M22 24 V34 M30 24 V31 M38 24 V34 M46 24 V31" strokeOpacity=".6"/>
+      <path d="M50 24 V36" stroke="var(--diagram-accent, var(--brand-gold))"/>
+    </>
+  ),
   'thermodynamics': (
     <>
       <rect x="12" y="16" width="40" height="36" rx="3"/>
