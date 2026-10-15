@@ -12,7 +12,8 @@ import TrigTriangle from '@/components/lesson-models/TrigTriangle';
 import OrbitLauncher from '@/components/paper/OrbitLauncher';
 import WaveInstrument from '@/components/paper/WaveInstrument';
 import UnitConverter from '@/components/study/UnitConverter';
-import { hasQuiz, QUIZZES } from '@/lib/quiz';
+import QuizPanel from '@/components/quiz/QuizPanel';
+import { hasQuiz } from '@/lib/quiz';
 import { useQuizActive } from '@/lib/quiz/active';
 import type { ConceptId } from '@/lib/study-modules';
 
@@ -93,36 +94,27 @@ function PausedDuringQuiz({ id, children }: { id: ConceptId; children: ReactNode
 const FLASHCARDS: ConceptId[] = ['arithmetic', 'basic-geometry', 'proportions', 'decimals-percentages', 'binary', 'multiplication', 'fraction-ops', 'negative-numbers', 'exponents-roots'];
 
 /**
- * On a lesson with a step-by-step quiz, the old flashcards would only repeat it, and they sit at the top
- * of the page while the quiz is further down. This card takes their place and leads to the quiz.
+ * On a lesson with a step-by-step quiz and no explore model of its own (only the old fixed-question
+ * flashcards), the quiz itself fills the Try it panel, as the Quiz tab does on Measures.
  */
-function QuizPointer({ id }: { id: ConceptId }) {
-  const quiz = QUIZZES[id]!;
+function QuizModel({ id }: { id: ConceptId }) {
   return (
-    <Panel>
-      <p className="mt-3 text-slate-200">Practise with the step-by-step quiz. Each question is answered one step at a time, with new numbers every time.</p>
-      <ul className="mt-4 space-y-2">
-        {Object.values(quiz.rounds).map((r) => (
-          <li key={r.label} className="rounded-xl bg-white/[0.05] px-4 py-3 ring-1 ring-white/10">
-            <span className="block font-semibold text-white">{r.label}</span>
-            <span className="block text-sm text-slate-300">{r.blurb}</span>
-          </li>
-        ))}
-      </ul>
-      <a
-        href="#practice"
-        className="mt-4 inline-block rounded-lg bg-[#f6c453] px-4 py-2.5 text-sm font-bold text-[#0b1026] hover:bg-[#f8d27a] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-      >
-        Start the quiz
-      </a>
-    </Panel>
+    <figure className="night-window overflow-hidden rounded-3xl p-4 shadow-[0_30px_70px_-20px_rgba(11,16,38,0.6)] ring-1 ring-white/10 sm:p-6">
+      <figcaption className="flex items-baseline justify-between gap-3">
+        <span className="font-fraunces text-xl font-semibold text-white">Try it</span>
+        <span className="text-sm font-semibold text-cyan-200">Quiz</span>
+      </figcaption>
+      <div data-quiz className="mt-4">
+        <QuizPanel lesson={id} />
+      </div>
+    </figure>
   );
 }
 
 /** Each lesson's interactive model, in its night window. */
 export default function LessonModel({ id }: { id: ConceptId }) {
   if (id === 'measures') return <MeasuresModel />; // pauses its own tools during a quiz question
-  if (hasQuiz(id) && FLASHCARDS.includes(id)) return <QuizPointer id={id} />;
+  if (hasQuiz(id) && FLASHCARDS.includes(id)) return <QuizModel id={id} />;
   return (
     <PausedDuringQuiz id={id}>
       <ModelFor id={id} />

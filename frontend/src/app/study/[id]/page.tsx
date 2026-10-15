@@ -9,7 +9,6 @@ import { Rich, Tex } from '@/components/paper/maths';
 import { SkyBand } from '@/components/Sky';
 import LessonIntro from '@/components/study/LessonIntro';
 import LessonModel from '@/components/study/LessonModel';
-import QuizPanel from '@/components/quiz/QuizPanel';
 import { hasQuiz } from '@/lib/quiz';
 import ReportProblem from '@/components/study/ReportProblem';
 import TrackedDetails from '@/components/study/TrackedDetails';
@@ -169,7 +168,7 @@ export default async function LessonPage({ params }: Props) {
         <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-10">
           {/* The model: a night window that stays in view while you read. min-w-0 so a wide model cannot widen the page. */}
           <div className="min-w-0">
-            <div className="lg:sticky lg:top-4 lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto lg:rounded-3xl">
+            <div id="try-it" className="scroll-mt-4 lg:sticky lg:top-4 lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto lg:rounded-3xl">
               <LessonModel id={lesson.id} />
             </div>
           </div>
@@ -252,11 +251,14 @@ export default async function LessonPage({ params }: Props) {
             {hasQuiz(lesson.id) ? (
               <Section id="practice" title="Practice">
                 <p className="text-[var(--ink-soft)]">
-                  Answer each question one step at a time. New numbers every time, and the questions you miss come back for review.
+                  Practise with the step-by-step quiz in the Try it panel{lesson.id === 'measures' ? ' (the Quiz tab)' : ''}. Each question is answered one
+                  step at a time, with new numbers every time, and the questions you miss come back for review.
                 </p>
-                <div data-quiz className="night-window mt-4 overflow-hidden rounded-3xl p-4 shadow-[0_30px_60px_-20px_rgba(11,16,38,0.55)] sm:p-6">
-                  <QuizPanel lesson={lesson.id} />
-                </div>
+                <p className="mt-3">
+                  <a href="#try-it" className="font-semibold text-[var(--action)] underline underline-offset-2 hover:text-[var(--action-hover)]">
+                    Go to the quiz
+                  </a>
+                </p>
               </Section>
             ) : (
               <Section id="practice" title="Practice questions">
