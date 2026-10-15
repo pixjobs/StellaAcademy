@@ -35,6 +35,9 @@ export function runQuizChecks(): Finding[] {
     const r = rng(20261015 + round.length);
     for (let n = 0; n < PER_ROUND; n++) {
       const q = makeQuestion(round, r);
+      // Review questions are made again from their seed, so the same seed must give the same question.
+      const seed = 1000 + n;
+      if (JSON.stringify(makeQuestion(round, rng(seed)).steps.map((s) => s.prompt)) !== JSON.stringify(makeQuestion(round, rng(seed)).steps.map((s) => s.prompt)) || makeQuestion(round, rng(seed)).prompt !== makeQuestion(round, rng(seed)).prompt) fail(`${round} seed ${seed}`, '', 'the same seed gave a different question');
       const where = `${round} #${n}`;
       const all = [q.prompt, ...q.workings, ...q.steps.flatMap((s) => [s.prompt, ...(s.type === 'choice' ? [...s.options, ...Object.values(s.why)] : [s.unit ?? ''])])].join(' | ');
       if (/undefined|NaN|\[object/.test(all)) fail(where, q.prompt, `bad text: ${all.slice(0, 200)}`);

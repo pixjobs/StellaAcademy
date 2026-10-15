@@ -3,29 +3,70 @@
 import { useEffect, useImperativeHandle, useRef, useState, type RefObject } from 'react';
 import { track } from '@/lib/track';
 import { makeQuestion, markNumber, rng, ROUNDS, type Question, type Round } from '@/lib/measures-quiz';
+import { dueNow, roundsToday, useMeasuresSaved, type RoundRecord } from '@/lib/measures-progress';
 
 const QUESTIONS_PER_QUIZ = 10;
 
-type Result = { question: Question; firstTime: boolean; note?: string };
+/** A question with the round and seed that make it, so a missed one can be made again for review. */
+type Item = { round: Round; seed: number; question: Question };
+type Result = { item: Item; firstTime: boolean; note?: string };
+type Mode = Round | 'review';
 
 export type QuizHandle = { interrupt: () => void };
 
-/** Ten new questions from a fresh random seed. Called only from click handlers. */
-function newQuestions(round: Round): Question[] {
-  const random = rng(Math.floor(Math.random() * 2 ** 31));
-  return Array.from({ length: QUESTIONS_PER_QUIZ }, () => makeQuestion(round, random));
+const itemFor = (round: Round, seed: number): Item => ({ round, seed, question: makeQuestion(round, rng(seed)) });
+
+/** Ten new questions, each from its own random seed. Called only from click handlers. */
+function newItems(round: Round): Item[] {
+  return Array.from({ length: QUESTIONS_PER_QUIZ }, () => itemFor(round, Math.floor(Math.random() * 2 ** 31)));
+}
+
+const label = (mode: Mode) => (mode === 'review' ? 'Review' : ROUNDS[mode].label);
+
+function dayLabel(at: number, now: number): string {
+  const d = new Date(at);
+  const today = new Date(now);
+  const sameDay = (a: Date, b: Date) => a.toDateString() === b.toDateString();
+  if (sameDay(d, today)) return 'today';
+  const yesterday = new Date(now - 24 * 60 * 60 * 1000);
+  if (sameDay(d, yesterday)) return 'yesterday';
+  if (sameDay(d, new Date(now + 24 * 60 * 60 * 1000))) return 'tomorrow';
+  return d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
+}
+
+function History({ rounds, now }: { rounds: RoundRecord[]; now: number }) {
+  if (!rounds.length) return null;
+  return (
+    <ul className="mt-2 space-y-1 text-sm text-slate-200">
+      {rounds
+        .slice(-6)
+        .reverse()
+        .map((r) => (
+          <li key={r.at} className="flex justify-between gap-3">
+            <span>
+              {label(r.round)}, {dayLabel(r.at, now)}
+            </span>
+            <span className="font-semibold text-white">
+              {r.score} out of {r.out}
+            </span>
+          </li>
+        ))}
+    </ul>
+  );
 }
 
 /** One question, answered step by step. Later steps stay hidden until the one before is right. */
 function QuestionCard({
   question,
   number,
+  total,
   onDone,
   onFinished,
   announce,
 }: {
   question: Question;
   number: number;
+  total: number;
   onDone: (firstTime: boolean, note?: string) => void;
   /** The last step is answered or the working is shown: leaving now no longer voids the question. */
   onFinished: () => void;
@@ -94,7 +135,7 @@ function QuestionCard({
   return (
     <div ref={box}>
       <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-        Question {number} of {QUESTIONS_PER_QUIZ}
+        Question {number} of {total}
       </p>
       <p className="mt-1 font-fraunces text-xl font-semibold leading-snug text-white">{question.prompt}</p>
 
@@ -174,7 +215,7 @@ function QuestionCard({
             onClick={() => onDone(!shown && slips === 0, shown ? 'You looked at the working' : slips ? 'Needed another try' : undefined)}
             className="mt-3 rounded-lg bg-[#f6c453] px-4 py-2 text-sm font-bold text-[#0b1026] hover:bg-[#f8d27a] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
           >
-            {number === QUESTIONS_PER_QUIZ ? 'See your score' : 'Next question'}
+            {number === total ? 'See your score' : 'Next question'}
           </button>
         </div>
       ) : (
@@ -188,15 +229,29 @@ function QuestionCard({
 
 /**
  * The Measures quiz: 10 generated questions, each answered in steps. A question counts as right only if
- * every step is right first time, without looking at the working or the explore tools.
+ * every step is right first time, without looking at the working or the explore tools. Scores and missed
+ * questions are saved in this browser (lib/measures-progress.ts); missed ones come back for review.
  */
 export default function MeasuresQuiz({ handle }: { handle: RefObject<QuizHandle | null> }) {
-  const [round, setRound] = useState<Round | null>(null);
-  const [questions, setQuestions] = useState<Question[]>([]);
+  const saved = useMeasuresSaved();
+  const [mode, setMode] = useState<Mode | null>(null);
+  const [items, setItems] = useState<Item[]>([]);
   const [results, setResults] = useState<Result[]>([]);
   const [notice, setNotice] = useState('');
   const [cardDone, setCardDone] = useState(false);
   const [said, setSaid] = useState('');
+  const [now, setNow] = useState(() => Date.now());
+  const [confirmClear, setConfirmClear] = useState(false);
+  const total = items.length;
+
+  const finishRound = (all: Result[]) => {
+    const t = Date.now();
+    setNow(t);
+    const score = all.filter((x) => x.firstTime).length;
+    saved.finish(mode!, all.map((x) => ({ round: x.item.round, seed: x.item.seed, firstTime: x.firstTime })), t);
+    setSaid(`${score} out of ${all.length} right first time.`);
+    track('measures_quiz_finished', { round: mode!, score });
+  };
 
   // Leaving for the explore tools mid-question ends that question: it does not count, and the next one is shown.
   useImperativeHandle(
@@ -204,23 +259,27 @@ export default function MeasuresQuiz({ handle }: { handle: RefObject<QuizHandle 
     () => ({
       interrupt: () => {
         // A finished question (answered, or working shown) is not affected.
-        if (!round || cardDone || results.length >= QUESTIONS_PER_QUIZ || !questions[results.length]) return;
-        const next = [...results, { question: questions[results.length], firstTime: false, note: 'You opened the explore tools' }];
+        if (!mode || cardDone || results.length >= total || !items[results.length]) return;
+        const next = [...results, { item: items[results.length], firstTime: false, note: 'You opened the explore tools' }];
         setResults(next);
         setNotice('You opened the explore tools during that question, so it does not count. Here is the next one.');
-        if (next.length >= QUESTIONS_PER_QUIZ) track('measures_quiz_finished', { round, score: next.filter((x) => x.firstTime).length });
+        if (next.length >= total) finishRound(next);
       },
     }),
-    [round, cardDone, results, questions],
   );
 
-  const start = (r: Round) => {
-    setRound(r);
-    setQuestions(newQuestions(r));
+  const start = (m: Mode) => {
+    const t = Date.now();
+    setNow(t);
+    const next = m === 'review' ? dueNow(saved.review, t).slice(0, QUESTIONS_PER_QUIZ).map((x) => itemFor(x.round, x.seed)) : newItems(m);
+    if (!next.length) return;
+    setMode(m);
+    setItems(next);
     setResults([]);
     setNotice('');
     setCardDone(false);
-    track('measures_quiz_started', { round: r });
+    setConfirmClear(false);
+    track('measures_quiz_started', { round: m });
   };
 
   // One live region that is always there, so screen readers hear each "Correct" and the score.
@@ -230,7 +289,9 @@ export default function MeasuresQuiz({ handle }: { handle: RefObject<QuizHandle 
     </p>
   );
 
-  if (!round) {
+  if (!mode) {
+    const due = dueNow(saved.review, now);
+    const later = saved.review.filter((x) => x.due > now).sort((a, b) => a.due - b.due);
     return (
       <div>
         {live}
@@ -238,6 +299,16 @@ export default function MeasuresQuiz({ handle }: { handle: RefObject<QuizHandle 
           Ten questions, each in steps. A question counts only if every step is right first time. New numbers every time.
         </p>
         <div className="mt-4 grid gap-2.5">
+          {due.length > 0 && (
+            <button
+              type="button"
+              onClick={() => start('review')}
+              className="rounded-xl border border-amber-300/50 bg-amber-400/10 px-4 py-3 text-left hover:border-amber-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-200"
+            >
+              <span className="block font-semibold text-white">Review: {Math.min(due.length, QUESTIONS_PER_QUIZ)} question{due.length === 1 ? '' : 's'} to try again</span>
+              <span className="block text-sm text-slate-200">Questions you missed before. Get one right and it comes back less often.</span>
+            </button>
+          )}
           {(Object.keys(ROUNDS) as Round[]).map((r) => (
             <button
               key={r}
@@ -250,41 +321,73 @@ export default function MeasuresQuiz({ handle }: { handle: RefObject<QuizHandle 
             </button>
           ))}
         </div>
+        {!due.length && later.length > 0 && (
+          <p className="mt-3 text-sm text-slate-300">
+            {later.length} question{later.length === 1 ? '' : 's'} saved for review. The next one comes back {dayLabel(later[0].due, now)}.
+          </p>
+        )}
+        {saved.rounds.length > 0 && (
+          <div className="mt-5 border-t border-white/10 pt-4">
+            <p className="text-sm font-semibold text-white">Your recent rounds</p>
+            <History rounds={saved.rounds} now={now} />
+            <p className="mt-3 text-xs text-slate-400">
+              Saved in this browser only, never sent to us.{' '}
+              {confirmClear ? (
+                <button type="button" onClick={() => { saved.clear(); setConfirmClear(false); }} className="font-semibold text-rose-200 underline underline-offset-2">
+                  Yes, clear my scores and review list
+                </button>
+              ) : (
+                <button type="button" onClick={() => setConfirmClear(true)} className="underline underline-offset-2 hover:text-white">
+                  Clear saved progress
+                </button>
+              )}
+            </p>
+          </div>
+        )}
       </div>
     );
   }
 
-  if (results.length >= QUESTIONS_PER_QUIZ) {
+  if (results.length >= total) {
     const score = results.filter((x) => x.firstTime).length;
+    const today = roundsToday(saved.rounds, now);
     return (
       <div>
         {live}
         <p className="font-fraunces text-2xl font-semibold text-white">
-          {score} out of {QUESTIONS_PER_QUIZ} right first time
+          {score} out of {total} right first time
         </p>
-        <p className="mt-1 text-sm text-slate-300">{ROUNDS[round].label} round</p>
-        {score < QUESTIONS_PER_QUIZ && (
+        <p className="mt-1 text-sm text-slate-300">{label(mode)} round</p>
+        {today.length > 1 && (
+          <p className="mt-2 text-sm text-slate-200">
+            Your rounds today: {today.map((r) => `${r.score} out of ${r.out}`).join(', ')}
+          </p>
+        )}
+        {score < total && (
           <>
             <p className="mt-4 text-sm font-semibold text-white">Worth another look:</p>
+            <p className="text-xs text-slate-400">These come back for review tomorrow.</p>
             <ul className="mt-2 space-y-2">
               {results
                 .filter((x) => !x.firstTime)
                 .map((x, i) => (
                   <li key={i} className="rounded-xl bg-white/[0.05] px-3 py-2.5 text-sm ring-1 ring-white/10">
-                    <p className="font-semibold text-white">{x.question.prompt}</p>
+                    <p className="font-semibold text-white">{x.item.question.prompt}</p>
                     {x.note && <p className="text-xs text-slate-400">{x.note}</p>}
-                    <p className="mt-1 text-slate-200">{x.question.workings[x.question.workings.length - 1]}</p>
+                    <p className="mt-1 text-slate-200">{x.item.question.workings[x.item.question.workings.length - 1]}</p>
                   </li>
                 ))}
             </ul>
           </>
         )}
         <div className="mt-4 flex flex-wrap gap-2">
-          <button type="button" onClick={() => start(round)} className="rounded-lg bg-[#f6c453] px-4 py-2 text-sm font-bold text-[#0b1026] hover:bg-[#f8d27a]">
-            Another {ROUNDS[round].label.toLowerCase()} round
-          </button>
-          <button type="button" onClick={() => setRound(null)} className="rounded-lg border border-white/20 px-4 py-2 text-sm font-semibold text-white hover:border-cyan-300">
-            Choose a different round
+          {mode !== 'review' && (
+            <button type="button" onClick={() => start(mode)} className="rounded-lg bg-[#f6c453] px-4 py-2 text-sm font-bold text-[#0b1026] hover:bg-[#f8d27a]">
+              Another {label(mode).toLowerCase()} round
+            </button>
+          )}
+          <button type="button" onClick={() => { setNow(Date.now()); setMode(null); }} className="rounded-lg border border-white/20 px-4 py-2 text-sm font-semibold text-white hover:border-cyan-300">
+            {mode === 'review' ? 'Back to the rounds' : 'Choose a different round'}
           </button>
         </div>
       </div>
@@ -296,7 +399,7 @@ export default function MeasuresQuiz({ handle }: { handle: RefObject<QuizHandle 
     <div>
       {live}
       <div className="mb-3 flex items-center justify-between gap-3 text-sm text-slate-300">
-        <span>{ROUNDS[round].label} round</span>
+        <span>{label(mode)} round</span>
         <span>
           Right first time: <strong className="text-white">{results.filter((x) => x.firstTime).length}</strong>
         </span>
@@ -304,20 +407,17 @@ export default function MeasuresQuiz({ handle }: { handle: RefObject<QuizHandle 
       {notice && <p className="mb-3 rounded-lg bg-amber-400/10 px-3 py-2 text-sm text-amber-100 ring-1 ring-amber-300/30">{notice}</p>}
       <QuestionCard
         key={n}
-        question={questions[n]}
+        question={items[n].question}
         number={n + 1}
+        total={total}
         announce={setSaid}
         onFinished={() => setCardDone(true)}
         onDone={(firstTime, note) => {
           setNotice('');
           setCardDone(false);
-          const next = [...results, { question: questions[n], firstTime, note }];
+          const next = [...results, { item: items[n], firstTime, note }];
           setResults(next);
-          if (next.length >= QUESTIONS_PER_QUIZ) {
-            const score = next.filter((x) => x.firstTime).length;
-            setSaid(`${score} out of ${QUESTIONS_PER_QUIZ} right first time.`);
-            track('measures_quiz_finished', { round, score });
-          }
+          if (next.length >= total) finishRound(next);
         }}
       />
     </div>
