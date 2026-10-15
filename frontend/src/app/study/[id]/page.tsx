@@ -9,6 +9,8 @@ import { Rich, Tex } from '@/components/paper/maths';
 import { SkyBand } from '@/components/Sky';
 import LessonIntro from '@/components/study/LessonIntro';
 import LessonModel from '@/components/study/LessonModel';
+import QuizPanel from '@/components/quiz/QuizPanel';
+import { hasQuiz } from '@/lib/quiz';
 import ReportProblem from '@/components/study/ReportProblem';
 import TrackedDetails from '@/components/study/TrackedDetails';
 import SupportLink from '@/components/SupportLink';
@@ -165,8 +167,8 @@ export default async function LessonPage({ params }: Props) {
 
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-10">
-          {/* The model: a night window that stays in view while you read. */}
-          <div>
+          {/* The model: a night window that stays in view while you read. min-w-0 so a wide model cannot widen the page. */}
+          <div className="min-w-0">
             <div className="lg:sticky lg:top-4 lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto lg:rounded-3xl">
               <LessonModel id={lesson.id} />
             </div>
@@ -247,34 +249,45 @@ export default async function LessonPage({ params }: Props) {
               </p>
             </Section>
 
-            <Section id="practice" title="Practice questions">
-              <p className="text-[var(--ink-soft)]">Have a go first, then open the hint or the answer.</p>
-              <ol className="mt-4 space-y-4">
-                {lesson.practiceProblems.map((problem, i) => (
-                  <li key={i} className="rounded-2xl border border-[var(--rule)] bg-[var(--paper)] p-5">
-                    <p className="text-[var(--ink)]">
-                      <span className="mr-2 font-semibold" style={{ color: subject.ink }}>
-                        {i + 1}.
-                      </span>
-                      <Rich text={problem.question} />
-                    </p>
-                    <div className="mt-3 space-y-2 text-[15px]">
-                      <details>
-                        <summary className="cursor-pointer font-semibold text-[var(--action)] hover:text-[var(--action-hover)]">Show a hint</summary>
-                        <p className="mt-2 text-[var(--ink-soft)]">
-                          <Rich text={problem.hint} />
-                        </p>
-                      </details>
-                      <TrackedDetails summary="Show the answer" event="practice_answer_revealed" params={{ lesson: lesson.id, question: i + 1 }}>
-                        <p className="mt-2 font-semibold text-[var(--ink)]">
-                          <Rich text={problem.answer} />
-                        </p>
-                      </TrackedDetails>
-                    </div>
-                  </li>
-                ))}
-              </ol>
-            </Section>
+            {hasQuiz(lesson.id) ? (
+              <Section id="practice" title="Practice">
+                <p className="text-[var(--ink-soft)]">
+                  Answer each question one step at a time. New numbers every time, and the questions you miss come back for review.
+                </p>
+                <div data-quiz className="night-window mt-4 overflow-hidden rounded-3xl p-4 shadow-[0_30px_60px_-20px_rgba(11,16,38,0.55)] sm:p-6">
+                  <QuizPanel lesson={lesson.id} />
+                </div>
+              </Section>
+            ) : (
+              <Section id="practice" title="Practice questions">
+                <p className="text-[var(--ink-soft)]">Have a go first, then open the hint or the answer.</p>
+                <ol className="mt-4 space-y-4">
+                  {lesson.practiceProblems.map((problem, i) => (
+                    <li key={i} className="rounded-2xl border border-[var(--rule)] bg-[var(--paper)] p-5">
+                      <p className="text-[var(--ink)]">
+                        <span className="mr-2 font-semibold" style={{ color: subject.ink }}>
+                          {i + 1}.
+                        </span>
+                        <Rich text={problem.question} />
+                      </p>
+                      <div className="mt-3 space-y-2 text-[15px]">
+                        <details>
+                          <summary className="cursor-pointer font-semibold text-[var(--action)] hover:text-[var(--action-hover)]">Show a hint</summary>
+                          <p className="mt-2 text-[var(--ink-soft)]">
+                            <Rich text={problem.hint} />
+                          </p>
+                        </details>
+                        <TrackedDetails summary="Show the answer" event="practice_answer_revealed" params={{ lesson: lesson.id, question: i + 1 }}>
+                          <p className="mt-2 font-semibold text-[var(--ink)]">
+                            <Rich text={problem.answer} />
+                          </p>
+                        </TrackedDetails>
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+              </Section>
+            )}
 
             {lesson.textbookContent && (
               <Section id="notes" title="Notes">

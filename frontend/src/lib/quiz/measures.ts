@@ -1,13 +1,9 @@
 /**
- * Quiz questions for the Measures lesson. Every question is generated, and each one is answered in
- * steps: the reasoning first (bigger or smaller unit, multiply or divide, by how much), then the answer.
- * A later step only opens once the one before it is right, so the answer cannot be reached by guessing
- * the last box alone.
- *
- * All arithmetic is exact (decimal strings and BigInt), so answers never carry floating-point noise.
- * scripts/content-checks/quiz.ts generates thousands of questions and checks every answer independently.
+ * Quiz for the Measures lesson: metric conversions, bigger jumps and imperial rough equivalents.
+ * Built on the shared engine in lib/quiz/core.ts.
  */
-import { MEASURES, bottom, formatDecimal, parseDecimal, powerOfTen, shift, type Digits, type MeasureKind, type MetricUnit } from '@/lib/measures';
+import { MEASURES, bottom, formatDecimal, powerOfTen, shift, type Digits, type MeasureKind } from '@/lib/measures';
+import { D, cap, divide, int, multiply, pick, same, shuffle, type ChoiceStep, type LessonQuiz, type Question as Q, type Step } from '@/lib/quiz/core';
 
 export type Round = 'metric' | 'decimals' | 'imperial';
 
@@ -17,115 +13,13 @@ export const ROUNDS: Record<Round, { label: string; blurb: string }> = {
   imperial: { label: 'Imperial', blurb: 'Miles, inches, pounds and pints, using the rough equivalents.' },
 };
 
-export type ChoiceStep = {
-  type: 'choice';
-  prompt: string;
-  options: string[];
-  correct: number;
-  /** Feedback for each wrong option, by index. */
-  why: Record<number, string>;
-};
-
-export type NumberStep = {
-  type: 'number';
-  prompt: string;
-  answer: Digits;
-  /** Unit shown after the box, if any. */
-  unit?: string;
-  /** Feedback for a wrong typed answer. */
-  feedback: (given: Digits) => string;
-  /** Other answers that are also right, such as a rough answer rounded. */
-  alsoAccept?: Digits[];
-};
-
-export type Step = ChoiceStep | NumberStep;
-
-export type Question = {
-  round: Round;
-  /** The question as the pupil reads it, for example "Convert 3.5 km to metres." */
-  prompt: string;
-  steps: Step[];
-  /** The full working, shown once the question is finished. */
-  workings: string[];
-  /** For the automatic check: the starting value and units, and the final answer. */
-  check: { value: string; from: string; to: string; answer: Digits; rough?: { factor: string; exactFactor: number } };
-};
-
-// ---------------------------------------------------------------------------------------------
-// Random numbers (seeded, so the checks can repeat a run)
-// ---------------------------------------------------------------------------------------------
-
-export function rng(seed: number): () => number {
-  let a = seed >>> 0;
-  return () => {
-    a = (a + 0x6d2b79f5) >>> 0;
-    let t = a;
-    t = Math.imul(t ^ (t >>> 15), t | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-const pick = <T>(r: () => number, xs: readonly T[]): T => xs[Math.floor(r() * xs.length)];
-const int = (r: () => number, lo: number, hi: number) => lo + Math.floor(r() * (hi - lo + 1));
-function shuffle<T>(r: () => number, xs: T[]): T[] {
-  const a = [...xs];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(r() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
-// ---------------------------------------------------------------------------------------------
-// Exact decimal helpers
-// ---------------------------------------------------------------------------------------------
-
-const D = (s: string) => parseDecimal(s)!;
-const same = (a: Digits, b: Digits) => a.digits === b.digits && (a.digits === '0' || a.top === b.top);
-
-/** a × b, exactly. */
-export function multiply(a: Digits, b: Digits): Digits {
-  if (a.digits === '0' || b.digits === '0') return D('0');
-  const product = (BigInt(a.digits) * BigInt(b.digits)).toString();
-  const exp = bottom(a) + bottom(b); // place value of the product's last digit
-  const trimmed = product.replace(/0+$/, '');
-  return { digits: trimmed, top: exp + product.length - 1 };
-}
-
-/** a ÷ b when it divides exactly to at most 3 decimal places; null otherwise. */
-export function divide(a: Digits, b: Digits): Digits | null {
-  if (b.digits === '0') return null;
-  // Scale both to whole numbers: a = A × 10^ea, b = B × 10^eb.
-  const A = BigInt(a.digits) * 10n ** 6n; // allow up to 6 extra places, then check
-  const B = BigInt(b.digits);
-  if (A % B !== 0n) return null;
-  const q = (A / B).toString();
-  const exp = bottom(a) - 6 - bottom(b);
-  const trimmed = q.replace(/0+$/, '') || '0';
-  if (trimmed === '0') return D('0');
-  const result = { digits: trimmed, top: exp + q.length - 1 };
-  return bottom(result) < -3 ? null : result;
-}
-
-/** Reads a typed answer: digits with optional commas, then optionally a unit. */
-export function readAnswer(text: string): { value: Digits; unit: string } | null {
-  const m = text.trim().match(/^(?:about\s+)?([\d.,]+)\s*([a-zA-Z ]*)$/i);
-  const value = m && parseDecimal(m[1]);
-  return value ? { value, unit: m[2].trim().toLowerCase() } : null;
-}
-
-/** The ways a unit may be written after an answer. */
-const UNIT_WORDS: Record<string, string[]> = {
-  km: ['km', 'kilometre', 'kilometres'], m: ['m', 'metre', 'metres'], cm: ['cm', 'centimetre', 'centimetres'], mm: ['mm', 'millimetre', 'millimetres'],
-  kg: ['kg', 'kilogram', 'kilograms'], g: ['g', 'gram', 'grams'], l: ['l', 'litre', 'litres'], ml: ['ml', 'millilitre', 'millilitres'],
-  miles: ['mile', 'miles'], inches: ['in', 'inch', 'inches'], pounds: ['lb', 'lbs', 'pound', 'pounds'], litres: ['l', 'litre', 'litres'],
-};
+/** For the automatic check: the starting value and units, and the final answer. */
+export type MeasuresCheck = { value: string; from: string; to: string; answer: Digits; rough?: { factor: string; exactFactor: number } };
+type Question = Q<MeasuresCheck>;
 
 // ---------------------------------------------------------------------------------------------
 // Metric questions
 // ---------------------------------------------------------------------------------------------
-
-const cap = (s: string) => s[0].toUpperCase() + s.slice(1);
 
 /** Practice questions printed in the lesson (value, from, to). The quiz never asks these. */
 const PRINTED = new Set(['3.5 km m', '17 cm mm', '45 mm cm', '2,750 g kg', '1.5 l ml', '8,849 m km', '15 miles km', '30 cm inches', '20 kilograms pounds']);
@@ -346,16 +240,9 @@ export function makeQuestion(round: Round, r: () => number): Question {
   return round === 'imperial' ? imperialQuestion(r) : metricQuestion(r, round);
 }
 
-/** Is the typed answer right? Empty feedback means yes. */
-export function markNumber(step: NumberStep, text: string): { ok: boolean; feedback: string } {
-  const read = readAnswer(text);
-  if (!read) return { ok: false, feedback: 'Type a number, such as 2.5 or 3,500.' };
-  if (read.unit && step.unit && !(UNIT_WORDS[step.unit] ?? [step.unit]).includes(read.unit)) {
-    const words = UNIT_WORDS[step.unit];
-    return { ok: false, feedback: `Check the unit: this answer is in ${words ? words[words.length - 1] : step.unit}.` };
-  }
-  if (same(read.value, step.answer) || step.alsoAccept?.some((d) => same(read.value, d))) return { ok: true, feedback: '' };
-  return { ok: false, feedback: step.feedback(read.value) || 'Not quite. Try again.' };
-}
-
-export type { MetricUnit };
+export const measuresQuiz: LessonQuiz<MeasuresCheck> = {
+  lesson: 'measures',
+  storageKey: 'stella-measures-v1',
+  rounds: ROUNDS,
+  make: (round, r) => makeQuestion(round as Round, r),
+};

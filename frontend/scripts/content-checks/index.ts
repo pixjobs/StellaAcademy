@@ -30,7 +30,7 @@ const groups: Array<[string, Finding[]]> = [
   ['style', runStyleChecks(lessons)],
   ['curriculum', runCurriculumChecks(lessons)],
   // The Measures quiz is generated, so its questions are checked by generating thousands of them.
-  ...(lessons.includes('measures') ? ([['quiz', runQuizChecks()]] as Array<[string, Finding[]]>) : []),
+  ['quiz', runQuizChecks(lessons)],
 ];
 
 let fails = 0;

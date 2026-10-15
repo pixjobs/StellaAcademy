@@ -1,27 +1,29 @@
 'use client';
 
-import { useEffect, useImperativeHandle, useRef, useState, type RefObject } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { track } from '@/lib/track';
-import { makeQuestion, markNumber, rng, ROUNDS, type Question, type Round } from '@/lib/measures-quiz';
-import { dueNow, roundsToday, useMeasuresSaved, type RoundRecord } from '@/lib/measures-progress';
+import { answerText, markTyped, rng, type LessonQuiz, type Question } from '@/lib/quiz/core';
+import { QUIZZES } from '@/lib/quiz';
+import { useQuizActive } from '@/lib/quiz/active';
+import { dueNow, roundsToday, useSavedProgress, type RoundRecord } from '@/lib/quiz/progress';
+import type { ConceptId } from '@/lib/study-modules';
 
 const QUESTIONS_PER_QUIZ = 10;
 
 /** A question with the round and seed that make it, so a missed one can be made again for review. */
-type Item = { round: Round; seed: number; question: Question };
+type Item = { round: string; seed: number; question: Question };
 type Result = { item: Item; firstTime: boolean; note?: string };
-type Mode = Round | 'review';
+/** A round's id, or 'review'. */
+type Mode = string;
 
-export type QuizHandle = { interrupt: () => void };
-
-const itemFor = (round: Round, seed: number): Item => ({ round, seed, question: makeQuestion(round, rng(seed)) });
+const itemFor = (quiz: LessonQuiz, round: string, seed: number): Item => ({ round, seed, question: quiz.make(round, rng(seed)) });
 
 /** Ten new questions, each from its own random seed. Called only from click handlers. */
-function newItems(round: Round): Item[] {
-  return Array.from({ length: QUESTIONS_PER_QUIZ }, () => itemFor(round, Math.floor(Math.random() * 2 ** 31)));
+function newItems(quiz: LessonQuiz, round: string): Item[] {
+  return Array.from({ length: QUESTIONS_PER_QUIZ }, () => itemFor(quiz, round, Math.floor(Math.random() * 2 ** 31)));
 }
 
-const label = (mode: Mode) => (mode === 'review' ? 'Review' : ROUNDS[mode].label);
+const labelFor = (quiz: LessonQuiz) => (mode: Mode) => (mode === 'review' ? 'Review' : (quiz.rounds[mode]?.label ?? mode));
 
 function dayLabel(at: number, now: number): string {
   const d = new Date(at);
@@ -34,7 +36,7 @@ function dayLabel(at: number, now: number): string {
   return d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
 }
 
-function History({ rounds, now }: { rounds: RoundRecord[]; now: number }) {
+function History({ rounds, now, label }: { rounds: RoundRecord[]; now: number; label: (mode: Mode) => string }) {
   if (!rounds.length) return null;
   return (
     <ul className="mt-2 space-y-1 text-sm text-slate-200">
@@ -48,6 +50,7 @@ function History({ rounds, now }: { rounds: RoundRecord[]; now: number }) {
             </span>
             <span className="font-semibold text-white">
               {r.score} out of {r.out}
+              {r.done === false ? ' (not finished)' : ''}
             </span>
           </li>
         ))}
@@ -62,6 +65,7 @@ function QuestionCard({
   total,
   onDone,
   onFinished,
+  onSlip,
   announce,
 }: {
   question: Question;
@@ -70,6 +74,8 @@ function QuestionCard({
   onDone: (firstTime: boolean, note?: string) => void;
   /** The last step is answered or the working is shown: leaving now no longer voids the question. */
   onFinished: () => void;
+  /** The first slip, or "show me how": the question is saved as missed at once, so leaving cannot hide it. */
+  onSlip: () => void;
   announce: (text: string) => void;
 }) {
   const [step, setStep] = useState(0);
@@ -80,6 +86,12 @@ function QuestionCard({
   const [shown, setShown] = useState(false);
   const [answers, setAnswers] = useState<string[]>([]);
   const box = useRef<HTMLDivElement>(null);
+  const slipped = useRef(false);
+  const slip = () => {
+    if (slipped.current) return;
+    slipped.current = true;
+    onSlip();
+  };
   const finished = step >= question.steps.length || shown;
   const current = question.steps[step];
 
@@ -87,6 +99,7 @@ function QuestionCard({
   useEffect(() => {
     const target = box.current?.querySelector<HTMLElement>(finished ? '[data-next]' : `[data-step="${step}"] input, [data-step="${step}"] button:not([aria-disabled="true"])`);
     target?.focus({ preventScroll: true });
+    target?.scrollIntoView({ block: 'nearest' });
   }, [step, finished]);
 
   const advance = (given: string) => {
@@ -113,21 +126,26 @@ function QuestionCard({
       setWrong((w) => [...w, k]);
       miss(current.why[k] ?? 'Not quite. Try again.');
       setSlips((s) => s + 1);
+      slip();
     }
   };
 
   const submit = () => {
-    if (current?.type !== 'number') return;
-    const m = markNumber(current, typed);
-    if (m.ok) advance(`${typed.trim()}`);
+    if (current?.type !== 'number' && current?.type !== 'fraction') return;
+    const m = markTyped(current, typed);
+    if (m.ok) advance(answerText(current));
     else {
       miss(m.feedback);
-      if (typed.trim()) setSlips((s) => s + 1);
+      if (typed.trim()) {
+        setSlips((s) => s + 1);
+        slip();
+      }
     }
   };
 
   const showMe = () => {
     setShown(true);
+    slip();
     onFinished();
     announce('Here is how it works. This one does not count.');
   };
@@ -144,7 +162,7 @@ function QuestionCard({
           const done = i < step;
           return (
             <li key={i} data-step={i} className={`rounded-xl px-3 py-3 ring-1 ${done ? 'bg-emerald-400/[0.07] ring-emerald-300/30' : 'bg-white/[0.05] ring-white/15'}`}>
-              <p className="text-sm text-slate-100">
+              <p id={`q${number}-s${i}`} className="text-sm text-slate-100">
                 <span className="mr-1.5 font-semibold text-slate-400">Step {i + 1}.</span>
                 {s.prompt}
               </p>
@@ -152,10 +170,9 @@ function QuestionCard({
                 <p className="mt-1.5 text-sm font-semibold text-emerald-200">
                   <span aria-hidden>✓ </span>
                   {answers[i]}
-                  {s.type === 'number' && s.unit && !/[a-z]/i.test(answers[i]) ? ` ${s.unit}` : ''}
                 </p>
               ) : shown ? null : s.type === 'choice' ? (
-                <div className="mt-2 flex flex-wrap gap-2" role="group" aria-label={`Step ${i + 1} choices`}>
+                <div className="mt-2 flex flex-wrap gap-2" role="group" aria-label={`Step ${i + 1} choices`} aria-describedby={`q${number}-s${i}`}>
                   {s.options.map((o, k) => (
                     <button
                       key={o}
@@ -176,15 +193,18 @@ function QuestionCard({
                     submit();
                   }}
                 >
+                  {s.type === 'number' && s.unit === '£' && <span className="text-lg font-semibold text-slate-200">£</span>}
                   <input
-                    inputMode="decimal"
+                    inputMode={s.type === 'fraction' ? 'text' : 'decimal'}
                     autoComplete="off"
                     value={typed}
                     onChange={(e) => setTyped(e.target.value)}
-                    aria-label={`Step ${i + 1} answer${s.unit ? ` in ${s.unit}` : ''}`}
+                    placeholder={s.type === 'fraction' ? 'for example 7/20' : undefined}
+                    aria-describedby={`q${number}-s${i}`}
+                    aria-label={`Step ${i + 1} answer${s.type === 'number' && s.unit ? ` in ${s.unit === '%' ? 'per cent' : s.unit}` : ''}`}
                     className="w-32 rounded-lg border border-white/20 bg-black/30 px-3 py-2 text-lg font-semibold text-white focus:border-cyan-300 focus:outline-none focus:ring-2 focus:ring-cyan-400/40"
                   />
-                  {s.unit && <span className="text-sm font-semibold text-slate-200">{s.unit}</span>}
+                  {s.type === 'number' && s.unit && s.unit !== '£' && <span className="text-sm font-semibold text-slate-200">{s.unit}</span>}
                   <button type="submit" className="rounded-lg bg-[#f6c453] px-3 py-2 text-sm font-bold text-[#0b1026] hover:bg-[#f8d27a] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
                     Check
                   </button>
@@ -228,58 +248,60 @@ function QuestionCard({
 }
 
 /**
- * The Measures quiz: 10 generated questions, each answered in steps. A question counts as right only if
- * every step is right first time, without looking at the working or the explore tools. Scores and missed
- * questions are saved in this browser (lib/measures-progress.ts); missed ones come back for review.
+ * A lesson's quiz: 10 generated questions, each answered in steps. A question counts as right only if
+ * every step is right first time, without looking at the working. Scores and missed questions are saved
+ * in this browser (lib/quiz/progress.ts); missed ones come back for review. While a question is in
+ * progress the lesson's explore model pauses (lib/quiz/active.ts).
  */
-export default function MeasuresQuiz({ handle }: { handle: RefObject<QuizHandle | null> }) {
-  const saved = useMeasuresSaved();
+export default function QuizPanel({ lesson }: { lesson: ConceptId }) {
+  const quiz = QUIZZES[lesson]!;
+  const label = labelFor(quiz);
+  const saved = useSavedProgress(quiz.storageKey);
+  const setActive = useQuizActive((s) => s.set);
   const [mode, setMode] = useState<Mode | null>(null);
   const [items, setItems] = useState<Item[]>([]);
   const [results, setResults] = useState<Result[]>([]);
-  const [notice, setNotice] = useState('');
+  const [roundAt, setRoundAt] = useState(0);
+  const [saved1, setSaved1] = useState<number[]>([]); // questions already saved as missed, by number
   const [cardDone, setCardDone] = useState(false);
   const [said, setSaid] = useState('');
   const [now, setNow] = useState(() => Date.now());
   const [confirmClear, setConfirmClear] = useState(false);
   const total = items.length;
 
+  // Announce, even when the same words come twice in a row.
+  const announce = (text: string) => setSaid((old) => (old === text ? `${text}\u00a0` : text));
+
   const finishRound = (all: Result[]) => {
     const t = Date.now();
     setNow(t);
     const score = all.filter((x) => x.firstTime).length;
-    saved.finish(mode!, all.map((x) => ({ round: x.item.round, seed: x.item.seed, firstTime: x.firstTime })), t);
+    saved.end(roundAt);
     setSaid(`${score} out of ${all.length} right first time.`);
-    track('measures_quiz_finished', { round: mode!, score });
+    track('quiz_finished', { lesson, round: mode!, score });
   };
 
-  // Leaving for the explore tools mid-question ends that question: it does not count, and the next one is shown.
-  useImperativeHandle(
-    handle,
-    () => ({
-      interrupt: () => {
-        // A finished question (answered, or working shown) is not affected.
-        if (!mode || cardDone || results.length >= total || !items[results.length]) return;
-        const next = [...results, { item: items[results.length], firstTime: false, note: 'You opened the explore tools' }];
-        setResults(next);
-        setNotice('You opened the explore tools during that question, so it does not count. Here is the next one.');
-        if (next.length >= total) finishRound(next);
-      },
-    }),
-  );
+  // A question is in progress: pause the explore model so it cannot work the answer out.
+  const inProgress = !!mode && results.length < total && !cardDone;
+  useEffect(() => {
+    setActive(lesson, inProgress);
+  }, [lesson, inProgress, setActive]);
+  useEffect(() => () => setActive(lesson, false), [lesson, setActive]);
 
   const start = (m: Mode) => {
     const t = Date.now();
     setNow(t);
-    const next = m === 'review' ? dueNow(saved.review, t).slice(0, QUESTIONS_PER_QUIZ).map((x) => itemFor(x.round, x.seed)) : newItems(m);
+    const next = m === 'review' ? dueNow(saved.review, t).filter((x) => x.round in quiz.rounds).slice(0, QUESTIONS_PER_QUIZ).map((x) => itemFor(quiz, x.round, x.seed)) : newItems(quiz, m);
     if (!next.length) return;
     setMode(m);
     setItems(next);
     setResults([]);
-    setNotice('');
+    setSaved1([]);
+    setRoundAt(t);
+    saved.begin(m, t);
     setCardDone(false);
     setConfirmClear(false);
-    track('measures_quiz_started', { round: m });
+    track('quiz_started', { lesson, round: m });
   };
 
   // One live region that is always there, so screen readers hear each "Correct" and the score.
@@ -290,7 +312,7 @@ export default function MeasuresQuiz({ handle }: { handle: RefObject<QuizHandle 
   );
 
   if (!mode) {
-    const due = dueNow(saved.review, now);
+    const due = dueNow(saved.review, now).filter((x) => x.round in quiz.rounds);
     const later = saved.review.filter((x) => x.due > now).sort((a, b) => a.due - b.due);
     return (
       <div>
@@ -309,15 +331,15 @@ export default function MeasuresQuiz({ handle }: { handle: RefObject<QuizHandle 
               <span className="block text-sm text-slate-200">Questions you missed before. Get one right and it comes back less often.</span>
             </button>
           )}
-          {(Object.keys(ROUNDS) as Round[]).map((r) => (
+          {Object.keys(quiz.rounds).map((r) => (
             <button
               key={r}
               type="button"
               onClick={() => start(r)}
               className="rounded-xl border border-white/15 bg-white/[0.05] px-4 py-3 text-left hover:border-cyan-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-300"
             >
-              <span className="block font-semibold text-white">{ROUNDS[r].label}</span>
-              <span className="block text-sm text-slate-300">{ROUNDS[r].blurb}</span>
+              <span className="block font-semibold text-white">{quiz.rounds[r].label}</span>
+              <span className="block text-sm text-slate-300">{quiz.rounds[r].blurb}</span>
             </button>
           ))}
         </div>
@@ -329,7 +351,7 @@ export default function MeasuresQuiz({ handle }: { handle: RefObject<QuizHandle 
         {saved.rounds.length > 0 && (
           <div className="mt-5 border-t border-white/10 pt-4">
             <p className="text-sm font-semibold text-white">Your recent rounds</p>
-            <History rounds={saved.rounds} now={now} />
+            <History rounds={saved.rounds} now={now} label={label} />
             <p className="mt-3 text-xs text-slate-400">
               Saved in this browser only, never sent to us.{' '}
               {confirmClear ? (
@@ -360,7 +382,7 @@ export default function MeasuresQuiz({ handle }: { handle: RefObject<QuizHandle 
         <p className="mt-1 text-sm text-slate-300">{label(mode)} round</p>
         {today.length > 1 && (
           <p className="mt-2 text-sm text-slate-200">
-            Your rounds today: {today.map((r) => `${r.score} out of ${r.out}`).join(', ')}
+            Your rounds today: {today.map((r) => `${r.score} out of ${r.out}${r.done === false && r.at !== roundAt ? ' (not finished)' : ''}`).join(', ')}
           </p>
         )}
         {score < total && (
@@ -404,16 +426,19 @@ export default function MeasuresQuiz({ handle }: { handle: RefObject<QuizHandle 
           Right first time: <strong className="text-white">{results.filter((x) => x.firstTime).length}</strong>
         </span>
       </div>
-      {notice && <p className="mb-3 rounded-lg bg-amber-400/10 px-3 py-2 text-sm text-amber-100 ring-1 ring-amber-300/30">{notice}</p>}
       <QuestionCard
         key={n}
         question={items[n].question}
         number={n + 1}
         total={total}
-        announce={setSaid}
+        announce={announce}
         onFinished={() => setCardDone(true)}
+        onSlip={() => {
+          saved.answer(roundAt, { round: items[n].round, seed: items[n].seed, firstTime: false });
+          setSaved1((x) => [...x, n]);
+        }}
         onDone={(firstTime, note) => {
-          setNotice('');
+          saved.answer(roundAt, { round: items[n].round, seed: items[n].seed, firstTime }, Date.now(), saved1.includes(n));
           setCardDone(false);
           const next = [...results, { item: items[n], firstTime, note }];
           setResults(next);

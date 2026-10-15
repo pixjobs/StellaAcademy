@@ -12,6 +12,7 @@ import TrigTriangle from '@/components/lesson-models/TrigTriangle';
 import OrbitLauncher from '@/components/paper/OrbitLauncher';
 import WaveInstrument from '@/components/paper/WaveInstrument';
 import UnitConverter from '@/components/study/UnitConverter';
+import { useQuizActive } from '@/lib/quiz/active';
 import type { ConceptId } from '@/lib/study-modules';
 
 function Slider({
@@ -66,8 +67,38 @@ function AnimatedModel({ id }: { id: ConceptId }) {
   );
 }
 
+/**
+ * While a quiz question on this lesson is in progress, the model is hidden (kept mounted, so nothing is
+ * lost) and a note says why, so the model cannot be used to work out the answer.
+ */
+function PausedDuringQuiz({ id, children }: { id: ConceptId; children: ReactNode }) {
+  const paused = useQuizActive((s) => !!s.active[id]);
+  return (
+    <>
+      {paused && (
+        <figure className="night-window overflow-hidden rounded-3xl p-4 ring-1 ring-white/10 sm:p-6">
+          <figcaption className="font-fraunces text-xl font-semibold text-white">Try it</figcaption>
+          <p className="mt-3 rounded-xl bg-amber-400/10 px-4 py-3 text-sm text-amber-100 ring-1 ring-amber-300/30" role="status">
+            Paused while you answer a quiz question. It comes back when you finish the question.
+          </p>
+        </figure>
+      )}
+      <div hidden={paused}>{children}</div>
+    </>
+  );
+}
+
 /** Each lesson's interactive model, in its night window. */
 export default function LessonModel({ id }: { id: ConceptId }) {
+  if (id === 'measures') return <MeasuresModel />; // pauses its own tools during a quiz question
+  return (
+    <PausedDuringQuiz id={id}>
+      <ModelFor id={id} />
+    </PausedDuringQuiz>
+  );
+}
+
+function ModelFor({ id }: { id: ConceptId }) {
   if (id === 'gravity') return <OrbitLauncher placement="lesson" />;
   if (id === 'waves') return <WaveInstrument placement="lesson" />;
   if (id === 'circuit') return <CircuitBoard />;
@@ -76,7 +107,6 @@ export default function LessonModel({ id }: { id: ConceptId }) {
   if (id === 'momentum') return <MomentumTrack />;
   if (id === 'thermodynamics') return <GasPiston />;
   if (id === 'trajectory') return <TransferOrbit />;
-  if (id === 'measures') return <MeasuresModel />;
   if (id === 'units')
     return (
       <Panel>

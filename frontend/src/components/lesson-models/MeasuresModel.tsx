@@ -13,7 +13,7 @@ import {
   type MeasureKind,
   type MetricUnit,
 } from '@/lib/measures';
-import MeasuresQuiz, { type QuizHandle } from './MeasuresQuiz';
+import { useQuizActive } from '@/lib/quiz/active';
 import { useReadableLabels } from './useReadableLabels';
 
 /** Place-value headings, as taught in primary school. */
@@ -416,50 +416,24 @@ function ZoomRuler({ onUse }: { onUse: () => void }) {
   );
 }
 
-/** The model for the Measures lesson: explore (metric ladder and zooming ruler) or take the quiz. */
+/** The model for the Measures lesson: a metric ladder and a zooming ruler. It pauses while a quiz question is in progress. */
 export default function MeasuresModel() {
   const onUse = useOnce('measures_model_used');
-  const [tab, setTab] = useState<'explore' | 'quiz'>('explore');
-  const quiz = useRef<QuizHandle>(null);
-
-  const choose = (next: 'explore' | 'quiz') => {
-    if (next === tab) return;
-    // Leaving the quiz for the tools mid-question: the quiz swaps that question when it is next shown.
-    if (tab === 'quiz' && next === 'explore') quiz.current?.interrupt();
-    setTab(next);
-  };
+  const paused = useQuizActive((s) => !!s.active.measures);
 
   return (
     <figure className="night-window overflow-hidden rounded-3xl p-4 shadow-[0_30px_60px_-20px_rgba(11,16,38,0.55)] sm:p-6">
-      <figcaption className="flex flex-wrap items-center justify-between gap-3">
-        <span className="font-fraunces text-xl font-semibold text-white">Try it</span>
-        <span className="flex rounded-xl bg-white/[0.06] p-1 ring-1 ring-white/10" role="tablist" aria-label="Explore or quiz">
-          {(['explore', 'quiz'] as const).map((t) => (
-            <button
-              key={t}
-              type="button"
-              role="tab"
-              id={`measures-tab-${t}`}
-              aria-selected={tab === t}
-              aria-controls={`measures-panel-${t}`}
-              onClick={() => choose(t)}
-              className={`rounded-lg px-3 py-1.5 text-sm font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-300 ${
-                tab === t ? 'bg-cyan-400/20 text-white ring-1 ring-cyan-300' : 'text-slate-300 hover:text-white'
-              }`}
-            >
-              {t === 'explore' ? 'Explore' : 'Quiz'}
-            </button>
-          ))}
-        </span>
-      </figcaption>
-      {/* Both stay mounted so a quiz in progress keeps its place; only one is shown. */}
-      <div id="measures-panel-explore" role="tabpanel" aria-labelledby="measures-tab-explore" hidden={tab !== 'explore'} className="mt-4 space-y-5">
+      <figcaption className="font-fraunces text-xl font-semibold text-white">Try it</figcaption>
+      {paused && (
+        <p className="mt-4 rounded-xl bg-amber-400/10 px-4 py-3 text-sm text-amber-100 ring-1 ring-amber-300/30" role="status">
+          The ladder and ruler are paused while you answer a quiz question. They come back when you finish it.
+        </p>
+      )}
+      {/* Kept mounted while paused, so your place on the ladder is still there afterwards. */}
+      <div className="mt-4 space-y-5" hidden={paused}>
         <MetricLadder onUse={onUse} />
         <ZoomRuler onUse={onUse} />
         <p className="text-xs text-slate-400">Each unit keeps its colour everywhere in this lesson: kilo green, metres, grams and litres blue, centi amber, milli pink.</p>
-      </div>
-      <div id="measures-panel-quiz" role="tabpanel" aria-labelledby="measures-tab-quiz" hidden={tab !== 'quiz'} className="mt-4">
-        <MeasuresQuiz handle={quiz} />
       </div>
     </figure>
   );
