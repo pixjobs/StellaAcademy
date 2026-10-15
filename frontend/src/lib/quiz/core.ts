@@ -39,6 +39,8 @@ export type FractionStep = {
   simplest: boolean;
   /** The bottom number the answer must have, such as 100 for "out of 100". */
   denominator?: bigint;
+  /** Show the answer as a mixed number (3 11/24) once it is done. */
+  mixed?: boolean;
   feedback: (given: Fraction) => string;
 };
 
@@ -236,6 +238,10 @@ export function answerText(step: Step): string {
     if (step.unit === '£') return `£${fmt(step.answer)}`;
     return `${fmt(step.answer)}${step.unit ? (step.unit === '%' ? '%' : ` ${step.unit}`) : ''}`;
   }
-  if (step.type === 'fraction') return fracText(step.answer);
+  if (step.type === 'fraction') {
+    const { n, d } = step.answer;
+    if (step.mixed && n > d && d > 1n) return `${n / d}${n % d ? ` ${n % d}/${d}` : ''}`;
+    return fracText(step.answer);
+  }
   return step.options[step.correct];
 }

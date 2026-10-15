@@ -19,6 +19,7 @@ import { formatDecimal } from '../../src/lib/measures';
 import { answerText, markTyped, rng, type Question } from '../../src/lib/quiz/core';
 import { QUIZZES } from '../../src/lib/quiz';
 import { decimalsPercentagesVerifier } from './quiz/decimals-percentages';
+import { fractionOpsVerifier } from './quiz/fraction-ops';
 import { fractionsVerifier } from './quiz/fractions';
 import { measuresVerifier } from './quiz/measures';
 import type { Verifier } from './quiz/types';
@@ -30,6 +31,7 @@ const VERIFIERS: Record<string, Verifier> = {
   measures: measuresVerifier,
   'decimals-percentages': decimalsPercentagesVerifier,
   fractions: fractionsVerifier,
+  'fraction-ops': fractionOpsVerifier,
 };
 
 export function runQuizChecks(lessons?: string[]): Finding[] {
@@ -65,7 +67,10 @@ export function runQuizChecks(lessons?: string[]): Finding[] {
         if (problem) fail(where, q.prompt, problem);
         const last = q.steps[q.steps.length - 1];
         const final = answerText(last);
-        if (!q.workings.join(' ').includes(final.replace(/ (miles|inches|pounds|litres|km|cm|m|mm|g|kg|l|ml)$/, ''))) fail(where, q.prompt, `workings do not show the answer "${final}"`);
+        // A fraction answer may be shown in the working as a mixed number (23/6 as 3 5/6).
+        const mixed = last.type === 'fraction' && last.answer.n > last.answer.d ? `${last.answer.n / last.answer.d}${last.answer.n % last.answer.d ? ` ${last.answer.n % last.answer.d}/${last.answer.d}` : ''}` : final;
+        const shown = q.workings.join(' ');
+        if (!shown.includes(final.replace(/ (miles|inches|pounds|litres|km|cm|m|mm|g|kg|l|ml)$/, '')) && !shown.includes(mixed)) fail(where, q.prompt, `workings do not show the answer "${final}"`);
 
         q.steps.forEach((s, i) => {
           if (s.type === 'choice') {
