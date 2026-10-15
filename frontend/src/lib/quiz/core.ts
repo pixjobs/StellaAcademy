@@ -197,7 +197,7 @@ export function readFraction(text: string): Fraction | null {
 
 /** Reads a typed number: digits with optional commas, then optionally a unit or %. */
 export function readAnswer(text: string): { value: Digits; unit: string } | null {
-  const m = text.trim().match(/^(?:about\s+)?([-−–]?)\s*([\d.,]+)\s*([a-zA-Z %²^.°]*2?)$/i);
+  const m = text.trim().match(/^(?:about\s+)?([-−–]?)\s*([\d.,]+)\s*([a-zA-Z %²^.°/]*2?)$/i);
   const value = m && parseDecimal(m[2]);
   if (!m || !value) return null;
   return { value: m[1] && value.digits !== '0' ? { ...value, neg: true } : value, unit: m[3].trim().toLowerCase() };
@@ -211,6 +211,7 @@ const UNIT_WORDS: Record<string, string[]> = {
   '%': ['%', 'percent', 'per cent'],
   '£': ['£'],
   days: ['day', 'days'],
+  'm/s': ['m/s', 'ms', 'metres per second'],
   '°': ['°', 'deg', 'degree', 'degrees'],
   hours: ['h', 'hr', 'hrs', 'hour', 'hours'],
   watts: ['w', 'watt', 'watts'],

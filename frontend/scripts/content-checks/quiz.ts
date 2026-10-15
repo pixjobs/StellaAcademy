@@ -28,8 +28,10 @@ import { fractionsVerifier } from './quiz/fractions';
 import { measuresVerifier } from './quiz/measures';
 import { multiplicationVerifier } from './quiz/multiplication';
 import { negativeNumbersVerifier } from './quiz/negative-numbers';
+import { probabilityVerifier } from './quiz/probability';
 import { proportionsVerifier } from './quiz/proportions';
 import { trigonometryVerifier } from './quiz/trigonometry';
+import { vectorsVerifier } from './quiz/vectors';
 import type { Verifier } from './quiz/types';
 
 type Finding = { check: string; lesson: string; where: string; excerpt: string; message: string; level: 'fail' | 'warn' | 'info' };
@@ -48,6 +50,8 @@ const VERIFIERS: Record<string, Verifier> = {
   'exponents-roots': exponentsRootsVerifier,
   binary: binaryVerifier,
   trigonometry: trigonometryVerifier,
+  vectors: vectorsVerifier,
+  probability: probabilityVerifier,
 };
 
 export function runQuizChecks(lessons?: string[]): Finding[] {
