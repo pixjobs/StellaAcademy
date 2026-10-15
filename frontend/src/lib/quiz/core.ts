@@ -29,6 +29,15 @@ export type NumberStep = {
   feedback: (given: Digits) => string;
   /** Other answers that are also right, such as a rough answer rounded. */
   alsoAccept?: Digits[];
+  /** Show the answer without commas (a binary number such as 110011). */
+  plain?: boolean;
+  /**
+   * A calculator answer (GCSE and A-level): `answer` is the exact value rounded to 3 significant figures, and
+   * any typed value within half a unit of the third significant figure of `exact` is right (36.87 or 36.9).
+   */
+  exact?: number;
+  /** How the answer is shown, when it keeps trailing zeros (13.0 to 3 significant figures). */
+  shown?: string;
 };
 
 export type FractionStep = {
@@ -39,6 +48,10 @@ export type FractionStep = {
   simplest: boolean;
   /** The bottom number the answer must have, such as 100 for "out of 100". */
   denominator?: bigint;
+  /** Show the answer as a mixed number (3 11/24) once it is done. */
+  mixed?: boolean;
+  /** The question asks for a mixed number: an improper fraction, or a fraction part of 1 or more, is refused. */
+  requireMixed?: boolean;
   feedback: (given: Fraction) => string;
 };
 
@@ -104,8 +117,14 @@ export function whyAll(options: string[], correct: number, why: (option: string,
 // Exact decimals
 // ---------------------------------------------------------------------------------------------
 
-export const D = (s: string | number) => parseDecimal(String(s))!;
-export const same = (a: Digits, b: Digits) => a.digits === b.digits && (a.digits === '0' || a.top === b.top);
+/** A decimal from text or a number, negative numbers included ("-5", "−5" or -5). */
+export const D = (s: string | number): Digits => {
+  const t = String(s).trim();
+  const neg = /^[-−]/.test(t);
+  const d = parseDecimal(t.replace(/^[-−]\s*/, ''))!;
+  return neg && d.digits !== '0' ? { ...d, neg: true } : d;
+};
+export const same = (a: Digits, b: Digits) => a.digits === b.digits && (a.digits === '0' || (a.top === b.top && !!a.neg === !!b.neg));
 export const fmt = formatDecimal;
 
 /** a × b, exactly. */
@@ -159,7 +178,8 @@ export const fracText = (f: Fraction) => (f.d === 1n ? String(f.n) : `${f.n}/${f
 
 /** Reads "7/20", "2 3/4" (a mixed number) or a whole number. */
 export function readFraction(text: string): Fraction | null {
-  const t = text.trim().replace(/\s+/g, ' ');
+  // A pupil may type the π of an angle (2π/3, π/12, 5/3 π): read the number in front of it.
+  const t = text.trim().replace(/\s+/g, ' ').replace(/^(π|pi)\s*\//i, '1/').replace(/\s*(π|pi)\s*/gi, '').trim();
   let m = t.match(/^(\d+) (\d+)\s*\/\s*(\d+)$/);
   if (m) {
     const d = BigInt(m[3]);
@@ -180,9 +200,10 @@ export function readFraction(text: string): Fraction | null {
 
 /** Reads a typed number: digits with optional commas, then optionally a unit or %. */
 export function readAnswer(text: string): { value: Digits; unit: string } | null {
-  const m = text.trim().match(/^(?:about\s+)?([\d.,]+)\s*([a-zA-Z %]*)$/i);
-  const value = m && parseDecimal(m[1]);
-  return value ? { value, unit: m[2].trim().toLowerCase() } : null;
+  const m = text.trim().match(/^(?:about\s+)?([-−–]?)\s*([\d.,]+)\s*([a-zA-Z %²^.°/]*2?)$/i);
+  const value = m && parseDecimal(m[2]);
+  if (!m || !value) return null;
+  return { value: m[1] && value.digits !== '0' ? { ...value, neg: true } : value, unit: m[3].trim().toLowerCase() };
 }
 
 /** The ways a unit may be written after an answer. */
@@ -192,10 +213,33 @@ const UNIT_WORDS: Record<string, string[]> = {
   miles: ['mile', 'miles'], inches: ['in', 'inch', 'inches'], pounds: ['lb', 'lbs', 'pound', 'pounds'], litres: ['l', 'litre', 'litres'],
   '%': ['%', 'percent', 'per cent'],
   '£': ['£'],
+  days: ['day', 'days'],
+  'm/s': ['m/s', 'ms', 'metres per second'],
+  '°': ['°', 'deg', 'degree', 'degrees'],
+  hours: ['h', 'hr', 'hrs', 'hour', 'hours'],
+  watts: ['w', 'watt', 'watts'],
+  '°c': ['°c', '° c', 'c', 'degrees', '°', 'degrees c'],
+  // The last word is the one feedback uses.
+  'cm²': ['cm²', 'cm2', 'cm^2', 'sq cm', 'sq. cm', 'cm sq', 'square cm', 'square centimetre', 'square centimetres'],
+  'm²': ['m²', 'm2', 'm^2', 'sq m', 'sq. m', 'm sq', 'square m', 'square metre', 'square metres'],
 };
 
 /** Is the typed number right? Empty feedback means yes. */
+let unitWords: Set<string> | null = null;
+/** Every unit word a pupil might type, so a unit on an answer that has none can be refused. */
+const allUnitWords = () => (unitWords ??= new Set(Object.values(UNIT_WORDS).flat()));
+
 export function markNumber(step: NumberStep, text: string): { ok: boolean; feedback: string } {
+  if (step.plain) {
+    // A binary number: only 0s and 1s.
+    if (/^\s*\d+\s*$/.test(text) && /[2-9]/.test(text)) {
+      // Digits other than 0 and 1: name the slip if this step knows it (adding as in denary), else say why.
+      return { ok: false, feedback: step.feedback(D(text.trim())) || 'Binary uses only 0s and 1s.' };
+    }
+    if (!/^\s*[01]+\s*$/.test(text)) return { ok: false, feedback: 'Type only 0s and 1s, such as 10110.' };
+    const given = D(text.trim().replace(/^0+(?=\d)/, ''));
+    return same(given, step.answer) ? { ok: true, feedback: '' } : { ok: false, feedback: step.feedback(given) || 'Not quite. Try again.' };
+  }
   const pounds = /^£/.test(text.trim());
   if (pounds && step.unit !== '£') return { ok: false, feedback: 'This answer is not money. Type just the number.' };
   const read = readAnswer(text.trim().replace(/^£\s*/, ''));
@@ -205,12 +249,41 @@ export function markNumber(step: NumberStep, text: string): { ok: boolean; feedb
     if (same(read.value, step.answer)) return { ok: true, feedback: '' };
     return { ok: false, feedback: step.feedback(read.value) || 'Not quite. Try again.' };
   }
+  if (read.unit && !step.unit && allUnitWords().has(read.unit)) return { ok: false, feedback: 'This answer has no unit. Type just the number.' };
   if (read.unit && step.unit && !(UNIT_WORDS[step.unit] ?? [step.unit]).includes(read.unit)) {
     const words = UNIT_WORDS[step.unit];
     return { ok: false, feedback: `Check the unit: this answer is in ${words ? words[words.length - 1] : step.unit}.` };
   }
   if (same(read.value, step.answer) || step.alsoAccept?.some((d) => same(read.value, d))) return { ok: true, feedback: '' };
+  if (step.exact !== undefined) {
+    const v = toNumber(read.value);
+    // Half a unit of the third significant figure, or 0.2%, whichever is larger: a pupil who rounded a value on
+    // the way (such as sin 19° = 0.326) lands a little off the exact answer, and that is still right.
+    const tol = Math.max(sigFigUnit(step.exact) / 2, Math.abs(step.exact) * 0.002);
+    if (Math.abs(v - step.exact) <= tol * 1.0001) return { ok: true, feedback: '' };
+    // Right but rounded too far, such as 37 for 36.87.
+    if (Math.abs(v - step.exact) <= 10 * tol && countSigFigs(read.value) < 3) return { ok: false, feedback: 'Close, but give your answer to 3 significant figures.' };
+  }
   return { ok: false, feedback: step.feedback(read.value) || 'Not quite. Try again.' };
+}
+
+/** A decimal as an ordinary number. */
+export const toNumber = (d: Digits) => (d.neg ? -1 : 1) * Number(d.digits) * 10 ** (d.top - d.digits.length + 1);
+/** The place value of the third significant figure of x. */
+const sigFigUnit = (x: number) => 10 ** (Math.floor(Math.log10(Math.abs(x))) - 2);
+const countSigFigs = (d: Digits) => d.digits.replace(/^0+/, '').length;
+
+/** x to 3 significant figures as text, keeping trailing zeros (13.0, 5.10) and commas (2,820). */
+export function sf3(x: number): string {
+  const rounded = Number(x.toPrecision(3));
+  if (Math.abs(rounded) >= 100) return fmt(D(rounded));
+  const t = rounded.toPrecision(3);
+  return t.startsWith('-') ? `−${t.slice(1)}` : t;
+}
+
+/** A calculator answer: rounded to 3 significant figures for display, with the exact value for marking. */
+export function approx(x: number): { answer: Digits; exact: number; shown: string } {
+  return { answer: D(Number(x.toPrecision(3))), exact: x, shown: sf3(x) };
 }
 
 /** Is the typed fraction right? */
@@ -218,6 +291,10 @@ export function markFraction(step: FractionStep, text: string): { ok: boolean; f
   const given = readFraction(text);
   if (!given) return { ok: false, feedback: 'Type a fraction such as 7/20.' };
   if (fracEqual(given, step.answer)) {
+    if (step.requireMixed && step.answer.n > step.answer.d) {
+      const m = text.trim().replace(/\s+/g, ' ').match(/^(\d+) (\d+)\s*\/\s*(\d+)$/);
+      if (!m || Number(m[2]) >= Number(m[3])) return { ok: false, feedback: 'That is the right amount. Write it as a mixed number: a whole number and a fraction less than 1, such as 2 4/5.' };
+    }
     if (step.denominator && given.d !== step.denominator) return { ok: false, feedback: `Write it with ${step.denominator} on the bottom.` };
     if (step.simplest && !isSimplest(given)) return { ok: false, feedback: 'That is equal, but it can be simplified. Divide the top and bottom by a number that goes into both.' };
     return { ok: true, feedback: '' };
@@ -230,12 +307,21 @@ export function markTyped(step: NumberStep | FractionStep, text: string) {
   return step.type === 'number' ? markNumber(step, text) : markFraction(step, text);
 }
 
+/** A unit as shown on screen (units are stored lower case where a pupil may type them so). */
+export const unitLabel = (u: string) => (u === '°c' ? '°C' : u);
+
 /** How an answer is shown once done. */
 export function answerText(step: Step): string {
   if (step.type === 'number') {
+    if (step.plain) return fmt(step.answer).replace(/,/g, '');
+    if (step.shown) return `${step.shown}${step.unit ? (step.unit === '%' || step.unit === '°' ? step.unit : ` ${unitLabel(step.unit)}`) : ''}`;
     if (step.unit === '£') return `£${fmt(step.answer)}`;
-    return `${fmt(step.answer)}${step.unit ? (step.unit === '%' ? '%' : ` ${step.unit}`) : ''}`;
+    return `${fmt(step.answer)}${step.unit ? (step.unit === '%' || step.unit === '°' ? step.unit : ` ${unitLabel(step.unit)}`) : ''}`;
   }
-  if (step.type === 'fraction') return fracText(step.answer);
+  if (step.type === 'fraction') {
+    const { n, d } = step.answer;
+    if (step.mixed && n > d && d > 1n) return `${n / d}${n % d ? ` ${n % d}/${d}` : ''}`;
+    return fracText(step.answer);
+  }
   return step.options[step.correct];
 }

@@ -18,14 +18,51 @@ import { resolve } from 'node:path';
 import { formatDecimal } from '../../src/lib/measures';
 import { answerText, markTyped, rng, type Question } from '../../src/lib/quiz/core';
 import { QUIZZES } from '../../src/lib/quiz';
+import { anglesVerifier } from './quiz/angles';
+import { arithmeticVerifier } from './quiz/arithmetic';
+import { basicGeometryVerifier } from './quiz/basic-geometry';
+import { binaryVerifier } from './quiz/binary';
+import { calculusVerifier } from './quiz/calculus';
+import { diffeqVerifier } from './quiz/diffeq';
 import { decimalsPercentagesVerifier } from './quiz/decimals-percentages';
+import { exponentsRootsVerifier } from './quiz/exponents-roots';
+import { fractionOpsVerifier } from './quiz/fraction-ops';
+import { fractionsVerifier } from './quiz/fractions';
+import { matricesVerifier } from './quiz/matrices';
 import { measuresVerifier } from './quiz/measures';
+import { multiplicationVerifier } from './quiz/multiplication';
+import { negativeNumbersVerifier } from './quiz/negative-numbers';
+import { probabilityVerifier } from './quiz/probability';
+import { proportionsVerifier } from './quiz/proportions';
+import { statisticsVerifier } from './quiz/statistics';
+import { trigonometryVerifier } from './quiz/trigonometry';
+import { vectorsVerifier } from './quiz/vectors';
 import type { Verifier } from './quiz/types';
 
 type Finding = { check: string; lesson: string; where: string; excerpt: string; message: string; level: 'fail' | 'warn' | 'info' };
 
 const PER_ROUND = 3000;
-const VERIFIERS: Record<string, Verifier> = { measures: measuresVerifier, 'decimals-percentages': decimalsPercentagesVerifier };
+const VERIFIERS: Record<string, Verifier> = {
+  measures: measuresVerifier,
+  'decimals-percentages': decimalsPercentagesVerifier,
+  fractions: fractionsVerifier,
+  'fraction-ops': fractionOpsVerifier,
+  arithmetic: arithmeticVerifier,
+  multiplication: multiplicationVerifier,
+  'basic-geometry': basicGeometryVerifier,
+  'negative-numbers': negativeNumbersVerifier,
+  proportions: proportionsVerifier,
+  'exponents-roots': exponentsRootsVerifier,
+  binary: binaryVerifier,
+  trigonometry: trigonometryVerifier,
+  vectors: vectorsVerifier,
+  probability: probabilityVerifier,
+  statistics: statisticsVerifier,
+  angles: anglesVerifier,
+  matrices: matricesVerifier,
+  calculus: calculusVerifier,
+  diffeq: diffeqVerifier,
+};
 
 export function runQuizChecks(lessons?: string[]): Finding[] {
   const findings: Finding[] = [];
@@ -60,7 +97,10 @@ export function runQuizChecks(lessons?: string[]): Finding[] {
         if (problem) fail(where, q.prompt, problem);
         const last = q.steps[q.steps.length - 1];
         const final = answerText(last);
-        if (!q.workings.join(' ').includes(final.replace(/ (miles|inches|pounds|litres|km|cm|m|mm|g|kg|l|ml)$/, ''))) fail(where, q.prompt, `workings do not show the answer "${final}"`);
+        // A fraction answer may be shown in the working as a mixed number (23/6 as 3 5/6).
+        const mixed = last.type === 'fraction' && last.answer.n > last.answer.d ? `${last.answer.n / last.answer.d}${last.answer.n % last.answer.d ? ` ${last.answer.n % last.answer.d}/${last.answer.d}` : ''}` : final;
+        const shown = q.workings.join(' ');
+        if (!shown.includes(final.replace(/ (miles|inches|pounds|litres|km|cm|m|mm|g|kg|l|ml)$/, '')) && !shown.includes(mixed)) fail(where, q.prompt, `workings do not show the answer "${final}"`);
 
         q.steps.forEach((s, i) => {
           if (s.type === 'choice') {
@@ -71,7 +111,9 @@ export function runQuizChecks(lessons?: string[]): Finding[] {
             });
           } else if (s.type === 'number') {
             const a = formatDecimal(s.answer);
-            const forms = [a, a.replace(/,/g, ''), `about ${a}`];
+            // A binary answer is typed as plain 0s and 1s, with or without leading zeros; commas are refused.
+            const forms = s.plain ? [a.replace(/,/g, ''), `0${a.replace(/,/g, '')}`] : [a, a.replace(/,/g, ''), `about ${a}`];
+            if (s.plain && markTyped(s, a.includes(',') ? a : `${a}2`).ok) fail(where, s.prompt, 'binary step accepts a non-binary answer');
             if (s.unit) forms.push(s.unit === '%' ? `${a}%` : s.unit === '£' ? `£${a}` : `${a} ${s.unit}`);
             if (s.unit === '£') forms.push(`£ ${a}`);
             for (const typed of forms) if (!markTyped(s, typed).ok) fail(where, s.prompt, `marker rejects "${typed}"`);
@@ -86,7 +128,9 @@ export function runQuizChecks(lessons?: string[]): Finding[] {
           } else {
             const a = answerText(s);
             if (!markTyped(s, a).ok) fail(where, s.prompt, `marker rejects "${a}"`);
-            const doubled = `${s.answer.n * 2n}/${s.answer.d * 2n}`;
+            // An equal fraction, not simplified (as a mixed number where one is required).
+            const { n: fn, d: fd } = s.answer;
+            const doubled = s.requireMixed && fn > fd ? `${fn / fd} ${(fn % fd) * 2n}/${fd * 2n}` : `${fn * 2n}/${fd * 2n}`;
             const m = markTyped(s, doubled);
             const expectRejected = s.denominator ? /on the bottom/ : s.simplest ? /simplified/ : null;
             if (expectRejected ? m.ok || !expectRejected.test(m.feedback) : !m.ok) fail(where, s.prompt, `fraction marking wrong for "${doubled}": ${m.ok ? 'accepted' : m.feedback}`);
@@ -96,7 +140,16 @@ export function runQuizChecks(lessons?: string[]): Finding[] {
 
         for (const m of verifier.mistakes?.(q) ?? []) {
           const s = q.steps[m.step];
-          if (s.type === 'choice') continue;
+          if (!s) {
+            fail(where, q.prompt, `slip refers to a missing step ${m.step + 1}`);
+            continue;
+          }
+          if (s.type === 'choice') {
+            // A wrong option: its own feedback must name the mistake.
+            const k = s.options.indexOf(m.typed);
+            if (k === -1 || k === s.correct || !(s.why[k] ?? '').includes(m.expect)) fail(where, q.prompt, `option "${m.typed}" at step ${m.step + 1} gave "${k === -1 ? 'no such option' : s.why[k]}", expected feedback with "${m.expect}"`);
+            continue;
+          }
           const res = markTyped(s, m.typed);
           if (res.ok || !res.feedback.includes(m.expect)) fail(where, q.prompt, `slip "${m.typed}" at step ${m.step + 1} gave "${res.ok ? 'accepted' : res.feedback}", expected feedback with "${m.expect}"`);
         }

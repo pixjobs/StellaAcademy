@@ -251,7 +251,7 @@ export default async function LessonPage({ params }: Props) {
             {hasQuiz(lesson.id) ? (
               <Section id="practice" title="Practice">
                 <p className="text-[var(--ink-soft)]">
-                  Practise with the step-by-step quiz in the Try it panel{lesson.id === 'measures' ? ' (the Quiz tab)' : ''}. Each question is answered one
+                  Practise with the step-by-step quiz in the Try it panel at the top of the page. Each question is answered one
                   step at a time, with new numbers every time, and the questions you miss come back for review.
                 </p>
                 <p className="mt-3">

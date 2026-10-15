@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { track } from '@/lib/track';
-import { answerText, markTyped, rng, type LessonQuiz, type Question } from '@/lib/quiz/core';
+import { answerText, markTyped, rng, unitLabel, type LessonQuiz, type Question } from '@/lib/quiz/core';
 import { QUIZZES } from '@/lib/quiz';
 import { useQuizActive } from '@/lib/quiz/active';
 import { dueNow, roundsToday, useSavedProgress, type RoundRecord } from '@/lib/quiz/progress';
@@ -18,9 +18,59 @@ type Mode = string;
 
 const itemFor = (quiz: LessonQuiz, round: string, seed: number): Item => ({ round, seed, question: quiz.make(round, rng(seed)) });
 
-/** Ten new questions, each from its own random seed. Called only from click handlers. */
-function newItems(quiz: LessonQuiz, round: string): Item[] {
-  return Array.from({ length: QUESTIONS_PER_QUIZ }, () => itemFor(quiz, round, Math.floor(Math.random() * 2 ** 31)));
+/**
+ * Ten new questions, each from its own random seed, with no question twice in a round. Questions in `recent`
+ * (asked in the last few rounds on this device, oldest first) are avoided while there are enough others; a small
+ * round falls back to the ones asked longest ago rather than coming up short. Called only from click handlers.
+ */
+export function newItems(quiz: LessonQuiz, round: string, testSeed?: number, recent: readonly string[] = []): Item[] {
+  // The browser checks set window.__stellaQuizSeed so they can work out the same questions; they start with no history.
+  const hook = typeof window !== 'undefined' ? (window as { __stellaQuizSeed?: number }).__stellaQuizSeed : undefined;
+  const base = testSeed ?? hook;
+  const avoid = testSeed === undefined && hook !== undefined ? new Set<string>() : new Set(recent);
+  const items: Item[] = [];
+  const spare: Item[] = [];
+  for (let tries = 0; items.length < QUESTIONS_PER_QUIZ && tries < 400; tries++) {
+    const item = itemFor(quiz, round, base !== undefined ? base + tries : Math.floor(Math.random() * 2 ** 31));
+    const p = item.question.prompt;
+    if (items.some((x) => x.question.prompt === p) || spare.some((x) => x.question.prompt === p)) continue;
+    (avoid.has(p) ? spare : items).push(item);
+  }
+  spare.sort((a, b) => recent.indexOf(a.question.prompt) - recent.indexOf(b.question.prompt));
+  return [...items, ...spare.slice(0, QUESTIONS_PER_QUIZ - items.length)];
+}
+
+/**
+ * Text with maths markup: "10^{-3}" is drawn as 10 with a raised −3 (so every digit shows in the site's font),
+ * and "[[3;−2]]" as a column vector, 3 above −2 in brackets.
+ */
+function T({ text }: { text: string }) {
+  const parts = text.split(/(\^\{[^}]*\}|\[\[[^\]]*\]\])/);
+  return (
+    <>
+      {parts.map((p, i) => {
+        if (p.startsWith('^{')) return <sup key={i} className="text-[0.7em]">{p.slice(2, -1)}</sup>;
+        if (p.startsWith('[[')) {
+          // Rows split by ";", entries by ",": [[3;−2]] is a column vector, [[1,2;3,4]] a 2 × 2 matrix.
+          const rows = p.slice(2, -2).split(';').map((row) => row.split(','));
+          return (
+            <span
+              key={i}
+              className="mx-0.5 inline-grid items-center gap-x-2 rounded-md border-x-2 border-current px-1.5 text-center align-middle text-[0.9em] leading-tight"
+              style={{ gridTemplateColumns: `repeat(${rows[0].length}, auto)` }}
+              role="img"
+              aria-label={rows[0].length === 1 ? `column vector ${rows.map((r) => r[0]).join(', ')}` : `matrix, rows ${rows.map((r) => r.join(' ')).join('; ')}`}
+            >
+              {rows.flat().map((cell, k) => (
+                <span key={k}>{cell}</span>
+              ))}
+            </span>
+          );
+        }
+        return <span key={i}>{p}</span>;
+      })}
+    </>
+  );
 }
 
 const labelFor = (quiz: LessonQuiz) => (mode: Mode) => (mode === 'review' ? 'Review' : (quiz.rounds[mode]?.label ?? mode));
@@ -155,7 +205,9 @@ function QuestionCard({
       <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
         Question {number} of {total}
       </p>
-      <p className="mt-1 font-fraunces text-xl font-semibold leading-snug text-white">{question.prompt}</p>
+      <p className="mt-1 font-fraunces text-xl font-semibold leading-snug text-white">
+        <T text={question.prompt} />
+      </p>
 
       <ol className="mt-4 space-y-3">
         {question.steps.slice(0, finished ? question.steps.length : step + 1).map((s, i) => {
@@ -164,12 +216,12 @@ function QuestionCard({
             <li key={i} data-step={i} className={`rounded-xl px-3 py-3 ring-1 ${done ? 'bg-emerald-400/[0.07] ring-emerald-300/30' : 'bg-white/[0.05] ring-white/15'}`}>
               <p id={`q${number}-s${i}`} className="text-sm text-slate-100">
                 <span className="mr-1.5 font-semibold text-slate-400">Step {i + 1}.</span>
-                {s.prompt}
+                <T text={s.prompt} />
               </p>
               {done ? (
                 <p className="mt-1.5 text-sm font-semibold text-emerald-200">
                   <span aria-hidden>✓ </span>
-                  {answers[i]}
+                  <T text={answers[i]} />
                 </p>
               ) : shown ? null : s.type === 'choice' ? (
                 <div className="mt-2 flex flex-wrap gap-2" role="group" aria-label={`Step ${i + 1} choices`} aria-describedby={`q${number}-s${i}`}>
@@ -181,7 +233,7 @@ function QuestionCard({
                       onClick={() => choose(k)}
                       className="rounded-lg border border-white/20 bg-white/[0.06] px-3 py-2 text-sm font-semibold text-white hover:border-cyan-300 aria-disabled:cursor-not-allowed aria-disabled:border-rose-400/40 aria-disabled:bg-rose-500/10 aria-disabled:text-rose-200 aria-disabled:line-through focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-300"
                     >
-                      {o}
+                      <T text={o} />
                     </button>
                   ))}
                 </div>
@@ -204,7 +256,7 @@ function QuestionCard({
                     aria-label={`Step ${i + 1} answer${s.type === 'number' && s.unit ? ` in ${s.unit === '%' ? 'per cent' : s.unit}` : ''}`}
                     className="w-32 rounded-lg border border-white/20 bg-black/30 px-3 py-2 text-lg font-semibold text-white focus:border-cyan-300 focus:outline-none focus:ring-2 focus:ring-cyan-400/40"
                   />
-                  {s.type === 'number' && s.unit && s.unit !== '£' && <span className="text-sm font-semibold text-slate-200">{s.unit}</span>}
+                  {s.type === 'number' && s.unit && s.unit !== '£' && <span className="text-sm font-semibold text-slate-200">{unitLabel(s.unit)}</span>}
                   <button type="submit" className="rounded-lg bg-[#f6c453] px-3 py-2 text-sm font-bold text-[#0b1026] hover:bg-[#f8d27a] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
                     Check
                   </button>
@@ -216,7 +268,7 @@ function QuestionCard({
       </ol>
 
       <p className="mt-3 min-h-[1.25rem] text-sm text-rose-200">
-        {!finished && feedback}
+        {!finished && <T text={feedback} />}
       </p>
 
       {finished ? (
@@ -226,7 +278,9 @@ function QuestionCard({
           </p>
           <ul className="mt-2 space-y-1 text-sm text-slate-100">
             {question.workings.map((w) => (
-              <li key={w}>{w}</li>
+              <li key={w}>
+                <T text={w} />
+              </li>
             ))}
           </ul>
           <button
@@ -270,7 +324,10 @@ export default function QuizPanel({ lesson }: { lesson: ConceptId }) {
   const total = items.length;
 
   // Announce, even when the same words come twice in a row.
-  const announce = (text: string) => setSaid((old) => (old === text ? `${text}\u00a0` : text));
+  const announce = (raw: string) => {
+    const text = raw.replace(/\^\{([^}]*)\}/g, ' to the power $1').replace(/\[\[([^\]]*)\]\]/g, (_, m: string) => (m.includes(',') ? ` matrix ${m.replace(/;/g, '; ')} ` : ` column vector ${m.replace(';', ', ')} `)); // read maths aloud
+    setSaid((old) => (old === text ? `${text}\u00a0` : text));
+  };
 
   const finishRound = (all: Result[]) => {
     const t = Date.now();
@@ -291,14 +348,14 @@ export default function QuizPanel({ lesson }: { lesson: ConceptId }) {
   const start = (m: Mode) => {
     const t = Date.now();
     setNow(t);
-    const next = m === 'review' ? dueNow(saved.review, t).filter((x) => x.round in quiz.rounds).slice(0, QUESTIONS_PER_QUIZ).map((x) => itemFor(quiz, x.round, x.seed)) : newItems(quiz, m);
+    const next = m === 'review' ? dueNow(saved.review, t).filter((x) => x.round in quiz.rounds).slice(0, QUESTIONS_PER_QUIZ).map((x) => itemFor(quiz, x.round, x.seed)) : newItems(quiz, m, undefined, saved.recent ?? []);
     if (!next.length) return;
     setMode(m);
     setItems(next);
     setResults([]);
     setSaved1([]);
     setRoundAt(t);
-    saved.begin(m, t);
+    saved.begin(m, t, next.map((x) => x.question.prompt));
     setCardDone(false);
     setConfirmClear(false);
     track('quiz_started', { lesson, round: m });
@@ -394,9 +451,13 @@ export default function QuizPanel({ lesson }: { lesson: ConceptId }) {
                 .filter((x) => !x.firstTime)
                 .map((x, i) => (
                   <li key={i} className="rounded-xl bg-white/[0.05] px-3 py-2.5 text-sm ring-1 ring-white/10">
-                    <p className="font-semibold text-white">{x.item.question.prompt}</p>
+                    <p className="font-semibold text-white">
+                      <T text={x.item.question.prompt} />
+                    </p>
                     {x.note && <p className="text-xs text-slate-400">{x.note}</p>}
-                    <p className="mt-1 text-slate-200">{x.item.question.workings[x.item.question.workings.length - 1]}</p>
+                    <p className="mt-1 text-slate-200">
+                      <T text={x.item.question.workings[x.item.question.workings.length - 1]} />
+                    </p>
                   </li>
                 ))}
             </ul>

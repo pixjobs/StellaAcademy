@@ -73,3 +73,8 @@ reports no failures for it (`--lessons=<id>`). The checks are:
 - **Repeats:** no worked example or paragraph appears twice in a lesson.
 - **Curriculum:** each quoted DfE statement still matches its source text.
 - **Links:** every link to another lesson points to one that exists.
+
+## Quizzes
+
+Each lesson's step-by-step quiz is lesson content and follows this workflow too. How quizzes work, the rules every
+quiz follows and how to add one are in [quiz-pattern.md](quiz-pattern.md).

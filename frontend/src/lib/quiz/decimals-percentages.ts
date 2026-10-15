@@ -186,6 +186,7 @@ function percentToFraction(r: () => number): Question {
         answer: D(g),
         feedback: (x) => {
           const v = num(x);
+          if (v === 1) return '1 divides into every number. Look for a bigger number that divides into both.';
           if (Number.isInteger(v) && v > 0 && p % v === 0 && 100 % v === 0) return `${v} divides into both, but a bigger number does too.`;
           return `${fmt(x)} does not divide into both ${p} and 100. Try 2, 4, 5, 10, 20, 25 or 50.`;
         },
