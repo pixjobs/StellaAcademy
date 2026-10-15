@@ -1,12 +1,16 @@
 import type { ConceptId } from '@/lib/study-modules';
 import type { LessonQuiz } from '@/lib/quiz/core';
+import { anglesQuiz } from '@/lib/quiz/angles';
 import { arithmeticQuiz } from '@/lib/quiz/arithmetic';
 import { basicGeometryQuiz } from '@/lib/quiz/basic-geometry';
 import { binaryQuiz } from '@/lib/quiz/binary';
+import { calculusQuiz } from '@/lib/quiz/calculus';
+import { diffeqQuiz } from '@/lib/quiz/diffeq';
 import { decimalsPercentagesQuiz } from '@/lib/quiz/decimals-percentages';
 import { exponentsRootsQuiz } from '@/lib/quiz/exponents-roots';
 import { fractionOpsQuiz } from '@/lib/quiz/fraction-ops';
 import { fractionsQuiz } from '@/lib/quiz/fractions';
+import { matricesQuiz } from '@/lib/quiz/matrices';
 import { measuresQuiz } from '@/lib/quiz/measures';
 import { multiplicationQuiz } from '@/lib/quiz/multiplication';
 import { negativeNumbersQuiz } from '@/lib/quiz/negative-numbers';
@@ -33,6 +37,10 @@ export const QUIZZES: Partial<Record<ConceptId, LessonQuiz>> = {
   vectors: vectorsQuiz as LessonQuiz,
   probability: probabilityQuiz as LessonQuiz,
   statistics: statisticsQuiz as LessonQuiz,
+  angles: anglesQuiz as LessonQuiz,
+  matrices: matricesQuiz as LessonQuiz,
+  calculus: calculusQuiz as LessonQuiz,
+  diffeq: diffeqQuiz as LessonQuiz,
 };
 
 export const hasQuiz = (id: ConceptId) => id in QUIZZES;

@@ -18,13 +18,17 @@ import { resolve } from 'node:path';
 import { formatDecimal } from '../../src/lib/measures';
 import { answerText, markTyped, rng, type Question } from '../../src/lib/quiz/core';
 import { QUIZZES } from '../../src/lib/quiz';
+import { anglesVerifier } from './quiz/angles';
 import { arithmeticVerifier } from './quiz/arithmetic';
 import { basicGeometryVerifier } from './quiz/basic-geometry';
 import { binaryVerifier } from './quiz/binary';
+import { calculusVerifier } from './quiz/calculus';
+import { diffeqVerifier } from './quiz/diffeq';
 import { decimalsPercentagesVerifier } from './quiz/decimals-percentages';
 import { exponentsRootsVerifier } from './quiz/exponents-roots';
 import { fractionOpsVerifier } from './quiz/fraction-ops';
 import { fractionsVerifier } from './quiz/fractions';
+import { matricesVerifier } from './quiz/matrices';
 import { measuresVerifier } from './quiz/measures';
 import { multiplicationVerifier } from './quiz/multiplication';
 import { negativeNumbersVerifier } from './quiz/negative-numbers';
@@ -54,6 +58,10 @@ const VERIFIERS: Record<string, Verifier> = {
   vectors: vectorsVerifier,
   probability: probabilityVerifier,
   statistics: statisticsVerifier,
+  angles: anglesVerifier,
+  matrices: matricesVerifier,
+  calculus: calculusVerifier,
+  diffeq: diffeqVerifier,
 };
 
 export function runQuizChecks(lessons?: string[]): Finding[] {
