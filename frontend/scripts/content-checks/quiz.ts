@@ -18,6 +18,7 @@ import { resolve } from 'node:path';
 import { formatDecimal } from '../../src/lib/measures';
 import { answerText, markTyped, rng, type Question } from '../../src/lib/quiz/core';
 import { QUIZZES } from '../../src/lib/quiz';
+import { arithmeticVerifier } from './quiz/arithmetic';
 import { decimalsPercentagesVerifier } from './quiz/decimals-percentages';
 import { fractionOpsVerifier } from './quiz/fraction-ops';
 import { fractionsVerifier } from './quiz/fractions';
@@ -32,6 +33,7 @@ const VERIFIERS: Record<string, Verifier> = {
   'decimals-percentages': decimalsPercentagesVerifier,
   fractions: fractionsVerifier,
   'fraction-ops': fractionOpsVerifier,
+  arithmetic: arithmeticVerifier,
 };
 
 export function runQuizChecks(lessons?: string[]): Finding[] {

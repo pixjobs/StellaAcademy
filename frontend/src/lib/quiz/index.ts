@@ -1,5 +1,6 @@
 import type { ConceptId } from '@/lib/study-modules';
 import type { LessonQuiz } from '@/lib/quiz/core';
+import { arithmeticQuiz } from '@/lib/quiz/arithmetic';
 import { decimalsPercentagesQuiz } from '@/lib/quiz/decimals-percentages';
 import { fractionOpsQuiz } from '@/lib/quiz/fraction-ops';
 import { fractionsQuiz } from '@/lib/quiz/fractions';
@@ -11,6 +12,7 @@ export const QUIZZES: Partial<Record<ConceptId, LessonQuiz>> = {
   'decimals-percentages': decimalsPercentagesQuiz as LessonQuiz,
   fractions: fractionsQuiz as LessonQuiz,
   'fraction-ops': fractionOpsQuiz as LessonQuiz,
+  arithmetic: arithmeticQuiz as LessonQuiz,
 };
 
 export const hasQuiz = (id: ConceptId) => id in QUIZZES;
