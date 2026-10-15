@@ -71,6 +71,7 @@ export const CURRICULUM: Record<ConceptId, CurriculumPlace> = {
     statements: [
       { source: 'ncMaths', where: "Year 5", text: "recognise the per cent symbol (%) and understand that per cent relates to ‘number of parts per 100’, and write percentages as a fraction with denominator 100, and as a decimal fraction" },
       { source: 'ncMaths', where: "Year 6", text: "recall and use equivalences between simple fractions, decimals and percentages, including in different contexts" },
+      { source: 'ncMaths', where: "Year 6", text: "solve problems involving the calculation of percentages [for example, of measures and such as 15% of 360] and the use of percentages for comparison" },
     ],
   },
   "basic-geometry": {

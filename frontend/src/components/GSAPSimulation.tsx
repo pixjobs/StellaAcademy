@@ -742,11 +742,11 @@ export default function GSAPSimulation({
           let currStep = -1;
 
           const card = document.createElement('div');
-          card.className = 'bg-slate-900 border border-slate-700 p-5 md:p-6 rounded-2xl shadow-xl flex flex-col items-center gap-6 w-[95%] max-w-sm transform-gpu mt-4';
+          card.className = 'bg-slate-900 border border-slate-700 p-5 md:p-6 rounded-2xl shadow-xl flex flex-col items-center gap-6 w-[95%] max-w-sm min-w-0 transform-gpu mt-4';
           container.appendChild(card);
 
           const exprDisplay = document.createElement('div');
-          exprDisplay.className = 'text-2xl md:text-3xl text-indigo-400 min-h-[50px] flex items-center justify-center text-center';
+          exprDisplay.className = 'text-xl sm:text-2xl md:text-3xl text-indigo-400 min-h-[50px] max-w-full overflow-x-auto flex items-center justify-center text-center';
           katex.render(problems[currIndex].expr, exprDisplay, { throwOnError: false, displayMode: true });
           card.appendChild(exprDisplay);
 

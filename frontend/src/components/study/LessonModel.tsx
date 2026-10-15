@@ -12,6 +12,9 @@ import TrigTriangle from '@/components/lesson-models/TrigTriangle';
 import OrbitLauncher from '@/components/paper/OrbitLauncher';
 import WaveInstrument from '@/components/paper/WaveInstrument';
 import UnitConverter from '@/components/study/UnitConverter';
+import QuizPanel from '@/components/quiz/QuizPanel';
+import { hasQuiz } from '@/lib/quiz';
+import { useQuizActive } from '@/lib/quiz/active';
 import type { ConceptId } from '@/lib/study-modules';
 
 function Slider({
@@ -66,8 +69,60 @@ function AnimatedModel({ id }: { id: ConceptId }) {
   );
 }
 
+/**
+ * While a quiz question on this lesson is in progress, the model is hidden (kept mounted, so nothing is
+ * lost) and a note says why, so the model cannot be used to work out the answer.
+ */
+function PausedDuringQuiz({ id, children }: { id: ConceptId; children: ReactNode }) {
+  const paused = useQuizActive((s) => !!s.active[id]);
+  return (
+    <>
+      {paused && (
+        <figure className="night-window overflow-hidden rounded-3xl p-4 ring-1 ring-white/10 sm:p-6">
+          <figcaption className="font-fraunces text-xl font-semibold text-white">Try it</figcaption>
+          <p className="mt-3 rounded-xl bg-amber-400/10 px-4 py-3 text-sm text-amber-100 ring-1 ring-amber-300/30" role="status">
+            Paused while you answer a quiz question. It comes back when you finish the question.
+          </p>
+        </figure>
+      )}
+      <div hidden={paused}>{children}</div>
+    </>
+  );
+}
+
+/** Lessons whose "Try it" panel is the old fixed-question flashcards (in GSAPSimulation). */
+const FLASHCARDS: ConceptId[] = ['arithmetic', 'basic-geometry', 'proportions', 'decimals-percentages', 'binary', 'multiplication', 'fraction-ops', 'negative-numbers', 'exponents-roots'];
+
+/**
+ * On a lesson with a step-by-step quiz and no explore model of its own (only the old fixed-question
+ * flashcards), the quiz itself fills the Try it panel, as the Quiz tab does on Measures.
+ */
+function QuizModel({ id }: { id: ConceptId }) {
+  return (
+    <figure className="night-window overflow-hidden rounded-3xl p-4 shadow-[0_30px_70px_-20px_rgba(11,16,38,0.6)] ring-1 ring-white/10 sm:p-6">
+      <figcaption className="flex items-baseline justify-between gap-3">
+        <span className="font-fraunces text-xl font-semibold text-white">Try it</span>
+        <span className="text-sm font-semibold text-cyan-200">Quiz</span>
+      </figcaption>
+      <div data-quiz className="mt-4">
+        <QuizPanel lesson={id} />
+      </div>
+    </figure>
+  );
+}
+
 /** Each lesson's interactive model, in its night window. */
 export default function LessonModel({ id }: { id: ConceptId }) {
+  if (id === 'measures') return <MeasuresModel />; // pauses its own tools during a quiz question
+  if (hasQuiz(id) && FLASHCARDS.includes(id)) return <QuizModel id={id} />;
+  return (
+    <PausedDuringQuiz id={id}>
+      <ModelFor id={id} />
+    </PausedDuringQuiz>
+  );
+}
+
+function ModelFor({ id }: { id: ConceptId }) {
   if (id === 'gravity') return <OrbitLauncher placement="lesson" />;
   if (id === 'waves') return <WaveInstrument placement="lesson" />;
   if (id === 'circuit') return <CircuitBoard />;
@@ -76,7 +131,6 @@ export default function LessonModel({ id }: { id: ConceptId }) {
   if (id === 'momentum') return <MomentumTrack />;
   if (id === 'thermodynamics') return <GasPiston />;
   if (id === 'trajectory') return <TransferOrbit />;
-  if (id === 'measures') return <MeasuresModel />;
   if (id === 'units')
     return (
       <Panel>

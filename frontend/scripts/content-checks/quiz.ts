@@ -1,99 +1,118 @@
 /**
- * Quiz check: generates thousands of questions for each round of the Measures quiz
- * (src/lib/measures-quiz.ts) and checks every one independently.
+ * Quiz check: for every lesson with a step-by-step quiz (src/lib/quiz/index.ts), generates thousands of
+ * questions per round and checks every one.
  *
- *   - Metric answers are recomputed with mathjs's unit converter.
- *   - Imperial answers must equal the starting value times the rough equivalent, and the rough
- *     equivalent must be within 3% of the exact UK definition.
- *   - Every step is well formed, the marker accepts the answer in the forms a pupil might type
- *     (with or without commas or a unit) and rejects it when it is 10 times too big or too small.
- *   - No text contains "undefined" or "NaN", and answers fit the lesson (at most 3 decimal places).
+ *   - The lesson's own verifier (scripts/content-checks/quiz/<lesson>.ts) recomputes the answers by an
+ *     independent route (mathjs units or fractions, exact UK definitions).
+ *   - Every step is well formed. The marker accepts each answer in the forms a pupil might type (with or
+ *     without commas, a unit or %) and rejects it when it is 10 times too big or too small, or in the
+ *     wrong unit. Fractions that must be in simplest form reject an unsimplified equal fraction.
+ *   - The common slips each lesson names are rejected with their feedback.
+ *   - The same seed always makes the same question (review questions are made again from their seed).
+ *   - No text contains "undefined" or "NaN".
  *
  * Run:  npx tsx scripts/content-checks/quiz.ts      (also part of npm run check:content)
  */
-import { create, all } from 'mathjs';
 import { fileURLToPath } from 'node:url';
 import { resolve } from 'node:path';
-import { bottom, formatDecimal } from '../../src/lib/measures';
-import { makeQuestion, markNumber, rng, ROUNDS, type NumberStep, type Round } from '../../src/lib/measures-quiz';
+import { formatDecimal } from '../../src/lib/measures';
+import { answerText, markTyped, rng, type Question } from '../../src/lib/quiz/core';
+import { QUIZZES } from '../../src/lib/quiz';
+import { decimalsPercentagesVerifier } from './quiz/decimals-percentages';
+import { measuresVerifier } from './quiz/measures';
+import type { Verifier } from './quiz/types';
 
 type Finding = { check: string; lesson: string; where: string; excerpt: string; message: string; level: 'fail' | 'warn' | 'info' };
 
-const math = create(all);
 const PER_ROUND = 3000;
-const MATHJS_UNIT: Record<string, string> = { km: 'km', m: 'm', cm: 'cm', mm: 'mm', kg: 'kg', g: 'g', l: 'l', ml: 'ml' };
+const VERIFIERS: Record<string, Verifier> = { measures: measuresVerifier, 'decimals-percentages': decimalsPercentagesVerifier };
 
-export function runQuizChecks(): Finding[] {
+export function runQuizChecks(lessons?: string[]): Finding[] {
   const findings: Finding[] = [];
-  const fail = (where: string, excerpt: string, message: string) => {
-    if (findings.filter((f) => f.level === 'fail').length < 25) findings.push({ check: 'quiz', lesson: 'measures', where, excerpt, message, level: 'fail' });
-  };
-  let checked = 0;
-  // How often the right option sits in each position: it must not always be in the same place.
-  const position: Record<'factor' | 'other', Record<number, number>> = { factor: {}, other: {} };
-  for (const round of Object.keys(ROUNDS) as Round[]) {
-    const r = rng(20261015 + round.length);
-    for (let n = 0; n < PER_ROUND; n++) {
-      const q = makeQuestion(round, r);
-      // Review questions are made again from their seed, so the same seed must give the same question.
-      const seed = 1000 + n;
-      if (JSON.stringify(makeQuestion(round, rng(seed)).steps.map((s) => s.prompt)) !== JSON.stringify(makeQuestion(round, rng(seed)).steps.map((s) => s.prompt)) || makeQuestion(round, rng(seed)).prompt !== makeQuestion(round, rng(seed)).prompt) fail(`${round} seed ${seed}`, '', 'the same seed gave a different question');
-      const where = `${round} #${n}`;
-      const all = [q.prompt, ...q.workings, ...q.steps.flatMap((s) => [s.prompt, ...(s.type === 'choice' ? [...s.options, ...Object.values(s.why)] : [s.unit ?? ''])])].join(' | ');
-      if (/undefined|NaN|\[object/.test(all)) fail(where, q.prompt, `bad text: ${all.slice(0, 200)}`);
-
-      const answer = q.check.answer;
-      const last = q.steps[q.steps.length - 1] as NumberStep;
-      if (last.type !== 'number' || formatDecimal(last.answer) !== formatDecimal(answer)) fail(where, q.prompt, 'last step is not the answer');
-      if (bottom(answer) < -3) fail(where, q.prompt, `answer ${formatDecimal(answer)} has more than 3 decimal places`);
-      if (!q.workings.join(' ').includes(formatDecimal(answer))) fail(where, q.prompt, 'workings do not show the answer');
-
-      const value = Number(q.check.value);
-      const got = Number(formatDecimal(answer).replace(/,/g, ''));
-      if (q.check.rough) {
-        const want = value * Number(q.check.rough.factor);
-        if (Math.abs(got - want) > 1e-9 * Math.max(1, want)) fail(where, q.prompt, `answer ${got}, expected ${value} × ${q.check.rough.factor} = ${want}`);
-        const exact = value * q.check.rough.exactFactor;
-        if (Math.abs(got - exact) / exact > 0.03) fail(where, q.prompt, `rough answer ${got} is more than 3% from the exact ${exact}`);
-      } else {
-        const want = math.unit(value, MATHJS_UNIT[q.check.from]).toNumber(MATHJS_UNIT[q.check.to]);
-        if (Math.abs(got - want) > 1e-9 * Math.max(1, Math.abs(want))) fail(where, q.prompt, `answer ${got}, mathjs gives ${want}`);
-      }
-
-      for (const s of q.steps) {
-        if (s.type === 'choice') {
-          if (s.correct < 0 || s.correct >= s.options.length) fail(where, s.prompt, 'correct option missing');
-          position[s.prompt.startsWith('Multiply by') || s.prompt.startsWith('Divide by') ? 'factor' : 'other'][s.correct] = (position[s.prompt.startsWith('Multiply by') || s.prompt.startsWith('Divide by') ? 'factor' : 'other'][s.correct] ?? 0) + 1;
-          if (new Set(s.options).size !== s.options.length) fail(where, s.prompt, `repeated options: ${s.options.join(', ')}`);
-          s.options.forEach((_, k) => {
-            if (k !== s.correct && !s.why[k]) fail(where, s.prompt, `no feedback for wrong option "${s.options[k]}"`);
-          });
-        } else {
-          const a = formatDecimal(s.answer);
-          for (const typed of [a, a.replace(/,/g, ''), `${a} ${s.unit ?? ''}`.trim(), `about ${a}`]) {
-            if (!markNumber(s, typed).ok) fail(where, s.prompt, `marker rejects "${typed}"`);
-          }
-          if (s.unit && markNumber(s, `${a} parsecs`).ok) fail(where, s.prompt, 'marker accepts a wrong unit');
-          for (const k of [1, -1]) {
-            const wrong = formatDecimal({ ...s.answer, top: s.answer.top + k });
-            const m = markNumber(s, wrong);
-            if (s.answer.digits !== '0' && !s.alsoAccept?.length && (m.ok || !m.feedback)) fail(where, s.prompt, `marker accepts or gives no feedback for "${wrong}"`);
-          }
-        }
-      }
-      checked++;
+  for (const [lesson, quiz] of Object.entries(QUIZZES)) {
+    if (!quiz || (lessons && !lessons.includes(lesson))) continue;
+    let fails = 0;
+    const fail = (where: string, excerpt: string, message: string) => {
+      if (++fails <= 25) findings.push({ check: 'quiz', lesson, where, excerpt, message, level: 'fail' });
+    };
+    const verifier = VERIFIERS[lesson];
+    if (!verifier) {
+      fail('', '', 'no verifier in scripts/content-checks/quiz.ts');
+      continue;
     }
+    let checked = 0;
+    const made: Question[] = [];
+    for (const round of Object.keys(quiz.rounds)) {
+      const r = rng(20261015 + round.length);
+      for (let n = 0; n < PER_ROUND; n++) {
+        const q = quiz.make(round, r);
+        made.push(q);
+        const where = `${round} #${n}`;
+        const words = [q.prompt, ...q.workings, ...q.steps.flatMap((s) => [s.prompt, ...(s.type === 'choice' ? [...s.options, ...Object.values(s.why)] : [])])].join(' | ');
+        if (/undefined|NaN|\[object|null/.test(words)) fail(where, q.prompt, `bad text: ${words.slice(0, 200)}`);
+
+        const seed = 1000 + n;
+        const a1 = quiz.make(round, rng(seed));
+        const a2 = quiz.make(round, rng(seed));
+        if (a1.prompt !== a2.prompt || JSON.stringify(a1.steps.map((s) => s.prompt)) !== JSON.stringify(a2.steps.map((s) => s.prompt))) fail(where, '', 'the same seed gave a different question');
+
+        const problem = verifier.verify(q);
+        if (problem) fail(where, q.prompt, problem);
+        const last = q.steps[q.steps.length - 1];
+        const final = answerText(last);
+        if (!q.workings.join(' ').includes(final.replace(/ (miles|inches|pounds|litres|km|cm|m|mm|g|kg|l|ml)$/, ''))) fail(where, q.prompt, `workings do not show the answer "${final}"`);
+
+        q.steps.forEach((s, i) => {
+          if (s.type === 'choice') {
+            if (s.correct < 0 || s.correct >= s.options.length) fail(where, s.prompt, 'correct option missing');
+            if (new Set(s.options).size !== s.options.length) fail(where, s.prompt, `repeated options: ${s.options.join(', ')}`);
+            s.options.forEach((_, k) => {
+              if (k !== s.correct && !s.why[k]) fail(where, s.prompt, `no feedback for wrong option "${s.options[k]}"`);
+            });
+          } else if (s.type === 'number') {
+            const a = formatDecimal(s.answer);
+            const forms = [a, a.replace(/,/g, ''), `about ${a}`];
+            if (s.unit) forms.push(s.unit === '%' ? `${a}%` : s.unit === '£' ? `£${a}` : `${a} ${s.unit}`);
+            if (s.unit === '£') forms.push(`£ ${a}`);
+            for (const typed of forms) if (!markTyped(s, typed).ok) fail(where, s.prompt, `marker rejects "${typed}"`);
+            if (s.unit && markTyped(s, `${a} parsecs`).ok) fail(where, s.prompt, 'marker accepts a wrong unit');
+            if (s.unit === '£' && !/pence/.test(markTyped(s, `${a}p`).feedback)) fail(where, s.prompt, 'marker does not refuse pence');
+            if (s.unit !== '£' && markTyped(s, `£${a}`).ok) fail(where, s.prompt, 'marker accepts £ on a step that is not money');
+            for (const k of [1, -1]) {
+              const wrong = formatDecimal({ ...s.answer, top: s.answer.top + k });
+              const m = markTyped(s, wrong);
+              if (s.answer.digits !== '0' && !s.alsoAccept?.length && (m.ok || !m.feedback)) fail(where, s.prompt, `step ${i + 1}: marker accepts or gives no feedback for "${wrong}"`);
+            }
+          } else {
+            const a = answerText(s);
+            if (!markTyped(s, a).ok) fail(where, s.prompt, `marker rejects "${a}"`);
+            const doubled = `${s.answer.n * 2n}/${s.answer.d * 2n}`;
+            const m = markTyped(s, doubled);
+            const expectRejected = s.denominator ? /on the bottom/ : s.simplest ? /simplified/ : null;
+            if (expectRejected ? m.ok || !expectRejected.test(m.feedback) : !m.ok) fail(where, s.prompt, `fraction marking wrong for "${doubled}": ${m.ok ? 'accepted' : m.feedback}`);
+            if (markTyped(s, `${s.answer.n + 1n}/${s.answer.d}`).ok) fail(where, s.prompt, 'marker accepts a wrong fraction');
+          }
+        });
+
+        for (const m of verifier.mistakes?.(q) ?? []) {
+          const s = q.steps[m.step];
+          if (s.type === 'choice') continue;
+          const res = markTyped(s, m.typed);
+          if (res.ok || !res.feedback.includes(m.expect)) fail(where, q.prompt, `slip "${m.typed}" at step ${m.step + 1} gave "${res.ok ? 'accepted' : res.feedback}", expected feedback with "${m.expect}"`);
+        }
+        checked++;
+      }
+    }
+    const agg = verifier.aggregate?.(made);
+    if (agg) fail('all', '', agg);
+    findings.push({ check: 'quiz', lesson, where: '', excerpt: '', message: `${checked} generated questions checked`, level: 'info' });
   }
-  const counts = Object.values(position.factor);
-  const total = counts.reduce((x, y) => x + y, 0);
-  if (counts.length < 4 || Math.max(...counts) / total > 0.35) fail('factor step', '', `the right factor is not spread across the four buttons: ${JSON.stringify(position.factor)}`);
-  findings.push({ check: 'quiz', lesson: 'measures', where: '', excerpt: '', message: `${checked} generated questions checked`, level: 'info' });
   return findings;
 }
 
 const invokedAs = process.argv[1] ? resolve(process.argv[1]) : '';
 if (invokedAs === fileURLToPath(import.meta.url)) {
   const f = runQuizChecks();
-  for (const x of f) console.log(`${x.level.toUpperCase()}  ${x.where}: ${x.message}${x.excerpt ? `\n      "${x.excerpt}"` : ''}`);
+  for (const x of f) console.log(`${x.level.toUpperCase()}  ${x.lesson} ${x.where}: ${x.message}${x.excerpt ? `\n      "${x.excerpt}"` : ''}`);
   process.exit(f.some((x) => x.level === 'fail') ? 1 : 0);
 }
