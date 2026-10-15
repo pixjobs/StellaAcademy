@@ -125,7 +125,7 @@ export default function PrivacyPage() {
 
             <Block title="What stays on your device">
               <p>
-                Your cookie choice, your journey progress, your quiz scores and the questions saved for you to review,
+                Your cookie choice, your journey progress, your quiz scores, the questions saved for you to review and the ones asked recently (so they are not repeated),
                 your notes and your display settings are saved in your browser so the site remembers them. They are never sent to us. Clearing this site&rsquo;s data in your
                 browser removes them.
               </p>

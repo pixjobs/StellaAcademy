@@ -22,6 +22,8 @@ type Question = Q<BinaryCheck>;
 /** Numbers shown on the page (in either direction), and additions shown there. The quiz never asks these. */
 const SHOWN_VALUES = new Set([4, 11, 13, 19, 22, 25]);
 const SHOWN_SUMS = new Set(['110+11', '101+11', '1101+111']);
+/** A number to convert: half the time up to 63 (six bits), half the time a full byte, 64 to 255, as the lesson teaches. */
+const pickNumber = (r: () => number) => (r() < 0.5 ? int(r, 9, 63) : int(r, 64, 255));
 const list = (xs: (string | number)[]) => (xs.length < 2 ? xs.join('') : `${xs.slice(0, -1).join(', ')} and ${xs[xs.length - 1]}`);
 
 const bin = (n: number) => n.toString(2);
@@ -30,7 +32,7 @@ const places = (bits: string) => bits.split('').map((b, i) => [b, 2 ** (bits.len
 /** A different place each time: the place value of the nth digit from the right. */
 function placeValueStep(r: () => number, length: number): Step {
   const k = int(r, 3, Math.max(3, length));
-  const ord = ['', 'first', 'second', 'third', 'fourth', 'fifth', 'sixth'][k];
+  const ord = ['', 'first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth'][k];
   return {
     type: 'number',
     prompt: `In binary, what is the place value of the ${ord} digit from the right?`,
@@ -41,7 +43,7 @@ function placeValueStep(r: () => number, length: number): Step {
 
 function toDenary(r: () => number): Question {
   for (;;) {
-    const n = int(r, 9, 63);
+    const n = pickNumber(r);
     const bits = bin(n);
     if (SHOWN_VALUES.has(n)) continue;
     const ones = places(bits).filter(([b]) => b === '1').map(([, v]) => v);
@@ -68,7 +70,7 @@ function toDenary(r: () => number): Question {
 
 function toBinary(r: () => number): Question {
   for (;;) {
-    const n = int(r, 9, 63);
+    const n = pickNumber(r);
     if (SHOWN_VALUES.has(n)) continue;
     const top = 2 ** Math.floor(Math.log2(n));
     const left = n - top;
@@ -80,7 +82,7 @@ function toBinary(r: () => number): Question {
       round: 'to-binary',
       prompt: `Change ${n} into binary.`,
       steps: [
-        { type: 'number', prompt: `What is the biggest binary place value (1, 2, 4, 8, 16, 32 ...) that fits into ${n}?`, answer: D(top), feedback: (g) => (sameNumber(g, top * 2) ? `${top * 2} is bigger than ${n}.` : `Go up 1, 2, 4, 8 ... and stop before you pass ${n}.`) },
+        { type: 'number', prompt: `What is the biggest binary place value (1, 2, 4, 8, 16, 32, 64, 128) that fits into ${n}?`, answer: D(top), feedback: (g) => (sameNumber(g, top * 2) ? `${top * 2} is bigger than ${n}.` : `Go up 1, 2, 4, 8 ... and stop before you pass ${n}.`) },
         { type: 'number', prompt: `Take it away. What is left?`, answer: D(left), feedback: () => `${n} − ${top}.` },
         { type: 'number', prompt: `What is the biggest place value that fits into ${left}?`, answer: D(next), feedback: (g) => (sameNumber(g, next * 2) ? `${next * 2} is bigger than ${left}.` : `Go up 1, 2, 4, 8 ... and stop before you pass ${left}.`) },
         { type: 'number', prompt: `Take that away too. What is left now?`, answer: D(left - next), feedback: () => `${left} − ${next}.` },

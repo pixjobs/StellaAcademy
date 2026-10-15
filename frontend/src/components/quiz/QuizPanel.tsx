@@ -18,16 +18,26 @@ type Mode = string;
 
 const itemFor = (quiz: LessonQuiz, round: string, seed: number): Item => ({ round, seed, question: quiz.make(round, rng(seed)) });
 
-/** Ten new questions, each from its own random seed, with no question twice in a round. Called only from click handlers. */
-export function newItems(quiz: LessonQuiz, round: string, testSeed?: number): Item[] {
-  // The browser checks set window.__stellaQuizSeed so they can work out the same questions.
-  const base = testSeed ?? (typeof window !== 'undefined' ? (window as { __stellaQuizSeed?: number }).__stellaQuizSeed : undefined);
+/**
+ * Ten new questions, each from its own random seed, with no question twice in a round. Questions in `recent`
+ * (asked in the last few rounds on this device, oldest first) are avoided while there are enough others; a small
+ * round falls back to the ones asked longest ago rather than coming up short. Called only from click handlers.
+ */
+export function newItems(quiz: LessonQuiz, round: string, testSeed?: number, recent: readonly string[] = []): Item[] {
+  // The browser checks set window.__stellaQuizSeed so they can work out the same questions; they start with no history.
+  const hook = typeof window !== 'undefined' ? (window as { __stellaQuizSeed?: number }).__stellaQuizSeed : undefined;
+  const base = testSeed ?? hook;
+  const avoid = testSeed === undefined && hook !== undefined ? new Set<string>() : new Set(recent);
   const items: Item[] = [];
-  for (let tries = 0; items.length < QUESTIONS_PER_QUIZ && tries < 200; tries++) {
+  const spare: Item[] = [];
+  for (let tries = 0; items.length < QUESTIONS_PER_QUIZ && tries < 400; tries++) {
     const item = itemFor(quiz, round, base !== undefined ? base + tries : Math.floor(Math.random() * 2 ** 31));
-    if (!items.some((x) => x.question.prompt === item.question.prompt)) items.push(item);
+    const p = item.question.prompt;
+    if (items.some((x) => x.question.prompt === p) || spare.some((x) => x.question.prompt === p)) continue;
+    (avoid.has(p) ? spare : items).push(item);
   }
-  return items;
+  spare.sort((a, b) => recent.indexOf(a.question.prompt) - recent.indexOf(b.question.prompt));
+  return [...items, ...spare.slice(0, QUESTIONS_PER_QUIZ - items.length)];
 }
 
 /**
@@ -338,14 +348,14 @@ export default function QuizPanel({ lesson }: { lesson: ConceptId }) {
   const start = (m: Mode) => {
     const t = Date.now();
     setNow(t);
-    const next = m === 'review' ? dueNow(saved.review, t).filter((x) => x.round in quiz.rounds).slice(0, QUESTIONS_PER_QUIZ).map((x) => itemFor(quiz, x.round, x.seed)) : newItems(quiz, m);
+    const next = m === 'review' ? dueNow(saved.review, t).filter((x) => x.round in quiz.rounds).slice(0, QUESTIONS_PER_QUIZ).map((x) => itemFor(quiz, x.round, x.seed)) : newItems(quiz, m, undefined, saved.recent ?? []);
     if (!next.length) return;
     setMode(m);
     setItems(next);
     setResults([]);
     setSaved1([]);
     setRoundAt(t);
-    saved.begin(m, t);
+    saved.begin(m, t, next.map((x) => x.question.prompt));
     setCardDone(false);
     setConfirmClear(false);
     track('quiz_started', { lesson, round: m });

@@ -25,7 +25,10 @@ owner, the build, the automatic checks, a fresh review by someone who did not bu
    divide, which fraction, which ratio), then for the intermediate numbers, then the answer.
 2. **No step gives away a later one.** Feedback says what to do, not the answer.
 3. **New numbers every time.** Questions are generated from a random seed, and the same seed always gives the
-   same question, so a missed question can come back exactly.
+   same question, so a missed question can come back exactly. The last 100 questions asked on the device are
+   remembered and avoided in new rounds. A round should have at least 100 different questions; a smaller one
+   repeats the questions asked longest ago once it runs out. The lesson's full range is used (binary goes up to
+   255 because the lesson teaches a byte).
 4. **Never ask what the page shows.** Each generator excludes the examples in the idea, worked example and notes.
 5. **Name the classic mistakes.** The brief lists the misconceptions (at most four). Each gets feedback that names
    it, and the automatic check proves the feedback fires.

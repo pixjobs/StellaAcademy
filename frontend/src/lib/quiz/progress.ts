@@ -9,6 +9,8 @@ const DAY = 24 * 60 * 60 * 1000;
 export const REVIEW_DAYS = [1, 3, 7] as const;
 const KEEP_ROUNDS = 50;
 const KEEP_REVIEW = 50;
+/** How many recently asked questions are remembered, so new rounds can avoid them: ten rounds' worth. */
+export const KEEP_RECENT = 100;
 
 /** A round, saved as it is played: `out` counts the questions answered so far; `done` is false until the round ends. */
 export type RoundRecord = { round: string; score: number; out: number; at: number; done?: boolean };
@@ -19,8 +21,10 @@ export type Answered = { round: string; seed: number; firstTime: boolean };
 type ProgressState = {
   rounds: RoundRecord[];
   review: ReviewItem[];
+  /** The prompts of the questions asked most recently, oldest first, so new rounds can avoid repeating them. */
+  recent: string[];
   /** Starts a round. Its record is saved straight away, so leaving part way through still shows it. */
-  begin: (round: string, at: number) => void;
+  begin: (round: string, at: number, prompts?: string[]) => void;
   /**
    * Saves one answered question in the round that started at `at`, and moves it into, through or out of
    * the review list. A question already saved as missed (for example after its first slip) is not counted twice.
@@ -66,7 +70,12 @@ const makeStore = (key: string) => create<ProgressState>()(
     (set) => ({
       rounds: [],
       review: [],
-      begin: (round, at) => set((state) => ({ rounds: [...state.rounds, { round, score: 0, out: 0, at, done: false }].slice(-KEEP_ROUNDS) })),
+      recent: [],
+      begin: (round, at, prompts = []) =>
+        set((state) => ({
+          rounds: [...state.rounds, { round, score: 0, out: 0, at, done: false }].slice(-KEEP_ROUNDS),
+          recent: [...(state.recent ?? []).filter((p) => !prompts.includes(p)), ...prompts].slice(-KEEP_RECENT),
+        })),
       answer: (at, a, now = Date.now(), alreadySaved = false) =>
         set((state) => ({
           review: alreadySaved ? state.review : moveInReview(state.review, a, now),
@@ -81,7 +90,7 @@ const makeStore = (key: string) => create<ProgressState>()(
           const rounds = [...state.rounds, { round, score, out: answered.length, at: now, done: true }].slice(-KEEP_ROUNDS);
           return { rounds, review };
         }),
-      clear: () => set({ rounds: [], review: [] }),
+      clear: () => set({ rounds: [], review: [], recent: [] }),
     }),
     { name: key, skipHydration: true },
   ),
