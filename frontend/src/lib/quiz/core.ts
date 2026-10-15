@@ -36,6 +36,8 @@ export type NumberStep = {
    * any typed value within half a unit of the third significant figure of `exact` is right (36.87 or 36.9).
    */
   exact?: number;
+  /** How the answer is shown, when it keeps trailing zeros (13.0 to 3 significant figures). */
+  shown?: string;
 };
 
 export type FractionStep = {
@@ -254,7 +256,9 @@ export function markNumber(step: NumberStep, text: string): { ok: boolean; feedb
   if (same(read.value, step.answer) || step.alsoAccept?.some((d) => same(read.value, d))) return { ok: true, feedback: '' };
   if (step.exact !== undefined) {
     const v = toNumber(read.value);
-    const tol = sigFigUnit(step.exact) / 2;
+    // Half a unit of the third significant figure, or 0.2%, whichever is larger: a pupil who rounded a value on
+    // the way (such as sin 19° = 0.326) lands a little off the exact answer, and that is still right.
+    const tol = Math.max(sigFigUnit(step.exact) / 2, Math.abs(step.exact) * 0.002);
     if (Math.abs(v - step.exact) <= tol * 1.0001) return { ok: true, feedback: '' };
     // Right but rounded too far, such as 37 for 36.87.
     if (Math.abs(v - step.exact) <= 10 * tol && countSigFigs(read.value) < 3) return { ok: false, feedback: 'Close, but give your answer to 3 significant figures.' };
@@ -268,9 +272,17 @@ export const toNumber = (d: Digits) => (d.neg ? -1 : 1) * Number(d.digits) * 10 
 const sigFigUnit = (x: number) => 10 ** (Math.floor(Math.log10(Math.abs(x))) - 2);
 const countSigFigs = (d: Digits) => d.digits.replace(/^0+/, '').length;
 
+/** x to 3 significant figures as text, keeping trailing zeros (13.0, 5.10) and commas (2,820). */
+export function sf3(x: number): string {
+  const rounded = Number(x.toPrecision(3));
+  if (Math.abs(rounded) >= 100) return fmt(D(rounded));
+  const t = rounded.toPrecision(3);
+  return t.startsWith('-') ? `−${t.slice(1)}` : t;
+}
+
 /** A calculator answer: rounded to 3 significant figures for display, with the exact value for marking. */
-export function approx(x: number): { answer: Digits; exact: number } {
-  return { answer: D(Number(x.toPrecision(3))), exact: x };
+export function approx(x: number): { answer: Digits; exact: number; shown: string } {
+  return { answer: D(Number(x.toPrecision(3))), exact: x, shown: sf3(x) };
 }
 
 /** Is the typed fraction right? */
@@ -301,6 +313,7 @@ export const unitLabel = (u: string) => (u === '°c' ? '°C' : u);
 export function answerText(step: Step): string {
   if (step.type === 'number') {
     if (step.plain) return fmt(step.answer).replace(/,/g, '');
+    if (step.shown) return `${step.shown}${step.unit ? (step.unit === '%' || step.unit === '°' ? step.unit : ` ${unitLabel(step.unit)}`) : ''}`;
     if (step.unit === '£') return `£${fmt(step.answer)}`;
     return `${fmt(step.answer)}${step.unit ? (step.unit === '%' || step.unit === '°' ? step.unit : ` ${unitLabel(step.unit)}`) : ''}`;
   }

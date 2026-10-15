@@ -22,7 +22,8 @@ export type ProbabilityCheck =
 type Question = Q<ProbabilityCheck>;
 
 /** Examples shown on the lesson page. The quiz never asks these. */
-const SHOWN = new Set(['bag 2 7', 'not 0.05', 'backups 0.9 3']);
+const SHOWN = new Set(['bag 2 7', 'bag 3 5', 'not 0.05', 'not 0.3', 'and 0.8 0.9', 'backups 0.9 3']);
+const counters = (n: number, c: string) => `${n} ${c} counter${n === 1 ? '' : 's'}`;
 
 const COLOURS = ['red', 'blue', 'green', 'yellow'] as const;
 /** p in hundredths as an exact decimal string: 35 gives "0.35". */
@@ -44,7 +45,7 @@ function single(r: () => number): Question {
     const total = n1 + n2 + n3;
     if (SHOWN.has(`bag ${n1} ${n2}`) || SHOWN.has(`bag ${n2} ${n1}`)) continue;
     const not = r() < 0.45;
-    const bag = `A bag holds ${n1} ${c1}, ${n2} ${c2}${n3 ? ` and ${n3} ${c3}` : ''} counters. One is taken at random.`;
+    const bag = `A bag holds ${n3 ? `${counters(n1, c1)}, ${counters(n2, c2)} and ${counters(n3, c3)}` : `${counters(n1, c1)} and ${counters(n2, c2)}`}. One is taken at random.`;
     const p = simplify(F(n1, total));
     const pNot = simplify(F(total - n1, total));
     const steps: Step[] = [
@@ -114,10 +115,11 @@ function combined(r: () => number): Question {
       const a = int(r, 2, 9) / 10;
       const b = int(r, 2, 9) / 10;
       const [pa, pb] = [hundredths(a * 100), hundredths(b * 100)];
+      if (SHOWN.has(`and ${pa} ${pb}`) || SHOWN.has(`and ${pb} ${pa}`)) continue;
       const product = exactDecimal(Math.round(a * 10) * Math.round(b * 10), 2);
       const sumSlip = hundredths(Math.round(a * 100 + b * 100));
       const ctx = pick(r, [
-        [`The probability a launch leaves on time is ${pa}. Separately, the probability of good weather at the landing site is ${pb}.`, 'both'],
+        [`The probability a launch leaves on time is ${pa}. The probability of good weather at the landing site is ${pb}. The two are independent.`, 'both'],
         [`A rover's camera works on a given day with probability ${pa}, and its radio with probability ${pb}, independently.`, 'both work'],
         [`The probability that a bus is late is ${pa}, and that a train is late is ${pb}. They are independent.`, 'both are late'],
       ] as const);
@@ -127,7 +129,7 @@ function combined(r: () => number): Question {
         round: 'combined',
         prompt: `${ctx[0]} What is the probability that ${ctx[1] === 'both' ? 'both happen' : ctx[1]}?`,
         steps: [
-          { type: 'choice', prompt: 'The events are independent and you want both. Do you multiply or add the probabilities?', options, correct, why: whyAll(options, correct, () => 'For both of two independent events, multiply. Adding is for one or the other, when they cannot both happen.') },
+          { type: 'choice', prompt: 'Do you multiply or add the two probabilities?', options, correct, why: whyAll(options, correct, () => 'For both of two independent events, multiply. Adding is for one or the other, when they cannot both happen.') },
           { type: 'number', prompt: `So what is ${pa} × ${pb}?`, answer: D(product), feedback: (g) => (sameNumber(g, Number(sumSlip)) ? 'That adds them. For both, multiply.' : `Work out ${Math.round(a * 10)} × ${Math.round(b * 10)}, then divide by 100.`) },
         ],
         workings: [`Independent events, both: multiply.`, `${pa} × ${pb} = ${product}.`],
@@ -173,6 +175,7 @@ function dependent(r: () => number): Question {
       const second = F(want - 1, total - 1);
       const answer = simplify(F(want * (want - 1), total * (total - 1)));
       const sameBottom = F(want - 1, total);
+      const keptBottom = F(want * (want - 1), total * total); // the classic slip at the end: not taking one off the bottom
       return {
         round: 'dependent',
         prompt: `A bag holds ${want} ${c1} and ${other} ${c2} counters. Two are taken out, one after the other, without putting the first back. What is the probability that both are ${c1}?`,
@@ -183,9 +186,15 @@ function dependent(r: () => number): Question {
             prompt: `The first ${c1} is not put back. Now what is the probability that the second is ${c1}?`,
             answer: second,
             simplest: false,
-            feedback: (g) => (fracEqual(g, sameBottom) || fracEqual(g, first) ? `One counter has gone, so there are ${total - 1} left, and ${want - 1} of them are ${c1}.` : `Count again: how many ${c1} are left, and how many counters?`),
+            feedback: (g) => (fracEqual(g, sameBottom) || fracEqual(g, first) ? 'One counter has gone. Take one off the top and one off the bottom.' : `Count again: how many ${c1} are left, and how many counters?`),
           },
-          { type: 'fraction', prompt: 'Multiply the two. What is the probability that both are ' + c1 + ', in its simplest form?', answer, simplest: true, feedback: () => `${want}/${total} × ${want - 1}/${total - 1}: multiply the tops and the bottoms, then simplify.` },
+          {
+            type: 'fraction',
+            prompt: `Multiply the two. What is the probability that both are ${c1}, in its simplest form?`,
+            answer,
+            simplest: true,
+            feedback: (g) => (fracEqual(g, keptBottom) ? 'One counter has gone before the second pick, so the second bottom number is one less.' : 'Multiply the tops and the bottoms, then simplify.'),
+          },
         ],
         workings: [`First: ${want}/${total}. Second, with one ${c1} gone: ${want - 1}/${total - 1}.`, `${want}/${total} × ${want - 1}/${total - 1} = ${want * (want - 1)}/${total * (total - 1)}${fracText(answer) === `${want * (want - 1)}/${total * (total - 1)}` ? '' : ` = ${fracText(answer)}`}.`],
         check: { kind: 'without', want, total, answer: fracText(answer) },
@@ -196,6 +205,7 @@ function dependent(r: () => number): Question {
     const n = int(r, 2, 4);
     const p = hundredths(h);
     if (SHOWN.has(`backups ${p} ${n}`)) continue;
+    if (h % 10 !== 0 && n > 3) continue; // keeps answers to at most six decimal places
     const fail = 100 - h;
     const failText = hundredths(fail);
     const allFail = exactDecimal(fail ** n, 2 * n);
@@ -206,7 +216,7 @@ function dependent(r: () => number): Question {
       prompt: `A spacecraft carries ${n} identical radios side by side. Each works with probability ${p}, independently. The link works if at least one radio works. What is the probability that the link works?`,
       steps: [
         { type: 'number', prompt: `What is the probability that one radio fails?`, answer: D(failText), feedback: () => `1 − ${p}.` },
-        { type: 'number', prompt: `The link fails only if all ${n} fail. What is the probability of that? (${failText} multiplied by itself ${n} times)`, answer: D(allFail), feedback: () => `${Array(n).fill(failText).join(' × ')}.` },
+        { type: 'number', prompt: `The link fails only if ${n === 2 ? 'both fail' : `all ${n} fail`}. What is the probability of that? (${Array(n).fill(failText).join(' × ')})`, answer: D(allFail), feedback: () => 'Multiply the chance that one fails by itself, once for each radio.' },
         { type: 'number', prompt: `So what is the probability that the link works?`, answer: D(works), feedback: (g) => (sameNumber(g, Number(nTimesP)) ? `That is ${n} × ${p}, which can be more than 1. The link works unless all fail: 1 − ${allFail}.` : `1 − ${allFail}.`) },
       ],
       workings: [`One radio fails with probability 1 − ${p} = ${failText}.`, `All ${n} fail: ${failText} to the power ${n} = ${allFail}.`, `So the link works with probability 1 − ${allFail} = ${works}.`],

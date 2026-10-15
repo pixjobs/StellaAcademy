@@ -42,8 +42,15 @@ export const trigonometryVerifier: Verifier = {
     }
     if (c.kind === 'pythagoras') {
       const sum = c.hypotenuse ? c.a + c.b : c.b - c.a;
-      return Math.abs(sum - c.answer) > 0.01 ? [{ step: last, typed: String(sum), expect: 'Square them first' }] : [];
+      const out = Math.abs(sum - c.answer) > 0.01 ? [{ step: last, typed: String(sum), expect: 'Square them first' }] : [];
+      // Adding the squares when finding a shorter side.
+      if (!c.hypotenuse) out.push({ step: 2, typed: 'Add them', expect: 'biggest' });
+      return out;
     }
+    // Rounded too far: 2 significant figures where it differs from the 3 s.f. answer.
+    const two = Number(c.answer.toPrecision(2));
+    if (Math.abs(two - c.answer) > Math.max(Math.abs(c.answer) * 0.002, 10 ** (Math.floor(Math.log10(Math.abs(c.answer))) - 2) / 2) * 1.01)
+      return [{ step: last, typed: String(two), expect: '3 significant figures' }];
     return [];
   },
 };

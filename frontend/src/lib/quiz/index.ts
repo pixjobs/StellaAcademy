@@ -12,6 +12,7 @@ import { multiplicationQuiz } from '@/lib/quiz/multiplication';
 import { negativeNumbersQuiz } from '@/lib/quiz/negative-numbers';
 import { probabilityQuiz } from '@/lib/quiz/probability';
 import { proportionsQuiz } from '@/lib/quiz/proportions';
+import { statisticsQuiz } from '@/lib/quiz/statistics';
 import { trigonometryQuiz } from '@/lib/quiz/trigonometry';
 import { vectorsQuiz } from '@/lib/quiz/vectors';
 
@@ -31,6 +32,7 @@ export const QUIZZES: Partial<Record<ConceptId, LessonQuiz>> = {
   trigonometry: trigonometryQuiz as LessonQuiz,
   vectors: vectorsQuiz as LessonQuiz,
   probability: probabilityQuiz as LessonQuiz,
+  statistics: statisticsQuiz as LessonQuiz,
 };
 
 export const hasQuiz = (id: ConceptId) => id in QUIZZES;

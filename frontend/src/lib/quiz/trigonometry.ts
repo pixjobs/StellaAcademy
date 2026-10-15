@@ -2,7 +2,7 @@
  * Quiz for "Trigonometry in Right-Angled Triangles" (KAN-81): finding a side, finding an angle, Pythagoras.
  * GCSE: a calculator is allowed and answers are marked to 3 significant figures (core.ts `approx`).
  */
-import { D, approx, fmt, int, pick, shuffle, toNumber, whyAll, type LessonQuiz, type Question as Q, type Step } from '@/lib/quiz/core';
+import { D, approx, sf3, fmt, int, pick, shuffle, toNumber, whyAll, type LessonQuiz, type Question as Q, type Step } from '@/lib/quiz/core';
 
 export type Round = 'sides' | 'angles' | 'pythagoras';
 
@@ -27,7 +27,7 @@ const ratioFor = (x: Side, y: Side): Ratio => RATIO_OF[[x, y].sort().join(' ')];
 const RATIO_TEXT: Record<Ratio, string> = { sin: 'sin θ = opposite ÷ hypotenuse', cos: 'cos θ = adjacent ÷ hypotenuse', tan: 'tan θ = opposite ÷ adjacent' };
 const TOP: Record<Ratio, Side> = { sin: 'opposite', cos: 'adjacent', tan: 'opposite' };
 const BOTTOM: Record<Ratio, Side> = { sin: 'hypotenuse', cos: 'hypotenuse', tan: 'adjacent' };
-const short = (x: number) => fmt(D(Number(x.toPrecision(3))));
+const short = sf3;
 
 /** Angles in the lesson's exact-values table, left out so they cannot be looked up. */
 const TABLE_ANGLES = new Set([0, 30, 45, 60, 90]);
@@ -49,23 +49,24 @@ const ratioStep = (r: () => number, ratio: Ratio): Step => {
 // Find a side
 // ---------------------------------------------------------------------------------------------
 
-type SideContext = { known: Side; want: Side; ask: (angle: number, len: number) => string; unit: string };
+/** Each context with sizes that make sense: ladders stand steeply, ramps are gentle. */
+type SideContext = { known: Side; want: Side; ask: (angle: number, len: number) => string; unit: string; angles: [number, number]; lengths: [number, number] };
 const SIDE_CONTEXTS: SideContext[] = [
-  { known: 'hypotenuse', want: 'opposite', ask: (a, l) => `A ladder ${l} m long leans against a wall at ${a}° to the ground. How high up the wall does it reach?`, unit: 'm' },
-  { known: 'hypotenuse', want: 'adjacent', ask: (a, l) => `A ladder ${l} m long leans against a wall at ${a}° to the ground. How far is its foot from the wall?`, unit: 'm' },
-  { known: 'opposite', want: 'hypotenuse', ask: (a, l) => `A ramp rises ${l} m and slopes at ${a}° to the ground. How long is the ramp?`, unit: 'm' },
-  { known: 'hypotenuse', want: 'opposite', ask: (a, l) => `A kite flies on a string ${l} m long, at ${a}° above the ground. How high is the kite?`, unit: 'm' },
-  { known: 'adjacent', want: 'opposite', ask: (a, l) => `You stand ${l} km from a launch pad and see a rocket at ${a}° above the horizon. How high is the rocket? Treat the ground as flat.`, unit: 'km' },
-  { known: 'adjacent', want: 'hypotenuse', ask: (a, l) => `In a right-angled triangle, the side adjacent to angle θ = ${a}° is ${l} cm. How long is the hypotenuse?`, unit: 'cm' },
-  { known: 'opposite', want: 'adjacent', ask: (a, l) => `In a right-angled triangle, the side opposite angle θ = ${a}° is ${l} cm. How long is the adjacent side?`, unit: 'cm' },
+  { known: 'hypotenuse', want: 'opposite', ask: (a, l) => `A ladder ${l} m long leans against a wall at ${a}° to the ground. How high up the wall does it reach?`, unit: 'm', angles: [61, 80], lengths: [2, 10] },
+  { known: 'hypotenuse', want: 'adjacent', ask: (a, l) => `A ladder ${l} m long leans against a wall at ${a}° to the ground. How far is its foot from the wall?`, unit: 'm', angles: [61, 80], lengths: [2, 10] },
+  { known: 'opposite', want: 'hypotenuse', ask: (a, l) => `A ramp rises ${l} m and slopes at ${a}° to the ground. How long is the ramp?`, unit: 'm', angles: [3, 15], lengths: [1, 3] },
+  { known: 'hypotenuse', want: 'opposite', ask: (a, l) => `A kite flies on a string ${l} m long, at ${a}° above the ground. How high is the kite?`, unit: 'm', angles: [20, 70], lengths: [10, 60] },
+  { known: 'adjacent', want: 'opposite', ask: (a, l) => `You stand ${l} km from a launch pad and see a rocket at ${a}° above the horizon. How high is the rocket? Treat the ground as flat.`, unit: 'km', angles: [10, 70], lengths: [2, 20] },
+  { known: 'adjacent', want: 'hypotenuse', ask: (a, l) => `In a right-angled triangle, the side adjacent to angle θ = ${a}° is ${l} cm. How long is the hypotenuse?`, unit: 'cm', angles: [15, 75], lengths: [3, 30] },
+  { known: 'opposite', want: 'adjacent', ask: (a, l) => `In a right-angled triangle, the side opposite angle θ = ${a}° is ${l} cm. How long is the side adjacent to θ?`, unit: 'cm', angles: [15, 75], lengths: [3, 30] },
 ];
 
 function findSide(r: () => number): Question {
   for (;;) {
     const ctx = pick(r, SIDE_CONTEXTS);
-    const angle = int(r, 15, 75);
+    const angle = int(r, ...ctx.angles);
     if (TABLE_ANGLES.has(angle)) continue;
-    const len = int(r, 3, 30);
+    const len = int(r, ...ctx.lengths);
     const ratio = ratioFor(ctx.known, ctx.want);
     const value = f[ratio](angle * RAD);
     const wantOnTop = TOP[ratio] === ctx.want;
@@ -122,17 +123,14 @@ function findAngle(r: () => number): Question {
     const a = approx(angle);
     return {
       round: 'angles',
-      prompt: `In a right-angled triangle, the ${top} side is ${tl} cm and the ${bottom} is ${bl} cm. Find the angle θ.`,
+      prompt: `In a right-angled triangle, ${top === 'opposite' ? 'the side opposite θ' : 'the side adjacent to θ'} is ${tl} cm and ${bottom === 'hypotenuse' ? 'the hypotenuse' : 'the side adjacent to θ'} is ${bl} cm. Find the angle θ.`,
       steps: [
-        pairStep(r, top, bottom),
-        ratioStep(r, ratio),
+        { ...ratioStep(r, ratio), prompt: 'Which ratio uses the two sides you know? (SOH CAH TOA)' } as Step,
         { type: 'number', prompt: `Work out the ratio: ${ratio} θ = ${tl} ÷ ${bl} = ? (3 significant figures)`, ...approx(value), feedback: () => `Work out ${tl} ÷ ${bl}.` },
         {
           type: 'number',
           prompt: `Use the inverse function, ${ratio}^{−1}, on your calculator. What is θ, to 3 significant figures?`,
           ...a,
-          // Also right: the angle from the ratio already rounded to 3 significant figures, as the pupil typed it.
-          alsoAccept: [D(Number(((ratio === 'sin' ? Math.asin : ratio === 'cos' ? Math.acos : Math.atan)(Number(value.toPrecision(3))) / RAD).toPrecision(3)))],
           unit: '°',
           feedback: () => `Press ${ratio}^{−1} (often shift, then ${ratio}) and enter ${tl} ÷ ${bl}. Check your calculator is in degrees.`,
         },
@@ -152,7 +150,9 @@ function pythagoras(r: () => number): Question {
     const hyp = r() < 0.6;
     const a = int(r, 2, 15);
     const b = int(r, 2, 15);
-    if ((a === 3 && b === 4) || (a === 4 && b === 3)) continue; // the example in the notes
+    // The 3, 4, 5 and 6, 8, 10 triangles from the page, in any arrangement.
+    const set = [a, b, hyp ? Math.round(Math.sqrt(a * a + b * b)) : Math.round(Math.sqrt(Math.abs(b * b - a * a)))].sort((x, y) => x - y).join(',');
+    if (set === '3,4,5' || set === '6,8,10') continue;
     if (!hyp && b <= a) continue; // finding a shorter side: the hypotenuse b is longer than a
     const exact = hyp ? Math.sqrt(a * a + b * b) : Math.sqrt(b * b - a * a);
     const inside = hyp ? a * a + b * b : b * b - a * a;
@@ -167,8 +167,8 @@ function pythagoras(r: () => number): Question {
       round: 'pythagoras',
       prompt,
       steps: [
-        { type: 'number', prompt: `Square the first: ${a}^{2} = ?`, answer: D(a * a), feedback: () => `${a} × ${a}.` },
-        { type: 'number', prompt: `Square the other: ${b}^{2} = ?`, answer: D(b * b), feedback: () => `${b} × ${b}.` },
+        { type: 'number', prompt: `Square ${hyp ? 'one shorter side' : 'the shorter side you know'}: ${a}^{2} = ?`, answer: D(a * a), feedback: () => `${a} × ${a}.` },
+        { type: 'number', prompt: `Square ${hyp ? 'the other shorter side' : 'the hypotenuse'}: ${b}^{2} = ?`, answer: D(b * b), feedback: () => `${b} × ${b}.` },
         {
           type: 'choice',
           prompt: `a^{2} + b^{2} = c^{2}, where c is the hypotenuse. ${hyp ? 'You want the hypotenuse.' : 'You want a shorter side.'} What do you do with the two squares?`,

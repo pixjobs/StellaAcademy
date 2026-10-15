@@ -30,6 +30,7 @@ import { multiplicationVerifier } from './quiz/multiplication';
 import { negativeNumbersVerifier } from './quiz/negative-numbers';
 import { probabilityVerifier } from './quiz/probability';
 import { proportionsVerifier } from './quiz/proportions';
+import { statisticsVerifier } from './quiz/statistics';
 import { trigonometryVerifier } from './quiz/trigonometry';
 import { vectorsVerifier } from './quiz/vectors';
 import type { Verifier } from './quiz/types';
@@ -52,6 +53,7 @@ const VERIFIERS: Record<string, Verifier> = {
   trigonometry: trigonometryVerifier,
   vectors: vectorsVerifier,
   probability: probabilityVerifier,
+  statistics: statisticsVerifier,
 };
 
 export function runQuizChecks(lessons?: string[]): Finding[] {

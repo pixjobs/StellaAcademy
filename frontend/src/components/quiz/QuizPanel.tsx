@@ -41,11 +41,19 @@ function T({ text }: { text: string }) {
       {parts.map((p, i) => {
         if (p.startsWith('^{')) return <sup key={i} className="text-[0.7em]">{p.slice(2, -1)}</sup>;
         if (p.startsWith('[[')) {
-          const [top, bottom] = p.slice(2, -2).split(';');
+          // Rows split by ";", entries by ",": [[3;−2]] is a column vector, [[1,2;3,4]] a 2 × 2 matrix.
+          const rows = p.slice(2, -2).split(';').map((row) => row.split(','));
           return (
-            <span key={i} className="mx-0.5 inline-flex flex-col items-center rounded-md border-x-2 border-current px-1.5 align-middle text-[0.9em] leading-tight" aria-label={`column vector ${top}, ${bottom}`}>
-              <span>{top}</span>
-              <span>{bottom}</span>
+            <span
+              key={i}
+              className="mx-0.5 inline-grid items-center gap-x-2 rounded-md border-x-2 border-current px-1.5 text-center align-middle text-[0.9em] leading-tight"
+              style={{ gridTemplateColumns: `repeat(${rows[0].length}, auto)` }}
+              role="img"
+              aria-label={rows[0].length === 1 ? `column vector ${rows.map((r) => r[0]).join(', ')}` : `matrix, rows ${rows.map((r) => r.join(' ')).join('; ')}`}
+            >
+              {rows.flat().map((cell, k) => (
+                <span key={k}>{cell}</span>
+              ))}
             </span>
           );
         }
@@ -307,7 +315,7 @@ export default function QuizPanel({ lesson }: { lesson: ConceptId }) {
 
   // Announce, even when the same words come twice in a row.
   const announce = (raw: string) => {
-    const text = raw.replace(/\^\{([^}]*)\}/g, ' to the power $1').replace(/\[\[([^;\]]*);([^\]]*)\]\]/g, ' column vector $1, $2 '); // read maths aloud
+    const text = raw.replace(/\^\{([^}]*)\}/g, ' to the power $1').replace(/\[\[([^\]]*)\]\]/g, (_, m: string) => (m.includes(',') ? ` matrix ${m.replace(/;/g, '; ')} ` : ` column vector ${m.replace(';', ', ')} `)); // read maths aloud
     setSaid((old) => (old === text ? `${text}\u00a0` : text));
   };
 

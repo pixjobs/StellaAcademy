@@ -43,7 +43,10 @@ export const probabilityVerifier: Verifier = {
     const last = q.steps.length - 1;
     if (c.kind === 'and') return [{ step: last, typed: String(Number(math.add(fr(c.p), fr(c.q)))), expect: 'adds them' }];
     if (c.kind === 'single' && !c.not) return c.total - c.want > 0 ? [{ step: 1, typed: `${c.want}/${c.total - c.want}`, expect: 'counters that are not' }] : [];
-    if (c.kind === 'without') return [{ step: 1, typed: `${c.want - 1}/${c.total}`, expect: 'One counter has gone' }];
+    if (c.kind === 'without') {
+      const kept = math.fraction(c.want * (c.want - 1), c.total * c.total) as MFraction;
+      return [{ step: 1, typed: `${c.want - 1}/${c.total}`, expect: 'One counter has gone' }, { step: last, typed: `${kept.n}/${kept.d}`, expect: 'one less' }];
+    }
     if (c.kind === 'backups') return [{ step: last, typed: String(Number((Number(c.p) * c.n).toFixed(2))), expect: 'can be more than 1' }];
     return [];
   },

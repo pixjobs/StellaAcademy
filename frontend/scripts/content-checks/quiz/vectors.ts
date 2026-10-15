@@ -28,8 +28,8 @@ export const vectorsVerifier: Verifier = {
       const sum = Math.abs(c.v[0]) + Math.abs(c.v[1]);
       return Math.abs(sum - c.answer) > 0.01 ? [{ step: last, typed: String(sum), expect: 'adds the parts' }] : [];
     }
-    if (c.kind === 'combine' && c.kb === -1 && c.b[0] < 0) {
-      const slip = c.ka * c.a[0] - Math.abs(c.b[0]);
+    if (c.kind === 'combine' && c.kb < 0 && c.b[0] < 0) {
+      const slip = c.ka * c.a[0] + c.kb * Math.abs(c.b[0]);
       const at = q.steps.findIndex((s) => s.prompt.startsWith('What is the top'));
       return slip === c.answer[0] ? [] : [{ step: at, typed: slip < 0 ? `-${-slip}` : String(slip), expect: 'Taking away a negative' }];
     }
