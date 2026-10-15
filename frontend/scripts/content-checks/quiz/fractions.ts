@@ -41,15 +41,15 @@ export const fractionsVerifier: Verifier = {
       return taken <= 0 || taken === Number(c.answer) ? [] : [{ step: 1, typed: String(taken), expect: 'took' }];
     }
     if (c.kind === 'of-amount') {
-      const byTop = c.a / c.n;
-      return Number.isInteger(byTop) && byTop !== c.a / c.d ? [{ step: 0, typed: String(byTop), expect: 'top number' }] : [];
+      // Every fraction-of-amount question is built so that this slip gives a whole number.
+      return [{ step: 0, typed: String(c.a / c.n), expect: 'top number' }];
     }
     if (c.kind === 'part-whole') return [{ step: 0, typed: `${c.whole}/${c.part}`, expect: 'upside down' }];
     if (c.kind === 'simplest') {
       // A common factor that is not the biggest is named as such.
       const g = Number(math.gcd(c.n, c.d));
       const smaller = [2, 3, 5, 7].find((p) => g % p === 0 && p !== g);
-      return smaller ? [{ step: 0, typed: String(smaller), expect: 'bigger number' }] : [];
+      return [...(smaller ? [{ step: 0, typed: String(smaller), expect: 'bigger number' }] : []), { step: 0, typed: '1', expect: 'every number' }];
     }
     return [];
   },

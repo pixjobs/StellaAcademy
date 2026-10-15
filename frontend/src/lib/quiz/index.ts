@@ -1,10 +1,12 @@
 import type { ConceptId } from '@/lib/study-modules';
 import type { LessonQuiz } from '@/lib/quiz/core';
 import { arithmeticQuiz } from '@/lib/quiz/arithmetic';
+import { basicGeometryQuiz } from '@/lib/quiz/basic-geometry';
 import { decimalsPercentagesQuiz } from '@/lib/quiz/decimals-percentages';
 import { fractionOpsQuiz } from '@/lib/quiz/fraction-ops';
 import { fractionsQuiz } from '@/lib/quiz/fractions';
 import { measuresQuiz } from '@/lib/quiz/measures';
+import { multiplicationQuiz } from '@/lib/quiz/multiplication';
 
 /** Lessons with a step-by-step quiz (KAN-70). On these, the quiz takes the place of the printed practice questions. */
 export const QUIZZES: Partial<Record<ConceptId, LessonQuiz>> = {
@@ -13,6 +15,8 @@ export const QUIZZES: Partial<Record<ConceptId, LessonQuiz>> = {
   fractions: fractionsQuiz as LessonQuiz,
   'fraction-ops': fractionOpsQuiz as LessonQuiz,
   arithmetic: arithmeticQuiz as LessonQuiz,
+  multiplication: multiplicationQuiz as LessonQuiz,
+  'basic-geometry': basicGeometryQuiz as LessonQuiz,
 };
 
 export const hasQuiz = (id: ConceptId) => id in QUIZZES;

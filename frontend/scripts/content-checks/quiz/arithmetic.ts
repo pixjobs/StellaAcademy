@@ -32,17 +32,30 @@ export const arithmeticVerifier: Verifier = {
     const out: { step: number; typed: string; expect: string }[] = [];
     // Only a pure "× or ÷ after + or −" case is the left-to-right slip; equal-priority pairs are named differently.
     if (ltr !== null && Number.isInteger(ltr) && ltr !== q.check.answer && /[+−].*[×÷]/.test(q.check.expr)) out.push({ step: last, typed: String(ltr), expect: 'left to right' });
-    const m = q.check.expr.match(/^\((\d+) ([+−]) (\d+)\)²$/);
+    const m = q.check.expr.match(/\((\d+) ([+−]) (\d+)\)²/);
     if (m) {
       const [x, y] = [Number(m[1]), Number(m[3])];
-      const wrong = m[2] === '+' ? x * x + y * y : x * x - y * y;
-      if (wrong !== q.check.answer && wrong > 0) out.push({ step: last, typed: String(wrong), expect: 'bracket first' });
+      const squared = m[2] === '+' ? x * x + y * y : x * x - y * y;
+      const wrong = math.evaluate(js(q.check.expr.replace(m[0], `(${squared})`))) as number;
+      if (wrong !== q.check.answer && wrong > 0 && Number.isInteger(wrong)) out.push({ step: last, typed: String(wrong), expect: 'bracket first' });
+      // Choosing to square the second number first is named too.
+      const choice = q.steps[0];
+      if (choice.type === 'choice' && choice.options.includes(`${y}²`)) out.push({ step: 0, typed: `${y}²`, expect: 'bracket first' });
     }
     const eq = q.check.expr.match(/^(\d+) ([×÷+−]) (\d+) ([×÷+−]) (\d+)$/);
     if (eq && ((eq[2] === '÷' && eq[4] === '×') || (eq[2] === '−' && eq[4] === '+'))) {
       const f = (a: number, o: string, b: number) => (o === '+' ? a + b : o === '−' ? a - b : o === '×' ? a * b : a / b);
       const wrong = f(Number(eq[1]), eq[2], f(Number(eq[3]), eq[4], Number(eq[5])));
       if (Number.isInteger(wrong) && wrong !== q.check.answer) out.push({ step: last, typed: String(wrong), expect: 'left to right' });
+    }
+    // Wrong first picks are named: + or − before × or ÷, and the right-hand one of two equal operations.
+    const choice = q.steps[0];
+    const two = q.check.expr.match(/^(\d+) ([+−×÷]) (\d+) ([+−×÷]) (\d+)$/);
+    if (choice.type === 'choice' && two) {
+      const [, a, o1, b, o2, c] = two;
+      const md = (o: string) => o === '×' || o === '÷';
+      if (!md(o1) && md(o2) && choice.options.includes(`${a} ${o1} ${b}`)) out.push({ step: 0, typed: `${a} ${o1} ${b}`, expect: 'left to right' });
+      if (md(o1) === md(o2) && choice.options.includes(`${b} ${o2} ${c}`)) out.push({ step: 0, typed: `${b} ${o2} ${c}`, expect: 'are equal' });
     }
     return out;
   },

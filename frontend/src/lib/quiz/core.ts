@@ -41,6 +41,8 @@ export type FractionStep = {
   denominator?: bigint;
   /** Show the answer as a mixed number (3 11/24) once it is done. */
   mixed?: boolean;
+  /** The question asks for a mixed number: an improper fraction, or a fraction part of 1 or more, is refused. */
+  requireMixed?: boolean;
   feedback: (given: Fraction) => string;
 };
 
@@ -182,7 +184,7 @@ export function readFraction(text: string): Fraction | null {
 
 /** Reads a typed number: digits with optional commas, then optionally a unit or %. */
 export function readAnswer(text: string): { value: Digits; unit: string } | null {
-  const m = text.trim().match(/^(?:about\s+)?([\d.,]+)\s*([a-zA-Z %]*)$/i);
+  const m = text.trim().match(/^(?:about\s+)?([\d.,]+)\s*([a-zA-Z %²^.]*2?)$/i);
   const value = m && parseDecimal(m[1]);
   return value ? { value, unit: m[2].trim().toLowerCase() } : null;
 }
@@ -194,6 +196,9 @@ const UNIT_WORDS: Record<string, string[]> = {
   miles: ['mile', 'miles'], inches: ['in', 'inch', 'inches'], pounds: ['lb', 'lbs', 'pound', 'pounds'], litres: ['l', 'litre', 'litres'],
   '%': ['%', 'percent', 'per cent'],
   '£': ['£'],
+  // The last word is the one feedback uses.
+  'cm²': ['cm²', 'cm2', 'cm^2', 'sq cm', 'sq. cm', 'cm sq', 'square cm', 'square centimetre', 'square centimetres'],
+  'm²': ['m²', 'm2', 'm^2', 'sq m', 'sq. m', 'm sq', 'square m', 'square metre', 'square metres'],
 };
 
 /** Is the typed number right? Empty feedback means yes. */
@@ -220,6 +225,10 @@ export function markFraction(step: FractionStep, text: string): { ok: boolean; f
   const given = readFraction(text);
   if (!given) return { ok: false, feedback: 'Type a fraction such as 7/20.' };
   if (fracEqual(given, step.answer)) {
+    if (step.requireMixed && step.answer.n > step.answer.d) {
+      const m = text.trim().replace(/\s+/g, ' ').match(/^(\d+) (\d+)\s*\/\s*(\d+)$/);
+      if (!m || Number(m[2]) >= Number(m[3])) return { ok: false, feedback: 'That is the right amount. Write it as a mixed number: a whole number and a fraction less than 1, such as 2 4/5.' };
+    }
     if (step.denominator && given.d !== step.denominator) return { ok: false, feedback: `Write it with ${step.denominator} on the bottom.` };
     if (step.simplest && !isSimplest(given)) return { ok: false, feedback: 'That is equal, but it can be simplified. Divide the top and bottom by a number that goes into both.' };
     return { ok: true, feedback: '' };

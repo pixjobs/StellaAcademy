@@ -23,8 +23,8 @@ type Question = Q<FractionsCheck>;
 
 /** Examples shown on the lesson page. The quiz never asks these. */
 const SHOWN = new Set([
-  'eq 1/2 4', 'eq 1/2 8', 'eq 1/2 100', 'eq 2/4 8', 'eq 7/10 100', 'eq 9/10 100', 'eq 1/4 100', 'eq 1/5 100', 'eq 3/4 4',
-  'simplest 10/15', 'simplest 2/4', 'simplest 50/100',
+  'eq 1/2 4', 'eq 1/2 8', 'eq 1/2 100', 'eq 2/4 8', 'eq 7/10 100', 'eq 9/10 100', 'eq 1/4 100', 'eq 1/5 100',
+  'simplest 10/15', 'simplest 2/4', 'simplest 50/100', 'simplest 75/100', 'simplest 4/8',
   'of 2/3 90',
   'pw 300 900', 'pw 15 10', 'pw 7500 10000',
 ]);
@@ -100,6 +100,7 @@ function simplifySteps(n: number, d: number): { steps: Step[]; g: number; simple
         answer: D(g),
         feedback: (x) => {
           const v = num(x);
+          if (v === 1) return '1 divides into every number. Look for a bigger number that divides into both.';
           if (Number.isInteger(v) && v > 1 && n % v === 0 && d % v === 0) return `${v} divides into both, but a bigger number does too.`;
           return `${v} does not divide into both ${n} and ${d}. List the numbers that divide into ${n}, and find the biggest that also divides into ${d}.`;
         },
@@ -134,10 +135,10 @@ function simplest(r: () => number): Question {
 // ---------------------------------------------------------------------------------------------
 
 const AMOUNT_CONTEXTS = [
-  { ask: (f: string, a: number) => `What is ${f} of ${a}?`, unit: undefined as string | undefined, show: (v: number | string) => String(v) },
-  { ask: (f: string, a: number) => `A satellite has a mass of ${a} kg. ${f} of it is fuel. What is the mass of the fuel?`, unit: 'kg', show: (v: number | string) => `${v} kg` },
-  { ask: (f: string, a: number) => `A rover must drive ${a} km. It has done ${f} of the drive. How far is that?`, unit: 'km', show: (v: number | string) => `${v} km` },
-  { ask: (f: string, a: number) => `A class of ${a} pupils voted. ${f} of them chose Mars. How many pupils is that?`, unit: undefined, show: (v: number | string) => String(v) },
+  { ask: (f: string, a: number) => `What is ${f} of ${a}?`, unit: undefined as string | undefined, show: (v: number | string) => String(v), min: 6, max: 200 },
+  { ask: (f: string, a: number) => `A satellite has a mass of ${a} kg. Of that, ${f} is fuel. What is the mass of the fuel?`, unit: 'kg', show: (v: number | string) => `${v} kg`, min: 60, max: 600 },
+  { ask: (f: string, a: number) => `A rover must drive ${a} km. It has done ${f} of the drive. How far is that?`, unit: 'km', show: (v: number | string) => `${v} km`, min: 12, max: 300 },
+  { ask: (f: string, a: number) => `A class of ${a} pupils voted. Of them, ${f} chose Mars. How many pupils is that?`, unit: undefined, show: (v: number | string) => String(v), min: 20, max: 36 },
 ];
 
 function ofAmount(r: () => number): Question {
@@ -145,9 +146,11 @@ function ofAmount(r: () => number): Question {
     const d = pick(r, [3, 4, 5, 6, 8, 10]);
     const n = int(r, 2, d - 1);
     if (gcd(BigInt(n), BigInt(d)) !== 1n) continue;
-    const a = d * int(r, 2, 15);
-    if (SHOWN.has(`of ${n}/${d} ${a}`)) continue;
+    // A multiple of both n and d, so dividing by the top by mistake gives a whole number the feedback can name.
+    const step = (n * d) / Number(gcd(BigInt(n), BigInt(d)));
     const ctx = pick(r, AMOUNT_CONTEXTS);
+    const a = step * int(r, Math.ceil(ctx.min / step), Math.max(Math.ceil(ctx.min / step), Math.floor(ctx.max / step)));
+    if (a < ctx.min || a > ctx.max || a / n === a / d || SHOWN.has(`of ${n}/${d} ${a}`)) continue;
     const one = a / d;
     const answer = one * n;
     const byTop = a / n; // the slip: dividing by the top number
@@ -176,11 +179,11 @@ function ofAmount(r: () => number): Question {
 }
 
 const PART_WHOLE = [
-  { make: (p: number, w: number) => `A lander has a mass of ${w} kg, and ${p} kg of that is fuel. What fraction of the lander is fuel?`, unit: 'kg' },
-  { make: (p: number, w: number) => `A team of ${w} people builds a rover. ${p} of them are engineers. What fraction of the team are engineers?`, unit: '' },
-  { make: (p: number, w: number) => `A probe sends ${w} pictures, and ${p} of them show clouds. What fraction of the pictures show clouds?`, unit: '' },
+  { make: (p: number, w: number) => `A lander has a mass of ${w} kg, and ${p} kg of that is fuel. What fraction of the lander is fuel?`, min: 100, max: 2000 },
+  { make: (p: number, w: number) => `A team of ${w} people builds a rover. Of them, ${p} are engineers. What fraction of the team are engineers?`, min: 8, max: 40 },
+  { make: (p: number, w: number) => `A probe sends ${w} pictures, and ${p} of them show clouds. What fraction of the pictures show clouds?`, min: 10, max: 200 },
 ];
-const BIGGER = { make: (p: number, w: number) => `A rocket is ${p} m tall. Another is ${w} m tall. What fraction of the second rocket's height is the first? Your answer will be bigger than 1.`, unit: 'm' };
+const BIGGER = { make: (p: number, w: number) => `A rocket is ${p} m tall. Another is ${w} m tall. What fraction of the second rocket's height is the first? Your answer will be bigger than 1.`, min: 4, max: 120 };
 
 function partWhole(r: () => number): Question {
   for (;;) {
@@ -188,11 +191,12 @@ function partWhole(r: () => number): Question {
     const d0 = pick(r, [2, 3, 4, 5, 8, 10]);
     const n0 = bigger ? int(r, d0 + 1, 2 * d0) : int(r, 1, d0 - 1);
     if (gcd(BigInt(n0), BigInt(d0)) !== 1n) continue;
-    const k = bigger ? int(r, 2, 6) : pick(r, [2, 3, 4, 5, 6, 10, 20, 25, 50]);
+    const ctx = bigger ? BIGGER : pick(r, PART_WHOLE);
+    const k = bigger ? int(r, 2, 6) : pick(r, [2, 3, 4, 5, 6, 10, 20, 25, 50, 100]);
     const part = n0 * k;
     const whole = d0 * k;
-    if (SHOWN.has(`pw ${part} ${whole}`)) continue;
-    const ctx = bigger ? BIGGER : pick(r, PART_WHOLE);
+    if (whole < ctx.min || whole > ctx.max) continue;
+    if (SHOWN.has(`pw ${part} ${whole}`) || SHOWN.has(`simplest ${part}/${whole}`)) continue;
     const { steps, g, simple } = simplifySteps(part, whole);
     return {
       round: 'amounts',

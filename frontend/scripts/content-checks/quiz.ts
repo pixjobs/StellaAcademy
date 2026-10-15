@@ -19,10 +19,12 @@ import { formatDecimal } from '../../src/lib/measures';
 import { answerText, markTyped, rng, type Question } from '../../src/lib/quiz/core';
 import { QUIZZES } from '../../src/lib/quiz';
 import { arithmeticVerifier } from './quiz/arithmetic';
+import { basicGeometryVerifier } from './quiz/basic-geometry';
 import { decimalsPercentagesVerifier } from './quiz/decimals-percentages';
 import { fractionOpsVerifier } from './quiz/fraction-ops';
 import { fractionsVerifier } from './quiz/fractions';
 import { measuresVerifier } from './quiz/measures';
+import { multiplicationVerifier } from './quiz/multiplication';
 import type { Verifier } from './quiz/types';
 
 type Finding = { check: string; lesson: string; where: string; excerpt: string; message: string; level: 'fail' | 'warn' | 'info' };
@@ -34,6 +36,8 @@ const VERIFIERS: Record<string, Verifier> = {
   fractions: fractionsVerifier,
   'fraction-ops': fractionOpsVerifier,
   arithmetic: arithmeticVerifier,
+  multiplication: multiplicationVerifier,
+  'basic-geometry': basicGeometryVerifier,
 };
 
 export function runQuizChecks(lessons?: string[]): Finding[] {
@@ -98,7 +102,9 @@ export function runQuizChecks(lessons?: string[]): Finding[] {
           } else {
             const a = answerText(s);
             if (!markTyped(s, a).ok) fail(where, s.prompt, `marker rejects "${a}"`);
-            const doubled = `${s.answer.n * 2n}/${s.answer.d * 2n}`;
+            // An equal fraction, not simplified (as a mixed number where one is required).
+            const { n: fn, d: fd } = s.answer;
+            const doubled = s.requireMixed && fn > fd ? `${fn / fd} ${(fn % fd) * 2n}/${fd * 2n}` : `${fn * 2n}/${fd * 2n}`;
             const m = markTyped(s, doubled);
             const expectRejected = s.denominator ? /on the bottom/ : s.simplest ? /simplified/ : null;
             if (expectRejected ? m.ok || !expectRejected.test(m.feedback) : !m.ok) fail(where, s.prompt, `fraction marking wrong for "${doubled}": ${m.ok ? 'accepted' : m.feedback}`);
@@ -108,7 +114,16 @@ export function runQuizChecks(lessons?: string[]): Finding[] {
 
         for (const m of verifier.mistakes?.(q) ?? []) {
           const s = q.steps[m.step];
-          if (s.type === 'choice') continue;
+          if (!s) {
+            fail(where, q.prompt, `slip refers to a missing step ${m.step + 1}`);
+            continue;
+          }
+          if (s.type === 'choice') {
+            // A wrong option: its own feedback must name the mistake.
+            const k = s.options.indexOf(m.typed);
+            if (k === -1 || k === s.correct || !(s.why[k] ?? '').includes(m.expect)) fail(where, q.prompt, `option "${m.typed}" at step ${m.step + 1} gave "${k === -1 ? 'no such option' : s.why[k]}", expected feedback with "${m.expect}"`);
+            continue;
+          }
           const res = markTyped(s, m.typed);
           if (res.ok || !res.feedback.includes(m.expect)) fail(where, q.prompt, `slip "${m.typed}" at step ${m.step + 1} gave "${res.ok ? 'accepted' : res.feedback}", expected feedback with "${m.expect}"`);
         }

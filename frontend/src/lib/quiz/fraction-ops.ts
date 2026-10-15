@@ -20,8 +20,10 @@ type Question = Q<FractionOpsCheck>;
 const SHOWN = new Set([
   'add 1/3 1/4', 'add 2/7 3/7', 'add 1/2 1/5', 'sub 3/4 1/3', 'sub 3/4 2/8', 'sub 3/4 1/4',
   'mixed-add 1 1/2 2 1/3', 'mixed-sub 3 1/4 1 1/2',
-  'mul 4/5 1/2', 'mul 1/2 1/4', 'mul 2/3 3/4', 'div 1/2 3', 'div 3/4 2',
+  'mul 4/5 1/2', 'mul 1/2 1/4', 'mul 2/3 3/4', 'mul 1/2 3/4', 'div 1/2 3', 'div 3/4 2',
 ]);
+/** Adding and multiplying work either way round, so both orders count as shown. */
+const shown = (kind: string, a: string, b: string) => SHOWN.has(`${kind} ${a} ${b}`) || ((kind === 'add' || kind === 'mul') && SHOWN.has(`${kind} ${b} ${a}`));
 
 const big = (x: bigint) => Number(x);
 const lcm = (a: number, b: number) => (a * b) / Number(gcd(BigInt(a), BigInt(b)));
@@ -86,8 +88,7 @@ function addSub(r: () => number): Question {
     const L = lcm(big(a.d), big(b.d));
     const exact = sub ? F(big(a.n) * big(b.d) - big(b.n) * big(a.d), big(a.d) * big(b.d)) : F(big(a.n) * big(b.d) + big(b.n) * big(a.d), big(a.d) * big(b.d));
     if (exact.n <= 0n || big(exact.n) >= big(exact.d)) continue; // a proper fraction, so the answer is not a mixed number here
-    const key = `${sub ? 'sub' : 'add'} ${fracText(a)} ${fracText(b)}`;
-    if (SHOWN.has(key) || L > 60) continue;
+    if (shown(sub ? 'sub' : 'add', fracText(a), fracText(b)) || L > 60) continue;
     const answer = simplify(exact);
     const sign = sub ? '−' : '+';
     const sumTops = F(big(a.n) + (sub ? -big(b.n) : big(b.n)), big(a.d) + big(b.d)); // the slip: adding tops and bottoms
@@ -131,16 +132,16 @@ function mixed(r: () => number): Question {
   for (;;) {
     const x = proper(r, [2, 3, 4, 5, 6, 8, 10]);
     const y = proper(r, [2, 3, 4, 5, 6, 8, 10]);
+    if (x.d === y.d) continue; // different bottoms, so a common bottom number is needed
     const L = lcm(big(x.d), big(y.d));
-    if (L > 40) continue;
-    const w1 = int(r, 1, 5);
-    const w2 = int(r, 1, 4);
+    if (L > 24) continue; // keeps the improper fractions to a size a Year 6 pupil can handle
+    const w1 = int(r, 1, 3);
+    const w2 = int(r, 1, 2);
     const sub = r() < 0.5;
     if (!sub) {
       const fracSum = F(big(x.n) * big(y.d) + big(y.n) * big(x.d), big(x.d) * big(y.d));
       if (big(fracSum.n) >= big(fracSum.d)) continue; // the fractions add to less than 1
-      const key = `mixed-add ${w1} ${fracText(x)} ${w2} ${fracText(y)}`;
-      if (SHOWN.has(key)) continue;
+      if (SHOWN.has(`mixed-add ${w1} ${fracText(x)} ${w2} ${fracText(y)}`)) continue;
       const fs = simplify(fracSum);
       const total = F(BigInt(w1 + w2) * fs.d + fs.n, fs.d);
       const ka = L / big(x.d);
@@ -157,7 +158,7 @@ function mixed(r: () => number): Question {
             answer: F(big(x.n) * ka + big(y.n) * kb, L),
             simplest: false,
             denominator: BigInt(L),
-            feedback: () => `${fracText(x)} = ${big(x.n) * ka}/${L} and ${fracText(y)} = ${big(y.n) * kb}/${L}. Add the tops.`,
+            feedback: () => `Write each fraction over ${L} first, then add the tops.`,
           },
           {
             type: 'fraction',
@@ -165,6 +166,7 @@ function mixed(r: () => number): Question {
             answer: total,
             simplest: true,
             mixed: true,
+            requireMixed: true,
             feedback: () => `Put the whole number ${w1 + w2} with the fraction you found, simplified.`,
           },
         ],
@@ -175,8 +177,7 @@ function mixed(r: () => number): Question {
     // Subtract: turn both into improper fractions over the common bottom number.
     const A = F(BigInt(w1 + w2) * x.d + x.n, x.d); // the bigger mixed number
     const B = F(BigInt(w2) * y.d + y.n, y.d);
-    const key = `mixed-sub ${mixedText(A)} ${mixedText(B)}`;
-    if (SHOWN.has(key)) continue;
+    if (SHOWN.has(`mixed-sub ${mixedText(A)} ${mixedText(B)}`)) continue;
     const diff = F(big(A.n) * big(B.d) - big(B.n) * big(A.d), big(A.d) * big(B.d));
     if (diff.n <= 0n) continue;
     const answer = simplify(diff);
@@ -187,8 +188,8 @@ function mixed(r: () => number): Question {
       prompt: `Work out ${mixedText(A)} − ${mixedText(B)}. Give your answer in its simplest form.`,
       steps: [
         lcmStep(big(A.d), big(B.d)),
-        { type: 'fraction', prompt: `Write ${mixedText(A)} as an improper fraction with ${L} on the bottom.`, answer: F(big(A.n) * ka, L), simplest: false, denominator: BigInt(L), feedback: () => `${w1 + w2} whole ones is ${(w1 + w2) * L}/${L}. Add the ${big(x.n) * ka}/${L}.` },
-        { type: 'fraction', prompt: `Write ${mixedText(B)} as an improper fraction with ${L} on the bottom.`, answer: F(big(B.n) * kb, L), simplest: false, denominator: BigInt(L), feedback: () => `${w2} whole ones is ${w2 * L}/${L}. Add the ${big(y.n) * kb}/${L}.` },
+        { type: 'fraction', prompt: `Write ${mixedText(A)} as an improper fraction with ${L} on the bottom.`, answer: F(big(A.n) * ka, L), simplest: false, denominator: BigInt(L), feedback: () => `Multiply the whole number by ${L}, then add the top of the fraction once it is over ${L}.` },
+        { type: 'fraction', prompt: `Write ${mixedText(B)} as an improper fraction with ${L} on the bottom.`, answer: F(big(B.n) * kb, L), simplest: false, denominator: BigInt(L), feedback: () => `Multiply the whole number by ${L}, then add the top of the fraction once it is over ${L}.` },
         { type: 'fraction', prompt: `Take away the tops. What is the answer? You can type it as a mixed number.`, answer, simplest: true, mixed: true, feedback: () => `${big(A.n) * ka}/${L} − ${big(B.n) * kb}/${L}: take away the tops, then simplify.` },
       ],
       workings: [`${mixedText(A)} = ${big(A.n) * ka}/${L} and ${mixedText(B)} = ${big(B.n) * kb}/${L}.`, `${big(A.n) * ka}/${L} − ${big(B.n) * kb}/${L} = ${big(A.n) * ka - big(B.n) * kb}/${L}.`, `So the answer is ${mixedText(answer)}.`],
@@ -206,8 +207,7 @@ function multiplyDivide(r: () => number): Question {
     if (r() < 0.55) {
       const a = proper(r, [2, 3, 4, 5, 6, 7, 8, 9, 10]);
       const b = proper(r, [2, 3, 4, 5, 6, 7, 8, 9, 10]);
-      const key = `mul ${fracText(a)} ${fracText(b)}`;
-      if (SHOWN.has(key)) continue;
+      if (shown('mul', fracText(a), fracText(b))) continue;
       const tops = big(a.n) * big(b.n);
       const bottoms = big(a.d) * big(b.d);
       const answer = simplify(F(tops, bottoms));
@@ -225,8 +225,8 @@ function multiplyDivide(r: () => number): Question {
     }
     const a = proper(r, [2, 3, 4, 5, 6, 7, 8, 9, 10]);
     const n = int(r, 2, 6);
-    const key = `div ${fracText(a)} ${n}`;
-    if (SHOWN.has(key)) continue;
+    // When n divides the top, dividing the top also gives the right answer, so the choice would be unfair.
+    if (big(a.n) % n === 0 || SHOWN.has(`div ${fracText(a)} ${n}`)) continue;
     const bottom = big(a.d) * n;
     const answer = simplify(F(big(a.n), bottom));
     const options = shuffle(r, ['It stays the same', `It is multiplied by ${n}`, `It is divided by ${n}`]);

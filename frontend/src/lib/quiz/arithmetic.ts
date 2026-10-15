@@ -17,7 +17,21 @@ export type ArithmeticCheck = { expr: string; answer: number };
 type Question = Q<ArithmeticCheck>;
 
 /** Examples shown on the lesson page. The quiz never asks these. */
-const SHOWN = new Set(['8 − 4 ÷ 2 + (1 + 1)²', '5 + 2 × 3', '(5 + 2) × 3', '16 ÷ 4 × 2', '10 − 4 + 3', '3 × 2 × 5 + 4', '4 × 3 + 2', '6 + 4 × 5', '(6 + 4) × 5', '18 ÷ 3 × 2', '3² + 4 × 2', '2 + 3 × 4']);
+const SHOWN = new Set(['8 − 4 ÷ 2 + (1 + 1)²', '5 + 2 × 3', '(5 + 2) × 3', '16 ÷ 4 × 2', '10 − 4 + 3', '3 × 2 × 5 + 4', '3 × 2 × (5 + 4)', '4 × 3 + 2', '6 + 4 × 5', '(6 + 4) × 5', '18 ÷ 3 × 2', '3² + 4 × 2', '2 + 3 × 4', '(2 + 3) × 4']);
+
+/**
+ * Feedback for picking `option` as the first part when `first` is right. Each names the mistake behind
+ * the pick, without saying which part is right.
+ */
+function whyNotFirst(expr: string, first: string, option: string): string {
+  const inBracket = /\(/.test(expr) && expr.includes(`(${first})`);
+  if (inBracket && option.endsWith('²')) return 'Work out the bracket first, then square the answer. Squaring a number inside the bracket gives the wrong answer.';
+  if (inBracket) return 'Brackets come first: work out the part inside the brackets before anything else.';
+  if (first.endsWith('²')) return 'Powers come before ×, ÷, + and −: work out the power first.';
+  const md = (x: string) => /[×÷]/.test(x);
+  if (md(first) && !md(option)) return 'It looks like you worked from left to right. × and ÷ come before + and −.';
+  return md(first) ? '× and ÷ are equal, so work from left to right: start with the one on the left.' : '+ and − are equal, so work from left to right: start with the one on the left.';
+}
 
 // ---------------------------------------------------------------------------------------------
 // A tiny evaluator: tokens, one reduction at a time, in BIDMAS order
@@ -113,7 +127,7 @@ function slips(expr: string): { value: number; why: string }[] {
   if (ts.length === 5 && isOp(ts[1]) && isOp(ts[3])) {
     const [a, o1, b, o2, c] = ts as [number, Tok, number, Tok, number];
     const pair = (x: Tok, y: Tok) => (['×', '÷'].includes(x as string) && ['×', '÷'].includes(y as string)) || (['+', '−'].includes(x as string) && ['+', '−'].includes(y as string));
-    if (pair(o1, o2) && o1 !== o2) out.push({ value: apply(a, o1, apply(b, o2, c)), why: `The order in BIDMAS does not mean ${o2 === '÷' ? 'divide' : o2 === '+' ? 'add' : o2 === '−' ? 'subtract' : 'multiply'} first. ${o1} and ${o2} are equal: work from left to right.` });
+    if (pair(o1, o2) && o1 !== o2) out.push({ value: apply(a, o1, apply(b, o2, c)), why: `${o1} and ${o2} are equal, so work from left to right: ${a} ${o1} ${b} comes first.` });
   }
   // (a ± b)² worked as a² ± b².
   const m = expr.match(/\((\d+) ([+−]) (\d+)\)²/);
@@ -145,7 +159,7 @@ function stepsFor(r: () => number, expr: string): { steps: Step[]; answer: numbe
       prompt: `In ${expr}, which part do you work out first?`,
       options,
       correct,
-      why: whyAll(options, correct, () => `Brackets first, then powers, then × and ÷ from left to right, then + and − from left to right.`),
+      why: whyAll(options, correct, (o) => whyNotFirst(expr, s[0].part, o)),
     });
   }
   s.forEach((x, i) => {
@@ -182,8 +196,8 @@ const ORDER = [
 const BRACKETS = [
   (a: number, b: number, c: number) => `(${a} + ${b}) × ${c}`,
   (a: number, b: number, c: number) => `${c} × (${a + b} − ${b})`,
-  (a: number, b: number, c: number) => `${a} + ${b}²`,
-  (a: number, b: number, c: number) => `(${a + b} − ${b})²`,
+  (a: number, b: number) => `${a} + ${b}²`,
+  (a: number, b: number) => `(${a + b} − ${b})²`,
   (a: number, b: number, c: number) => `${a + 2}² − ${b} × ${c}`,
   (a: number, b: number, c: number) => `(${a * c} + ${b * c}) ÷ ${c}`,
   (a: number, b: number, c: number) => `(${a} + ${b})² − ${c}`,
@@ -234,9 +248,9 @@ const STORIES: Story[] = [
 ];
 
 function story(r: () => number): Question {
+  const st = pick(r, STORIES); // the story first, then numbers that suit it, so every story comes up as often
   for (;;) {
     const n = [int(r, 2, 9), int(r, 2, 6), int(r, 2, 9), int(r, 2, 12)];
-    const st = pick(r, STORIES);
     const right = st.right(n);
     if (SHOWN.has(right)) continue;
     const wrongs = st.wrong.map((w) => w(n)).filter((w) => Number.isInteger(evaluate(w)) && evaluate(w) > 0 && evaluate(w) !== evaluate(right));
@@ -257,7 +271,8 @@ function story(r: () => number): Question {
           correct,
           why: whyAll(options, correct, (o) => `${o} does not match: think about what happens to each number in the story, and where brackets are needed.`),
         },
-        ...unitFree.map((s, i) => (i === unitFree.length - 1 && money ? { ...s, unit: '£' } : s)),
+        // In the money story every amount is in pounds.
+        ...unitFree.map((s) => (money ? { ...s, unit: '£' } : s)),
       ],
       workings: [`The calculation is ${right}.`, ...workings, ...(money ? [`So each person gets £${answer}.`] : [])],
       check: { expr: right, answer },

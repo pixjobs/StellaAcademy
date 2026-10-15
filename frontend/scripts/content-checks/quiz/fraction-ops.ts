@@ -30,16 +30,32 @@ export const fractionOpsVerifier: Verifier = {
   mistakes: (question) => {
     const q = question as Question<FractionOpsCheck>;
     const c = q.check;
+    const last = q.steps.length - 1;
+    const out: { step: number; typed: string; expect: string }[] = [];
+    // A common bottom number that works but is not the smallest.
+    const lcmStep = q.steps.findIndex((s) => s.type === 'number' && /smallest number that both/.test(s.prompt));
+    if (lcmStep !== -1) {
+      const m = q.steps[lcmStep].prompt.match(/both (\d+) and (\d+)/)!;
+      const product = Number(m[1]) * Number(m[2]);
+      if (product !== Number(math.lcm(Number(m[1]), Number(m[2])))) out.push({ step: lcmStep, typed: String(product), expect: 'a smaller number' });
+    }
     if (c.kind === 'add') {
+      // Adding the bottoms as well as the tops.
       const [an, ad] = c.a.split('/').map(Number);
       const [bn, bd] = c.b.split('/').map(Number);
       const slip = `${an + bn}/${ad + bd}`;
-      return math.equal(parse(slip), parse(c.answer)) ? [] : [{ step: q.steps.length - 1, typed: slip, expect: 'added the bottom numbers' }];
+      if (!math.equal(parse(slip), parse(c.answer))) out.push({ step: last, typed: slip, expect: 'added the bottom numbers' });
+    }
+    if (c.kind === 'mixed-add') {
+      // The right amount as an improper fraction, when a mixed number is asked for.
+      const f = parse(c.answer);
+      out.push({ step: last, typed: `${f.n}/${f.d}`, expect: 'mixed number' });
     }
     if (c.kind === 'div') {
+      // Multiplying the top instead of sharing.
       const [an, ad] = c.a.split('/').map(Number);
-      return [{ step: 2, typed: `${an * Number(c.b)}/${ad}`, expect: 'Sharing makes each part smaller' }];
+      out.push({ step: last, typed: `${an * Number(c.b)}/${ad}`, expect: 'Sharing makes each part smaller' });
     }
-    return [];
+    return out;
   },
 };
