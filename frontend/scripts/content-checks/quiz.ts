@@ -20,7 +20,9 @@ import { answerText, markTyped, rng, type Question } from '../../src/lib/quiz/co
 import { QUIZZES } from '../../src/lib/quiz';
 import { arithmeticVerifier } from './quiz/arithmetic';
 import { basicGeometryVerifier } from './quiz/basic-geometry';
+import { binaryVerifier } from './quiz/binary';
 import { decimalsPercentagesVerifier } from './quiz/decimals-percentages';
+import { exponentsRootsVerifier } from './quiz/exponents-roots';
 import { fractionOpsVerifier } from './quiz/fraction-ops';
 import { fractionsVerifier } from './quiz/fractions';
 import { measuresVerifier } from './quiz/measures';
@@ -42,6 +44,8 @@ const VERIFIERS: Record<string, Verifier> = {
   'basic-geometry': basicGeometryVerifier,
   'negative-numbers': negativeNumbersVerifier,
   proportions: proportionsVerifier,
+  'exponents-roots': exponentsRootsVerifier,
+  binary: binaryVerifier,
 };
 
 export function runQuizChecks(lessons?: string[]): Finding[] {

@@ -2,7 +2,9 @@ import type { ConceptId } from '@/lib/study-modules';
 import type { LessonQuiz } from '@/lib/quiz/core';
 import { arithmeticQuiz } from '@/lib/quiz/arithmetic';
 import { basicGeometryQuiz } from '@/lib/quiz/basic-geometry';
+import { binaryQuiz } from '@/lib/quiz/binary';
 import { decimalsPercentagesQuiz } from '@/lib/quiz/decimals-percentages';
+import { exponentsRootsQuiz } from '@/lib/quiz/exponents-roots';
 import { fractionOpsQuiz } from '@/lib/quiz/fraction-ops';
 import { fractionsQuiz } from '@/lib/quiz/fractions';
 import { measuresQuiz } from '@/lib/quiz/measures';
@@ -21,6 +23,8 @@ export const QUIZZES: Partial<Record<ConceptId, LessonQuiz>> = {
   'basic-geometry': basicGeometryQuiz as LessonQuiz,
   'negative-numbers': negativeNumbersQuiz as LessonQuiz,
   proportions: proportionsQuiz as LessonQuiz,
+  'exponents-roots': exponentsRootsQuiz as LessonQuiz,
+  binary: binaryQuiz as LessonQuiz,
 };
 
 export const hasQuiz = (id: ConceptId) => id in QUIZZES;

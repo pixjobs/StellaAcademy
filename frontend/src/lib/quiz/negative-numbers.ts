@@ -139,7 +139,7 @@ function mulDiv(r: () => number): Question {
     const op = pick(r, ['×', '÷'] as const);
     const decimal = op === '×' && r() < 0.2;
     let a = nonZero(r, -12, 12) * (decimal ? 0.5 : 1);
-    let b = nonZero(r, -12, 12);
+    const b = nonZero(r, -12, 12);
     if (op === '÷') a = a * b; // exact division
     if (a > 0 && b > 0) continue;
     if (Math.abs(b) === 1 || SHOWN.has(`mul ${a} ${op} ${b}`)) continue;

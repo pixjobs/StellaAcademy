@@ -29,6 +29,8 @@ export type NumberStep = {
   feedback: (given: Digits) => string;
   /** Other answers that are also right, such as a rough answer rounded. */
   alsoAccept?: Digits[];
+  /** Show the answer without commas (a binary number such as 110011). */
+  plain?: boolean;
 };
 
 export type FractionStep = {
@@ -257,6 +259,7 @@ export const unitLabel = (u: string) => (u === '°c' ? '°C' : u);
 /** How an answer is shown once done. */
 export function answerText(step: Step): string {
   if (step.type === 'number') {
+    if (step.plain) return fmt(step.answer).replace(/,/g, '');
     if (step.unit === '£') return `£${fmt(step.answer)}`;
     return `${fmt(step.answer)}${step.unit ? (step.unit === '%' ? '%' : ` ${unitLabel(step.unit)}`) : ''}`;
   }
