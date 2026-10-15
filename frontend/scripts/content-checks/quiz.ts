@@ -19,13 +19,18 @@ import { formatDecimal } from '../../src/lib/measures';
 import { answerText, markTyped, rng, type Question } from '../../src/lib/quiz/core';
 import { QUIZZES } from '../../src/lib/quiz';
 import { decimalsPercentagesVerifier } from './quiz/decimals-percentages';
+import { fractionsVerifier } from './quiz/fractions';
 import { measuresVerifier } from './quiz/measures';
 import type { Verifier } from './quiz/types';
 
 type Finding = { check: string; lesson: string; where: string; excerpt: string; message: string; level: 'fail' | 'warn' | 'info' };
 
 const PER_ROUND = 3000;
-const VERIFIERS: Record<string, Verifier> = { measures: measuresVerifier, 'decimals-percentages': decimalsPercentagesVerifier };
+const VERIFIERS: Record<string, Verifier> = {
+  measures: measuresVerifier,
+  'decimals-percentages': decimalsPercentagesVerifier,
+  fractions: fractionsVerifier,
+};
 
 export function runQuizChecks(lessons?: string[]): Finding[] {
   const findings: Finding[] = [];

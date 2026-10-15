@@ -13,6 +13,7 @@ import OrbitLauncher from '@/components/paper/OrbitLauncher';
 import WaveInstrument from '@/components/paper/WaveInstrument';
 import UnitConverter from '@/components/study/UnitConverter';
 import QuizPanel from '@/components/quiz/QuizPanel';
+import TryItWithQuiz from '@/components/quiz/TryItWithQuiz';
 import { hasQuiz } from '@/lib/quiz';
 import { useQuizActive } from '@/lib/quiz/active';
 import type { ConceptId } from '@/lib/study-modules';
@@ -52,21 +53,23 @@ function Panel({ children }: { children: ReactNode }) {
 }
 
 /** The animated models, with a control where the lesson has one to adjust. */
-function AnimatedModel({ id }: { id: ConceptId }) {
+function AnimatedModel({ id, bare = false }: { id: ConceptId; bare?: boolean }) {
   const [refractiveIndex, setRefractiveIndex] = useState(1.5);
 
   const controls: Partial<Record<ConceptId, ReactNode>> = {
     prism: <Slider label="Refractive index" display={`n = ${refractiveIndex.toFixed(2)}`} min={1} max={2.5} step={0.1} value={refractiveIndex} onChange={setRefractiveIndex} />,
   };
 
-  return (
-    <Panel>
+  const body = (
+    <>
       <div className="mt-3 h-[360px] w-full overflow-hidden rounded-2xl ring-1 ring-white/10 lg:h-[400px]">
         <GSAPSimulation conceptId={id} refractiveIndex={refractiveIndex} />
       </div>
       {controls[id] && <div className="mt-4">{controls[id]}</div>}
-    </Panel>
+    </>
   );
+  // Bare: inside a Try it panel that already has its frame (the Explore tab).
+  return bare ? body : <Panel>{body}</Panel>;
 }
 
 /**
@@ -115,12 +118,17 @@ function QuizModel({ id }: { id: ConceptId }) {
 export default function LessonModel({ id }: { id: ConceptId }) {
   if (id === 'measures') return <MeasuresModel />; // pauses its own tools during a quiz question
   if (hasQuiz(id) && FLASHCARDS.includes(id)) return <QuizModel id={id} />;
+  // A lesson with its own animation and a quiz: Explore and Quiz tabs, as on Measures.
+  if (hasQuiz(id) && !CUSTOM_MODELS.includes(id)) return <TryItWithQuiz lesson={id} explore={<AnimatedModel id={id} bare />} />;
   return (
     <PausedDuringQuiz id={id}>
       <ModelFor id={id} />
     </PausedDuringQuiz>
   );
 }
+
+/** Lessons with their own model component rather than the shared animation. */
+const CUSTOM_MODELS: ConceptId[] = ['gravity', 'waves', 'circuit', 'trigonometry', 'gears', 'momentum', 'thermodynamics', 'trajectory', 'units'];
 
 function ModelFor({ id }: { id: ConceptId }) {
   if (id === 'gravity') return <OrbitLauncher placement="lesson" />;
