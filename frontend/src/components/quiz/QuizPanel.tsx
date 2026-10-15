@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { track } from '@/lib/track';
-import { answerText, markTyped, rng, type LessonQuiz, type Question } from '@/lib/quiz/core';
+import { answerText, markTyped, rng, unitLabel, type LessonQuiz, type Question } from '@/lib/quiz/core';
 import { QUIZZES } from '@/lib/quiz';
 import { useQuizActive } from '@/lib/quiz/active';
 import { dueNow, roundsToday, useSavedProgress, type RoundRecord } from '@/lib/quiz/progress';
@@ -204,7 +204,7 @@ function QuestionCard({
                     aria-label={`Step ${i + 1} answer${s.type === 'number' && s.unit ? ` in ${s.unit === '%' ? 'per cent' : s.unit}` : ''}`}
                     className="w-32 rounded-lg border border-white/20 bg-black/30 px-3 py-2 text-lg font-semibold text-white focus:border-cyan-300 focus:outline-none focus:ring-2 focus:ring-cyan-400/40"
                   />
-                  {s.type === 'number' && s.unit && s.unit !== '£' && <span className="text-sm font-semibold text-slate-200">{s.unit}</span>}
+                  {s.type === 'number' && s.unit && s.unit !== '£' && <span className="text-sm font-semibold text-slate-200">{unitLabel(s.unit)}</span>}
                   <button type="submit" className="rounded-lg bg-[#f6c453] px-3 py-2 text-sm font-bold text-[#0b1026] hover:bg-[#f8d27a] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
                     Check
                   </button>

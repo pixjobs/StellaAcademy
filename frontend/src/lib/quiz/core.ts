@@ -108,8 +108,14 @@ export function whyAll(options: string[], correct: number, why: (option: string,
 // Exact decimals
 // ---------------------------------------------------------------------------------------------
 
-export const D = (s: string | number) => parseDecimal(String(s))!;
-export const same = (a: Digits, b: Digits) => a.digits === b.digits && (a.digits === '0' || a.top === b.top);
+/** A decimal from text or a number, negative numbers included ("-5", "−5" or -5). */
+export const D = (s: string | number): Digits => {
+  const t = String(s).trim();
+  const neg = /^[-−]/.test(t);
+  const d = parseDecimal(t.replace(/^[-−]\s*/, ''))!;
+  return neg && d.digits !== '0' ? { ...d, neg: true } : d;
+};
+export const same = (a: Digits, b: Digits) => a.digits === b.digits && (a.digits === '0' || (a.top === b.top && !!a.neg === !!b.neg));
 export const fmt = formatDecimal;
 
 /** a × b, exactly. */
@@ -184,9 +190,10 @@ export function readFraction(text: string): Fraction | null {
 
 /** Reads a typed number: digits with optional commas, then optionally a unit or %. */
 export function readAnswer(text: string): { value: Digits; unit: string } | null {
-  const m = text.trim().match(/^(?:about\s+)?([\d.,]+)\s*([a-zA-Z %²^.]*2?)$/i);
-  const value = m && parseDecimal(m[1]);
-  return value ? { value, unit: m[2].trim().toLowerCase() } : null;
+  const m = text.trim().match(/^(?:about\s+)?([-−]?)\s*([\d.,]+)\s*([a-zA-Z %²^.°]*2?)$/i);
+  const value = m && parseDecimal(m[2]);
+  if (!m || !value) return null;
+  return { value: m[1] && value.digits !== '0' ? { ...value, neg: true } : value, unit: m[3].trim().toLowerCase() };
 }
 
 /** The ways a unit may be written after an answer. */
@@ -196,6 +203,9 @@ const UNIT_WORDS: Record<string, string[]> = {
   miles: ['mile', 'miles'], inches: ['in', 'inch', 'inches'], pounds: ['lb', 'lbs', 'pound', 'pounds'], litres: ['l', 'litre', 'litres'],
   '%': ['%', 'percent', 'per cent'],
   '£': ['£'],
+  days: ['day', 'days'],
+  watts: ['w', 'watt', 'watts'],
+  '°c': ['°c', '° c', 'c', 'degrees', '°', 'degrees c'],
   // The last word is the one feedback uses.
   'cm²': ['cm²', 'cm2', 'cm^2', 'sq cm', 'sq. cm', 'cm sq', 'square cm', 'square centimetre', 'square centimetres'],
   'm²': ['m²', 'm2', 'm^2', 'sq m', 'sq. m', 'm sq', 'square m', 'square metre', 'square metres'],
@@ -241,11 +251,14 @@ export function markTyped(step: NumberStep | FractionStep, text: string) {
   return step.type === 'number' ? markNumber(step, text) : markFraction(step, text);
 }
 
+/** A unit as shown on screen (units are stored lower case where a pupil may type them so). */
+export const unitLabel = (u: string) => (u === '°c' ? '°C' : u);
+
 /** How an answer is shown once done. */
 export function answerText(step: Step): string {
   if (step.type === 'number') {
     if (step.unit === '£') return `£${fmt(step.answer)}`;
-    return `${fmt(step.answer)}${step.unit ? (step.unit === '%' ? '%' : ` ${step.unit}`) : ''}`;
+    return `${fmt(step.answer)}${step.unit ? (step.unit === '%' ? '%' : ` ${unitLabel(step.unit)}`) : ''}`;
   }
   if (step.type === 'fraction') {
     const { n, d } = step.answer;

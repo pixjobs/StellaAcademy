@@ -48,8 +48,8 @@ export const MEASURES: Record<MeasureKind, { label: string; units: MetricUnit[] 
   },
 };
 
-/** A non-negative decimal written as its digits and the place value of the first one. */
-export type Digits = { digits: string; top: number };
+/** A decimal written as its digits and the place value of the first one. `neg` marks a negative number (quizzes only). */
+export type Digits = { digits: string; top: number; neg?: boolean };
 
 /** Parses "2.5", "0.005", "8,849" or "3500" into significant digits; null if it is not a non-negative decimal. */
 export function parseDecimal(text: string): Digits | null {
@@ -94,7 +94,7 @@ export function formatDecimal(d: Digits): string {
     else fraction += digitAt(d, p);
   }
   whole = whole.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-  return fraction ? `${whole}.${fraction}` : whole;
+  return (d.neg ? '−' : '') + (fraction ? `${whole}.${fraction}` : whole);
 }
 
 /** 10^n as text with commas: 1,000 or 1,000,000. */

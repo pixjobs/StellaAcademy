@@ -25,6 +25,8 @@ import { fractionOpsVerifier } from './quiz/fraction-ops';
 import { fractionsVerifier } from './quiz/fractions';
 import { measuresVerifier } from './quiz/measures';
 import { multiplicationVerifier } from './quiz/multiplication';
+import { negativeNumbersVerifier } from './quiz/negative-numbers';
+import { proportionsVerifier } from './quiz/proportions';
 import type { Verifier } from './quiz/types';
 
 type Finding = { check: string; lesson: string; where: string; excerpt: string; message: string; level: 'fail' | 'warn' | 'info' };
@@ -38,6 +40,8 @@ const VERIFIERS: Record<string, Verifier> = {
   arithmetic: arithmeticVerifier,
   multiplication: multiplicationVerifier,
   'basic-geometry': basicGeometryVerifier,
+  'negative-numbers': negativeNumbersVerifier,
+  proportions: proportionsVerifier,
 };
 
 export function runQuizChecks(lessons?: string[]): Finding[] {
