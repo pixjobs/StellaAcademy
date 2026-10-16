@@ -34,6 +34,7 @@ import { momentumVerifier } from './quiz/momentum';
 import { trajectoryVerifier } from './quiz/trajectory';
 import { thermodynamicsVerifier } from './quiz/thermodynamics';
 import { electromagnetismVerifier } from './quiz/electromagnetism';
+import { quantumVerifier } from './quiz/quantum';
 import { decimalsPercentagesVerifier } from './quiz/decimals-percentages';
 import { exponentsRootsVerifier } from './quiz/exponents-roots';
 import { fractionOpsVerifier } from './quiz/fraction-ops';
@@ -82,6 +83,7 @@ const VERIFIERS: Record<string, Verifier> = {
   trajectory: trajectoryVerifier,
   thermodynamics: thermodynamicsVerifier,
   electromagnetism: electromagnetismVerifier,
+  quantum: quantumVerifier,
 };
 
 export function runQuizChecks(lessons?: string[]): Finding[] {
