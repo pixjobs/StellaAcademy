@@ -60,7 +60,7 @@ function speedQuestion(r: () => number): Question {
       steps: [
         { type: 'choice', prompt: 'Which satellite moves faster?', options: fasterOptions, correct: fasterRight, why: { [1 - fasterRight]: 'The lower the orbit, the faster the satellite: gravity is stronger closer in.' } },
         { type: 'number', prompt: `What is r for satellite ${asked}, its distance from Earth’s centre?`, answer: D(rr), unit: 'km', feedback: (g) => (near(g, h, 1e-9) ? 'That is its height above the ground. r is measured from the centre: add Earth’s radius.' : 'Add Earth’s radius, 6,370 km, to the height.') },
-        { type: 'number', prompt: 'What is GM ÷ r? Give 3 significant figures.', ...approxStd(gmr), feedback: (g) => (near(g, GM / h) ? 'That divides by the height. Use r from the centre.' : 'Divide 3.986 × 10^{5} by r in km.') },
+        { type: 'number', prompt: 'What is GM ÷ r? Give 3 significant figures.', ...approxStd(gmr), unit: 'km²/s²', feedback: (g) => (near(g, GM / h) ? 'That divides by the height. Use r from the centre.' : 'Divide 3.986 × 10^{5} by r in km.') },
         {
           type: 'number',
           prompt: 'So what is its speed, in km/s? Give 3 significant figures.',
@@ -124,46 +124,56 @@ function transferQuestion(r: () => number): Question {
 // Period and radius
 // ---------------------------------------------------------------------------------------------
 
-/** Radius factors whose 1.5 power comes out exactly. The page shows 4 (period × 8). */
-const FACTORS = [9, 16, 25, 0.25, 0.36, 1.44, 2.25, 6.25];
-const PERIODS: { T0: number; unit: string; what: string }[] = [
-  ...[90, 95, 100, 105, 110, 120].map((T0) => ({ T0, unit: 'minutes', what: `A satellite in a low orbit takes ${T0} minutes to go round once.` })),
-  ...[2, 3, 4, 6, 8, 10, 12, 24].map((T0) => ({ T0, unit: 'hours', what: `A satellite takes ${T0} hours to go round once.` })),
+/** Radius factors whose 1.5 power comes out exactly (0.64 gives 0.512). The page shows 4 (period × 8). */
+const FACTORS = [0.25, 0.36, 0.49, 0.64, 0.81, 1.21, 1.44, 1.69, 1.96, 2.25, 2.56, 3.24, 4.84, 6.25, 9, 16, 25];
+const PERIODS: { T0: number; unit: 'minutes' | 'hours'; what: string }[] = [
+  ...[90, 95, 100, 105, 110, 115, 120, 130].map((T0) => ({ T0, unit: 'minutes' as const, what: `A satellite in a low orbit takes ${T0} minutes to go round once.` })),
+  ...[2, 3, 4, 5, 6, 8, 10, 12, 16, 20, 24].map((T0) => ({ T0, unit: 'hours' as const, what: `A satellite takes ${T0} hours to go round once.` })),
 ];
-const TIMES: Record<number, string> = { 9: '9 times', 16: '16 times', 25: '25 times', 0.25: 'a quarter of', 0.36: '0.36 times', 1.44: '1.44 times', 2.25: '2.25 times', 6.25: '6.25 times' };
+const TIMES: Record<number, string> = { 0.25: '0.25 times', 0.36: '0.36 times', 0.49: '0.49 times', 0.64: '0.64 times', 0.81: '0.81 times', 6.25: '6.25 times', 9: '9 times', 16: '16 times', 25: '25 times' };
+const factorText = (k: number) => (k < 1 ? `${TIMES[k]} the old one` : `${TIMES[k] ?? `${k} times`} as big`);
+/** The orbit radius in km for a period in seconds: r = (GM T² / 4π²)^(1/3). */
+const radiusFor = (seconds: number) => Math.cbrt((GM * seconds * seconds) / (4 * Math.PI * Math.PI));
 
 function periodQuestion(r: () => number): Question {
-  const k = pick(r, FACTORS);
-  const P = pick(r, PERIODS);
-  // Calculator answers: the exact value or 3 s.f. are both right (1.44³ = 2.985984, shown as 2.99).
-  const k3n = k ** 3;
-  const k15n = k ** 1.5;
-  const T = P.T0 * k15n;
-  const k3 = exactOr3(k3n);
-  const k15 = exactOr3(k15n);
-  const Ts = exactOr3(T);
-  const options = shuffle(r, ['Longer', 'Shorter']);
-  const correct = options.indexOf(k > 1 ? 'Longer' : 'Shorter');
-  return {
-    round: 'period',
-    prompt: `${P.what} It moves to a circular orbit with a radius ${TIMES[k]} ${k < 1 ? 'the old one' : 'as big'}. How long does one orbit take now?`,
-    steps: [
+  for (;;) {
+    const k = pick(r, FACTORS);
+    const P = pick(r, PERIODS);
+    // A real orbit both before and after: above the atmosphere (200 km up) and no further out than geostationary.
+    const r0 = radiusFor(P.T0 * (P.unit === 'minutes' ? 60 : 3600));
+    if (r0 * k < R + 200 || r0 * k > 42200) continue;
+    const k3n = k ** 3;
+    const k15n = k ** 1.5;
+    const T = P.T0 * k15n;
+    const k3 = exactOr3(k3n);
+    const k15 = exactOr3(k15n);
+    // Very long times in minutes are asked in hours instead.
+    const inHours = P.unit === 'minutes' && T > 1000;
+    const Tm = exactOr3(T);
+    const Th = exactOr3(T / 60);
+    const options = shuffle(r, ['Longer', 'Shorter']);
+    const correct = options.indexOf(k > 1 ? 'Longer' : 'Shorter');
+    const slips = (g: Digits, scale: number) =>
+      near(g, (P.T0 * k) / scale) ? 'That changes the period by the same factor as the radius. It grows faster: the factor is √(k^{3}).' : near(g, (P.T0 * k3n) / scale) ? 'That uses the change in r^{3}. Take its square root first.' : near(g, (P.T0 * k * k) / scale) ? 'That squares the change in radius. The factor is √(k^{3}).' : 'Multiply the old period by the change in T.';
+    const steps: Step[] = [
       { type: 'choice', prompt: 'Will one orbit take longer or shorter?', options, correct, why: { [1 - correct]: 'A higher orbit is longer and slower, so it takes more time; a lower one takes less.' } },
       { type: 'number', prompt: 'T = 2π√(r^{3}/GM). By what number is r^{3} multiplied?', ...k3, feedback: (g) => (near(g, k) ? 'That is the change in r. Cube it.' : near(g, k * k) ? 'That squares it. r^{3} means cubing.' : `Multiply ${k} by itself three times.`) },
       { type: 'number', prompt: 'So by what number is T multiplied?', ...k15, feedback: (g) => (near(g, k3n) ? 'That is the change in r^{3}. T depends on its square root.' : 'Take the square root of the change in r^{3}.') },
-      {
-        type: 'number',
-        prompt: `So how long does one orbit take now, in ${P.unit}?`,
-        ...Ts,
-        unit: P.unit,
-        tolerance: 0.005,
-        feedback: (g) =>
-          near(g, P.T0 * k) ? 'That changes the period by the same factor as the radius. It grows faster: the factor is √(k^{3}).' : near(g, P.T0 * k3n) ? 'That uses the change in r^{3}. Take its square root first.' : near(g, P.T0 * k * k) ? 'That squares the change in radius. The factor is √(k^{3}).' : 'Multiply the old period by the change in T.',
-      },
-    ],
-    workings: [`r is multiplied by ${k}, so r^{3} is multiplied by ${k3.shown}.`, `T is multiplied by √${k3.shown} = ${k15.shown}.`, `${P.T0} × ${k15.shown} = ${Ts.shown} ${P.unit}.`],
-    check: { kind: 'period', k, T0: P.T0, unit: P.unit, T },
-  };
+      { type: 'number', prompt: `So how long does one orbit take now, in ${P.unit}?`, ...Tm, unit: P.unit, tolerance: 0.005, feedback: (g) => slips(g, 1) },
+    ];
+    if (inHours) steps.push({ type: 'number', prompt: 'That is a long time in minutes. What is it in hours?', ...Th, unit: 'hours', tolerance: 0.005, feedback: (g) => (near(g, T * 60) ? 'That multiplies. There are 60 minutes in an hour: divide.' : 'Divide the minutes by 60.') });
+    return {
+      round: 'period',
+      prompt: `${P.what} It moves to a circular orbit with a radius ${factorText(k)}. How long does one orbit take now?`,
+      steps,
+      workings: [
+        `r is multiplied by ${k}, so r^{3} is multiplied by ${k}^{3} = ${k3.shown}.`,
+        `T is multiplied by √(${k}^{3}) = ${k15.shown}.`,
+        `${P.T0} × ${k15.shown} = ${Tm.shown} ${P.unit}${inHours ? `, which is ${Th.shown} hours` : ''}.`,
+      ],
+      check: { kind: 'period', k, T0: P.T0, unit: P.unit, T },
+    };
+  }
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -171,7 +181,9 @@ function periodQuestion(r: () => number): Question {
 // ---------------------------------------------------------------------------------------------
 
 function coastQuestion(r: () => number): Question {
-  const [h1, h2] = lowHigh(r);
+  let [h1, h2] = lowHigh(r);
+  // The notes give about 5 hours 15 minutes for 300 km up to geostationary: stay well away from it.
+  while (h2 === 35800 && h1 <= 500) [h1, h2] = lowHigh(r);
   const a = (h1 + R + h2 + R) / 2;
   const a3 = approxStd(a ** 3);
   // Worked from a³ as shown, as a pupil carrying 3 s.f. would.
@@ -182,6 +194,7 @@ function coastQuestion(r: () => number): Question {
     round: 'coast',
     prompt: `A spacecraft makes a Hohmann transfer from a circular orbit ${km(h1)} above the ground to one ${km(h2)} above it${NAMED[h2] ?? ''}. Earth’s radius is 6,370 km, and GM = 3.986 × 10^{5} km^{3} s^{−2}. How long does the coast take?`,
     steps: [
+      ...radiusSteps(h1, h2),
       semiMajor(h1, h2),
       { type: 'number', prompt: 'What is a^{3}? Give 3 significant figures.', ...a3, unit: 'km³', feedback: (g) => (near(g, a * a) ? 'That squares it. a^{3} means a × a × a.' : 'Multiply a by itself three times.') },
       {

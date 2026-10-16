@@ -276,7 +276,8 @@ const UNIT_WORDS: Record<string, string[]> = {
   'kΩ': ['kω', 'kohm', 'kohms', 'kilohm', 'kilohms'],
   C: ['c', 'coulomb', 'coulombs'],
   N: ['n', 'newton', 'newtons'],
-  'km/s': ['km/s', 'kms', 'km s-1', 'km s⁻¹', 'km s^-1', 'km/sec', 'kilometres per second'],
+  'km/s': ['km/s', 'kms', 'km s-1', 'km s⁻¹', 'km s^-1', 'kms-1', 'kms⁻¹', 'kms^-1', 'km/sec', 'km per second', 'kilometres per second'],
+  'km²/s²': ['km²/s²', 'km^2/s^2', 'km2/s2', 'km² s⁻²', 'km^2 s^-2', 'km2 s-2', 'km²s⁻²'],
   'km³': ['km³', 'km3', 'km^3', 'cubic km', 'cubic kilometres'],
   'kg m/s': ['kg m/s', 'kgm/s', 'kg m s-1', 'kg m s⁻¹', 'kg ms-1', 'kg ms⁻¹', 'kg m s^-1', 'kg·m/s', 'n s', 'ns', 'n·s', 'newton seconds'],
   // Field strength may also be given as an acceleration, as A-level allows.

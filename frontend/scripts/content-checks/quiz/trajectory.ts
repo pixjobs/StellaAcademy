@@ -44,14 +44,18 @@ export const trajectoryVerifier: Verifier = {
       const T = Math.sqrt(c.T0 ** 2 * c.k ** 3);
       if (Math.abs(T - c.T) > 1e-9 * T) return `period factor for k = ${c.k}`;
       if ((chosen(st[0]) === 'Longer') !== c.k > 1) return 'longer or shorter';
-      return accepts(st[1], c.k ** 3) && accepts(st[2], c.k ** 1.5) && accepts(last, T) ? null : 'period answers refused';
+      // A real orbit before and after (above 200 km, no further than geostationary).
+      const r0 = Math.cbrt((GM * (c.T0 * (c.unit === 'minutes' ? 60 : 3600)) ** 2) / (4 * Math.PI ** 2));
+      if (r0 * c.k < R + 200 || r0 * c.k > 42200) return `impossible orbit: ${Math.round(r0 * c.k)} km`;
+      const hoursStep = st.length === 5;
+      return accepts(st[1], c.k ** 3) && accepts(st[2], c.k ** 1.5) && accepts(st[3], T) && (!hoursStep || accepts(last, T / 60)) ? null : 'period answers refused';
     }
     const a = (c.h1 + c.h2 + 2 * R) / 2;
     const whole = 2 * Math.PI * Math.sqrt(a ** 3 / GM); // one full orbit of the ellipse
     if (Math.abs(whole / 2 - c.seconds) > 1e-6 * c.seconds) return 'coast is not half an orbit';
     const sChained = Math.PI * Math.sqrt(r3(a ** 3) / GM);
     const hChained = r3(sChained) / 3600;
-    return accepts(st[0], a) && accepts(st[1], a ** 3) && accepts(st[2], c.seconds) && accepts3(st[2], sChained) && accepts(last, c.hours) && accepts3(last, hChained) ? null : `coast ${c.h1}-${c.h2}`;
+    return accepts(st[2], a) && accepts(st[3], a ** 3) && accepts(st[4], c.seconds) && accepts3(st[4], sChained) && accepts(last, c.hours) && accepts3(last, hChained) ? null : `coast ${c.h1}-${c.h2}`;
   },
   mistakes: (question) => {
     const q = question as Question<TrajectoryCheck>;
@@ -61,29 +65,29 @@ export const trajectoryVerifier: Verifier = {
     if (c.kind === 'speed') {
       const h = c.asked === 'A' ? c.hA : c.hB;
       out.push({ step: 1, typed: String(h), expect: 'height above the ground' });
-      out.push({ step: last, typed: t3(GM / (h + R)), expect: 'square root' });
+      out.push({ step: last, typed: t3(GM / (h + R)), expect: 'That is GM ÷ r' });
       out.push({ step: last, typed: t3(Math.sqrt(GM / h)), expect: 'uses the height' });
       const s0 = q.steps[0];
       if (s0.type === 'choice') out.push({ step: 0, typed: s0.options[1 - s0.correct], expect: 'lower the orbit' });
     }
     if (c.kind === 'transfer' || c.kind === 'coast') {
       const [r1, r2] = [c.h1 + R, c.h2 + R];
-      const at = c.kind === 'transfer' ? 2 : 0;
+      const at = 2; // after the two radius steps, in both rounds
       out.push({ step: at, typed: String(r1 + r2), expect: 'full length' });
       out.push({ step: at, typed: String((r2 - r1) / 2), expect: 'halves the difference' });
       out.push({ step: at, typed: String((c.h1 + c.h2) / 2), expect: 'uses the heights' });
       if (c.kind === 'transfer') out.push({ step: 0, typed: String(c.h1), expect: 'height above the ground' });
     }
     if (c.kind === 'period') {
-      out.push({ step: last, typed: t3(c.T0 * c.k), expect: 'same factor as the radius' });
-      out.push({ step: last, typed: t3(c.T0 * c.k ** 3), expect: 'change in r^{3}' });
-      out.push({ step: last, typed: t3(c.T0 * c.k ** 2), expect: 'squares the change' });
+      out.push({ step: 3, typed: t3(c.T0 * c.k), expect: 'same factor as the radius' });
+      out.push({ step: 3, typed: t3(c.T0 * c.k ** 3), expect: 'change in r^{3}' });
+      out.push({ step: 3, typed: t3(c.T0 * c.k ** 2), expect: 'squares the change' });
       out.push({ step: 1, typed: t3(c.k), expect: 'Cube it' });
     }
     if (c.kind === 'coast') {
-      out.push({ step: 2, typed: t3(2 * c.seconds), expect: 'whole orbit' });
-      out.push({ step: 3, typed: t3(c.seconds), expect: 'still in seconds' });
-      out.push({ step: 3, typed: t3(c.seconds / 60), expect: 'in minutes' });
+      out.push({ step: 4, typed: t3(2 * c.seconds), expect: 'whole orbit' });
+      out.push({ step: 5, typed: t3(c.seconds), expect: 'still in seconds' });
+      out.push({ step: 5, typed: t3(c.seconds / 60), expect: 'in minutes' });
     }
     return out;
   },
