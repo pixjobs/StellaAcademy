@@ -27,12 +27,17 @@ export const thermodynamicsVerifier: Verifier = {
     if (c.kind === 'boyle') {
       if (Math.abs(c.p1 * c.V1 - c.p2 * c.V2) > 1e-9 * c.p1 * c.V1) return 'pV not constant';
       const up = c.find === 'p' ? c.p2 > c.p1 : c.V2 > c.V1;
-      return chosen(st[0]) === (up ? 'It goes up' : 'It goes down') && acceptsExact(st[1], c.p1 * c.V1) && acceptsExact(last, c.find === 'p' ? c.p2 : c.V2) ? null : 'boyle';
+      const ans = c.find === 'p' ? c.p2 : c.V2;
+      if (c.p2 < 100 && /diver/.test(q.prompt)) return 'a diver’s bubble below air pressure';
+      if (/squeezed|grows|expands/.test(q.prompt)) return 'the wording gives the direction away';
+      return chosen(st[0]) === (up ? 'It goes up' : 'It goes down') && acceptsExact(st[1], c.p1 * c.V1) && acceptsExact(last, ans) && accepts3(last, ans) ? null : 'boyle';
     }
     if (c.kind === 'kelvin') {
       // A different route: x/T stays constant.
       const x2 = (c.x1 / (c.c1 + 273)) * (c.c2 + 273);
-      return acceptsExact(st[0], c.c1 + 273) && acceptsExact(st[1], c.c2 + 273) && (acceptsExact(last, x2) || accepts3(last, x2)) ? null : 'kelvin';
+      // Also chained: the ratio T₂ ÷ T₁ rounded to 3 s.f. first, as many pupils work it.
+      const chained = c.x1 * r3((c.c2 + 273) / (c.c1 + 273));
+      return acceptsExact(st[0], c.c1 + 273) && acceptsExact(st[1], c.c2 + 273) && accepts3(last, x2) && accepts3(last, chained) ? null : 'kelvin';
     }
     if (c.kind === 'ideal') {
       const T = c.T;
@@ -45,7 +50,12 @@ export const thermodynamicsVerifier: Verifier = {
       }
       const formStep = st.find((s) => s.type === 'choice');
       const form = { p: 'p = nRT ÷ V', V: 'V = nRT ÷ p', n: 'n = pV ÷ RT', T: 'T = pV ÷ nR' }[c.find];
-      return chosen(formStep) === form && accepts3(last, want) ? null : `ideal ${c.find}: ${want}`;
+      if (c.find === 'p' && (want < 5e4 || want > 2e6)) return `pressure out of range: ${want}`;
+      // Chained: the top line (nRT or pV) rounded to 3 s.f. before dividing.
+      const top = c.find === 'p' || c.find === 'V' ? c.n * R * T : (want * (c.find === 'n' ? R * T : c.n * R));
+      const under = c.find === 'p' ? c.V : c.find === 'V' ? top / want : c.find === 'n' ? R * T : c.n * R;
+      const chained = r3(top) / under;
+      return chosen(formStep) === form && accepts3(last, want) && accepts3(last, chained) ? null : `ideal ${c.find}: ${want}`;
     }
     if (c.c2 === undefined) return acceptsExact(st[0], c.c1 + 273) && accepts3(last, 1.5 * K * (c.c1 + 273)) ? null : 'energy';
     const [T1, T2] = [c.c1 + 273, c.c2 + 273];
@@ -65,8 +75,8 @@ export const thermodynamicsVerifier: Verifier = {
     }
     if (c.kind === 'kelvin') {
       out.push({ step: 0, typed: String(c.c1), expect: 'still in °C' });
-      out.push({ step: last, typed: t3((c.x1 * c.c2) / c.c1), expect: 'works in °C' });
-      out.push({ step: last, typed: t3((c.x1 * (c.c1 + 273)) / (c.c2 + 273)), expect: 'upside down' });
+      out.push({ step: last, typed: ((c.x1 * c.c2) / c.c1).toPrecision(3), expect: 'works in °C' });
+      out.push({ step: last, typed: ((c.x1 * (c.c1 + 273)) / (c.c2 + 273)).toPrecision(3), expect: 'upside down' });
     }
     if (c.kind === 'ideal') {
       const k = q.steps.findIndex((s) => s.prompt.includes('in kelvin?'));
@@ -74,17 +84,20 @@ export const thermodynamicsVerifier: Verifier = {
       const s = q.steps.find((x) => x.type === 'choice');
       const upside = { p: 'p = V ÷ nRT', V: 'V = p ÷ nRT', n: 'n = RT ÷ pV', T: 'T = nR ÷ pV' }[c.find];
       if (s) out.push({ step: q.steps.indexOf(s), typed: upside, expect: 'upside down' });
-      const lit = q.steps.findIndex((x) => x.prompt.includes('litres in m³'));
-      if (lit !== -1) out.push({ step: lit, typed: String(c.V * 1000), expect: 'still in litres' });
+      const lit = q.steps.findIndex((x) => x.prompt.includes(' in m³?'));
+      if (lit !== -1) out.push({ step: lit, typed: String(clean(c.V * (q.steps[lit].prompt.includes('cm³') ? 1e6 : 1000))), expect: 'That is still in' });
       if (c.find === 'p' && c.T !== 273) out.push({ step: last, typed: t3((c.n * R * (c.T - 273)) / c.V), expect: 'temperature in °C' });
-      if (c.find === 'p' && lit !== -1) out.push({ step: last, typed: t3((c.n * R * c.T) / (c.V * 1000)), expect: 'volume in litres' });
+      if (c.find === 'p' && lit !== -1) out.push({ step: last, typed: t3((c.n * R * c.T) / (c.V * (q.steps[lit].prompt.includes('cm³') ? 1e6 : 1000))), expect: 'That uses the volume in' });
     }
     if (c.kind === 'energy') {
       if (c.c2 === undefined) {
         out.push({ step: last, typed: `${t3(K * (c.c1 + 273) * 1e21)}e-21`, expect: 'leaves out the ³⁄₂' });
         if (c.c1 !== 0) out.push({ step: last, typed: `${t3(1.5 * K * c.c1 * 1e21)}e-21`, expect: 'uses °C' });
       } else {
-        if (c.c1 !== 0) out.push({ step: 2, typed: t3(c.c2 / c.c1), expect: 'in °C' });
+        if (c.c1 !== 0) {
+          out.push({ step: 2, typed: t3(c.c2 / c.c1), expect: 'in °C' });
+          out.push({ step: last, typed: `${t3(r3(1.5 * K * (c.c1 + 273)) * (c.c2 / c.c1) * 1e21)}e-21`, expect: 'change in °C' });
+        }
         out.push({ step: 2, typed: t3((c.c1 + 273) / (c.c2 + 273)), expect: 'upside down' });
       }
     }
