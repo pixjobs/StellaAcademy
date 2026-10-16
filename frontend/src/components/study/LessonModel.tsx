@@ -133,7 +133,7 @@ const CUSTOM_MODELS: ConceptId[] = ['gravity', 'waves', 'circuit', 'trigonometry
 /** `bare` drops a model's own frame, for the Explore tab; models without that option keep theirs. */
 function ModelFor({ id, bare = false }: { id: ConceptId; bare?: boolean }) {
   if (id === 'gravity') return <OrbitLauncher placement="lesson" bare={bare} />;
-  if (id === 'waves') return <WaveInstrument placement="lesson" />;
+  if (id === 'waves') return <WaveInstrument placement="lesson" bare={bare} />;
   if (id === 'circuit') return <CircuitBoard bare={bare} />;
   if (id === 'trigonometry') return <TrigTriangle bare={bare} />;
   if (id === 'gears') return <GearTrain bare={bare} />;
