@@ -221,11 +221,11 @@ export function readAnswer(text: string): { value: Digits; unit: string; rawUnit
   const grouped = lifted.replace(/(\d)[ \u00a0\u2009\u202f](?=\d{3}(?!\d))/g, '$1');
   const UNIT = '([a-zA-Z %²³^.°/μµΩω⁻¹·-]*[123]?)';
   // Standard form, as the physics lessons teach it: 4.7 × 10^6, 4.7x10^6, 4.7*10^-3 or 4.7e6.
-  const sf = grouped.match(new RegExp(`^(?:about\\s+)?([-−–]?)\\s*(\\d+(?:\\.\\d+)?)\\s*(?:[x×*]\\s*10\\s*\\^\\s*\\{?|e)\\s*([-−–+]?\\d+)\\}?\\s*${UNIT}$`, 'i'));
+  const sf = grouped.match(new RegExp(`^(?:about\\s+)?([-−–]?)\\s*(\\d+(?:\\.\\d+)?)\\s*(?:[x×*]\\s*10\\s*(?:\\^\\s*)?[({]?|e)\\s*([-−–+⁻]?\\d+)[)}]?\\s*${UNIT}$`, 'i'));
   if (sf) {
     const front = parseDecimal(sf[2]);
     if (!front) return null;
-    const value = shiftDigits(front, (/^[-−–]/.test(sf[3]) ? -1 : 1) * Number(sf[3].replace(/^[-−–+]/, '')));
+    const value = shiftDigits(front, (/^[-−–⁻]/.test(sf[3]) ? -1 : 1) * Number(sf[3].replace(/^[-−–+⁻]/, '')));
     return { value: sf[1] && value.digits !== '0' ? { ...value, neg: true } : value, unit: sf[4].trim().toLowerCase(), rawUnit: sf[4].trim() };
   }
   const m = grouped.match(new RegExp(`^(?:about\\s+)?([-−–]?)\\s*([\\d.,]+)\\s*${UNIT}$`, 'i'));
@@ -276,7 +276,7 @@ const UNIT_WORDS: Record<string, string[]> = {
   'kΩ': ['kω', 'kohm', 'kohms', 'kilohm', 'kilohms'],
   C: ['c', 'coulomb', 'coulombs'],
   N: ['n', 'newton', 'newtons'],
-  eV: ['ev', 'electronvolt', 'electronvolts', 'electron volts'],
+  eV: ['ev', 'electron volts', 'electronvolt', 'electronvolts'],
   nm: ['nm', 'nanometre', 'nanometres'],
   Wb: ['wb', 'weber', 'webers', 'wb turns', 'wb-turns', 'weber turns'],
   // 1 Wb/s is 1 V, and A-level pupils often write it that way.
@@ -291,7 +291,7 @@ const UNIT_WORDS: Record<string, string[]> = {
   'km/s': ['km/s', 'kms', 'km s-1', 'km s⁻¹', 'km s^-1', 'kms-1', 'kms⁻¹', 'kms^-1', 'km/sec', 'km per second', 'kilometres per second'],
   'km²/s²': ['km²/s²', 'km^2/s^2', 'km2/s2', 'km² s⁻²', 'km^2 s^-2', 'km2 s-2', 'km²s⁻²'],
   'km³': ['km³', 'km3', 'km^3', 'cubic km', 'cubic kilometres'],
-  'kg m/s': ['kg m/s', 'kgm/s', 'kg m s-1', 'kg m s⁻¹', 'kg ms-1', 'kg ms⁻¹', 'kg m s^-1', 'kg·m/s', 'n s', 'ns', 'n·s', 'newton seconds'],
+  'kg m/s': ['kg m/s', 'kgm/s', 'kg m s-1', 'kg m s⁻¹', 'kg ms-1', 'kg ms⁻¹', 'kg ms^-1', 'kg m s^-1', 'kgms-1', 'kgms⁻¹', 'kgm s-1', 'kgm s⁻¹', 'kg·m/s', 'kg·m·s⁻¹', 'n s', 'ns', 'n·s', 'newton seconds', 'kilogram metres per second'],
   // Field strength may also be given as an acceleration, as A-level allows.
   'N/kg': ['n/kg', 'n kg-1', 'n kg⁻¹', 'n kg^-1', 'nkg-1', 'nkg⁻¹', 'nkg^-1', 'm/s²', 'm/s^2', 'm/s2', 'm s⁻²', 'm s-2', 'm s^-2', 'ms⁻²', 'ms-2', 'ms^-2', 'newtons per kilogram', 'newtons per kg'],
   minutes: ['min', 'mins', 'minute', 'minutes'],

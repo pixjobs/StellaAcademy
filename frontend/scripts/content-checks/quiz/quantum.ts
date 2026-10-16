@@ -25,6 +25,13 @@ export const quantumVerifier: Verifier = {
     const st = q.steps;
     const last = st[st.length - 1];
     if (c.kind === 'photon') {
+      // The colour named must match the frequency: c ÷ f inside that colour's wavelength range.
+      // Ultraviolet first: its name contains "violet light".
+      const RANGES: Record<string, [number, number]> = { ultraviolet: [10, 400], red: [620, 750], orange: [590, 625], yellow: [565, 595], green: [495, 570], blue: [445, 500], violet: [380, 450] };
+      const colour = Object.keys(RANGES).find((k) => q.prompt.includes(`${k} light`));
+      const lam = (C / c.f) * 1e9;
+      if (!colour || lam < RANGES[colour][0] - 3 || lam > RANGES[colour][1] + 3) return `${colour} light at ${lam.toFixed(0)} nm`;
+      if (Math.abs(c.f - 6e14) < 1e12 || Math.abs(c.f - 5e14) < 1e12) return 'the page’s worked example or practice frequency';
       if (c.nm !== undefined) {
         const viaLambda = (H * C) / (c.nm * 1e-9); // E = hc/λ directly
         if (Math.abs(viaLambda - c.EJ) > 0.01 * viaLambda) return 'E = hc/λ disagrees';
@@ -35,9 +42,14 @@ export const quantumVerifier: Verifier = {
     }
     if (c.kind === 'photoelectric') {
       if (c.released !== c.eV > c.phi) return 'released';
-      const rel = chosen(st[0])?.startsWith('Yes') === c.released;
+      const at = c.nm !== undefined ? 1 : 0; // a wavelength first asks for the photon energy
+      if (c.nm !== undefined) {
+        const eV = (H * C) / (c.nm * 1e-9) / EV;
+        if (!accepts3(st[0], eV)) return 'photon energy from the wavelength';
+      }
+      const rel = chosen(st[at])?.startsWith('Yes') === c.released;
       const bright = chosen(st[st.length - 1]) === (c.released ? 'More electrons, with the same greatest energy' : 'Nothing changes');
-      const ek = c.released ? acceptsExact(st[1], Math.round((c.eV - c.phi) * 100) / 100) : true;
+      const ek = c.released ? (c.nm !== undefined ? accepts3(st[at + 1], r3((H * C) / (c.nm * 1e-9) / EV) - c.phi) : acceptsExact(st[at + 1], Math.round((c.eV - c.phi) * 100) / 100)) : true;
       return rel && bright && ek ? null : 'photoelectric';
     }
     if (c.kind === 'levels') {
@@ -48,7 +60,9 @@ export const quantumVerifier: Verifier = {
       return acceptsExact(st[0], Math.round(eV * 100) / 100) && accepts3(st[1], J) && accepts3(last, want) ? null : 'levels';
     }
     const p = ME * c.v;
-    return accepts3(st[0], p) && accepts3(st[1], H / r3(p)) && accepts3(st[1], H / p) && chosen(st[2]) === 'Shorter' ? null : 'de Broglie';
+    // Faster or heavier means more momentum and a shorter wavelength; slower means a longer one.
+    const want = /slower/.test(st[2].prompt) ? 'Longer' : 'Shorter';
+    return accepts3(st[0], p) && accepts3(st[1], H / r3(p)) && accepts3(st[1], H / p) && chosen(st[2]) === want ? null : 'de Broglie';
   },
   mistakes: (question) => {
     const q = question as Question<QuantumCheck>;
@@ -58,17 +72,22 @@ export const quantumVerifier: Verifier = {
     if (c.kind === 'photon') {
       out.push({ step: last - 1, typed: s3(H / c.f), expect: 'That divides' });
       out.push({ step: last, typed: s3(r3(H * c.f) * EV), expect: 'That multiplies' });
-      if (c.nm !== undefined) out.push({ step: 1, typed: s3(C / c.nm), expect: 'nanometres' });
+      if (c.nm !== undefined) out.push({ step: 1, typed: s3(C / c.nm), expect: 'nanometres' }, { step: 0, typed: String(c.nm), expect: 'still in nanometres' });
     }
     if (c.kind === 'photoelectric') {
-      out.push({ step: 0, typed: (q.steps[0] as { options: string[]; correct: number }).options.find((_, i) => i !== (q.steps[0] as { correct: number }).correct)!, expect: 'One photon gives its energy' });
-      if (c.released) out.push({ step: 1, typed: String(c.eV), expect: 'That is the photon energy' });
+      const at = c.nm !== undefined ? 1 : 0;
+      const sc = q.steps[at] as { options: string[]; correct: number };
+      out.push({ step: at, typed: sc.options.find((_, i) => i !== sc.correct)!, expect: c.released ? 'Compare the photon’s energy' : 'less energy than the work function' });
+      if (c.released) out.push({ step: at + 1, typed: String(c.eV), expect: 'That is the photon energy' }, { step: at + 1, typed: String(Math.round((c.phi - c.eV) * 100) / 100), expect: 'wrong way round' });
       const b = q.steps[last];
-      if (b.type === 'choice') out.push({ step: last, typed: 'The same number of electrons, but faster', expect: c.released ? 'same energy' : 'still release nothing' });
+      if (b.type === 'choice') out.push({ step: last, typed: 'The same number of electrons, but faster', expect: 'What sets the energy of each one' });
     }
     if (c.kind === 'levels') {
       out.push({ step: 0, typed: String(Math.round(Math.abs(c.from + c.to) * 100) / 100), expect: 'adds the levels' });
       out.push({ step: 1, typed: s3(Math.abs(c.from - c.to) / EV), expect: 'That divides' });
+      const J = r3(Math.abs(c.from - c.to) * EV);
+      if (q.steps[2].prompt.includes('wavelength')) out.push({ step: 2, typed: s3(J / (H * C)), expect: 'upside down' });
+      else out.push({ step: 2, typed: s3(J * H), expect: 'That multiplies' });
     }
     if (c.kind === 'debroglie') {
       const p = r3(ME * c.v);
