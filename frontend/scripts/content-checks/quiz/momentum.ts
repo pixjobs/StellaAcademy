@@ -26,11 +26,16 @@ export const momentumVerifier: Verifier = {
     const last = st[st.length - 1];
     if (c.kind === 'one') {
       if (Math.abs(N(c.m) * N(c.v) - N(c.p)) > 1e-9) return 'p = mv';
-      return chosen(st[0]) === 'p = m × v' && accepts(last, c.find === 'p' ? N(c.p) : c.find === 'v' ? N(c.v) : N(c.m)) ? null : `one ${c.find}`;
+      const form = { p: 'p = m × v', v: 'v = p ÷ m', m: 'm = p ÷ v' }[c.find];
+      return chosen(st[0]) === form && accepts(last, c.find === 'p' ? N(c.p) : c.find === 'v' ? N(c.v) : N(c.m)) ? null : `one ${c.find}`;
     }
     if (c.kind === 'two') {
       const [p1, p2] = [N(c.m1) * N(c.v1), N(c.m2) * N(c.v2)];
-      return accepts(st[0], p1) && accepts(st[1], p2) && accepts(st[3], Math.abs(p1 - p2)) && chosen(st[2]) === 'Take one from the other' && (chosen(st[4]) === 'In the first one’s direction') === p1 > p2 ? null : 'two';
+      const total = c.towards ? Math.abs(p1 - p2) : p1 + p2;
+      const combine = chosen(st[2]) === (c.towards ? 'Take one from the other' : 'Add them');
+      const dir = !c.towards || (chosen(st[4]) === 'In the first one’s direction') === p1 > p2;
+      if (!c.towards && N(c.v1) === N(c.v2)) return 'same way at the same speed: nobody catches up';
+      return accepts(st[0], p1) && accepts(st[1], p2) && accepts(st[3], total) && combine && dir ? null : 'two';
     }
     if (c.kind === 'stick') {
       const p = N(c.m1) * N(c.v1) + N(c.m2) * N(c.v2);
@@ -40,12 +45,12 @@ export const momentumVerifier: Verifier = {
     }
     if (c.kind === 'bounce') {
       const v2 = (N(c.m1) * N(c.v1) - N(c.m1) * N(c.u1)) / N(c.m2);
-      if (v2 < N(c.u1)) return 'the hit object is left behind';
+      if (v2 <= N(c.u1)) return 'the hit object is left behind, or moves off with the first (a stick, not a bounce)';
       if (ke(N(c.m1), N(c.u1)) + ke(N(c.m2), v2) > ke(N(c.m1), N(c.v1)) + 1e-9) return 'energy created';
       return accepts(st[0], N(c.m1) * N(c.v1)) && accepts(st[2], v2 * N(c.m2)) && accepts(last, v2) ? null : 'bounce';
     }
     const vB = (N(c.mA) * N(c.vA)) / N(c.mB);
-    return accepts(st[0], 0) && accepts(st[1], N(c.mA) * N(c.vA)) && accepts(st[2], vB) && (chosen(st[3]) ?? '').startsWith('The opposite way') ? null : 'apart';
+    return accepts(st[0], 0) && accepts(st[1], N(c.mA) * N(c.vA)) && accepts(st[2], vB) ? null : 'apart';
   },
   mistakes: (question) => {
     const q = question as Question<MomentumCheck>;
@@ -56,7 +61,11 @@ export const momentumVerifier: Verifier = {
       if (c.find === 'p') out.push({ step: last, typed: t3(N(c.m) / N(c.v)), expect: 'That divides' });
       else out.push({ step: last, typed: t3(N(c.p) * (c.find === 'v' ? N(c.m) : N(c.v))), expect: 'That multiplies' });
     }
-    if (c.kind === 'two') out.push({ step: 3, typed: t3(N(c.m1) * N(c.v1) + N(c.m2) * N(c.v2)), expect: 'That adds them' });
+    if (c.kind === 'two') {
+      const [p1, p2] = [N(c.m1) * N(c.v1), N(c.m2) * N(c.v2)];
+      out.push(c.towards ? { step: 3, typed: t3(p1 + p2), expect: 'That adds them' } : { step: 3, typed: t3(Math.abs(p1 - p2)), expect: 'takes one from the other' });
+      out.push({ step: 3, typed: `-${t3(c.towards ? Math.abs(p1 - p2) : p1 + p2)}`, expect: 'Right size' });
+    }
     if (c.kind === 'stick') {
       out.push({ step: 1, typed: c.m1, expect: 'move as one object' });
       const p = N(c.m1) * N(c.v1) + N(c.m2) * N(c.v2);
@@ -70,9 +79,13 @@ export const momentumVerifier: Verifier = {
       if (c.m1 !== c.m2) out.push({ step: 3, typed: t3(pB / N(c.m1)), expect: 'first one’s mass' });
     }
     if (c.kind === 'apart') {
+      const pA = N(c.mA) * N(c.vA);
+      out.push({ step: 0, typed: t3(pA), expect: 'nothing moves' });
       out.push({ step: 2, typed: c.vA, expect: 'same momentum but a different mass' });
-      const s3 = q.steps[3];
-      if (s3.type === 'choice') out.push({ step: 3, typed: s3.options[1 - s3.correct], expect: 'opposite directions' });
+      // Only where it is clearly different: for a tiny tool or burst of gas it is within a few per cent of the answer.
+      const both = pA / (N(c.mA) + N(c.mB));
+      if (Math.abs(both - c.vB) > 0.05 * c.vB) out.push({ step: 2, typed: t3(both), expect: 'both masses' });
+      out.push({ step: 2, typed: `-${t3(c.vB)}`, expect: 'Right size' });
     }
     return out;
   },
