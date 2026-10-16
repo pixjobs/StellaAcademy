@@ -136,7 +136,7 @@ function ModelFor({ id, bare = false }: { id: ConceptId; bare?: boolean }) {
   if (id === 'waves') return <WaveInstrument placement="lesson" />;
   if (id === 'circuit') return <CircuitBoard bare={bare} />;
   if (id === 'trigonometry') return <TrigTriangle bare={bare} />;
-  if (id === 'gears') return <GearTrain />;
+  if (id === 'gears') return <GearTrain bare={bare} />;
   if (id === 'momentum') return <MomentumTrack />;
   if (id === 'thermodynamics') return <GasPiston />;
   if (id === 'trajectory') return <TransferOrbit />;

@@ -43,6 +43,8 @@ export type NumberStep = {
    * default: a quiz about prefixes must not accept the question's own unit typed back.
    */
   prefixes?: boolean;
+  /** A ratio: "2:1" and "2/1" are read as 2, and "1:2" as 0.5, so a pupil may write it either way. */
+  ratio?: boolean;
 };
 
 export type FractionStep = {
@@ -209,7 +211,7 @@ export function readFraction(text: string): Fraction | null {
  */
 export function readAnswer(text: string): { value: Digits; unit: string; rawUnit: string } | null {
   const grouped = text.trim().replace(/(\d)[ \u00a0\u2009\u202f](?=\d{3}(?!\d))/g, '$1');
-  const UNIT = '([a-zA-Z %²³^.°/μµΩω⁻¹-]*[123]?)';
+  const UNIT = '([a-zA-Z %²³^.°/μµΩω⁻¹·-]*[123]?)';
   // Standard form, as the physics lessons teach it: 4.7 × 10^6, 4.7x10^6, 4.7*10^-3 or 4.7e6.
   const sf = grouped.match(new RegExp(`^(?:about\\s+)?([-−–]?)\\s*(\\d+(?:\\.\\d+)?)\\s*(?:[x×*]\\s*10\\s*\\^\\s*\\{?|e)\\s*([-−–]?\\d+)\\}?\\s*${UNIT}$`, 'i'));
   if (sf) {
@@ -264,6 +266,9 @@ const UNIT_WORDS: Record<string, string[]> = {
   'Ω': ['ω', 'ohm', 'ohms'],
   'kΩ': ['kω', 'kohm', 'kohms', 'kilohm', 'kilohms'],
   C: ['c', 'coulomb', 'coulombs'],
+  N: ['n', 'newton', 'newtons'],
+  'N m': ['n m', 'nm', 'n·m', 'n.m', 'newton metre', 'newton metres', 'newton-metre', 'newton-metres'],
+  'turns a minute': ['turns per minute', 'turns per min', 'turns/min', 'turns/minute', 'times a minute', 'times per minute', 'revs per minute', 'revs a minute', 'rev/min', 'revolutions per minute', 'revolutions a minute', 'rotations per minute', 'rotations a minute', 'rpm', 'r.p.m.', 'r.p.m', 'per minute', 'a minute', 'turns', 'turns a minute'],
   'km/h': ['km/h', 'kmh', 'kph', 'kmph', 'km/hr', 'km h⁻¹', 'km h-1', 'km per hour', 'kilometres per hour'],
 };
 
@@ -283,6 +288,14 @@ export function markNumber(step: NumberStep, text: string): { ok: boolean; feedb
     const given = D(text.trim().replace(/^0+(?=\d)/, ''));
     return same(given, step.answer) ? { ok: true, feedback: '' } : { ok: false, feedback: step.feedback(given) || 'Not quite. Try again.' };
   }
+  if (step.ratio) {
+    const m = text.trim().match(/^(\d+(?:\.\d+)?)\s*[:/]\s*(\d+(?:\.\d+)?)$/);
+    if (m && Number(m[2]) !== 0) {
+      const value = Number(m[1]) / Number(m[2]);
+      if (Math.abs(value - toNumber(step.answer)) <= 1e-9 * Math.max(1, toNumber(step.answer))) return { ok: true, feedback: '' };
+      return { ok: false, feedback: step.feedback(D(String(parseFloat(value.toPrecision(6))))) || 'Not quite. Try again.' };
+    }
+  }
   const pounds = /^£/.test(text.trim());
   if (pounds && step.unit !== '£') return { ok: false, feedback: 'This answer is not money. Type just the number.' };
   const read = readAnswer(text.trim().replace(/^£\s*/, ''));
@@ -292,7 +305,7 @@ export function markNumber(step: NumberStep, text: string): { ok: boolean; feedb
     if (same(read.value, step.answer)) return { ok: true, feedback: '' };
     return { ok: false, feedback: step.feedback(read.value) || 'Not quite. Try again.' };
   }
-  if (read.unit && !step.unit && allUnitWords().has(read.unit)) return { ok: false, feedback: 'This answer has no unit. Type just the number.' };
+  if (read.unit && !step.unit) return { ok: false, feedback: allUnitWords().has(read.unit) ? 'This answer has no unit. Type just the number.' : 'Type just a number, such as 2.5.' };
   // A prefixed unit where the step allows it: convert to the base unit, then mark as usual.
   if (step.prefixes && step.unit && read.rawUnit) {
     const m = read.rawUnit.match(/^([mkMμuG])\s*(A|V|W|Ω|J|C)$/);
