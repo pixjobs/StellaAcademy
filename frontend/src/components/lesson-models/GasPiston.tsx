@@ -86,7 +86,8 @@ function Slider(props: { name: string; shown: string; min: number; max: number; 
  * An ideal gas in a cylinder with a piston: particles that speed up with
  * temperature, and readouts that obey pV = nRT as the sliders move.
  */
-export default function GasPiston({ placement = 'lesson' }: { placement?: string }) {
+/** `bare`: inside a Try it panel that already has its frame (the Explore tab on a quiz lesson). */
+export default function GasPiston({ placement = 'lesson', bare = false }: { placement?: string; bare?: boolean }) {
   const labelsRef = useReadableLabels();
   const [temperature, setTemperature] = useState(300); // kelvin
   const [volume, setVolume] = useState(25); // litres
@@ -154,11 +155,13 @@ export default function GasPiston({ placement = 'lesson' }: { placement?: string
   const kPa = sig3(pressure / 1000);
   const m3 = volumeM3.toFixed(3);
 
+  const Frame = bare ? 'div' : 'figure';
+  const Caption = bare ? 'p' : 'figcaption';
   return (
-    <figure className="night-window overflow-hidden rounded-3xl p-4 shadow-[0_30px_60px_-20px_rgba(11,16,38,0.55)] sm:p-6">
-      <figcaption className="flex items-baseline justify-between gap-3">
+    <Frame className={bare ? '' : 'night-window overflow-hidden rounded-3xl p-4 shadow-[0_30px_60px_-20px_rgba(11,16,38,0.55)] sm:p-6'}>
+      <Caption className="flex items-baseline justify-between gap-3">
         <span className="font-fraunces text-xl font-semibold text-white">A gas in a cylinder: pressure, volume, temperature</span>
-      </figcaption>
+      </Caption>
 
       <svg
         ref={labelsRef}
@@ -222,6 +225,6 @@ export default function GasPiston({ placement = 'lesson' }: { placement?: string
         average kinetic energy is proportional to the temperature in kelvin, so it would fall to zero at absolute zero,
         0 K (−273 °C). pV = nRT and pV = NkT are the same equation, since N × k = n × R.
       </p>
-    </figure>
+    </Frame>
   );
 }
