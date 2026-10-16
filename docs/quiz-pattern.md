@@ -80,7 +80,12 @@ the new power, then a value. No algebra has to be typed.
 5. Run `npm run check:content -- --lessons=<lesson>`. It generates 3,000 questions per round and checks the
    answers, every step, the typed forms, the units, the named mistakes and the seeds. Then plant a mistake in the
    generator and check that the check fails.
-6. Play every round in a browser on desktop and phone. Setting `window.__stellaQuizSeed` (a test hook in
-   `QuizPanel`) makes the quiz use known seeds, so a script can work out the same questions and play a perfect
-   run. Run all browser suites with `~/stella-work/browser-checks/run-all.sh`, which fails on any FAIL line.
+6. Play the lesson's rounds in a browser on desktop and phone:
+   `~/stella-work/browser-checks/quiz-play.sh <base> <lesson>` (about 10 seconds a lesson). Setting
+   `window.__stellaQuizSeed` (a test hook in `QuizPanel`) makes the quiz use known seeds, so the script works out
+   the same questions from the quiz code and plays a perfect run. Step 5 proves the answers; this step only proves
+   the screen marks them the same way, so play only the lessons that changed. Play all of them
+   (`quiz-play.sh <base> all`, under 3 minutes) only when `QuizPanel` or the engine's marking changes.
+   Before a release, run all browser suites with `~/stella-work/browser-checks/run-all.sh <base>` (under a minute
+   locally). It loads every page once first, runs several suites at once, and fails on any FAIL line.
 7. A fresh agent reviews the quiz against the brief and this page. Fix every finding, then ask the owner to review.
