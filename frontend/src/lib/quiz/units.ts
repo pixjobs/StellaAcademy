@@ -23,7 +23,10 @@ export type UnitsCheck =
 type Question = Q<UnitsCheck>;
 
 /** Examples and practice answers on the lesson page. The quiz never asks these. */
-const SHOWN = new Set(['450 mA A', '3.2 km m', '20 mA A', '650 nm m', '97.5 MHz Hz', '90 km/h', '72 km/h', '15 m/s', '2 m² cm²']);
+// Both directions: 0.45 A to mA is the 450 mA practice question turned round.
+const SHOWN = new Set(['450 mA A', '0.45 A mA', '20 mA A', '0.02 A mA', '650 nm m', '97.5 MHz Hz', '2 m² cm²', '20,000 cm² m²']);
+/** Speeds on the page, in m/s: 90 km/h = 25 m/s, 15 m/s = 54 km/h, 72 km/h = 20 m/s. Neither direction is asked. */
+const SHOWN_SPEEDS = new Set([25, 15, 20]);
 
 /** 10^{3}, 10^{−6}: a power of ten, drawn with a raised index by the quiz panel. */
 const pow = (n: number) => `10^{${n < 0 ? `−${-n}` : n}}`;
@@ -34,11 +37,11 @@ const plain = (d: Digits) => fmt(d).replace(/,/g, '');
 /** −9 for a signed whole number, with a proper minus sign. */
 const signed = (n: number) => (n < 0 ? `−${-n}` : String(n));
 
-/** A realistic value between lo and hi, to 2 significant figures (sometimes 3), never exactly 1. */
-function between(r: () => number, lo: number, hi: number): Digits {
+/** A realistic value between lo and hi, to 2 significant figures (sometimes 3, unless it is "about"), never exactly 1. */
+function between(r: () => number, lo: number, hi: number, rough = false): Digits {
   for (;;) {
     const x = lo + r() * (hi - lo);
-    const d = D(String(parseFloat(x.toPrecision(r() < 0.2 ? 3 : 2))));
+    const d = D(String(parseFloat(x.toPrecision(!rough && r() < 0.2 ? 3 : 2))));
     const v = toNumber(d);
     if (v >= lo && v <= hi && v !== 1) return d;
   }
@@ -96,8 +99,8 @@ function prefixQuestion(r: () => number): Question {
     const distract = shuffle(r, [3, -3, 6, -6, -2, 2, 9].filter((x) => x !== p && x !== twin)).slice(0, twin === null ? 3 : 2);
     const powOptions = shuffle(r, [p, ...(twin === null ? [] : [twin]), ...distract].map(pow));
     const powRight = powOptions.indexOf(pow(p));
-    const opOptions = [`Multiply by ${f}`, `Divide by ${f}`];
-    const opRight = bigger ? 0 : 1;
+    const opOptions = shuffle(r, [`Multiply by ${f}`, `Divide by ${f}`]);
+    const opRight = opOptions.indexOf(`${bigger ? 'Multiply' : 'Divide'} by ${f}`);
     const wrongWay = toBase ? shift(inPrefixed, -p) : shift(inBase, p);
     return {
       round: 'prefix',
@@ -105,11 +108,11 @@ function prefixQuestion(r: () => number): Question {
       steps: [
         {
           type: 'choice',
-          prompt: `What does the prefix ${name} (${pre}) stand for?`,
+          prompt: `What power of ten does the ${pre} in ${sym} stand for?`,
           options: powOptions,
           correct: powRight,
           why: whyAll(powOptions, powRight, (o) =>
-            twin !== null && o === pow(twin) ? 'Take care with capitals: m is milli, a thousandth, and M is mega, a million.' : `Look up ${name} in the prefix table: each prefix stands for one power of ten.`,
+            twin !== null && o === pow(twin) ? `Take care with capitals: m is milli, a thousandth, and M is mega, a million. This ${pre} is ${name}.` : `${pre} is ${name}. Look it up in the prefix table: each prefix stands for one power of ten.`,
           ),
         },
         {
@@ -141,9 +144,9 @@ function prefixQuestion(r: () => number): Question {
 const BIG = { G: { name: 'giga', p: 9 }, T: { name: 'tera', p: 12 }, M: { name: 'mega', p: 6 }, μ: { name: 'micro', p: -6 }, n: { name: 'nano', p: -9 } } as const;
 /** Real things, each with a realistic range in the prefixed unit. */
 const STANDARD: { pre: keyof typeof BIG; unit: string; what: string; lo: number; hi: number }[] = [
-  { pre: 'G', unit: 'W', what: 'A large power station produces', lo: 1, hi: 4 },
-  { pre: 'G', unit: 'W', what: 'An offshore wind farm can produce', lo: 0.3, hi: 1.5 },
-  { pre: 'G', unit: 'Hz', what: 'A mobile phone signal has a frequency of', lo: 0.7, hi: 3.8 },
+  { pre: 'M', unit: 'W', what: 'A large power station produces', lo: 1200, hi: 3600 },
+  { pre: 'G', unit: 'W', what: 'An offshore wind farm can produce', lo: 0.3, hi: 0.9 },
+  { pre: 'M', unit: 'Hz', what: 'A mobile phone signal has a frequency of', lo: 700, hi: 3800 },
   { pre: 'G', unit: 'J', what: 'A lightning strike carries about', lo: 1, hi: 5 },
   { pre: 'T', unit: 'W', what: 'The whole world uses electrical power of about', lo: 2.5, hi: 3.5 },
   { pre: 'T', unit: 'W', what: 'A pulse from a powerful laser reaches', lo: 10, hi: 500 },
@@ -155,7 +158,7 @@ const STANDARD: { pre: keyof typeof BIG; unit: string; what: string; lo: number;
   { pre: 'n', unit: 'm', what: 'Green light has a wavelength of', lo: 495, hi: 570 },
   { pre: 'n', unit: 'm', what: 'Ultraviolet light has a wavelength of', lo: 100, hi: 400 },
   { pre: 'n', unit: 'm', what: 'A virus is about', lo: 20, hi: 300 },
-  { pre: 'n', unit: 's', what: 'One step of a computer chip takes', lo: 0.2, hi: 5 },
+  { pre: 'n', unit: 's', what: 'One step of a computer chip takes', lo: 0.2, hi: 0.9 },
 ];
 const WORD: Record<string, string> = { W: 'watts', Hz: 'hertz', J: 'joules', m: 'metres', A: 'amperes', s: 'seconds' };
 
@@ -163,7 +166,7 @@ function standardQuestion(r: () => number): Question {
   for (;;) {
     const { pre, unit, what, lo, hi } = pick(r, STANDARD);
     const { name, p } = BIG[pre];
-    const start = between(r, lo, hi);
+    const start = between(r, lo, hi, what.endsWith('about'));
     const v = fmt(start);
     if (SHOWN.has(`${v} ${pre}${unit} ${unit}`)) continue;
     // a × 10^n with 1 ≤ a < 10: the digits of v with the first one in the units place.
@@ -176,20 +179,14 @@ function standardQuestion(r: () => number): Question {
     const steps: Step[] = [
       {
         type: 'choice',
-        prompt: `Which power of ten does ${name} (${pre}) stand for?`,
+        prompt: `What power of ten does the ${pre} in ${pre}${unit} stand for?`,
         options: powOptions,
         correct: powRight,
-        why: whyAll(powOptions, powRight, (o) => (o === pow(-p) ? `${cap(name)} is a ${tiny ? 'tiny' : 'huge'} prefix, so its power of ten is ${tiny ? 'negative' : 'positive'}.` : `Look up ${name} in the prefix table.`)),
+        why: whyAll(powOptions, powRight, (o) => (o === pow(-p) ? `${pre} is ${name}, a ${tiny ? 'tiny' : 'huge'} prefix, so its power of ten is ${tiny ? 'negative' : 'positive'}.` : `${pre} is ${name}. Look it up in the prefix table.`)),
       },
       {
         type: 'number',
-        prompt: `Replace the prefix: ${v} ${pre}${unit} = ${v} × 10^{?} ${unit}. What is the power?`,
-        answer: D(p),
-        feedback: (g) => (sameNumber(g, -p) ? `${cap(name)} is a ${tiny ? 'tiny' : 'huge'} prefix: the power is ${tiny ? 'negative' : 'positive'}.` : `Use the power of ten that ${name} stands for.`),
-      },
-      {
-        type: 'number',
-        prompt: 'Standard form is a × 10^{n}, where a is at least 1 and less than 10. What is a?',
+        prompt: `So ${v} ${pre}${unit} = ${v} × ${pow(p)} ${unit}. In standard form, a × 10^{n}, a is at least 1 and less than 10. What is a?`,
         answer: a,
         feedback: (g) => (same(g, start) && k !== 0 ? `${v} is not between 1 and 10. Move the decimal point so exactly one digit, not zero, is in front of it.` : 'Keep the same digits, with exactly one digit, not zero, in front of the decimal point.'),
       },
@@ -198,7 +195,9 @@ function standardQuestion(r: () => number): Question {
         prompt: 'And what is n?',
         answer: D(n),
         feedback: (g) =>
-          k !== 0 && sameNumber(g, p - k)
+          sameNumber(g, -n) && n !== 0
+            ? `${pre} is ${name}, a ${tiny ? 'tiny' : 'huge'} prefix: check the sign of the power.`
+            : k !== 0 && sameNumber(g, p - k)
             ? `That moves the power the wrong way. The front number became ${factorText(k)} times ${k > 0 ? 'smaller' : 'bigger'}, so the power of ten must make up for it: ${k > 0 ? 'add' : 'take away'} ${Math.abs(k)}.`
             : `Write ${v} as a × a power of ten, then add the indices.`,
       },
@@ -224,13 +223,13 @@ function standardQuestion(r: () => number): Question {
 /** Who is moving, and a realistic speed range in m/s. */
 const MOVERS: { who: string; lo: number; hi: number }[] = [
   { who: 'A high-speed train', lo: 40, hi: 85 },
-  { who: 'A car on a motorway', lo: 25, hi: 33 },
+  { who: 'A car on a motorway', lo: 26, hi: 31 },
   { who: 'A cyclist', lo: 5, hi: 12 },
   { who: 'A gust of wind', lo: 10, hi: 40 },
   { who: 'A sprinter', lo: 8, hi: 12 },
   { who: 'A cheetah', lo: 25, hi: 30 },
   { who: 'A plane on its take-off run', lo: 60, hi: 80 },
-  { who: 'A Mars rover test car on Earth', lo: 1, hi: 3 },
+  { who: 'A person jogging', lo: 2, hi: 4 },
 ];
 const SECONDS_FEEDBACK = (g: Digits) => (sameNumber(g, 60) ? '60 is the number of minutes in an hour, and each minute has 60 seconds.' : 'An hour is 60 minutes, and each minute is 60 seconds.');
 const near = (g: Digits, x: number) => Math.abs(toNumber(g) - x) < 0.01;
@@ -241,7 +240,7 @@ function speedQuestion(r: () => number): Question {
     const ms = int(r, lo, hi);
     const kmh = multiply(D(ms), D('3.6'));
     const toMs = r() < 0.5;
-    if (SHOWN.has(toMs ? `${fmt(kmh)} km/h` : `${ms} m/s`)) continue;
+    if (SHOWN_SPEEDS.has(ms)) continue;
     if (toMs) {
       const perHour = multiply(kmh, D(1000));
       return {
@@ -249,7 +248,7 @@ function speedQuestion(r: () => number): Question {
         prompt: `${who} travels at ${fmt(kmh)} km/h. What is this speed in m/s?`,
         steps: [
           { type: 'number', prompt: `In one hour it travels ${fmt(kmh)} km. How many metres is that?`, answer: perHour, unit: 'm', feedback: () => '1 km is 1,000 m.' },
-          { type: 'number', prompt: 'How many seconds are there in one hour?', answer: D(3600), feedback: SECONDS_FEEDBACK },
+          { type: 'number', prompt: 'How many seconds are there in one hour?', answer: D(3600), unit: 's', feedback: SECONDS_FEEDBACK },
           {
             type: 'number',
             prompt: 'So how many metres does it travel each second?',
@@ -272,7 +271,7 @@ function speedQuestion(r: () => number): Question {
       round: 'speed',
       prompt: `${who} moves at ${ms} m/s. What is this speed in km/h?`,
       steps: [
-        { type: 'number', prompt: 'How many seconds are there in one hour?', answer: D(3600), feedback: SECONDS_FEEDBACK },
+        { type: 'number', prompt: 'How many seconds are there in one hour?', answer: D(3600), unit: 's', feedback: SECONDS_FEEDBACK },
         { type: 'number', prompt: `It goes ${ms} m every second. How many metres is that in one hour?`, answer: metres, unit: 'm', feedback: (g) => (sameNumber(g, ms * 60) ? 'That is one minute. An hour has 3,600 seconds.' : 'Multiply the metres each second by the seconds in an hour.') },
         {
           type: 'number',
@@ -334,18 +333,19 @@ function spaceQuestion(r: () => number): Question {
     if (SHOWN.has(`${v} ${from} ${to}`)) continue;
     const factor = D(10 ** pair.power);
     const F = fmt(factor);
-    const opOptions = [`Multiply by ${F}`, `Divide by ${F}`];
-    const opRight = toSmall ? 0 : 1;
+    const opOptions = shuffle(r, [`Multiply by ${F}`, `Divide by ${F}`]);
+    const opRight = opOptions.indexOf(`${toSmall ? 'Multiply' : 'Divide'} by ${F}`);
     const wrongWay = shift(start, -places);
     const L = pair.length;
     const steps: Step[] = [];
     if (L) {
       steps.push(
-        { type: 'number', prompt: `How many ${L.small} are in 1 ${L.big}?`, answer: D(L.factor), feedback: () => `Think of a ruler: 1 ${L.big} is ${L.factor === 100 ? 'a hundred' : 'ten'} of them.` },
+        { type: 'number', prompt: `How many ${L.small} are in 1 ${L.big}?`, answer: D(L.factor), unit: L.small === 'centimetres' ? 'cm' : 'mm', feedback: () => (L.factor === 100 ? 'Centi means a hundredth: a centimetre is a hundredth of a metre.' : 'Look at a ruler: count the millimetre marks in one centimetre.') },
         {
           type: 'number',
           prompt: `So how many ${pair.small} are in 1 ${pair.big}?`,
           answer: factor,
+          unit: pair.small,
           feedback: (g) =>
             sameNumber(g, L.factor)
               ? `That is the length factor. A ${L.dim === 2 ? 'square' : 'cube'} 1 ${L.big} across is ${L.factor} ${L.small} ${L.dim === 2 ? 'by' : 'by'} ${L.factor}${L.dim === 3 ? ` by ${L.factor}` : ''}: ${L.dim === 2 ? 'square' : 'cube'} it.`
@@ -359,11 +359,17 @@ function spaceQuestion(r: () => number): Question {
         type: 'number',
         prompt: `How many ${pair.small} are in 1 ${one(pair.big)}?`,
         answer: factor,
-        feedback: (g) => (pair.big === 'm³' && sameNumber(g, 1000000) ? 'That is the cm³ in 1 m³. A litre is 1,000 cm³, so there are fewer litres.' : pair.big === 'm³' ? 'A cubic metre holds 1,000 litres.' : 'One litre is 1,000 cm³.'),
+        unit: pair.small,
+        feedback: (g) =>
+          pair.big === 'm³' && sameNumber(g, 1000000)
+            ? 'That is the number of cm³ in 1 m³. A litre is much bigger than 1 cm³, so fewer litres fill a cubic metre.'
+            : pair.big === 'm³'
+              ? 'See "Areas and volumes" in the notes: how many litres fill a cubic metre?'
+              : 'See "Areas and volumes" in the notes: how many cm³ fill one litre?',
       });
     }
     steps.push(
-      { type: 'choice', prompt: `To change ${from} into ${to}, do you multiply or divide?`, options: opOptions, correct: opRight, why: { [1 - opRight]: toSmall ? `${cap(to)} are smaller, so you need more of them: multiply.` : `${cap(to)} are bigger, so you need fewer of them: divide.` } },
+      { type: 'choice', prompt: `To change ${from} into ${to}, do you multiply or divide?`, options: opOptions, correct: opRight, why: { [1 - opRight]: toSmall ? `The new unit, ${to}, is smaller, so you need more of them: multiply.` : `The new unit, ${to}, is bigger, so you need fewer of them: divide.` } },
       {
         type: 'number',
         prompt: `So what is ${v} ${from} in ${to}?`,

@@ -202,13 +202,24 @@ export function readFraction(text: string): Fraction | null {
  * Reads a typed number: digits with optional commas, or spaces between groups of three as some lesson pages
  * write them (20 000), then optionally a unit or %.
  */
-export function readAnswer(text: string): { value: Digits; unit: string } | null {
+export function readAnswer(text: string): { value: Digits; unit: string; rawUnit: string } | null {
   const grouped = text.trim().replace(/(\d)[ \u00a0\u2009\u202f](?=\d{3}(?!\d))/g, '$1');
-  const m = grouped.match(/^(?:about\s+)?([-−–]?)\s*([\d.,]+)\s*([a-zA-Z %²³^.°/μµ]*[23]?)$/i);
+  const UNIT = '([a-zA-Z %²³^.°/μµ⁻¹-]*[123]?)';
+  // Standard form, as the physics lessons teach it: 4.7 × 10^6, 4.7x10^6, 4.7*10^-3 or 4.7e6.
+  const sf = grouped.match(new RegExp(`^(?:about\\s+)?([-−–]?)\\s*(\\d+(?:\\.\\d+)?)\\s*(?:[x×*]\\s*10\\s*\\^\\s*\\{?|e)\\s*([-−–]?\\d+)\\}?\\s*${UNIT}$`, 'i'));
+  if (sf) {
+    const front = parseDecimal(sf[2]);
+    if (!front) return null;
+    const value = shiftDigits(front, (/^[-−–]/.test(sf[3]) ? -1 : 1) * Number(sf[3].replace(/^[-−–]/, '')));
+    return { value: sf[1] && value.digits !== '0' ? { ...value, neg: true } : value, unit: sf[4].trim().toLowerCase(), rawUnit: sf[4].trim() };
+  }
+  const m = grouped.match(new RegExp(`^(?:about\\s+)?([-−–]?)\\s*([\\d.,]+)\\s*${UNIT}$`, 'i'));
   const value = m && parseDecimal(m[2]);
   if (!m || !value) return null;
-  return { value: m[1] && value.digits !== '0' ? { ...value, neg: true } : value, unit: m[3].trim().toLowerCase() };
+  return { value: m[1] && value.digits !== '0' ? { ...value, neg: true } : value, unit: m[3].trim().toLowerCase(), rawUnit: m[3].trim() };
 }
+/** Multiplies by 10 to the power `places`, exactly. */
+const shiftDigits = (d: Digits, places: number): Digits => (d.digits === '0' ? d : { ...d, top: d.top + places });
 
 /** The ways a unit may be written after an answer. */
 const UNIT_WORDS: Record<string, string[]> = {
@@ -218,7 +229,8 @@ const UNIT_WORDS: Record<string, string[]> = {
   '%': ['%', 'percent', 'per cent'],
   '£': ['£'],
   days: ['day', 'days'],
-  'm/s': ['m/s', 'ms', 'metres per second'],
+  'm/s': ['m/s', 'm s⁻¹', 'm s-1', 'ms⁻¹', 'ms-1', 'metres per second'],
+  s: ['s', 'sec', 'secs', 'second', 'seconds'],
   '°': ['°', 'deg', 'degree', 'degrees'],
   hours: ['h', 'hr', 'hrs', 'hour', 'hours'],
   watts: ['w', 'watt', 'watts'],
@@ -244,7 +256,7 @@ const UNIT_WORDS: Record<string, string[]> = {
   kHz: ['khz', 'kilohertz'],
   MHz: ['mhz', 'megahertz'],
   mg: ['mg', 'milligram', 'milligrams'],
-  'km/h': ['km/h', 'kmh', 'kph', 'km per hour', 'kilometres per hour'],
+  'km/h': ['km/h', 'kmh', 'kph', 'kmph', 'km/hr', 'km h⁻¹', 'km h-1', 'km per hour', 'kilometres per hour'],
 };
 
 /** Is the typed number right? Empty feedback means yes. */
@@ -273,6 +285,9 @@ export function markNumber(step: NumberStep, text: string): { ok: boolean; feedb
     return { ok: false, feedback: step.feedback(read.value) || 'Not quite. Try again.' };
   }
   if (read.unit && !step.unit && allUnitWords().has(read.unit)) return { ok: false, feedback: 'This answer has no unit. Type just the number.' };
+  // Milli and mega differ only by a capital: mW for MW is a different unit, a billion times smaller.
+  if (read.unit && step.unit && /^[mM][A-Za-z]/.test(step.unit) && /^[mM][A-Za-z]{1,2}$/.test(read.rawUnit) && read.rawUnit[0] !== step.unit[0])
+    return { ok: false, feedback: 'Check the capital letter: m is milli and M is mega.' };
   if (read.unit && step.unit && !(UNIT_WORDS[step.unit] ?? [step.unit]).includes(read.unit)) {
     const words = UNIT_WORDS[step.unit];
     return { ok: false, feedback: `Check the unit: this answer is in ${words ? words[words.length - 1] : step.unit}.` };

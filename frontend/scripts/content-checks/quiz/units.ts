@@ -36,16 +36,17 @@ export const unitsVerifier: Verifier = {
       const right = q.steps[0].type === 'choice' ? q.steps[0].options[q.steps[0].correct] : '';
       const twin = right === '10^{6}' ? '10^{−3}' : right === '10^{−3}' ? '10^{6}' : null;
       if (twin) out.push({ step: 0, typed: twin, expect: 'Take care with capitals' });
+      // The answer typed with the wrong capital (mW for MW, MA for mA) is refused.
+      if (/^[mM][A-Za-z]/.test(c.to)) out.push({ step: last, typed: `${c.answer} ${c.to[0] === 'm' ? 'M' : 'm'}${c.to.slice(1)}`, expect: 'capital letter' });
     }
     if (c.kind === 'standard') {
       const p = Math.round(Math.log10(convert('1', c.from, c.to)));
       const k = c.n - p;
-      out.push({ step: 1, typed: String(-p), expect: 'the power is' });
-      const s0 = q.steps[0];
-      if (s0.type === 'choice') out.push({ step: 0, typed: `10^{${-p < 0 ? `−${p}` : -p}}`, expect: 'prefix, so its power' });
+      out.push({ step: 0, typed: `10^{${-p < 0 ? `−${p}` : -p}}`, expect: 'prefix, so its power' });
+      if (c.n !== 0) out.push({ step: 2, typed: String(-c.n), expect: 'check the sign' });
       if (k !== 0) {
-        out.push({ step: 2, typed: c.value, expect: 'not between 1 and 10' });
-        out.push({ step: 3, typed: String(p - k), expect: 'wrong way' });
+        out.push({ step: 1, typed: c.value, expect: 'not between 1 and 10' });
+        if (p - k !== -c.n) out.push({ step: 2, typed: String(p - k), expect: 'wrong way' });
       }
     }
     if (c.kind === 'speed') {
