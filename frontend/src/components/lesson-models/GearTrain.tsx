@@ -72,7 +72,10 @@ function Gear({ teeth, k, offset, colour, innerRef }: { teeth: number; k: number
  * Two meshing gears: the tooth counts set the gear ratio, and the ratio trades
  * speed of turning for turning effect (moment) while their product stays the same.
  */
-export default function GearTrain({ placement = 'lesson' }: { placement?: string }) {
+/** `bare`: inside a Try it panel that already has its frame (the Explore tab on a quiz lesson). */
+export default function GearTrain({ placement = 'lesson', bare = false }: { placement?: string; bare?: boolean }) {
+  const Frame = bare ? 'div' : 'figure';
+  const Caption = bare ? 'p' : 'figcaption';
   const labelsRef = useReadableLabels();
   const [driver, setDriver] = useState(16);
   const [driven, setDriven] = useState(40);
@@ -145,10 +148,10 @@ export default function GearTrain({ placement = 'lesson' }: { placement?: string
   ];
 
   return (
-    <figure className="night-window overflow-hidden rounded-3xl p-4 shadow-[0_30px_60px_-20px_rgba(11,16,38,0.55)] sm:p-6">
-      <figcaption className="flex items-baseline justify-between gap-3">
+    <Frame className={bare ? '' : 'night-window overflow-hidden rounded-3xl p-4 shadow-[0_30px_60px_-20px_rgba(11,16,38,0.55)] sm:p-6'}>
+      <Caption className="flex items-baseline justify-between gap-3">
         <span className="font-fraunces text-xl font-semibold text-white">Gears: trading speed for turning effect</span>
-      </figcaption>
+      </Caption>
 
       <svg
         ref={labelsRef}
@@ -235,6 +238,6 @@ export default function GearTrain({ placement = 'lesson' }: { placement?: string
         animation runs at a quarter of real speed so you can follow the teeth, and the numbers shown are rounded to two
         decimal places.
       </p>
-    </figure>
+    </Frame>
   );
 }
