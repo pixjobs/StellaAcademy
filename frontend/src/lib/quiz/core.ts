@@ -43,6 +43,11 @@ export type NumberStep = {
    * default: a quiz about prefixes must not accept the question's own unit typed back.
    */
   prefixes?: boolean;
+  /**
+   * How far a calculator answer may be from `exact`, as a fraction of it (default 0.002). Chained A-level steps
+   * built from rounded values use more, so a pupil who rounded each step to 3 significant figures is not refused.
+   */
+  tolerance?: number;
   /** A ratio: "2:1" and "2/1" are read as 2, and "1:2" as 0.5, so a pupil may write it either way. */
   ratio?: boolean;
 };
@@ -267,6 +272,8 @@ const UNIT_WORDS: Record<string, string[]> = {
   'kΩ': ['kω', 'kohm', 'kohms', 'kilohm', 'kilohms'],
   C: ['c', 'coulomb', 'coulombs'],
   N: ['n', 'newton', 'newtons'],
+  'N/kg': ['n/kg', 'n kg-1', 'n kg⁻¹', 'newtons per kilogram', 'newtons per kg'],
+  minutes: ['min', 'mins', 'minute', 'minutes'],
   'N m': ['n m', 'nm', 'n·m', 'n.m', 'newton metre', 'newton metres', 'newton-metre', 'newton-metres'],
   'turns a minute': ['turns per minute', 'turns per min', 'turns/min', 'turns/minute', 'times a minute', 'times per minute', 'revs per minute', 'revs a minute', 'rev/min', 'revolutions per minute', 'revolutions a minute', 'rotations per minute', 'rotations a minute', 'rpm', 'r.p.m.', 'r.p.m', 'per minute', 'a minute', 'turns', 'turns a minute'],
   'km/h': ['km/h', 'kmh', 'kph', 'kmph', 'km/hr', 'km h⁻¹', 'km h-1', 'km per hour', 'kilometres per hour'],
@@ -326,7 +333,7 @@ export function markNumber(step: NumberStep, text: string): { ok: boolean; feedb
     const v = toNumber(read.value);
     // Half a unit of the third significant figure, or 0.2%, whichever is larger: a pupil who rounded a value on
     // the way (such as sin 19° = 0.326) lands a little off the exact answer, and that is still right.
-    const tol = Math.max(sigFigUnit(step.exact) / 2, Math.abs(step.exact) * 0.002);
+    const tol = Math.max(sigFigUnit(step.exact) / 2, Math.abs(step.exact) * (step.tolerance ?? 0.002));
     if (Math.abs(v - step.exact) <= tol * 1.0001) return { ok: true, feedback: '' };
     // Right but rounded too far, such as 37 for 36.87.
     if (Math.abs(v - step.exact) <= 10 * tol && countSigFigs(read.value) < 3) return { ok: false, feedback: 'Close, but give your answer to 3 significant figures.' };
@@ -351,6 +358,30 @@ export function sf3(x: number): string {
 /** A calculator answer: rounded to 3 significant figures for display, with the exact value for marking. */
 export function approx(x: number): { answer: Digits; exact: number; shown: string } {
   return { answer: D(Number(x.toPrecision(3))), exact: x, shown: sf3(x) };
+}
+
+/** 10^{17}, 10^{−6}: a power of ten, drawn with a raised index by the quiz panel. */
+const tenTo = (n: number) => `10^{${n < 0 ? `−${-n}` : n}}`;
+
+/**
+ * A calculator answer to 3 significant figures, shown in standard form (3.98 × 10^{17}) when it is 100,000 or more,
+ * or less than 0.001, and as an ordinary number otherwise. The answer is exact Digits, so it never passes through
+ * a float's own exponent notation.
+ */
+export function approxStd(x: number): { answer: Digits; exact: number; shown: string } {
+  if (x === 0) return { answer: D(0), exact: 0, shown: '0' };
+  const e = Math.floor(Math.log10(Math.abs(x)));
+  let mant = Number((x / 10 ** e).toPrecision(3));
+  let exp = e;
+  if (Math.abs(mant) >= 10) {
+    mant /= 10;
+    exp += 1;
+  }
+  const digits = Math.abs(Math.round(mant * 100)).toString().replace(/0+$/, '') || '0';
+  const answer: Digits = { digits, top: exp, ...(x < 0 ? { neg: true } : {}) };
+  const standard = Math.abs(x) >= 1e5 || Math.abs(x) < 1e-3;
+  const m = (Math.abs(mant)).toFixed(2);
+  return { answer, exact: x, shown: standard ? `${x < 0 ? '−' : ''}${m} × ${tenTo(exp)}` : sf3(x) };
 }
 
 /** Is the typed fraction right? */

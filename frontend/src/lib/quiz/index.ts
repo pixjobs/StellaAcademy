@@ -9,6 +9,7 @@ import { diffeqQuiz } from '@/lib/quiz/diffeq';
 import { unitsQuiz } from '@/lib/quiz/units';
 import { circuitQuiz } from '@/lib/quiz/circuit';
 import { gearsQuiz } from '@/lib/quiz/gears';
+import { gravityQuiz } from '@/lib/quiz/gravity';
 import { decimalsPercentagesQuiz } from '@/lib/quiz/decimals-percentages';
 import { exponentsRootsQuiz } from '@/lib/quiz/exponents-roots';
 import { fractionOpsQuiz } from '@/lib/quiz/fraction-ops';
@@ -47,6 +48,7 @@ export const QUIZZES: Partial<Record<ConceptId, LessonQuiz>> = {
   units: unitsQuiz as LessonQuiz,
   circuit: circuitQuiz as LessonQuiz,
   gears: gearsQuiz as LessonQuiz,
+  gravity: gravityQuiz as LessonQuiz,
 };
 
 export const hasQuiz = (id: ConceptId) => id in QUIZZES;
