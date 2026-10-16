@@ -32,6 +32,7 @@ import { prismVerifier } from './quiz/prism';
 import { wavesVerifier } from './quiz/waves';
 import { momentumVerifier } from './quiz/momentum';
 import { trajectoryVerifier } from './quiz/trajectory';
+import { thermodynamicsVerifier } from './quiz/thermodynamics';
 import { decimalsPercentagesVerifier } from './quiz/decimals-percentages';
 import { exponentsRootsVerifier } from './quiz/exponents-roots';
 import { fractionOpsVerifier } from './quiz/fraction-ops';
@@ -78,6 +79,7 @@ const VERIFIERS: Record<string, Verifier> = {
   waves: wavesVerifier,
   momentum: momentumVerifier,
   trajectory: trajectoryVerifier,
+  thermodynamics: thermodynamicsVerifier,
 };
 
 export function runQuizChecks(lessons?: string[]): Finding[] {

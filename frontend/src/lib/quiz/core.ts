@@ -240,7 +240,7 @@ const shiftDigits = (d: Digits, places: number): Digits => (d.digits === '0' ? d
 const UNIT_WORDS: Record<string, string[]> = {
   km: ['km', 'kilometre', 'kilometres'], m: ['m', 'metre', 'metres'], cm: ['cm', 'centimetre', 'centimetres'], mm: ['mm', 'millimetre', 'millimetres'],
   kg: ['kg', 'kilogram', 'kilograms'], g: ['g', 'gram', 'grams'], l: ['l', 'litre', 'litres'], ml: ['ml', 'millilitre', 'millilitres'],
-  miles: ['mile', 'miles'], inches: ['in', 'inch', 'inches'], pounds: ['lb', 'lbs', 'pound', 'pounds'], litres: ['l', 'litre', 'litres'],
+  miles: ['mile', 'miles'], inches: ['in', 'inch', 'inches'], pounds: ['lb', 'lbs', 'pound', 'pounds'], litres: ['l', 'litre', 'litres', 'dm³', 'dm3', 'dm^3'],
   '%': ['%', 'percent', 'per cent'],
   '£': ['£'],
   days: ['day', 'days'],
@@ -276,6 +276,10 @@ const UNIT_WORDS: Record<string, string[]> = {
   'kΩ': ['kω', 'kohm', 'kohms', 'kilohm', 'kilohms'],
   C: ['c', 'coulomb', 'coulombs'],
   N: ['n', 'newton', 'newtons'],
+  Pa: ['pa', 'pascal', 'pascals', 'n/m²', 'n/m2', 'n m⁻²', 'n m-2'],
+  kPa: ['kpa', 'kilopascal', 'kilopascals'],
+  K: ['k', 'kelvin', 'kelvins'],
+  mol: ['mol', 'mole', 'moles'],
   'km/s': ['km/s', 'kms', 'km s-1', 'km s⁻¹', 'km s^-1', 'kms-1', 'kms⁻¹', 'kms^-1', 'km/sec', 'km per second', 'kilometres per second'],
   'km²/s²': ['km²/s²', 'km^2/s^2', 'km2/s2', 'km² s⁻²', 'km^2 s^-2', 'km2 s-2', 'km²s⁻²'],
   'km³': ['km³', 'km3', 'km^3', 'cubic km', 'cubic kilometres'],
@@ -324,7 +328,7 @@ export function markNumber(step: NumberStep, text: string): { ok: boolean; feedb
   if (read.unit && !step.unit) return { ok: false, feedback: allUnitWords().has(read.unit) ? 'This answer has no unit. Type just the number.' : 'Type just a number, such as 2.5.' };
   // A prefixed unit where the step allows it: convert to the base unit, then mark as usual.
   if (step.prefixes && step.unit && read.rawUnit) {
-    const m = read.rawUnit.match(/^([mkMμuG])\s*(A|V|W|Ω|J|C|m\/s)$/);
+    const m = read.rawUnit.match(/^([mkMμuG])\s*(A|V|W|Ω|J|C|Pa|m\/s)$/);
     if (m && m[2] === step.unit) {
       const power = { m: -3, k: 3, M: 6, μ: -6, u: -6, G: 9 }[m[1]]!;
       return markNumber({ ...step, prefixes: false }, `${fmt(shiftDigits(read.value, power))} ${step.unit}`.replace(/^−/, '-'));
@@ -347,7 +351,7 @@ export function markNumber(step: NumberStep, text: string): { ok: boolean; feedb
     // An answer that is exact with fewer figures (0.5 for 0.500, 13 for 13.0) matches `answer` above instead.
     if (Math.abs(v - step.exact) <= tol * 1.0001) return typedSigFigs(text) < 3 ? { ok: false, feedback: 'Close, but give your answer to 3 significant figures.' } : { ok: true, feedback: '' };
     // Right but rounded too far, such as 37 for 36.87.
-    if (Math.abs(v - step.exact) <= 10 * tol && countSigFigs(read.value) < 3) return { ok: false, feedback: 'Close, but give your answer to 3 significant figures.' };
+    if (Math.abs(v - step.exact) <= 10 * tol && typedSigFigs(text) < 3) return { ok: false, feedback: 'Close, but give your answer to 3 significant figures.' };
   }
   return { ok: false, feedback: step.feedback(read.value) || 'Not quite. Try again.' };
 }
@@ -356,7 +360,6 @@ export function markNumber(step: NumberStep, text: string): { ok: boolean; feedb
 export const toNumber = (d: Digits) => (d.neg ? -1 : 1) * Number(d.digits) * 10 ** (d.top - d.digits.length + 1);
 /** The place value of the third significant figure of x. */
 const sigFigUnit = (x: number) => 10 ** (Math.floor(Math.log10(Math.abs(x))) - 2);
-const countSigFigs = (d: Digits) => d.digits.replace(/^0+/, '').length;
 /**
  * Significant figures as typed, so trailing zeros count: 0.290 and 1,500 have 3. In a whole number, trailing
  * zeros are taken as significant, giving the pupil the benefit of the doubt. In standard form, the front number.

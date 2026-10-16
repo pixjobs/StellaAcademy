@@ -14,6 +14,7 @@ import { prismQuiz } from '@/lib/quiz/prism';
 import { wavesQuiz } from '@/lib/quiz/waves';
 import { momentumQuiz } from '@/lib/quiz/momentum';
 import { trajectoryQuiz } from '@/lib/quiz/trajectory';
+import { thermodynamicsQuiz } from '@/lib/quiz/thermodynamics';
 import { decimalsPercentagesQuiz } from '@/lib/quiz/decimals-percentages';
 import { exponentsRootsQuiz } from '@/lib/quiz/exponents-roots';
 import { fractionOpsQuiz } from '@/lib/quiz/fraction-ops';
@@ -57,6 +58,7 @@ export const QUIZZES: Partial<Record<ConceptId, LessonQuiz>> = {
   waves: wavesQuiz as LessonQuiz,
   momentum: momentumQuiz as LessonQuiz,
   trajectory: trajectoryQuiz as LessonQuiz,
+  thermodynamics: thermodynamicsQuiz as LessonQuiz,
 };
 
 export const hasQuiz = (id: ConceptId) => id in QUIZZES;
