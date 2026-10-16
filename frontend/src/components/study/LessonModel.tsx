@@ -134,7 +134,7 @@ const CUSTOM_MODELS: ConceptId[] = ['gravity', 'waves', 'circuit', 'trigonometry
 function ModelFor({ id, bare = false }: { id: ConceptId; bare?: boolean }) {
   if (id === 'gravity') return <OrbitLauncher placement="lesson" />;
   if (id === 'waves') return <WaveInstrument placement="lesson" />;
-  if (id === 'circuit') return <CircuitBoard />;
+  if (id === 'circuit') return <CircuitBoard bare={bare} />;
   if (id === 'trigonometry') return <TrigTriangle bare={bare} />;
   if (id === 'gears') return <GearTrain />;
   if (id === 'momentum') return <MomentumTrack />;

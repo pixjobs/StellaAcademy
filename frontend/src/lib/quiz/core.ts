@@ -38,6 +38,11 @@ export type NumberStep = {
   exact?: number;
   /** How the answer is shown, when it keeps trailing zeros (13.0 to 3 significant figures). */
   shown?: string;
+  /**
+   * The answer may also be typed with a prefix on its unit (2.4 mA for 0.0024 A, 4.7 kΩ for 4,700 Ω). Off by
+   * default: a quiz about prefixes must not accept the question's own unit typed back.
+   */
+  prefixes?: boolean;
 };
 
 export type FractionStep = {
@@ -204,7 +209,7 @@ export function readFraction(text: string): Fraction | null {
  */
 export function readAnswer(text: string): { value: Digits; unit: string; rawUnit: string } | null {
   const grouped = text.trim().replace(/(\d)[ \u00a0\u2009\u202f](?=\d{3}(?!\d))/g, '$1');
-  const UNIT = '([a-zA-Z %²³^.°/μµ⁻¹-]*[123]?)';
+  const UNIT = '([a-zA-Z %²³^.°/μµΩω⁻¹-]*[123]?)';
   // Standard form, as the physics lessons teach it: 4.7 × 10^6, 4.7x10^6, 4.7*10^-3 or 4.7e6.
   const sf = grouped.match(new RegExp(`^(?:about\\s+)?([-−–]?)\\s*(\\d+(?:\\.\\d+)?)\\s*(?:[x×*]\\s*10\\s*\\^\\s*\\{?|e)\\s*([-−–]?\\d+)\\}?\\s*${UNIT}$`, 'i'));
   if (sf) {
@@ -256,6 +261,9 @@ const UNIT_WORDS: Record<string, string[]> = {
   kHz: ['khz', 'kilohertz'],
   MHz: ['mhz', 'megahertz'],
   mg: ['mg', 'milligram', 'milligrams'],
+  'Ω': ['ω', 'ohm', 'ohms'],
+  'kΩ': ['kω', 'kohm', 'kohms', 'kilohm', 'kilohms'],
+  C: ['c', 'coulomb', 'coulombs'],
   'km/h': ['km/h', 'kmh', 'kph', 'kmph', 'km/hr', 'km h⁻¹', 'km h-1', 'km per hour', 'kilometres per hour'],
 };
 
@@ -285,6 +293,14 @@ export function markNumber(step: NumberStep, text: string): { ok: boolean; feedb
     return { ok: false, feedback: step.feedback(read.value) || 'Not quite. Try again.' };
   }
   if (read.unit && !step.unit && allUnitWords().has(read.unit)) return { ok: false, feedback: 'This answer has no unit. Type just the number.' };
+  // A prefixed unit where the step allows it: convert to the base unit, then mark as usual.
+  if (step.prefixes && step.unit && read.rawUnit) {
+    const m = read.rawUnit.match(/^([mkMμuG])\s*(A|V|W|Ω|J|C)$/);
+    if (m && m[2] === step.unit) {
+      const power = { m: -3, k: 3, M: 6, μ: -6, u: -6, G: 9 }[m[1]]!;
+      return markNumber({ ...step, prefixes: false }, `${fmt(shiftDigits(read.value, power))} ${step.unit}`.replace(/^−/, '-'));
+    }
+  }
   // Milli and mega differ only by a capital: mW for MW is a different unit, a billion times smaller.
   if (read.unit && step.unit && /^[mM][A-Za-z]/.test(step.unit) && /^[mM][A-Za-z]{1,2}$/.test(read.rawUnit) && read.rawUnit[0] !== step.unit[0])
     return { ok: false, feedback: 'Check the capital letter: m is milli and M is mega.' };
