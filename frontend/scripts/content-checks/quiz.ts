@@ -27,6 +27,7 @@ import { diffeqVerifier } from './quiz/diffeq';
 import { unitsVerifier } from './quiz/units';
 import { circuitVerifier } from './quiz/circuit';
 import { gearsVerifier } from './quiz/gears';
+import { gravityVerifier } from './quiz/gravity';
 import { decimalsPercentagesVerifier } from './quiz/decimals-percentages';
 import { exponentsRootsVerifier } from './quiz/exponents-roots';
 import { fractionOpsVerifier } from './quiz/fraction-ops';
@@ -68,6 +69,7 @@ const VERIFIERS: Record<string, Verifier> = {
   units: unitsVerifier,
   circuit: circuitVerifier,
   gears: gearsVerifier,
+  gravity: gravityVerifier,
 };
 
 export function runQuizChecks(lessons?: string[]): Finding[] {

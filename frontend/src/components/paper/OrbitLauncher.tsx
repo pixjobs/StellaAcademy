@@ -101,7 +101,8 @@ type Phase = 'pad' | 'liftoff' | 'climb' | 'orbit';
 const LIFTOFF_SECONDS = 9;
 const CLIMB_SECONDS = 8.5;
 
-export default function OrbitLauncher({ placement = 'hero' }: { placement?: string }) {
+/** `bare`: inside a Try it panel that already has its frame (the Explore tab on a quiz lesson). */
+export default function OrbitLauncher({ placement = 'hero', bare = false }: { placement?: string; bare?: boolean }) {
   const [speed, setSpeed] = useState(Number(CIRCULAR_KMS.toFixed(1)));
   const [live, setLive] = useState({ altitude: LAUNCH_ALTITUDE_KM, speed: Number(CIRCULAR_KMS.toFixed(1)) });
   const [phase, setPhase] = useState<Phase>('pad');
@@ -368,9 +369,11 @@ export default function OrbitLauncher({ placement = 'hero' }: { placement?: stri
     `absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${visible ? 'opacity-100' : 'pointer-events-none opacity-0'}`;
   const inOrbit = phase === 'orbit';
 
+  const Frame = bare ? 'div' : 'figure';
+  const Caption = bare ? 'p' : 'figcaption';
   return (
-    <figure className="night-window overflow-hidden rounded-3xl p-4 shadow-[0_30px_70px_-20px_rgba(0,0,0,0.7)] ring-1 ring-white/10 sm:p-6">
-      <figcaption className="font-fraunces text-xl font-semibold text-white">Launch a rocket and see where it ends up</figcaption>
+    <Frame className={bare ? '' : 'night-window overflow-hidden rounded-3xl p-4 shadow-[0_30px_70px_-20px_rgba(0,0,0,0.7)] ring-1 ring-white/10 sm:p-6'}>
+      <Caption className="font-fraunces text-xl font-semibold text-white">Launch a rocket and see where it ends up</Caption>
 
       <div className="relative mt-3 overflow-hidden rounded-2xl bg-black ring-1 ring-white/10" style={{ aspectRatio: `${W} / ${H}` }}>
         <canvas
@@ -487,6 +490,6 @@ export default function OrbitLauncher({ placement = 'hero' }: { placement?: stri
         and escape speed is {ESCAPE_KMS.toFixed(1)} km/s. It runs at least {SPEED_UP.toLocaleString('en-GB')} times
         faster than real life. Stella Academy is not affiliated with NASA.
       </p>
-    </figure>
+    </Frame>
   );
 }
