@@ -139,7 +139,8 @@ function Slider(props: { label: string; shown: string; min: number; max: number;
  * Two trolleys on a straight track. Whatever the masses, velocities and kind
  * of collision, the total momentum before equals the total momentum after.
  */
-export default function MomentumTrack({ placement = 'lesson' }: { placement?: string }) {
+/** `bare`: inside a Try it panel that already has its frame (the Explore tab on a quiz lesson). */
+export default function MomentumTrack({ placement = 'lesson', bare = false }: { placement?: string; bare?: boolean }) {
   const labelsRef = useReadableLabels();
   const [mA, setMA] = useState(2);
   const [uA, setUA] = useState(3);
@@ -225,11 +226,13 @@ export default function MomentumTrack({ placement = 'lesson' }: { placement?: st
   const pill = (active: boolean) =>
     `rounded-full border px-4 py-1.5 text-sm font-semibold ${active ? 'border-white bg-white text-[#0b1026]' : 'border-white/30 text-white hover:border-white'}`;
 
+  const Frame = bare ? 'div' : 'figure';
+  const Caption = bare ? 'p' : 'figcaption';
   return (
-    <figure className="night-window overflow-hidden rounded-3xl p-4 shadow-[0_30px_60px_-20px_rgba(11,16,38,0.55)] sm:p-6">
-      <figcaption className="flex items-baseline justify-between gap-3">
+    <Frame className={bare ? '' : 'night-window overflow-hidden rounded-3xl p-4 shadow-[0_30px_60px_-20px_rgba(11,16,38,0.55)] sm:p-6'}>
+      <Caption className="flex items-baseline justify-between gap-3">
         <span className="font-fraunces text-xl font-semibold text-white">Collisions: momentum before and after</span>
-      </figcaption>
+      </Caption>
 
       <svg
         ref={labelsRef}
@@ -311,6 +314,6 @@ export default function MomentumTrack({ placement = 'lesson' }: { placement?: st
         Friction is ignored. Velocities to the right are positive, so a negative velocity means moving left. Values are
         rounded to 2 decimal places. The trolleys start {LEAD} seconds of travel away from where they meet.
       </p>
-    </figure>
+    </Frame>
   );
 }

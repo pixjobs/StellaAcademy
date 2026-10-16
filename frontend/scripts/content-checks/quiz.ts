@@ -30,6 +30,7 @@ import { gearsVerifier } from './quiz/gears';
 import { gravityVerifier } from './quiz/gravity';
 import { prismVerifier } from './quiz/prism';
 import { wavesVerifier } from './quiz/waves';
+import { momentumVerifier } from './quiz/momentum';
 import { decimalsPercentagesVerifier } from './quiz/decimals-percentages';
 import { exponentsRootsVerifier } from './quiz/exponents-roots';
 import { fractionOpsVerifier } from './quiz/fraction-ops';
@@ -74,6 +75,7 @@ const VERIFIERS: Record<string, Verifier> = {
   gravity: gravityVerifier,
   prism: prismVerifier,
   waves: wavesVerifier,
+  momentum: momentumVerifier,
 };
 
 export function runQuizChecks(lessons?: string[]): Finding[] {
