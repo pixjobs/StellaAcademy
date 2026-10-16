@@ -38,7 +38,8 @@ function Readout({ label, value, note }: { label: string; value: string; note?: 
  * The wave model as an instrument: a bold trace, its wavelength and amplitude
  * marked on the stage, and readouts that obey v = fλ as the sliders move.
  */
-export default function WaveInstrument({ placement = 'hero' }: { placement?: string }) {
+/** `bare`: inside a Try it panel that already has its frame (the Explore tab on a quiz lesson). */
+export default function WaveInstrument({ placement = 'hero', bare = false }: { placement?: string; bare?: boolean }) {
   const [frequency, setFrequency] = useState(2);
   const [amplitude, setAmplitude] = useState(0.4);
   const pathRef = useRef<SVGPathElement>(null);
@@ -77,11 +78,13 @@ export default function WaveInstrument({ placement = 'hero' }: { placement?: str
   const ampPx = amplitude * PX_PER_M;
   const period = 1 / frequency;
 
+  const Frame = bare ? 'div' : 'figure';
+  const Caption = bare ? 'p' : 'figcaption';
   return (
-    <figure className="night-window overflow-hidden rounded-3xl p-4 shadow-[0_30px_60px_-20px_rgba(11,16,38,0.55)] sm:p-6">
-      <figcaption className="flex items-baseline justify-between gap-3">
+    <Frame className={bare ? '' : 'night-window overflow-hidden rounded-3xl p-4 shadow-[0_30px_60px_-20px_rgba(11,16,38,0.55)] sm:p-6'}>
+      <Caption className="flex items-baseline justify-between gap-3">
         <span className="font-fraunces text-xl font-semibold text-white">Waves: change one thing, watch the rest</span>
-      </figcaption>
+      </Caption>
 
       <svg viewBox={`0 0 ${W} ${H}`} className="mt-4 w-full rounded-2xl bg-black/25 ring-1 ring-white/10" role="img" aria-label={`A wave of frequency ${frequency} hertz and wavelength ${wavelength.toFixed(2)} metres`}>
         {/* metre grid */}
@@ -174,6 +177,6 @@ export default function WaveInstrument({ placement = 'hero' }: { placement?: str
       </div>
 
       <p className="mt-3 text-xs text-slate-400">The animation runs at a quarter of real speed so you can follow the crests.</p>
-    </figure>
+    </Frame>
   );
 }

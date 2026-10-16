@@ -29,6 +29,7 @@ import { circuitVerifier } from './quiz/circuit';
 import { gearsVerifier } from './quiz/gears';
 import { gravityVerifier } from './quiz/gravity';
 import { prismVerifier } from './quiz/prism';
+import { wavesVerifier } from './quiz/waves';
 import { decimalsPercentagesVerifier } from './quiz/decimals-percentages';
 import { exponentsRootsVerifier } from './quiz/exponents-roots';
 import { fractionOpsVerifier } from './quiz/fraction-ops';
@@ -72,6 +73,7 @@ const VERIFIERS: Record<string, Verifier> = {
   gears: gearsVerifier,
   gravity: gravityVerifier,
   prism: prismVerifier,
+  waves: wavesVerifier,
 };
 
 export function runQuizChecks(lessons?: string[]): Finding[] {
@@ -113,6 +115,8 @@ export function runQuizChecks(lessons?: string[]): Finding[] {
         if (!shown.includes(final.replace(/ (miles|inches|pounds|litres|km|cm|m|mm|g|kg|l|ml)$/, '')) && !shown.includes(mixed)) fail(where, q.prompt, `workings do not show the answer "${final}"`);
 
         q.steps.forEach((s, i) => {
+          // Float noise such as 0.39999999999999997 for 1.2 ÷ 3: no answer a pupil could type needs this many digits.
+          if (s.type === 'number' && s.answer.digits.length > 10) fail(where, q.prompt, `step ${i + 1}: answer ${s.answer.digits} looks like rounding noise`);
           if (s.type === 'choice') {
             if (s.correct < 0 || s.correct >= s.options.length) fail(where, s.prompt, 'correct option missing');
             if (new Set(s.options).size !== s.options.length) fail(where, s.prompt, `repeated options: ${s.options.join(', ')}`);
