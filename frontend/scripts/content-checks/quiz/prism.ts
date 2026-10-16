@@ -11,8 +11,9 @@ const SPECTRUM = ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet'
 
 /**
  * Refraction, checked against what each step marks. Directions from the rule "slower bends towards the normal";
- * Snell's law by θ₂ = atan(n₁ sin θ₁ / √(n₂² − n₁² sin² θ₁)), a different route from the inverse sine; speeds by
- * v × n = c; colours by their place in the spectrum; filters by "only its own colour passes".
+ * Snell's law by θ₂ = atan(n₁ sin θ₁ / √(n₂² − n₁² sin² θ₁)), a different route from the inverse sine; speeds and
+ * indices from the numbers printed in the prompt; colours by their place in the spectrum; filters by "only its
+ * own colour passes". Also: no air and glass in the bending round, which the page's practice questions cover.
  */
 export const prismVerifier: Verifier = {
   verify: (question) => {
@@ -20,6 +21,7 @@ export const prismVerifier: Verifier = {
     const c = q.check;
     const st = q.steps;
     if (c.kind === 'bend') {
+      if ([c.from, c.to].includes('air') && [c.from, c.to].includes('glass')) return 'air and glass in the bending round';
       let i = 0;
       if (c.surface && marked(st[i++]) !== c.angle) return 'angle to the normal';
       if (chosen(st[i++]) !== (c.n2 > c.n1 ? 'It slows down' : 'It speeds up')) return 'speed change';
@@ -35,38 +37,44 @@ export const prismVerifier: Verifier = {
       const theta2 = (Math.atan(s / Math.sqrt(c.n2 ** 2 - s ** 2)) * 180) / Math.PI;
       return ok3(st[0], Math.sin(rad(c.theta1))) && ok3(st[1], s / c.n2) && ok3(st[2], theta2) ? null : `snell ${c.n1}→${c.n2} at ${c.theta1}°`;
     }
-    if (c.kind === 'crossing') {
-      // Time by the number of wavelengths-free route: distance ÷ (c ÷ n) = distance × n ÷ c.
-      const t = ((c.cm / 100) * c.n) / 3e8;
-      return ok3(st[0], 3e8 / c.n) && Math.abs(marked(st[1]) - c.cm / 100) < 1e-9 && ok3(st[2], t) ? null : `crossing ${c.cm} cm, n=${c.n}`;
+    if (c.kind === 'speed') {
+      if (c.ask === 'v') {
+        const n = Number(q.prompt.match(/is (\d\.\d\d)\./)?.[1]);
+        if (n !== c.n) return 'index in the prompt';
+        const fasterIsRef = c.thanN < n;
+        if ((chosen(st[0]) === `In ${c.than}`) !== fasterIsRef) return 'speed comparison';
+        return ok3(st[1], 3e8 / n) ? null : `v for n = ${n}`;
+      }
+      const m = q.prompt.match(/at (\d\.\d\d) × 10\^\{8\} m\/s in/);
+      if (!m) return 'speed missing from the prompt';
+      const n = 3e8 / (Number(m[1]) * 1e8);
+      if ((chosen(st[0]) ?? '').startsWith('Bigger') !== n > c.thanN) return 'index comparison';
+      return ok3(st[1], n) ? null : `n from the prompt's speed`;
     }
-    if (c.kind === 'speed') return Math.abs(c.v * c.n - 3e8) < 1 && ok3(st[1], c.ask === 'v' ? c.v : c.n) ? null : `speed n=${c.n}`;
     if (c.kind === 'colours') {
       if (SPECTRUM.indexOf(c.high) <= SPECTRUM.indexOf(c.low)) return 'colour order';
       const want = c.asks.map((a) => (a === 'higher' || a === 'more' || a === 'bentMore' ? c.high : c.low));
       return want.every((w, k) => chosen(st[k])?.toLowerCase() === `${w} light`) ? null : 'colour answers';
     }
     const out = c.first === c.second ? `${c.first} light` : 'no light';
-    return chosen(st[0])?.toLowerCase() === `${c.first} light` && chosen(st[1])?.toLowerCase() === out ? null : `filters ${c.first} then ${c.second}`;
+    return chosen(st[0]) === `Every colour except ${c.first}` && chosen(st[1])?.toLowerCase() === out ? null : `filters ${c.first} then ${c.second}`;
   },
   mistakes: (question) => {
     const q = question as Question<PrismCheck>;
     const c = q.check;
     const out: { step: number; typed: string; expect: string }[] = [];
-    const wrongOption = (k: number, pickOne?: (o: string) => boolean) => {
+    const wrongOption = (k: number) => {
       const s = q.steps[k];
-      if (s.type !== 'choice') return null;
-      const opts = s.options.filter((_, i) => i !== s.correct);
-      return (pickOne ? opts.find(pickOne) : opts[0]) ?? null;
+      return s.type === 'choice' ? s.options.find((_, i) => i !== s.correct)! : '';
     };
     if (c.kind === 'bend') {
       let i = 0;
-      if (c.surface) out.push({ step: i++, typed: String(90 - c.angle), expect: 'angle to the boundary' });
-      out.push({ step: i, typed: wrongOption(i)!, expect: 'refractive index of' });
+      if (c.surface) out.push({ step: i++, typed: String(90 - c.angle), expect: 'angle to the surface' });
+      out.push({ step: i, typed: wrongOption(i), expect: 'Compare the refractive indices' });
       i++;
-      if (c.angle === 0) out.push({ step: i, typed: wrongOption(i)!, expect: 'reaches the surface all at once' });
+      if (c.angle === 0) out.push({ step: i, typed: wrongOption(i), expect: 'one side of the beam reaches' });
       else {
-        out.push({ step: i, typed: 'It does not change direction', expect: 'one side of the beam' });
+        out.push({ step: i, typed: 'It does not change direction', expect: 'one side of the beam changes speed first' });
         out.push({ step: i, typed: c.n2 > c.n1 ? 'Away from the normal' : 'Towards the normal', expect: 'Slowing down bends light towards' });
       }
     }
@@ -81,17 +89,17 @@ export const prismVerifier: Verifier = {
     if (c.kind === 'speed') {
       if (c.ask === 'v') out.push({ step: 1, typed: `${t3((3e8 * c.n) / 1e8)}e8`, expect: 'That multiplies' });
       else out.push({ step: 1, typed: t3(c.v / 3e8), expect: 'upside down' });
-      out.push({ step: 0, typed: wrongOption(0)!, expect: c.ask === 'v' ? 'n times slower' : 'more than 1' });
-    }
-    if (c.kind === 'crossing') {
-      out.push({ step: 2, typed: `${t3((c.cm * c.n) / 3)}e-8`, expect: 'centimetres' });
-      out.push({ step: 2, typed: `${t3((c.cm / 100 / 3e8) * 1e10)}e-10`, expect: 'speed in a vacuum' });
+      out.push({ step: 0, typed: wrongOption(0), expect: c.ask === 'v' ? 'the more slowly light travels' : 'the higher its refractive index' });
     }
     if (c.kind === 'colours') {
       const why = ['Frequency rises', 'the higher the frequency, the more the light slows', 'violet bends the most'];
-      c.asks.forEach((a, k) => out.push({ step: k, typed: wrongOption(k)!, expect: a === 'higher' || a === 'lower' ? why[0] : a === 'more' || a === 'less' ? why[1] : why[2] }));
+      c.asks.forEach((a, k) => out.push({ step: k, typed: wrongOption(k), expect: a === 'higher' || a === 'lower' ? why[0] : a === 'more' || a === 'less' ? why[1] : why[2] }));
     }
-    if (c.kind === 'filters' && c.first !== c.second) out.push({ step: 1, typed: `${c.second[0].toUpperCase()}${c.second.slice(1)} light`, expect: 'cannot add a colour' });
+    if (c.kind === 'filters') {
+      out.push({ step: 0, typed: `Only ${c.first}`, expect: 'absorbs the rest' });
+      if (c.first !== c.second) out.push({ step: 1, typed: `${c.second[0].toUpperCase()}${c.second.slice(1)} light`, expect: 'cannot add a colour' });
+      out.push({ step: 1, typed: 'White light', expect: 'cannot add colours back' });
+    }
     return out;
   },
   aggregate: (qs) => {
@@ -101,6 +109,9 @@ export const prismVerifier: Verifier = {
       const total = cs.reduce((a, b) => a + b, 0);
       if (total > 50 && Math.min(...cs) / total < 0.5 / Number(n)) return `right answers bunched in ${n}-option steps: ${cs.join(' / ')}`;
     }
-    return null;
+    // Filter answers: "no light" must not be a safe guess.
+    const filters = qs.filter((q) => (q.check as PrismCheck).kind === 'filters');
+    const none = filters.filter((q) => (q.check as { out: string }).out === 'No light').length;
+    return filters.length > 50 && (none / filters.length > 0.65 || none / filters.length < 0.35) ? `filters: "No light" is the answer in ${none} of ${filters.length}` : null;
   },
 };

@@ -221,11 +221,11 @@ export function readAnswer(text: string): { value: Digits; unit: string; rawUnit
   const grouped = lifted.replace(/(\d)[ \u00a0\u2009\u202f](?=\d{3}(?!\d))/g, '$1');
   const UNIT = '([a-zA-Z %²³^.°/μµΩω⁻¹·-]*[123]?)';
   // Standard form, as the physics lessons teach it: 4.7 × 10^6, 4.7x10^6, 4.7*10^-3 or 4.7e6.
-  const sf = grouped.match(new RegExp(`^(?:about\\s+)?([-−–]?)\\s*(\\d+(?:\\.\\d+)?)\\s*(?:[x×*]\\s*10\\s*\\^\\s*\\{?|e)\\s*([-−–]?\\d+)\\}?\\s*${UNIT}$`, 'i'));
+  const sf = grouped.match(new RegExp(`^(?:about\\s+)?([-−–]?)\\s*(\\d+(?:\\.\\d+)?)\\s*(?:[x×*]\\s*10\\s*\\^\\s*\\{?|e)\\s*([-−–+]?\\d+)\\}?\\s*${UNIT}$`, 'i'));
   if (sf) {
     const front = parseDecimal(sf[2]);
     if (!front) return null;
-    const value = shiftDigits(front, (/^[-−–]/.test(sf[3]) ? -1 : 1) * Number(sf[3].replace(/^[-−–]/, '')));
+    const value = shiftDigits(front, (/^[-−–]/.test(sf[3]) ? -1 : 1) * Number(sf[3].replace(/^[-−–+]/, '')));
     return { value: sf[1] && value.digits !== '0' ? { ...value, neg: true } : value, unit: sf[4].trim().toLowerCase(), rawUnit: sf[4].trim() };
   }
   const m = grouped.match(new RegExp(`^(?:about\\s+)?([-−–]?)\\s*([\\d.,]+)\\s*${UNIT}$`, 'i'));
@@ -339,7 +339,9 @@ export function markNumber(step: NumberStep, text: string): { ok: boolean; feedb
     // Half a unit of the third significant figure, or 0.2%, whichever is larger: a pupil who rounded a value on
     // the way (such as sin 19° = 0.326) lands a little off the exact answer, and that is still right.
     const tol = Math.max(sigFigUnit(step.exact) / 2, Math.abs(step.exact) * (step.tolerance ?? 0.002));
-    if (Math.abs(v - step.exact) <= tol * 1.0001) return { ok: true, feedback: '' };
+    // Close enough, but with fewer than 3 significant figures (53 for 52.9): ask for 3, as the house rule says.
+    // An answer that is exact with fewer figures (0.5 for 0.500, 13 for 13.0) matches `answer` above instead.
+    if (Math.abs(v - step.exact) <= tol * 1.0001) return typedSigFigs(text) < 3 ? { ok: false, feedback: 'Close, but give your answer to 3 significant figures.' } : { ok: true, feedback: '' };
     // Right but rounded too far, such as 37 for 36.87.
     if (Math.abs(v - step.exact) <= 10 * tol && countSigFigs(read.value) < 3) return { ok: false, feedback: 'Close, but give your answer to 3 significant figures.' };
   }
@@ -351,6 +353,16 @@ export const toNumber = (d: Digits) => (d.neg ? -1 : 1) * Number(d.digits) * 10 
 /** The place value of the third significant figure of x. */
 const sigFigUnit = (x: number) => 10 ** (Math.floor(Math.log10(Math.abs(x))) - 2);
 const countSigFigs = (d: Digits) => d.digits.replace(/^0+/, '').length;
+/**
+ * Significant figures as typed, so trailing zeros count: 0.290 and 1,500 have 3. In a whole number, trailing
+ * zeros are taken as significant, giving the pupil the benefit of the doubt. In standard form, the front number.
+ */
+function typedSigFigs(text: string): number {
+  const m = text.replace(/,/g, '').match(/\d+(?:\.\d*)?|\.\d+/);
+  if (!m) return 0;
+  const digits = m[0].replace('.', '').replace(/^0+/, '');
+  return digits.length;
+}
 
 /** x to 3 significant figures as text, keeping trailing zeros (13.0, 5.10) and commas (2,820). */
 export function sf3(x: number): string {
