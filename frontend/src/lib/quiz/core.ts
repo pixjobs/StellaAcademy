@@ -277,7 +277,8 @@ const UNIT_WORDS: Record<string, string[]> = {
   C: ['c', 'coulomb', 'coulombs'],
   N: ['n', 'newton', 'newtons'],
   Wb: ['wb', 'weber', 'webers', 'wb turns', 'wb-turns', 'weber turns'],
-  'Wb/s': ['wb/s', 'wb s-1', 'wb s⁻¹', 'wb s^-1', 'webers per second'],
+  // 1 Wb/s is 1 V, and A-level pupils often write it that way.
+  'Wb/s': ['wb/s', 'wb s-1', 'wb s⁻¹', 'wb s^-1', 'webers per second', 'v', 'volt', 'volts'],
   T: ['t', 'tesla', 'teslas'],
   mT: ['mt', 'millitesla', 'milliteslas'],
   ms: ['ms', 'millisecond', 'milliseconds'],

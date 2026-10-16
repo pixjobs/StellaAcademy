@@ -33,13 +33,18 @@ const short = (...ds: (Digits | null)[]) => ds.every((d) => d !== null && d.digi
 // When is an emf induced?
 // ---------------------------------------------------------------------------------------------
 
-const EFFECTS = ['Bigger', 'Smaller', 'The same size', 'Zero: no emf'];
+const EFFECTS = ['Bigger, but not zero', 'Smaller, but not zero', 'The same, and not zero', 'Zero: no emf'];
 type Effect = 'bigger' | 'smaller' | 'same size' | 'zero';
 const compare = (a: number, b: number): Effect => (b > a ? 'bigger' : b < a ? 'smaller' : 'same size');
+const amps = (n: number) => `${n} ampere${n === 1 ? '' : 's'}`;
 
-/** A situation, then a change to it, with numbers so the size of the effect has to be worked out. */
+/**
+ * A situation, then a change to it, with numbers so the size of the effect has to be worked out. About half
+ * start with nothing changing (a coil at rest, a steady current), so "is the flux changing?" is not a giveaway.
+ * The page's practice questions (a magnet at rest; doubling the turns) are left out.
+ */
 function situation(r: () => number): { text: string; change: string; changing: boolean; effect: Effect; direction?: 'same' | 'opposite' } {
-  const kind = pick(r, ['magnet', 'magnet', 'generator', 'electromagnet', 'still'] as const);
+  const kind = pick(r, ['magnet', 'magnet', 'generator', 'electromagnet', 'restingCoil', 'steadyCurrent', 'steadyCurrent'] as const);
   if (kind === 'magnet') {
     const N = pick(r, [100, 200, 300, 400, 500]);
     const v1 = pick(r, [0.2, 0.3, 0.4, 0.5, 0.6]);
@@ -54,7 +59,7 @@ function situation(r: () => number): { text: string; change: string; changing: b
       return { text, change: `It is now pulled out at ${v2} m/s.`, changing: true, effect: compare(v1, v2), direction: 'opposite' };
     }
     if (c === 'turns') {
-      const N2 = pick(r, [50, 100, 200, 300, 400, 500, 800].filter((x) => x !== N));
+      const N2 = pick(r, [50, 100, 150, 250, 300, 400, 500, 800].filter((x) => x !== N && x !== 2 * N));
       return { text, change: `The coil is swapped for one with ${N2} turns, and the magnet is pushed in at the same speed.`, changing: true, effect: compare(N, N2), direction: 'same' };
     }
     return { text, change: 'The magnet is then stopped inside the coil.', changing: true, effect: 'zero' };
@@ -67,26 +72,31 @@ function situation(r: () => number): { text: string; change: string; changing: b
       const f2 = pick(r, [5, 10, 20, 25, 50, 60].filter((x) => x !== f1));
       return { text, change: `It is now turned ${f2} times a second.`, changing: true, effect: compare(f1, f2) };
     }
-    if (c === 'magnet') return { text, change: `A stronger magnet is used, turning ${f1} times a second as before.`, changing: true, effect: 'bigger' };
+    if (c === 'magnet') return { text, change: `A stronger magnet is used, and the coil still turns ${f1} times a second.`, changing: true, effect: 'bigger' };
     return { text, change: 'It stops turning.', changing: true, effect: 'zero' };
   }
   if (kind === 'electromagnet') {
     const a = pick(r, [1, 2, 3, 4, 5]);
-    const text = `The current in an electromagnet next to a coil is switched on and rises by ${a} amperes each second.`;
+    const text = `The current in an electromagnet next to a coil is switched on and rises by ${amps(a)} each second.`;
     const c = pick(r, ['faster', 'steady', 'off'] as const);
     if (c === 'faster') {
       const b = pick(r, [1, 2, 3, 4, 5, 8].filter((x) => x !== a));
-      return { text, change: `The current is then made to rise by ${b} amperes each second.`, changing: true, effect: compare(a, b), direction: 'same' };
+      return { text, change: `The current is then made to rise by ${amps(b)} each second.`, changing: true, effect: compare(a, b), direction: 'same' };
     }
     if (c === 'steady') return { text, change: 'Later the current stays steady.', changing: true, effect: 'zero' };
     const b = pick(r, [1, 2, 3, 4, 5, 8]);
-    return { text, change: `Then it is switched off, and its current falls by ${b} amperes each second.`, changing: true, effect: compare(a, b), direction: 'opposite' };
+    return { text, change: `Then it is switched off, and its current falls by ${amps(b)} each second.`, changing: true, effect: compare(a, b), direction: 'opposite' };
   }
-  const N = pick(r, [100, 200, 300, 400, 500]);
-  const text = `A strong magnet sits inside a ${N}-turn coil, and nothing moves.`;
+  if (kind === 'restingCoil') {
+    const f = pick(r, [5, 10, 20, 25, 50]);
+    return { text: 'A coil rests, not turning, between the poles of a magnet.', change: `It is then turned steadily ${f} times a second.`, changing: false, effect: 'bigger' };
+  }
+  const a = pick(r, [1, 2, 3, 4, 5]);
+  const text = `A steady current of ${amps(a)} flows in an electromagnet next to a coil.`;
   return pick(r, [
-    { text, change: 'A stronger magnet is put in its place and left still.', changing: false, effect: 'zero' as Effect },
-    { text, change: `The coil is swapped for one with ${N * 2} turns, with the magnet inside and not moving.`, changing: false, effect: 'zero' as Effect },
+    { text, change: `It is then switched off, and the current falls to zero in half a second.`, changing: false, effect: 'bigger' as Effect },
+    { text, change: `The current is then made to rise steadily, by ${amps(pick(r, [1, 2, 4]))} each second.`, changing: false, effect: 'bigger' as Effect },
+    { text, change: 'The coil is then moved a little closer, and left still once it is there.', changing: false, effect: 'zero' as Effect },
   ]);
 }
 
@@ -95,7 +105,7 @@ function inducedQuestion(r: () => number): Question {
   const ch = { text: sit.change, effect: sit.effect, direction: sit.direction };
   const flowOptions = shuffle(r, ['Yes, it is changing', 'No, it is not changing']);
   const flowRight = flowOptions.indexOf(sit.changing ? 'Yes, it is changing' : 'No, it is not changing');
-  const effectText = { bigger: 'Bigger', smaller: 'Smaller', 'same size': 'The same size', zero: 'Zero: no emf' }[ch.effect];
+  const effectText = { bigger: 'Bigger, but not zero', smaller: 'Smaller, but not zero', 'same size': 'The same, and not zero', zero: 'Zero: no emf' }[ch.effect];
   const effectOptions = shuffle(r, [...EFFECTS]);
   const effectRight = effectOptions.indexOf(effectText);
   const steps: Step[] = [
@@ -106,11 +116,12 @@ function inducedQuestion(r: () => number): Question {
       options: effectOptions,
       correct: effectRight,
       why: whyAll(effectOptions, effectRight, (o) =>
-        o === 'Zero: no emf' ? 'Something is still changing the flux, so there is an emf.' : ch.effect === 'zero' ? 'A field that is not changing induces nothing, however strong it is.' : 'A faster change, more turns or a stronger field gives a bigger emf; a slower change gives a smaller one.',
+        o === 'Zero: no emf' ? 'Something is still changing the flux, so there is an emf.' : ch.effect === 'zero' ? 'Is anything still changing the flux through the coil?' : 'A faster change, more turns or a stronger field gives a bigger emf; a slower change gives a smaller one.',
       ),
     },
   ];
-  if (ch.direction) {
+  // A direction only makes sense when there was an emf before and there still is one.
+  if (ch.direction && sit.changing && ch.effect !== 'zero') {
     const dirOptions = shuffle(r, ['The same direction', 'The opposite direction']);
     const dirRight = dirOptions.indexOf(ch.direction === 'same' ? 'The same direction' : 'The opposite direction');
     steps.push({ type: 'choice', prompt: 'Does the emf act in the same direction as before, or the opposite?', options: dirOptions, correct: dirRight, why: { [1 - dirRight]: 'The emf reverses when the change reverses: flux rising, then flux falling.' } });
@@ -121,10 +132,10 @@ function inducedQuestion(r: () => number): Question {
     steps,
     workings: [
       sit.changing ? 'At first the flux through the coil is changing, so an emf is induced.' : 'At first nothing changes, so no emf is induced.',
-      `${effectText}: ${ch.effect === 'zero' ? 'with nothing changing, no emf is induced.' : ch.effect === 'same size' ? 'the flux changes just as fast as before.' : ch.effect === 'bigger' ? 'the flux linkage changes faster.' : 'the flux linkage changes more slowly.'}`,
-      ...(ch.direction ? [`${ch.direction === 'same' ? 'The same direction' : 'The opposite direction'}: the flux is ${ch.direction === 'same' ? 'still rising' : 'now falling instead of rising'}.`] : []),
+      `${effectText}: ${ch.effect === 'zero' ? 'with nothing changing, no emf is induced.' : ch.effect === 'same size' ? 'the flux changes just as fast as before.' : !sit.changing ? 'the flux now changes, where before it did not.' : ch.effect === 'bigger' ? 'the flux linkage changes faster.' : 'the flux linkage changes more slowly.'}`,
+      ...(ch.direction && sit.changing && ch.effect !== 'zero' ? [`${ch.direction === 'same' ? 'The same direction' : 'The opposite direction'}: the flux is ${ch.direction === 'same' ? 'still rising' : 'now falling instead of rising'}.`] : []),
     ],
-    check: { kind: 'induced', changing: sit.changing, effect: ch.effect, ...(ch.direction ? { direction: ch.direction } : {}) },
+    check: { kind: 'induced', changing: sit.changing, effect: ch.effect, ...(ch.direction && sit.changing && ch.effect !== 'zero' ? { direction: ch.direction } : {}) },
   };
 }
 
@@ -183,10 +194,10 @@ function faradayQuestion(r: () => number): Question {
     if (SHOWN_FARADAY.has(`${N} ${plain(a)} ${plain(b)} ${plain(t)}`)) continue;
     const dPhi = D(String(Math.abs(toNumber(sub(b, a)))));
     // The final flux must differ from the change (0.06 down to 0.03 would make the slip look right).
-    if (toNumber(dPhi) === toNumber(b)) continue;
+    if (toNumber(dPhi) === toNumber(b) || toNumber(dPhi) === toNumber(a)) continue;
     const rate = divide(dPhi, t);
     const emf = rate && multiply(rate, D(N));
-    if (!rate || !emf || !short(dPhi, rate, emf) || toNumber(emf) > 1000) continue;
+    if (!rate || !emf || !short(dPhi, rate, emf) || toNumber(emf) > 100) continue; // a realistic coil
     const rises = toNumber(b) > toNumber(a);
     const tGiven = ms ? `${s(multiply(t, D(1000)))} ms` : `${s(t)} s`;
     const finalOnly = (N * toNumber(b)) / toNumber(t);
@@ -220,10 +231,11 @@ function faradayQuestion(r: () => number): Question {
 
 function lenzQuestion(r: () => number): Question {
   for (;;) {
-    const pole = pick(r, ['north', 'south'] as const);
-    const inwards = r() < 0.5;
-    if (pole === 'north' && inwards) continue; // the page's practice question
-    const linkage = D(pick(r, ['0.2', '0.3', '0.4', '0.5', '0.6', '0.8', '1.2', '1.5', '2', '3']));
+    // North pushed in is the page's practice question. Weighting the other three cases 1 : 2 : 2 balances
+    // attract against repel, and north against south, at 60 : 40.
+    const [pole, inwards] = pick(r, [['north', false], ['south', true], ['south', true], ['south', false], ['south', false]] as const);
+    // A hand-held magnet and a classroom coil: a few hundredths of a weber, millivolts to about a volt.
+    const linkage = D(pick(r, ['0.002', '0.004', '0.005', '0.006', '0.008', '0.01', '0.012', '0.015', '0.02', '0.025', '0.03', '0.04', '0.05']));
     const t = D(pick(r, ['0.1', '0.2', '0.25', '0.4', '0.5']));
     const emf = divide(linkage, t);
     if (!emf || !short(emf)) continue;

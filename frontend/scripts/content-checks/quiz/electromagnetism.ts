@@ -28,17 +28,21 @@ export const electromagnetismVerifier: Verifier = {
       const cut = p.indexOf('. ') + 1; // the first sentence ends at '. ', not at the point in 0.2 m/s
       const [first, second] = [nums(p.slice(0, cut)), nums(p.slice(cut))];
       let want: string;
-      if (/nothing moves/.test(p) || /stopped inside|stops turning|stays steady/.test(p)) want = 'zero';
-      else if (/stronger magnet is used/.test(p)) want = 'bigger';
+      const startsStill = /rests, not turning|A steady current of/.test(p);
+      if (/stopped inside|stops turning|stays steady|left still once/.test(p)) want = 'zero';
+      else if (startsStill || /stronger magnet is used/.test(p)) want = 'bigger';
       else {
         // The quantity that sets the emf, before and after: speed (with the turns), turning rate, or current change.
         const before = /m\/s into a (\d+)-turn/.test(p) ? first[0] * first[1] : first[0];
         const after = /swapped for one with (\d+) turns/.test(p) ? first[0] * second[0] : /m\/s into a/.test(p) ? second[0] * first[1] : second[0];
         want = after > before ? 'bigger' : after < before ? 'smaller' : 'same size';
       }
-      const label = { bigger: 'Bigger', smaller: 'Smaller', 'same size': 'The same size', zero: 'Zero: no emf' }[want];
+      const label = { bigger: 'Bigger, but not zero', smaller: 'Smaller, but not zero', 'same size': 'The same, and not zero', zero: 'Zero: no emf' }[want];
+      if (/sits inside a .*nothing moves/.test(p)) return 'the page’s magnet-at-rest practice question';
+      const turns = p.match(/into a (\d+)-turn coil.*one with (\d+) turns/);
+      if (turns && Number(turns[2]) === 2 * Number(turns[1])) return 'the page’s doubling-the-turns practice question';
       if (want !== c.effect || chosen(st[1]) !== label) return `induced: expected ${want}, got ${c.effect}`;
-      if (chosen(st[0]) !== (/nothing moves/.test(p) ? 'No, it is not changing' : 'Yes, it is changing')) return 'is the flux changing';
+      if (chosen(st[0]) !== (startsStill ? 'No, it is not changing' : 'Yes, it is changing')) return 'is the flux changing';
       if (st[2]) {
         const opposite = /pulled out|switched off/.test(p);
         if (chosen(st[2]) !== (opposite ? 'The opposite direction' : 'The same direction')) return 'direction';
@@ -68,7 +72,7 @@ export const electromagnetismVerifier: Verifier = {
       return s.type === 'choice' ? s.options.find((_, i) => i !== s.correct)! : '';
     };
     if (c.kind === 'induced') {
-      if (c.effect === 'zero') out.push({ step: 1, typed: 'Bigger', expect: 'induces nothing' });
+      if (c.effect === 'zero') out.push({ step: 1, typed: 'Bigger, but not zero', expect: 'still changing the flux' });
       else out.push({ step: 1, typed: 'Zero: no emf', expect: 'still changing the flux' });
       if (c.direction) out.push({ step: 2, typed: wrong(2), expect: 'reverses' });
     }
@@ -77,12 +81,13 @@ export const electromagnetismVerifier: Verifier = {
       const cm = q.steps.findIndex((s) => s.prompt.includes('cm²'));
       if (cm !== -1) out.push({ step: cm, typed: t3(N(c.A) * 100), expect: 'divides by 100' }, { step: last - 1, typed: t3(phi * 10000), expect: 'area in cm²' });
       const mt = q.steps.findIndex((s) => s.prompt.includes('mT'));
-      if (mt !== -1) out.push({ step: mt, typed: t3(N(c.B) * 1000), expect: 'still in millitesla' });
+      if (mt !== -1) out.push({ step: mt, typed: t3(N(c.B) * 1000), expect: 'still in millitesla' }, { step: last - 1, typed: t3(phi * 1000), expect: 'field in mT' });
       if (c.N !== 1) out.push({ step: last, typed: t3(phi), expect: 'one turn' });
     }
     if (c.kind === 'faraday') {
       const d = Math.abs(N(c.phi2) - N(c.phi1));
       out.push({ step: 0, typed: t3(N(c.phi2)), expect: 'final flux' });
+      if (Math.abs(N(c.phi2) * c.N / N(c.seconds) - (c.N * d) / N(c.seconds)) > 0.01 * (c.N * d) / N(c.seconds)) out.push({ step: last, typed: t3((c.N * N(c.phi2)) / N(c.seconds)), expect: 'uses the final flux' });
       out.push({ step: last, typed: t3(d / N(c.seconds)), expect: 'leaves out the turns' });
       const ms = q.steps.findIndex((s) => s.prompt.includes(' ms in seconds'));
       if (ms !== -1) out.push({ step: ms + 1, typed: t3(d / (N(c.seconds) * 1000)), expect: 'milliseconds' });
