@@ -40,8 +40,9 @@ const WORLDS: { name: string; on: string; g: string }[] = [
   { name: 'Venus', on: 'on Venus', g: '8.9' },
 ];
 /** Things and realistic masses in kg. */
-const THINGS: { what: string; masses: number[] }[] = [
-  { what: 'An astronaut in a spacesuit', masses: [110, 120, 130, 140, 150] },
+const THINGS: { what: string; masses: number[]; notOn?: string }[] = [
+  // No astronauts on Venus: its surface is about 460 °C.
+  { what: 'An astronaut in a spacesuit', masses: [110, 120, 130, 140, 150], notOn: 'Venus' },
   { what: 'A rover', masses: [180, 200, 500, 900, 1000] },
   { what: 'A bag of rock samples', masses: [2, 4, 5, 8, 10, 12, 20] },
   { what: 'A lander', masses: [300, 400, 600, 800] },
@@ -57,7 +58,8 @@ const mult = (a: string, b: string) => {
 function weightQuestion(r: () => number): Question {
   const thing = pick(r, THINGS);
   const m = String(pick(r, thing.masses));
-  const place = pick(r, WORLDS);
+  const worlds = WORLDS.filter((w) => w.name !== thing.notOn);
+  const place = pick(r, worlds);
   if (r() < 0.5) {
     const W = mult(m, place.g);
     const options = shuffle(r, ['W = m × g', 'W = m ÷ g', 'W = g ÷ m']);
@@ -79,7 +81,7 @@ function weightQuestion(r: () => number): Question {
       check: { kind: 'weight', m, g: place.g, W: W.replace(/,/g, '') },
     };
   }
-  const other = pick(r, WORLDS.filter((w) => w !== place));
+  const other = pick(r, worlds.filter((w) => w !== place));
   const W1 = mult(m, place.g);
   const W2 = mult(m, other.g);
   const options = shuffle(r, ['It stays the same', 'It gets smaller', 'It gets bigger']);
@@ -95,7 +97,14 @@ function weightQuestion(r: () => number): Question {
         prompt: `So what does it weigh ${other.on}?`,
         answer: D(W2.replace(/,/g, '')),
         unit: 'N',
-        feedback: (g) => (near(g, Number(W1.replace(/,/g, '')) * Number(other.g)) ? 'That multiplies the weight, not the mass. Use the mass you found.' : `Multiply the mass by ${other.name}’s g.`),
+        feedback: (g) =>
+          near(g, Number(W1.replace(/,/g, '')) * Number(other.g))
+            ? 'That multiplies the weight, not the mass. Use the mass you found.'
+            : sameValue(g, Number(m))
+              ? 'That is the mass in kilograms. Weight is a force, in newtons.'
+              : near(g, Number(m) / Number(other.g))
+                ? 'That divides. Each kilogram is pulled with g newtons, so multiply.'
+                : `Multiply the mass by ${other.name}’s g.`,
       },
     ],
     workings: [`Its mass is ${W1} ÷ ${place.g} = ${m} kg, the same everywhere.`, `${cap(other.on)}: W = ${m} × ${other.g} = ${W2} N.`],
@@ -127,7 +136,8 @@ function inverseQuestion(r: () => number): Question {
     const F = (F0 * n) / (k * k);
     // Each slip must give its own number, different from the answer, so its feedback can be named.
     const slips = [(F0 * n) / k, ...(n !== 1 ? [F0 / (k * k)] : [])];
-    if (!Number.isInteger(F * 10) || new Set([F, ...slips]).size < slips.length + 1) continue;
+    // And never the starting force, which could be typed back without working anything out.
+    if (!Number.isInteger(F * 10) || F === F0 || new Set([F, ...slips]).size < slips.length + 1) continue;
     const P = pick(r, PULLS);
     const kk = k * k;
     const distWord = k < 1 ? 'multiplied by 4' : `divided by ${kk}`;
@@ -155,7 +165,7 @@ function inverseQuestion(r: () => number): Question {
       unit: 'N',
       feedback: (g) =>
         near(g, (F0 * n) / k, 0.005)
-          ? 'That divides by the change in distance, not its square. Gravity follows an inverse square law.'
+          ? 'That uses the change in distance, not its square. Gravity follows an inverse square law.'
           : n !== 1 && near(g, F0 / kk, 0.005)
             ? 'That leaves out the change in mass.'
             : `Start from ${fmt(D(F0))} N and apply each change in turn.`,
@@ -219,16 +229,16 @@ function newtonQuestion(r: () => number): Question {
       round: 'newton',
       prompt: field
         ? `What is the gravitational field strength ${fmt(D(h))} km above the surface of ${body.of}? Use G = 6.67 × 10^{−11} N m^{2} kg^{−2} and M = ${std(body.M)} kg.`
-        : `A ${fmt(D(m))} kg satellite orbits ${fmt(D(h))} km above the surface of ${body.of}. Find ${what}. Use G = 6.67 × 10^{−11} N m^{2} kg^{−2} and M = ${std(body.M)} kg.`,
+        : `${m === 800 ? 'An' : 'A'} ${fmt(D(m))} kg satellite orbits ${fmt(D(h))} km above the surface of ${body.of}. Find ${what}. Use G = 6.67 × 10^{−11} N m^{2} kg^{−2} and M = ${std(body.M)} kg.`,
       steps: [
         centreStep(body, h, rm),
-        { type: 'number', prompt: 'What is r^{2}?', ...approxStd(rm * rm), unit: 'm²', feedback: (g) => (near(g, 2 * rm) ? 'That doubles r. Squaring means r × r.' : 'Multiply r by itself.') },
+        { type: 'number', prompt: 'What is r^{2}?', ...approxStd(rm * rm), unit: 'm²', tolerance: 0.005, feedback: (g) => (near(g, 2 * rm) ? 'That doubles r. Squaring means r × r.' : 'Multiply r by itself.') },
         {
           type: 'number',
           prompt: `So what is ${what}? Give 3 significant figures.`,
           ...approxStd(answer),
           unit,
-          tolerance: 0.005,
+          tolerance: 0.01,
           feedback: (g) =>
             near(g, noSquare) ? 'That divides by r, not r^{2}. Gravity follows an inverse square law.' : near(g, fromSurface) ? 'That uses the height, not the distance from the centre.' : `Put the values into ${formula}.`,
         },
@@ -259,13 +269,14 @@ function orbitQuestion(r: () => number): Question {
     const periodMin = (2 * Math.PI * rm) / v / 60;
     const steps: Step[] = [
       centreStep(body, h, rm),
-      { type: 'number', prompt: 'What is GM ÷ r?', ...approxStd(gmr), feedback: (g) => (near(g, body.GM / rm ** 2) ? 'That divides by r^{2}. Here it is r, not r^{2}.' : 'Divide GM by r in metres.') },
+      { type: 'number', prompt: 'What is GM ÷ r?', ...approxStd(gmr), unit: 'm²/s²', tolerance: 0.006, feedback: (g) => (near(g, body.GM / rm ** 2) ? 'That divides by r^{2}. Here it is r, not r^{2}.' : 'Divide GM by r in metres.') },
       {
         type: 'number',
         prompt: 'So what is the orbital speed? Give 3 significant figures.',
         ...approxStd(v),
         unit: 'm/s',
-        tolerance: 0.005,
+        prefixes: true,
+        tolerance: 0.008,
         feedback: (g) => (near(g, gmr) ? 'That is GM ÷ r. The speed is its square root.' : near(g, Math.sqrt(body.GM / (h * 1000))) ? 'That uses the height, not the distance from the centre.' : 'Take the square root of GM ÷ r.'),
       },
     ];
@@ -275,7 +286,7 @@ function orbitQuestion(r: () => number): Question {
         prompt: 'How long does one lap take, in minutes? Give 3 significant figures.',
         ...approxStd(periodMin),
         unit: 'minutes',
-        tolerance: 0.006,
+        tolerance: 0.01,
         feedback: (g) => (near(g, periodMin * 60) ? 'That is in seconds. Divide by 60.' : near(g, rm / v / 60) ? 'One lap is the whole circumference, 2πr, not r.' : 'Time = distance ÷ speed, with the distance 2πr.'),
       });
     return {

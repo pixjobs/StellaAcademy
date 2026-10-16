@@ -215,7 +215,10 @@ export function readFraction(text: string): Fraction | null {
  * write them (20 000), then optionally a unit or %.
  */
 export function readAnswer(text: string): { value: Digits; unit: string; rawUnit: string } | null {
-  const grouped = text.trim().replace(/(\d)[ \u00a0\u2009\u202f](?=\d{3}(?!\d))/g, '$1');
+  // Superscript powers (10⁶, 10⁻³) read as 10^6 and 10^-3.
+  const SUP: Record<string, string> = { '⁰': '0', '¹': '1', '²': '2', '³': '3', '⁴': '4', '⁵': '5', '⁶': '6', '⁷': '7', '⁸': '8', '⁹': '9', '⁻': '-' };
+  const lifted = text.trim().replace(/10([⁻]?[⁰¹²³⁴⁵⁶⁷⁸⁹]+)/g, (_, p: string) => `10^${[...p].map((c) => SUP[c]).join('')}`);
+  const grouped = lifted.replace(/(\d)[ \u00a0\u2009\u202f](?=\d{3}(?!\d))/g, '$1');
   const UNIT = '([a-zA-Z %²³^.°/μµΩω⁻¹·-]*[123]?)';
   // Standard form, as the physics lessons teach it: 4.7 × 10^6, 4.7x10^6, 4.7*10^-3 or 4.7e6.
   const sf = grouped.match(new RegExp(`^(?:about\\s+)?([-−–]?)\\s*(\\d+(?:\\.\\d+)?)\\s*(?:[x×*]\\s*10\\s*\\^\\s*\\{?|e)\\s*([-−–]?\\d+)\\}?\\s*${UNIT}$`, 'i'));
@@ -241,7 +244,8 @@ const UNIT_WORDS: Record<string, string[]> = {
   '%': ['%', 'percent', 'per cent'],
   '£': ['£'],
   days: ['day', 'days'],
-  'm/s': ['m/s', 'm s⁻¹', 'm s-1', 'ms⁻¹', 'ms-1', 'metres per second'],
+  'm/s': ['m/s', 'm s⁻¹', 'm s-1', 'm s^-1', 'ms⁻¹', 'ms-1', 'ms^-1', 'm/sec', 'metres per second'],
+  'm²/s²': ['m²/s²', 'm^2/s^2', 'm2/s2', 'm² s⁻²', 'm^2 s^-2', 'm2 s-2', 'm²s⁻²'],
   s: ['s', 'sec', 'secs', 'second', 'seconds'],
   '°': ['°', 'deg', 'degree', 'degrees'],
   hours: ['h', 'hr', 'hrs', 'hour', 'hours'],
@@ -272,7 +276,8 @@ const UNIT_WORDS: Record<string, string[]> = {
   'kΩ': ['kω', 'kohm', 'kohms', 'kilohm', 'kilohms'],
   C: ['c', 'coulomb', 'coulombs'],
   N: ['n', 'newton', 'newtons'],
-  'N/kg': ['n/kg', 'n kg-1', 'n kg⁻¹', 'newtons per kilogram', 'newtons per kg'],
+  // Field strength may also be given as an acceleration, as A-level allows.
+  'N/kg': ['n/kg', 'n kg-1', 'n kg⁻¹', 'n kg^-1', 'nkg-1', 'nkg⁻¹', 'nkg^-1', 'm/s²', 'm/s^2', 'm/s2', 'm s⁻²', 'm s-2', 'm s^-2', 'ms⁻²', 'ms-2', 'ms^-2', 'newtons per kilogram', 'newtons per kg'],
   minutes: ['min', 'mins', 'minute', 'minutes'],
   'N m': ['n m', 'nm', 'n·m', 'n.m', 'newton metre', 'newton metres', 'newton-metre', 'newton-metres'],
   'turns a minute': ['turns per minute', 'turns per min', 'turns/min', 'turns/minute', 'times a minute', 'times per minute', 'revs per minute', 'revs a minute', 'rev/min', 'revolutions per minute', 'revolutions a minute', 'rotations per minute', 'rotations a minute', 'rpm', 'r.p.m.', 'r.p.m', 'per minute', 'a minute', 'turns', 'turns a minute'],
@@ -315,7 +320,7 @@ export function markNumber(step: NumberStep, text: string): { ok: boolean; feedb
   if (read.unit && !step.unit) return { ok: false, feedback: allUnitWords().has(read.unit) ? 'This answer has no unit. Type just the number.' : 'Type just a number, such as 2.5.' };
   // A prefixed unit where the step allows it: convert to the base unit, then mark as usual.
   if (step.prefixes && step.unit && read.rawUnit) {
-    const m = read.rawUnit.match(/^([mkMμuG])\s*(A|V|W|Ω|J|C)$/);
+    const m = read.rawUnit.match(/^([mkMμuG])\s*(A|V|W|Ω|J|C|m\/s)$/);
     if (m && m[2] === step.unit) {
       const power = { m: -3, k: 3, M: 6, μ: -6, u: -6, G: 9 }[m[1]]!;
       return markNumber({ ...step, prefixes: false }, `${fmt(shiftDigits(read.value, power))} ${step.unit}`.replace(/^−/, '-'));

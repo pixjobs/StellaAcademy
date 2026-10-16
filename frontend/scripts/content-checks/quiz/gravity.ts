@@ -30,6 +30,8 @@ export const gravityVerifier: Verifier = {
     }
     if (c.kind === 'inverse') {
       const want = math.divide(math.multiply(F(c.F0), F(c.n)), math.pow(F(c.k), 2)) as Fraction;
+      // The answer must never be the starting force, which could be typed back without working.
+      if (c.F === c.F0) return `inverse: the answer is the starting force (${c.F0} N)`;
       return math.equal(want, F(c.F)) && ok3(st[st.length - 1], math.number(want)) ? null : `inverse ${c.F0} k=${c.k} n=${c.n}`;
     }
     const r = (c.Rkm + c.hkm) * 1000;
@@ -58,6 +60,8 @@ export const gravityVerifier: Verifier = {
     if (c.kind === 'weight2') {
       out.push({ step: 1, typed: t3(Number(c.W1) * Number(c.g1)), expect: 'That multiplies' });
       out.push({ step: 2, typed: t3(Number(c.W1) * Number(c.g2)), expect: 'multiplies the weight' });
+      out.push({ step: 2, typed: c.m, expect: 'That is the mass' });
+      out.push({ step: 2, typed: t3(Number(c.m) / Number(c.g2)), expect: 'That divides' });
       out.push({ step: 0, typed: 'It gets smaller', expect: 'same everywhere' });
     }
     if (c.kind === 'inverse' && c.k !== 1) {
@@ -70,6 +74,7 @@ export const gravityVerifier: Verifier = {
       out.push({ step: 0, typed: t3(c.Rkm + c.hkm), expect: 'kilometres' });
       if (c.kind === 'orbit') {
         out.push({ step: 2, typed: t3(c.GM / r), expect: 'square root' });
+        out.push({ step: 2, typed: t3(Math.sqrt(c.GM / (c.hkm * 1000))), expect: 'uses the height' });
         out.push({ step: 1, typed: t3(c.GM / (r * r)), expect: 'divides by r^{2}' });
         if (c.periodMin !== undefined) {
           out.push({ step: 3, typed: t3(c.periodMin * 60), expect: 'in seconds' });
