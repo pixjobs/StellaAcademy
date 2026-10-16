@@ -98,7 +98,8 @@ function Readout({ label, value, note }: { label: string; value: string; note?: 
  * joins them, and the two burns, with every readout following from v = √(GM/r)
  * and the vis-viva equation.
  */
-export default function TransferOrbit({ placement = 'lesson' }: { placement?: string }) {
+/** `bare`: inside a Try it panel that already has its frame (the Explore tab on a quiz lesson). */
+export default function TransferOrbit({ placement = 'lesson', bare = false }: { placement?: string; bare?: boolean }) {
   const labelsRef = useReadableLabels();
   const [h1, setH1] = useState(300);
   const [h2Wanted, setH2Wanted] = useState(35800);
@@ -149,11 +150,13 @@ export default function TransferOrbit({ placement = 'lesson' }: { placement?: st
   const burn2 = round2(o.burn2);
   const totalBurn = (burn1 + burn2).toFixed(2);
 
+  const Frame = bare ? 'div' : 'figure';
+  const Caption = bare ? 'p' : 'figcaption';
   return (
-    <figure className="night-window overflow-hidden rounded-3xl p-4 shadow-[0_30px_60px_-20px_rgba(11,16,38,0.55)] sm:p-6">
-      <figcaption className="flex items-baseline justify-between gap-3">
+    <Frame className={bare ? '' : 'night-window overflow-hidden rounded-3xl p-4 shadow-[0_30px_60px_-20px_rgba(11,16,38,0.55)] sm:p-6'}>
+      <Caption className="flex items-baseline justify-between gap-3">
         <span className="font-fraunces text-xl font-semibold text-white">Changing orbit: the Hohmann transfer</span>
-      </figcaption>
+      </Caption>
 
       <svg
         ref={labelsRef}
@@ -273,6 +276,6 @@ export default function TransferOrbit({ placement = 'lesson' }: { placement?: st
         up, but one clock runs the whole route, so the speeds you see are in true proportion. Uses Earth radius 6,371 km
         and GM = 3.986 × 10⁵ km³/s². The target orbit is kept at least 1,000 km above the start.
       </p>
-    </figure>
+    </Frame>
   );
 }
