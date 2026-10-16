@@ -38,6 +38,11 @@ export type NumberStep = {
   exact?: number;
   /** How the answer is shown, when it keeps trailing zeros (13.0 to 3 significant figures). */
   shown?: string;
+  /**
+   * The answer may also be typed with a prefix on its unit (2.4 mA for 0.0024 A, 4.7 kΩ for 4,700 Ω). Off by
+   * default: a quiz about prefixes must not accept the question's own unit typed back.
+   */
+  prefixes?: boolean;
 };
 
 export type FractionStep = {
@@ -288,6 +293,14 @@ export function markNumber(step: NumberStep, text: string): { ok: boolean; feedb
     return { ok: false, feedback: step.feedback(read.value) || 'Not quite. Try again.' };
   }
   if (read.unit && !step.unit && allUnitWords().has(read.unit)) return { ok: false, feedback: 'This answer has no unit. Type just the number.' };
+  // A prefixed unit where the step allows it: convert to the base unit, then mark as usual.
+  if (step.prefixes && step.unit && read.rawUnit) {
+    const m = read.rawUnit.match(/^([mkMμuG])\s*(A|V|W|Ω|J|C)$/);
+    if (m && m[2] === step.unit) {
+      const power = { m: -3, k: 3, M: 6, μ: -6, u: -6, G: 9 }[m[1]]!;
+      return markNumber({ ...step, prefixes: false }, `${fmt(shiftDigits(read.value, power))} ${step.unit}`.replace(/^−/, '-'));
+    }
+  }
   // Milli and mega differ only by a capital: mW for MW is a different unit, a billion times smaller.
   if (read.unit && step.unit && /^[mM][A-Za-z]/.test(step.unit) && /^[mM][A-Za-z]{1,2}$/.test(read.rawUnit) && read.rawUnit[0] !== step.unit[0])
     return { ok: false, feedback: 'Check the capital letter: m is milli and M is mega.' };

@@ -16,7 +16,8 @@ export const circuitVerifier: Verifier = {
     if (c.kind === 'ohm') return eq(math.multiply(F(c.I), F(c.R)) as Fraction, c.V) ? null : `V = IR fails: ${c.V} = ${c.I} × ${c.R}?`;
     if (c.kind === 'series') {
       const I = math.divide(F(c.V), math.add(F(c.R1), F(c.R2))) as Fraction;
-      return eq(I, c.I) && eq(math.multiply(I, F(c.R2)) as Fraction, c.V2) ? null : `series ${c.V} V, ${c.R1} + ${c.R2}: I ${c.I}, V2 ${c.V2}`;
+      const ok = eq(I, c.I) && eq(math.multiply(I, F(c.asked)) as Fraction, c.V2) && (c.asked === c.R1 || c.asked === c.R2) && c.R1 !== c.R2;
+      return ok ? null : `series ${c.V} V, ${c.R1} + ${c.R2}: I ${c.I}, across ${c.asked}: ${c.V2}`;
     }
     if (c.kind === 'parallel') {
       // By the total resistance, a different route from adding the branch currents.
@@ -50,16 +51,19 @@ export const circuitVerifier: Verifier = {
       }
     }
     if (c.kind === 'series') {
-      out.push({ step: 0, typed: typed(math.multiply(F(c.R1), F(c.R2)) as Fraction), expect: 'In series the resistances add' });
+      out.push({ step: 0, typed: typed(math.multiply(F(c.R1), F(c.R2)) as Fraction), expect: 'That multiplies them' });
       out.push({ step: 2, typed: c.V, expect: 'potential difference is shared' });
       const one = math.divide(F(c.V), F(c.R1)) as Fraction;
       if (!eq(one, c.I)) out.push({ step: 1, typed: typed(one), expect: 'uses one resistor' });
     }
     if (c.kind === 'parallel') {
       out.push({ step: 0, typed: typed(math.divide(F(c.V), 2) as Fraction), expect: 'not shared' });
+      out.push({ step: 1, typed: typed(math.divide(math.divide(F(c.V), 2), F(c.R1)) as Fraction), expect: 'not half' });
+      out.push({ step: 2, typed: typed(math.divide(math.divide(F(c.V), 2), F(c.R2)) as Fraction), expect: 'not half' });
       out.push({ step: 3, typed: typed(math.divide(F(c.V), math.add(F(c.R1), F(c.R2))) as Fraction), expect: 'as in series' });
     }
     if (c.kind === 'charge' && q.steps.length === 3) out.push({ step: last, typed: typed(math.divide(math.multiply(F(c.I), F(c.seconds)), 60) as Fraction), expect: 'time in minutes' });
+    if (c.kind === 'power') out.push({ step: 0, typed: 'P = I × R', expect: 'not the power' });
     if (c.kind === 'power' && c.R) {
       out.push({ step: 1, typed: typed(math.multiply(F(c.I), 2) as Fraction), expect: 'doubles' });
       out.push({ step: last, typed: typed(math.multiply(F(c.I), F(c.R)) as Fraction), expect: 'Square the current first' });
