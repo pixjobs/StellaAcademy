@@ -204,7 +204,7 @@ export function readFraction(text: string): Fraction | null {
  */
 export function readAnswer(text: string): { value: Digits; unit: string; rawUnit: string } | null {
   const grouped = text.trim().replace(/(\d)[ \u00a0\u2009\u202f](?=\d{3}(?!\d))/g, '$1');
-  const UNIT = '([a-zA-Z %²³^.°/μµ⁻¹-]*[123]?)';
+  const UNIT = '([a-zA-Z %²³^.°/μµΩω⁻¹-]*[123]?)';
   // Standard form, as the physics lessons teach it: 4.7 × 10^6, 4.7x10^6, 4.7*10^-3 or 4.7e6.
   const sf = grouped.match(new RegExp(`^(?:about\\s+)?([-−–]?)\\s*(\\d+(?:\\.\\d+)?)\\s*(?:[x×*]\\s*10\\s*\\^\\s*\\{?|e)\\s*([-−–]?\\d+)\\}?\\s*${UNIT}$`, 'i'));
   if (sf) {
@@ -256,6 +256,9 @@ const UNIT_WORDS: Record<string, string[]> = {
   kHz: ['khz', 'kilohertz'],
   MHz: ['mhz', 'megahertz'],
   mg: ['mg', 'milligram', 'milligrams'],
+  'Ω': ['ω', 'ohm', 'ohms'],
+  'kΩ': ['kω', 'kohm', 'kohms', 'kilohm', 'kilohms'],
+  C: ['c', 'coulomb', 'coulombs'],
   'km/h': ['km/h', 'kmh', 'kph', 'kmph', 'km/hr', 'km h⁻¹', 'km h-1', 'km per hour', 'kilometres per hour'],
 };
 

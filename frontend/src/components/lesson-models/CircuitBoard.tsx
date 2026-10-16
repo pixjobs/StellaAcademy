@@ -70,7 +70,10 @@ function Readout({ label, value, note }: { label: string; value: string; note?: 
  * Two resistors and a battery, wired in series or in parallel. Dots drift round
  * the wires at a speed in proportion to the current, and every label obeys V = IR.
  */
-export default function CircuitBoard({ placement = 'lesson' }: { placement?: string }) {
+/** `bare`: inside a Try it panel that already has its frame (the Explore tab on a quiz lesson). */
+export default function CircuitBoard({ placement = 'lesson', bare = false }: { placement?: string; bare?: boolean }) {
+  const Frame = bare ? 'div' : 'figure';
+  const Caption = bare ? 'p' : 'figcaption';
   const labelsRef = useReadableLabels();
   const [layout, setLayout] = useState<Layout>('series');
   const [voltage, setVoltage] = useState(6);
@@ -145,10 +148,10 @@ export default function CircuitBoard({ placement = 'lesson' }: { placement?: str
     : `Parallel circuit: a ${num(voltage)} volt battery with resistors of ${r1} and ${r2} ohms on separate branches. ${amps(i1)} amps through R1, ${amps(i2)} amps through R2, ${amps(total)} amps from the battery, total resistance ${num(resistance)} ohms.`;
 
   return (
-    <figure className="night-window overflow-hidden rounded-3xl p-4 shadow-[0_30px_60px_-20px_rgba(11,16,38,0.55)] sm:p-6">
-      <figcaption className="flex items-baseline justify-between gap-3">
+    <Frame className={bare ? '' : 'night-window overflow-hidden rounded-3xl p-4 shadow-[0_30px_60px_-20px_rgba(11,16,38,0.55)] sm:p-6'}>
+      <Caption className="flex items-baseline justify-between gap-3">
         <span className="font-fraunces text-xl font-semibold text-white">Circuits: series and parallel</span>
-      </figcaption>
+      </Caption>
 
       <svg ref={labelsRef} viewBox={`0 0 ${W} ${H}`} className="mt-4 w-full rounded-2xl bg-black/25 ring-1 ring-white/10" role="img" aria-label={describe}>
         {/* wires: the outer loop, broken at the battery, plus the middle branch in parallel */}
@@ -285,6 +288,6 @@ export default function CircuitBoard({ placement = 'lesson' }: { placement?: str
         The battery and wires are treated as having no resistance of their own. Dot speed is in proportion to the
         current in that wire, and values are rounded.
       </p>
-    </figure>
+    </Frame>
   );
 }
