@@ -141,7 +141,9 @@ function ModelFor({ id, bare = false }: { id: ConceptId; bare?: boolean }) {
   if (id === 'thermodynamics') return <GasPiston />;
   if (id === 'trajectory') return <TransferOrbit />;
   if (id === 'units')
-    return (
+    return bare ? (
+      <UnitConverter />
+    ) : (
       <Panel>
         <div className="mt-3">
           <UnitConverter />

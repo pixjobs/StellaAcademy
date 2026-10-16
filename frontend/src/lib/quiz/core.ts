@@ -198,9 +198,13 @@ export function readFraction(text: string): Fraction | null {
 // Marking
 // ---------------------------------------------------------------------------------------------
 
-/** Reads a typed number: digits with optional commas, then optionally a unit or %. */
+/**
+ * Reads a typed number: digits with optional commas, or spaces between groups of three as some lesson pages
+ * write them (20 000), then optionally a unit or %.
+ */
 export function readAnswer(text: string): { value: Digits; unit: string } | null {
-  const m = text.trim().match(/^(?:about\s+)?([-−–]?)\s*([\d.,]+)\s*([a-zA-Z %²^.°/]*2?)$/i);
+  const grouped = text.trim().replace(/(\d)[ \u00a0\u2009\u202f](?=\d{3}(?!\d))/g, '$1');
+  const m = grouped.match(/^(?:about\s+)?([-−–]?)\s*([\d.,]+)\s*([a-zA-Z %²³^.°/μµ]*[23]?)$/i);
   const value = m && parseDecimal(m[2]);
   if (!m || !value) return null;
   return { value: m[1] && value.digits !== '0' ? { ...value, neg: true } : value, unit: m[3].trim().toLowerCase() };
@@ -222,6 +226,25 @@ const UNIT_WORDS: Record<string, string[]> = {
   // The last word is the one feedback uses.
   'cm²': ['cm²', 'cm2', 'cm^2', 'sq cm', 'sq. cm', 'cm sq', 'square cm', 'square centimetre', 'square centimetres'],
   'm²': ['m²', 'm2', 'm^2', 'sq m', 'sq. m', 'm sq', 'square m', 'square metre', 'square metres'],
+  'mm²': ['mm²', 'mm2', 'mm^2', 'sq mm', 'square mm', 'square millimetre', 'square millimetres'],
+  'cm³': ['cm³', 'cm3', 'cm^3', 'cc', 'cubic cm', 'cubic centimetre', 'cubic centimetres'],
+  'm³': ['m³', 'm3', 'm^3', 'cubic m', 'cubic metre', 'cubic metres'],
+  // Physics units, by symbol. Prefixed ones are matched without case, so a quiz never asks for both mW and MW.
+  A: ['a', 'amp', 'amps', 'ampere', 'amperes'],
+  mA: ['ma', 'milliamp', 'milliamps', 'milliampere', 'milliamperes'],
+  V: ['v', 'volt', 'volts'],
+  mV: ['mv', 'millivolt', 'millivolts'],
+  W: ['w', 'watt', 'watts'],
+  kW: ['kw', 'kilowatt', 'kilowatts'],
+  MW: ['mw', 'megawatt', 'megawatts'],
+  J: ['j', 'joule', 'joules'],
+  kJ: ['kj', 'kilojoule', 'kilojoules'],
+  MJ: ['mj', 'megajoule', 'megajoules'],
+  Hz: ['hz', 'hertz'],
+  kHz: ['khz', 'kilohertz'],
+  MHz: ['mhz', 'megahertz'],
+  mg: ['mg', 'milligram', 'milligrams'],
+  'km/h': ['km/h', 'kmh', 'kph', 'km per hour', 'kilometres per hour'],
 };
 
 /** Is the typed number right? Empty feedback means yes. */

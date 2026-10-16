@@ -24,6 +24,7 @@ import { basicGeometryVerifier } from './quiz/basic-geometry';
 import { binaryVerifier } from './quiz/binary';
 import { calculusVerifier } from './quiz/calculus';
 import { diffeqVerifier } from './quiz/diffeq';
+import { unitsVerifier } from './quiz/units';
 import { decimalsPercentagesVerifier } from './quiz/decimals-percentages';
 import { exponentsRootsVerifier } from './quiz/exponents-roots';
 import { fractionOpsVerifier } from './quiz/fraction-ops';
@@ -62,6 +63,7 @@ const VERIFIERS: Record<string, Verifier> = {
   matrices: matricesVerifier,
   calculus: calculusVerifier,
   diffeq: diffeqVerifier,
+  units: unitsVerifier,
 };
 
 export function runQuizChecks(lessons?: string[]): Finding[] {
